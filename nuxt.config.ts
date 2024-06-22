@@ -2,7 +2,12 @@
 export default defineNuxtConfig({
   css: ['@/assets/css/tailwind.css'],
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/strapi", '@vee-validate/nuxt'],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/strapi",
+    '@vee-validate/nuxt',
+    "@nuxt/image"
+  ],
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
     prefix: '/api',

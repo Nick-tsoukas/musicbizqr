@@ -13,4 +13,9 @@
  - [] deploy 
 
 
-
+ colors 
+Primary Color (Neon Green): #39FF14
+Secondary Color (Neon Purple): #9100FF
+Accent Color: #FF00FF (Magenta)
+Complementary Color 1: #00FFFF (Cyan)
+Complementary Color 2: #FFD700 (Gold)
