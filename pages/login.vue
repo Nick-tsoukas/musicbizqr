@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h2>login</h2>
+    login page
   </div>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
 
 </script>
 
