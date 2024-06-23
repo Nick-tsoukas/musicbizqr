@@ -105,12 +105,11 @@ const saveQrCode = async () => {
     const blob = await qrCodeStyling.getRawData('image/png')
     const file  = new File([blob], 'qrcode.png')
     const formData = new FormData();
-    const form = { url: options.data}
+    const form = { url: options.data,  users_permissions_user: user.value.id, }
     formData.append('files.q_image', file, 'qrcode.png');
-    formData.append('users_permissions_user', user.value.id); // Add the user relation
     formData.append('data', JSON.stringify(form))
 
-
+    consolelog(form)
     const { data } = await client(`/qrs`, {
       method: 'POST',
       body: formData
