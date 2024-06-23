@@ -1,6 +1,6 @@
 <template>
   <div class="flex  w-screen h-[80px] ">
-    <div class="w-full px-4 flex flex-grow items-center">MusicBizQR</div>
+    <div class="w-full px-4 flex flex-grow font-bold text-2xl items-center">MusicBizQR</div>
     <div class="w-full px-4 flex flex-grow  items-center justify-end">
       <div class="hidden md:flex">
         <NuxtLink to="/" class="hover:text-gray-400">Home</NuxtLink>

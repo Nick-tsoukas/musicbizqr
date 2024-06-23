@@ -1,8 +1,7 @@
 
 <script  setup>
 const route = useRoute()
-const type = route.query.type 
-console.log(route.query)
+const type = route.query.type
 </script>
 
 <template>
@@ -11,7 +10,7 @@ console.log(route.query)
     <!-- create params for qr code component type to hide of show the external link url -->
     <ClientOnly>
       <h1>{{ type }}</h1>
-      <QrCode type="type"/>
+      <QrCode :type="type"/>
     </ClientOnly>
   </div>
 </template>

@@ -1,13 +1,61 @@
-<template>
-  <div>
-    login page
-  </div>
-</template>
+<script setup >
+const { register, login } = useStrapiAuth()
+const router = useRouter()
+const route = useRoute()
 
-<script  setup>
+const { values, defineField } = useForm();
+const [email, emailAttrs] = defineField('email')
+const [password, passwordAttrs] = defineField('password')
+
+console.log(route.path)
+
+const signUp = async () => {
+  try {
+
+    await register({ username: values.email, email: values.email, password: values.password})
+    router.push('/dashboard')
+  } catch (e) {
+    console.log('there was an error')
+  }
+}
+const loginUser = async () => {
+  try {
+    await login({identifier: 'someg@gmail.com', password: 'jkjkjkjkjkjkjkjfdfd'})
+    router.push('/dashboard')
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 </script>
 
-<style>
-
-</style>
+<template>
+  
+   <div class="flex justify-center items-center w-screen h-screen" >
+    <div class="flex flex-col w-[80vw]  rounded shadow-md p-8 border border-neon-purpule">
+      <div>
+        <div>
+          <h2 class="text-xl mb-6">Sign up</h2>
+        </div>
+        <div class="mb-4">
+          <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+          <input v-model="email" v-bind="emailAttrs" id="email" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your email" />
+        </div>
+        <div class="mb-8">
+          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+          <input v-model="password" v-bind="passwordAttrs" id="password" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Create a password" />
+        </div>
+        <div >
+          <button @click="loginUser" class="btn w-full mb-4">
+            Login
+          </button>
+          <p class="text-right">Need an account? <NuxtLink to="signup" class="text-underline text-blue-800 ">SIGN UP</NuxtLink></p>
+        </div>
+      </div>
+    </div>
+      
+    
+   </div>
+  
+  
+</template>

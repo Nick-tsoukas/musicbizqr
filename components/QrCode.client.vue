@@ -2,9 +2,9 @@
   <div class="flex flex-col items-center p-4">
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
     <div class="mt-4 flex flex-col space-y-2">
-      <label v-if="type === 'externalUrl'" class="flex items-center">
+      <label v-if="type === 'externalURL'" class="flex items-center">
         <span class="mr-2">Data URL:</span>
-        <input v-model="options.data" type="text" class="border rounded p-2" placeholder="Enter URL" />
+        <input v-model="externalURL" type="text" class="border rounded p-2" placeholder="Enter URL" />
       </label>
       <label class="flex items-center">
         <span class="mr-2">Dot Color:</span>
@@ -37,12 +37,21 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
-const { create, user } = useStrapi()
-const client = useStrapiClient()
+import { v4 as uuidv4 } from 'uuid';
+const { create } = useStrapi()
+const user = useStrapiUser()
+const router = useRouter()
+
+const client =  useStrapiClient()
+const uuid = uuidv4();
+const url = `https://localhost:3000/directqr?id=${uuid}`;
+
+console.log('user', user.value.id)
+
 
 import QRCodeStyling from 'qr-code-styling'
 
-defineProps({
+const props = defineProps({
   type: String,
 })
 
@@ -50,7 +59,7 @@ const qrcode = ref(null)
 const options = reactive({
   width: 300,
   height: 300,
-  data: 'https://nuxtjs.org',
+  data: `https://localhost:3000/directqr?id=${uuid}`,
   dotsOptions: {
     color: '#4267b2',
     type: 'rounded'
@@ -89,14 +98,16 @@ onMounted(() => {
 })
 
 const saveQrCode = async () => {
+  // need to add a unique qr id to the url 
   try {
+   console.log(user)
+
     const blob = await qrCodeStyling.getRawData('image/png')
     const file  = new File([blob], 'qrcode.png')
-    console.log('blob' , blob)
-    console.log(file)
     const formData = new FormData();
-    const form = { url: 'someurl'}
+    const form = { url: options.data}
     formData.append('files.q_image', file, 'qrcode.png');
+    formData.append('users_permissions_user', user.value.id); // Add the user relation
     formData.append('data', JSON.stringify(form))
 
 
@@ -104,8 +115,9 @@ const saveQrCode = async () => {
       method: 'POST',
       body: formData
     })
-    router.push('/dashboard')
     console.log(data)
+    // router.push('/dashboard')
+
 
 
   } catch (error) {
