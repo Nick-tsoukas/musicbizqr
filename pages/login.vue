@@ -20,7 +20,7 @@ const signUp = async () => {
 }
 const loginUser = async () => {
   try {
-    await login({identifier: 'someg@gmail.com', password: 'jkjkjkjkjkjkjkjfdfd'})
+    await login({identifier: 'someg@gmail.com', password: 'password101'})
     router.push('/dashboard')
   } catch (error) {
     console.log(error)

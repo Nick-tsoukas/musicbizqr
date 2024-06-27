@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col items-center p-4">
+    
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
     <div class="mt-4 flex flex-col space-y-2">
       <label v-if="type === 'externalURL'" class="flex items-center">
@@ -28,6 +29,7 @@
       <button @click="saveQrCode" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
         Sace QR Code
       </button>
+      <button @click="textAPi" class="btn">Test api</button>
       <!-- <button @click="downloadQRCode" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
         Download QR Code
       </button> -->
@@ -38,7 +40,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
-const { create } = useStrapi()
+const { create, findOne, update } = useStrapi()
 const user = useStrapiUser()
 const router = useRouter()
 
@@ -46,7 +48,6 @@ const client =  useStrapiClient()
 const uuid = uuidv4();
 const url = `https://localhost:3000/directqr?id=${uuid}`;
 
-console.log('user', user.value.id)
 
 
 import QRCodeStyling from 'qr-code-styling'
@@ -56,6 +57,9 @@ const props = defineProps({
 })
 
 const qrcode = ref(null)
+
+
+
 const options = reactive({
   width: 300,
   height: 300,
@@ -97,24 +101,52 @@ onMounted(() => {
   initializeQrCode()
 })
 
+
+const textAPi = async () => {
+try {
+  const updateUserRelation = await update('users', 20, { qrs : [101, 102]})
+  console.log(updateUserRelation)
+} catch (error) {
+  console.log(error)
+}
+  // try {
+  //   const qr = await findOne('qrs', 90);
+  //   console.log(qr)
+  //   return qr;
+  //   console.log(qr)
+  // } catch (error) {
+  //   console.error('Error fetching QR code:', error);
+  //   throw error;
+  // }
+
+}
+
 const saveQrCode = async () => {
   // need to add a unique qr id to the url 
+  console.log(user.value)
   try {
-   console.log(user)
+      const form = {
+        url: options.data,
+        users_permissions_user: { id: user.value.id }
+      }
+
 
     const blob = await qrCodeStyling.getRawData('image/png')
     const file  = new File([blob], 'qrcode.png')
     const formData = new FormData();
-    const form = { url: options.data,  users_permissions_user: user.value.id, }
     formData.append('files.q_image', file, 'qrcode.png');
     formData.append('data', JSON.stringify(form))
 
-    consolelog(form)
     const { data } = await client(`/qrs`, {
       method: 'POST',
       body: formData
-    })
-    console.log(data)
+    }) 
+
+    // const updateUserRelation = await update('users', 20, {username: 'testname'})
+   
+    console.log(updateUserRelation , 'check update' , data.id)
+  
+// write a function that will update the user to include the relationship of the qr
     // router.push('/dashboard')
 
 
