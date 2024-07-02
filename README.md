@@ -1,17 +1,14 @@
-# Danny needs a dynamic qr code
+# task list next 
 
- - [] create a function that runs on page load that 
-    checks the parameters of the url, fetches data (qr meta data), and reroutes
- 
-        - [] create page that all qr are initially routed to to make check 
-            - [] name that page getqr/id(params) 
-            - [] create fetchQr funtion 
-                - [] use params to get qr data 
-                - [] reroute page 
+- [] build out the UI for the dash board page 
+    - [] get ideas using imaignary discord ai image generation 
+    - [] use it or schetch it out quickly 
 
- - [] create a coming soon page 
- - [] deploy 
-
+### dashboard page note=s 
+ - [] tablular data 
+    - use a lib or not?
+    - define headers 
+       - name, scans( defalut to 0 ), iamge ,link, function ( edit, delete )
 
  colors 
 Primary Color (Neon Green): #39FF14

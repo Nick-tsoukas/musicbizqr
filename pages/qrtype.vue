@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <div class="max-w-4xl mx-auto p-4">
@@ -26,9 +27,9 @@
             <NuxtLink :to="{ path: '/createqr', query: { type: 'bandProfile' } }" class="btn text-center">
              Create Band Profile
             </NuxtLink>
-            <Button class="btn">
+            <button class="btn">
               Preview
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -48,9 +49,9 @@
             <NuxtLink :to="{ path: '/createqr', query: { type: 'events' } }" class="btn text-center">
              Create Events Page
             </NuxtLink>
-            <Button class="btn">
+            <button class="btn">
               Preview
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -69,9 +70,9 @@
             <NuxtLink :to="{ path: '/createqr', query: { type: 'tipJar' } }" class="btn text-center">
              Tip Jar Page
             </NuxtLink>
-            <Button class="btn">
+            <button class="btn">
               Preview
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -91,9 +92,9 @@
             <NuxtLink :to="{ path: '/createqr', query: { type: 'audioPlayer' } }" class="btn text-center">
              Create Audio Page
             </NuxtLink>
-            <Button class="btn">
+            <button class="btn">
               Preview
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -115,10 +116,3 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-
-</script>
-
-<style>
-
-</style>
