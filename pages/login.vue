@@ -35,7 +35,7 @@ const loginUser = async () => {
     <div class="flex flex-col w-[80vw]  rounded shadow-md p-8 border border-neon-purpule">
       <div>
         <div>
-          <h2 class="text-xl mb-6">Sign up</h2>
+          <h2 class="text-xl mb-6">Login In</h2>
         </div>
         <div class="mb-4">
           <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>

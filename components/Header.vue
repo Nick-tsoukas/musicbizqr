@@ -1,15 +1,14 @@
 <template>
-  <div class="flex  w-screen h-[80px] ">
-    <div class="w-full px-4 flex flex-grow font-bold text-2xl items-center">MusicBizQR</div>
-    <div class="w-full px-4 flex flex-grow  items-center justify-end">
-      <div class="hidden md:flex">
-        <NuxtLink to="/" class="hover:text-gray-400">Home</NuxtLink>
-        <NuxtLink to="/signup" class="hover:text-gray-400">Signup</NuxtLink>
-        <NuxtLink to="/login" class="hover:text-gray-400">Login</NuxtLink>
-        <NuxtLink to="/contact" class="hover:text-gray-400">Contact</NuxtLink>
-      </div>
-      <div class="md:hidden">
-      <button @click="toggleMenu" class="focus:outline-none">
+  <header class="bg-purple-600 text-white shadow-lg">
+    <div class="container mx-auto flex items-center justify-between px-4 py-4">
+      <div class="text-xl font-bold">MusicBizQR</div>
+      <nav class="hidden md:flex space-x-4">
+        <NuxtLink to="/" class="nav-link">Home</NuxtLink>
+        <NuxtLink to="/signup" class="nav-link">Signup</NuxtLink>
+        <NuxtLink to="/login" class="nav-link">Login</NuxtLink>
+        <NuxtLink to="/contact" class="nav-link">Contact</NuxtLink>
+      </nav>
+      <button @click="toggleMenu" class="md:hidden focus:outline-none">
         <svg
           class="w-6 h-6 transition-transform transform"
           :class="{ 'rotate-45': isMenuOpen, 'rotate-0': !isMenuOpen }"
@@ -36,26 +35,20 @@
       </button>
     </div>
     <nav
-      class="hidden md:flex space-x-4"
-    >
-      <NuxtLink to="/" class="hover:text-gray-400">Home</NuxtLink>
-      <NuxtLink to="/signup" class="hover:text-gray-400">Signup</NuxtLink>
-      <NuxtLink to="/login" class="hover:text-gray-400">Login</NuxtLink>
-      <NuxtLink to="/contact" class="hover:text-gray-400">Contact</NuxtLink>
-    </nav>
-    <div
-      class="fixed top-[80px]  h-[calc(100vh - 80px)] inset-0 bg-white  flex flex-col items-center justify-center transition-transform transform md:hidden"
+      class="fixed top-20 left-0 w-full bg-white text-purple-600 transform transition-transform md:hidden"
       :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
     >
-      <NuxtLink to="/" @click="toggleMenu" class="hover:text-gray-400 text-2xl py-2">Home</NuxtLink>
-      <NuxtLink to="/signup" @click="toggleMenu" class="hover:text-gray-400 text-2xl py-2">Signup</NuxtLink>
-      <NuxtLink to="/login" @click="toggleMenu" class="hover:text-gray-400 text-2xl py-2">Login</NuxtLink>
-      <NuxtLink to="/contact" @click="toggleMenu" class="hover:text-gray-400 text-2xl py-2">Contact</NuxtLink>
-    </div>
-    </div>
-   
-  </div>
+      <div class="flex flex-col items-center space-y-4 py-4">
+        <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Home</NuxtLink>
+        <NuxtLink to="/signup" @click="toggleMenu" class="mobile-nav-link">Signup</NuxtLink>
+        <NuxtLink to="/login" @click="toggleMenu" class="mobile-nav-link">Login</NuxtLink>
+        <NuxtLink to="/contact" @click="toggleMenu" class="mobile-nav-link">Contact</NuxtLink>
+      </div>
+    </nav>
+  </header>
 </template>
+
+
 
 <script  setup>
   const isMenuOpen = ref(false);
@@ -65,7 +58,21 @@
     isMenuOpen.value = !isMenuOpen.value;
   }
 </script>
+<style scoped>
+.nav-link {
+  @apply text-white hover:bg-purple-700 rounded px-4 py-2 transition-colors;
+}
 
-<style>
+.mobile-nav-link {
+  @apply text-purple-600 text-xl hover:bg-purple-100 rounded px-4 py-2 transition-colors;
+}
 
+.translate-x-0 {
+  transform: translateX(0);
+}
+
+.translate-x-full {
+  transform: translateX(100%);
+}
 </style>
+

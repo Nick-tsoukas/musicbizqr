@@ -1,40 +1,26 @@
 <template>
   <div class="flex flex-col items-center p-4">
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
-    <div class="mt-4 flex flex-col space-y-2">
-      <label v-if="type === 'externalURL'" class="flex items-center">
-        <span class="mr-2">Data URL:</span>
-        <input v-model="externalURL" type="text" class="border rounded p-2" placeholder="Enter URL" />
+    <div class="mt-4 flex flex-col space-y-4 w-full max-w-md">
+      <label  class="flex flex-col">
+        <span class="mb-1 text-gray-700">Name of QR:</span>
+        <input v-model="name" type="text" class="input-field" placeholder="Enter URL" />
       </label>
-      <div>
-    </div>
-      <label class="flex items-center">
-        <span class="mr-2">Dot Color:</span>
-        <input type="color" id="color" v-model="options.dotsOptions.color" />
+      <label v-if="type === 'externalURL'" class="flex flex-col">
+        <span class="mb-1 text-gray-700">Data URL:</span>
+        <input v-model="link" type="text" class="input-field" placeholder="Enter URL" />
       </label>
-      <!-- <label class="flex items-center">
-        <span class="mr-2">Dot Gradient Start:</span>
-        <input v-model="options.dotsOptions.gradient.colorStops[0].color" type="color" class="border rounded p-2" />
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Background Color:</span>
+        <input v-model="options.backgroundOptions.color" type="color" class="input-field-color" />
       </label>
-      <label class="flex items-center">
-        <span class="mr-2">Dot Gradient End:</span>
-        <input v-model="options.dotsOptions.gradient.colorStops[1].color" type="color" class="border rounded p-2" />
-      </label> -->
-      <label class="flex items-center">
-        <span class="mr-2">Background Color:</span>
-        <input v-model="options.backgroundOptions.color" type="color"  />
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Dot Color:</span>
+        <input type="color" id="color" v-model="options.dotsOptions.color" class="input-field-color" />
       </label>
-      <!-- <label class="flex items-center">
-        <span class="mr-2">Background Gradient Start:</span>
-        <input v-model="options.backgroundOptions.gradient.colorStops[0].color" type="color" class="border rounded p-2" />
-      </label>
-      <label class="flex items-center">
-        <span class="mr-2">Background Gradient End:</span>
-        <input v-model="options.backgroundOptions.gradient.colorStops[1].color" type="color" class="border rounded p-2" />
-      </label> -->
-      <label class="flex items-center">
-        <span class="mr-2">Dot Type:</span>
-        <select v-model="options.dotsOptions.type" >
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Dot Type:</span>
+        <select v-model="options.dotsOptions.type" class="input-field">
           <option value="rounded">Rounded</option>
           <option value="dots">Dots</option>
           <option value="classy">Classy</option>
@@ -43,49 +29,35 @@
           <option value="extra-rounded">Extra Rounded</option>
         </select>
       </label>
-      <label class="flex items-center">
-        <span class="mr-2">Corner Square Color:</span>
-        <input v-model="options.cornersSquareOptions.color" type="color"  />
-     
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Corner Square Color:</span>
+        <input v-model="options.cornersSquareOptions.color" type="color" class="input-field-color" />
       </label>
-      <!-- <label class="flex items-center">
-        <span class="mr-2">Corner Square Gradient Start:</span>
-        <input v-model="options.cornersSquareOptions.gradient.colorStops[0].color" type="color" class="border rounded p-2" />
-      </label>
-      <label class="flex items-center">
-        <span class="mr-2">Corner Square Gradient End:</span>
-        <input v-model="options.cornersSquareOptions.gradient.colorStops[1].color" type="color" class="border rounded p-2" />
-      </label> -->
-      <label class="flex items-center">
-        <span class="mr-2">Corner Square Type:</span>
-        <select v-model="options.cornersSquareOptions.type" >
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Corner Square Type:</span>
+        <select v-model="options.cornersSquareOptions.type" class="input-field">
           <option value="dot">Dot</option>
           <option value="square">Square</option>
           <option value="extra-rounded">Extra Rounded</option>
         </select>
       </label>
-      <label class="flex items-center">
-        <span class="mr-2">Corner Dot Color:</span>
-        <input v-model="options.cornersDotOptions.color" type="color"  />
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Corner Dot Color:</span>
+        <input v-model="options.cornersDotOptions.color" type="color" class="input-field-color" />
       </label>
-      <!-- <label class="flex items-center">
-        <span class="mr-2">Corner Dot Gradient Start:</span>
-        <input v-model="options.cornersDotOptions.gradient.colorStops[0].color" type="color" class="border rounded p-2" />
+      <label class="flex flex-col">
+        <span class="mb-1 text-gray-700">Upload Logo:</span>
+        <input type="file" @change="handleImageUpload" class="input-field" />
       </label>
-      <label class="flex items-center">
-        <span class="mr-2">Corner Dot Gradient End:</span>
-        <input v-model="options.cornersDotOptions.gradient.colorStops[1].color" type="color" class="border rounded p-2" />
-      </label> -->
-      <button @click="saveQrCode" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+      <button @click="saveQrCode" class="btn-primary mt-4">
         Save QR Code
       </button>
-      <button @click="textAPi" class="btn">Test api</button>
-      <!-- <button @click="downloadQRCode" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-        Download QR Code
-      </button> -->
+
     </div>
   </div>
 </template>
+
+
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
@@ -106,11 +78,10 @@ const uuid = uuidv4();
 const url = `https://localhost:3000/directqr?id=${uuid}`;
 
 const qrcode = ref(null)
-
+const link = ref(null)
 const color = ref('#ffffff')
-const form = reactive ({
-  color: '#fdfdfff'
-})
+const name = ref('name')
+
 const options = reactive({
   width: 300,
   height: 300,
@@ -121,7 +92,6 @@ const options = reactive({
   },
   backgroundOptions: {
     color: '#ffffff',
-
   },
   imageOptions: {
     crossOrigin: 'anonymous',
@@ -136,26 +106,26 @@ const options = reactive({
   }
 })
 
-const  gradient = {
-      type: 'linear',
-      rotation: 0,
-      colorStops: [
-        { offset: 0, color: '#000000' },
-        { offset: 1, color: '#ffffff' }
-      ]
-    }
+const gradient = {
+  type: 'linear',
+  rotation: 0,
+  colorStops: [
+    { offset: 0, color: '#000000' },
+    { offset: 1, color: '#ffffff' }
+  ]
+}
 
 let qrCodeStyling
 
 const initializeQrCode = async () => {
- try {
-  qrCodeStyling = await new QRCodeStyling({ ...options })
-  if (qrcode.value) {
-    qrCodeStyling.append(qrcode.value)
+  try {
+    qrCodeStyling = await new QRCodeStyling({ ...options })
+    if (qrcode.value) {
+      qrCodeStyling.append(qrcode.value)
+    }
+  } catch (error) {
+    console.log(error)
   }
- } catch (error) {
-  console.log(error)
- }
 }
 
 const updateQrCode = () => {
@@ -163,6 +133,18 @@ const updateQrCode = () => {
     qrCodeStyling.update(options)
   }
 }
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      options.image = e.target.result;
+      updateQrCode();
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
 onMounted(() => {
   initializeQrCode()
@@ -173,7 +155,10 @@ const saveQrCode = async () => {
     const form = {
       url: options.data,
       users_permissions_user: { id: user.value.id },
-      q_type : route.query.type
+      q_type : route.query.type,
+      link: link.value,
+      name: name.value,
+      scanTime: [{date: 'some date one '}, {date: 'some date two'}]
     }
 
     const blob = await qrCodeStyling.getRawData('image/png')
@@ -187,18 +172,70 @@ const saveQrCode = async () => {
       body: formData
     })
 
-    console.log(data, 'this is data function')
-    // router.push('/dashboard')
-
+    console.log(props.type , 'test target', )
+    if(props.type === 'externalURL') {
+      router.push('/dashboard')
+    }
   } catch (error) {
     console.error(error);
   }
 };
 
 watch(() => options, updateQrCode, { deep: true })
-
 </script>
 
+
 <style scoped>
-/* Add any custom styles here if needed */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.input-field-color {
+  width: 100%;
+  height: 40px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #6200ea;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #3700b3;
+}
+
+label span {
+  font-weight: 500;
+  color: #333;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
 </style>
+
+
