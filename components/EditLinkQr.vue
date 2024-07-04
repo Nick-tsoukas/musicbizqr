@@ -1,9 +1,8 @@
 <template>
   <div class="container-mdc">
-    <h1 class="title">Edit {{props.name}}</h1>
-    <div>
-        <p><span class="font-semibold">Type</span> {{ props.q_type }}</p>
-    </div>
+    <p class="title">Edit </p>
+    <p class="font-semibold text-lg">{{props.name}}</p>
+
     <div class="mb-6">
         <img :src="props.q_image" alt="">
     </div>
@@ -42,6 +41,17 @@
           @click="clearInput"
         />
       </div>
+      <div class="mdc-text-field mdc-text-field--filled mb-4">
+        <select v-model="formData.q_type" class="mdc-text-field__input">
+          <option value="" disabled>Select QR Code Type</option>
+          <option value="externalURL">External URL</option>
+          <option value="Band Page">Band Page</option>
+        </select>
+        <label for="q_type" class="mdc-floating-label">QR Code Type</label>
+        <span class="mdc-line-ripple"></span>
+        {{ props.q_type }}
+      </div>
+      
       <button type="submit" class="mdc-button mdc-button--raised">Update Link</button>
     </form>
 
@@ -51,6 +61,7 @@
 <script setup>
 
 const { update } = useStrapi()
+const router = useRouter()
 // Initialize form data with the provided props
 const props = defineProps({
   name: {
@@ -84,7 +95,8 @@ const props = defineProps({
 
 const formData = ref({
   link: props.link,
-  name: props.name
+  name: props.name,
+  q_type: props.q_type
 })
 
 // Function to handle form submission
@@ -92,8 +104,10 @@ const updateLink = async () => {
   try {
     const data = await update('qrs', props.qrId, {
       link: formData.value.link,
-      name: formData.value.name
+      name: formData.value.name,
+      q_type: formData.value.q_type
     })
+    router.push('/dashboard')
     console.log(data)
   } catch (error) {
     console.log('There was an error:', error)
