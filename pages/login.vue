@@ -30,32 +30,31 @@ const loginUser = async () => {
 </script>
 
 <template>
-  
-   <div class="flex justify-center items-center w-screen h-screen" >
-    <div class="flex flex-col w-[80vw]  rounded shadow-md p-8 border border-neon-purpule">
+  <div class="flex justify-center items-center w-screen h-screen">
+    <div class="container-mdc">
       <div>
         <div>
           <h2 class="text-xl mb-6">Login In</h2>
         </div>
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-          <input v-model="email" v-bind="emailAttrs" id="email" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your email" />
+        <div class="mdc-text-field mdc-text-field--filled mb-4">
+          <input id="email" v-model="email" v-bind="emailAttrs" type="text" class="mdc-text-field__input" placeholder="Enter your email" />
+          <label for="email" class="mdc-floating-label">Email</label>
+          <span class="mdc-line-ripple"></span>
+          <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearForm" />
         </div>
-        <div class="mb-8">
-          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-          <input v-model="password" v-bind="passwordAttrs" id="password" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Create a password" />
+        <div class="mdc-text-field mdc-text-field--filled mb-8">
+          <input id="password" v-model="password" v-bind="passwordAttrs" type="text" class="mdc-text-field__input" placeholder="Create a password" />
+          <label for="password" class="mdc-floating-label">Password</label>
+          <span class="mdc-line-ripple"></span>
+          <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearForm" />
         </div>
-        <div >
-          <button @click="loginUser" class="btn w-full mb-4">
+        <div>
+          <button @click="loginUser" class="mdc-button mdc-button--raised w-full mb-4">
             Login
           </button>
-          <p class="text-right">Need an account? <NuxtLink to="signup" class="text-underline text-blue-800 ">SIGN UP</NuxtLink></p>
+          <p class="text-right">Need an account? <NuxtLink to="/signup" class="text-underline text-blue-800">SIGN UP</NuxtLink></p>
         </div>
       </div>
     </div>
-      
-    
-   </div>
-  
-  
+  </div>
 </template>

@@ -1,11 +1,13 @@
 <template>
-  <div class="container">
+  <div class="container-mdc">
     <h1 class="title">Edit QR Code Link</h1>
     <form @submit.prevent="updateLink">
       <div class="mdc-text-field mdc-text-field--filled">
         <input id="link" v-model="formData.link" type="text" class="mdc-text-field__input" />
-        <label for="link" class="mdc-floating-label">Link</label>
+        <label for="link" class="mdc-floating-label">Link some longer name </label>
         <span class="mdc-line-ripple"></span>
+        <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearInput" />
+
       </div>
       <button type="submit" class="mdc-button mdc-button--raised">Update Link</button>
     </form>
@@ -53,11 +55,14 @@ const updateLink = () => {
   // Perform the update logic here, such as making an API call to update the QR code link
   console.log('Updated Link:', formData.value.link)
 }
+const clearInput = () => {
+  formData.value.link = ''
+}
 </script>
 
 <style scoped>
 /* Basic Container Styling */
-.container {
+.container-mdc {
   max-width: 500px;
   margin: 2rem auto;
   padding: 2rem;
@@ -152,6 +157,15 @@ const updateLink = () => {
 
 .mdc-button:focus {
   outline: none;
+}
+.cancel-icon {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
 }
 </style>
 
