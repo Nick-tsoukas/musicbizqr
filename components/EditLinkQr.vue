@@ -1,22 +1,56 @@
 <template>
   <div class="container-mdc">
-    <h1 class="title">Edit QR Code Link</h1>
+    <h1 class="title">Edit {{props.name}}</h1>
+    <div>
+        <p><span class="font-semibold">Type</span> {{ props.q_type }}</p>
+    </div>
+    <div class="mb-6">
+        <img :src="props.q_image" alt="">
+    </div>
     <form @submit.prevent="updateLink">
       <div class="mdc-text-field mdc-text-field--filled">
-        <input id="link" v-model="formData.link" type="text" class="mdc-text-field__input" />
-        <label for="link" class="mdc-floating-label">Link some longer name </label>
+        <input
+          id="link"
+          v-model="formData.name"
+          type="text"
+          class="mdc-text-field__input"
+          placeholder="name"
+        />
+        <label for="link" class="mdc-floating-label">Name</label>
         <span class="mdc-line-ripple"></span>
-        <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearInput" />
-
+        <img
+          src="@/assets/cancel-icon.svg"
+          alt="Cancel Icon"
+          class="cancel-icon"
+          @click="clearInputName"
+        />
+      </div>
+      <div class="mdc-text-field mdc-text-field--filled">
+        <input
+          id="link"
+          v-model="formData.link"
+          type="text"
+          class="mdc-text-field__input"
+          placeholder="Link"
+        />
+        <label for="link" class="mdc-floating-label">Link</label>
+        <span class="mdc-line-ripple"></span>
+        <img
+          src="@/assets/cancel-icon.svg"
+          alt="Cancel Icon"
+          class="cancel-icon"
+          @click="clearInput"
+        />
       </div>
       <button type="submit" class="mdc-button mdc-button--raised">Update Link</button>
     </form>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 
+const { update } = useStrapi()
 // Initialize form data with the provided props
 const props = defineProps({
   name: {
@@ -35,29 +69,51 @@ const props = defineProps({
     default: 'https://via.placeholder.com/300'
   },
   q_type: {
-  type: String
+    type: String
   },
   link: {
     type: String,
     default: null
   },
-  qrId : {
+  qrId: {
     type: Number
   }
 })
 
+
+
 const formData = ref({
-  link: props.link
+  link: props.link,
+  name: props.name
 })
 
 // Function to handle form submission
-const updateLink = () => {
-  // Perform the update logic here, such as making an API call to update the QR code link
-  console.log('Updated Link:', formData.value.link)
+const updateLink = async () => {
+  try {
+    const data = await update('qrs', props.qrId, {
+      link: formData.value.link,
+      name: formData.value.name
+    })
+    console.log(data)
+  } catch (error) {
+    console.log('There was an error:', error)
+  }
 }
+
 const clearInput = () => {
   formData.value.link = ''
 }
+const clearInputName = () => {
+  formData.value.name = ''
+}
+
+watch(() => props.link, (newLink) => {
+  formData.value.link = newLink
+})
+
+watch(() => props.name, (newName) => {
+  formData.value.name = newName
+})
 </script>
 
 <style scoped>
@@ -102,8 +158,8 @@ const clearInput = () => {
   z-index: 99999;
   top: 0.75rem;
   left: 0.5rem;
-  padding-left: .2em;
-  padding-right: .2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
   font-size: 1rem;
   background: white;
   line-height: 1;
@@ -158,6 +214,7 @@ const clearInput = () => {
 .mdc-button:focus {
   outline: none;
 }
+
 .cancel-icon {
   position: absolute;
   top: 50%;
@@ -168,5 +225,3 @@ const clearInput = () => {
   cursor: pointer;
 }
 </style>
-
-
