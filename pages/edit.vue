@@ -29,13 +29,14 @@ const currentComponent = computed(() => editComponentRender[route.query.type])
 const setProps = async () => {
   const response = await findOne('qrs', route.query.id, {populate: '*'})
   const data = response.data.attributes;
+  console.log(response.data.id)
   const propsObject = await {
     name: data.name,
     url: data.url,
     q_type: data.q_type,
     q_image : data.q_image.data.attributes.url,
     link: data.link,
-    id: response.data.id
+    qrId: route.query.id
     
 
   }
