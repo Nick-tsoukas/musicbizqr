@@ -16,6 +16,12 @@ export default defineNuxtConfig({
     cookie: {},
     cookieName: 'strapi_jwt'
   },
+  publicRuntimeConfig: {
+    strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
+  },
+  privateRuntimeConfig: {
+    strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
+  },
   plugins: [
     '~/plugins/chart.js'
   ]

@@ -6,12 +6,12 @@
       <p class="text-gray-700 text-base "><span  class="font-bold">Type:</span> {{ q_type }} </p>
       <p class="text-gray-700 mb-2 text-base "><span  class="font-bold">Scans:</span> 0 </p>
       <p class="text-gray-700 text-base">{{ typeDescriptions[q_type] }} </p>
-      <p>{{ link }}</p>
+      <p>{{ link }} </p>
     </div>
     <div class="px-4 py-2 flex w-full justify-start space-x-2">
       <NuxtLink :to="q_image" class="bg-blue-500 text-white font-bold py-2 px-4 mr-auto rounded hover:bg-blue-700">Download QR</NuxtLink>
    
-      <img @click="navigateToEdit(qr)" src="@/assets/edit-icon.svg"   alt="Edit Icon" class="icon ml-auto" />
+      <img @click="navigateToEdit(q_type, qr.id)" src="@/assets/edit-icon.svg"   alt="Edit Icon" class="icon ml-auto" />
       <img   src="@/assets/delete-icon.svg" @click="handleDelete('qrs', qrId)" alt="Delete Icon" class="icon" />
     </div>
   </div>
@@ -57,11 +57,11 @@ const typeDescriptions = {
   externalURL : 'directs users to an external link such as a website, online portfolio, or multimedia content.'
 }
 
-const navigateToEdit = (item) => {
-  console.log(item)
+const navigateToEdit = (type, id) => {
+
   router.push({
     path: '/edit',
-    query: { item: item }
+    query: { type: type, id: id }
   })
 }
 

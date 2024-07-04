@@ -1,14 +1,51 @@
 <template>
   <div>
-    <pre>{{ route.query }}</pre>
+    
+    <component :is="currentComponent" v-bind="props"></component>
   </div>
 </template>
 
 <script setup>
+
+import EditLinkQr from '@/components/EditLinkQr.vue' // Adjust the path as necessary
+
+// Retrieve the route object
 const route = useRoute()
-console.log(route.query)
+const { findOne } = useStrapi()
+
+const props  = ref(null)
+
+// Define the map of component types to component names
+const editComponentRender = {
+  externalURL: EditLinkQr
+}
+
+
+
+
+
+const currentComponent = computed(() => editComponentRender[route.query.type])
+ 
+const setProps = async () => {
+  const response = await findOne('qrs', route.query.id, {populate: '*'})
+  const data = response.data.attributes;
+  const propsObject = await {
+    name: data.name,
+    url: data.url,
+    q_type: data.q_type,
+    q_image : data.q_image.data.attributes.url,
+    link: data.link,
+    id: response.data.id
+    
+
+  }
+  props.value = propsObject
+}
+
+setProps()
+
 </script>
 
-<style>
-
+<style scoped>
+/* Additional styles if needed */
 </style>
