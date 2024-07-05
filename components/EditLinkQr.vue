@@ -1,10 +1,8 @@
 <template>
   <div class="container-mdc">
-    <p class="title">Edit </p>
-    <p class="font-semibold text-lg">{{props.name}}</p>
-
+    <p class="title text-center">Edit QR Details </p>
     <div class="mb-6">
-        <img :src="props.q_image" alt="">
+        <img :src="props.q_image" class="mx-auto" alt="">
     </div>
     <form @submit.prevent="updateLink">
       <div class="mdc-text-field mdc-text-field--filled">
@@ -42,14 +40,13 @@
         />
       </div>
       <div class="mdc-text-field mdc-text-field--filled mb-4">
-        <select v-model="formData.q_type" class="mdc-text-field__input">
+        <select v-model="formData.q_type" placeholder="externalURL" class="mdc-text-field__input">
           <option value="" disabled>Select QR Code Type</option>
           <option value="externalURL">External URL</option>
           <option value="Band Page">Band Page</option>
         </select>
         <label for="q_type" class="mdc-floating-label">QR Code Type</label>
         <span class="mdc-line-ripple"></span>
-        {{ props.q_type }}
       </div>
       
       <button type="submit" class="mdc-button mdc-button--raised">Update Link</button>

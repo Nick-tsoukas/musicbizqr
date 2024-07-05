@@ -6,8 +6,14 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@nuxtjs/strapi",
     '@vee-validate/nuxt',
-    "@nuxt/image"
+    "@nuxt/image",
+    "nuxt-particles",
   ],
+  particles: {
+    mode: 'full',
+    lazy: true
+  },
+
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
     prefix: '/api',
@@ -15,12 +21,6 @@ export default defineNuxtConfig({
     version: 'v4',
     cookie: {},
     cookieName: 'strapi_jwt'
-  },
-  publicRuntimeConfig: {
-    strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
-  },
-  privateRuntimeConfig: {
-    strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
   },
   plugins: [
     '~/plugins/chart.js'

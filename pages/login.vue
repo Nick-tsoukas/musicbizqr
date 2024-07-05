@@ -34,7 +34,7 @@ const loginUser = async () => {
     <div class="container-mdc">
       <div>
         <div>
-          <h2 class="text-xl mb-6">Login In</h2>
+          <h2 class="text-xl mb-6">Login </h2>
         </div>
         <div class="mdc-text-field mdc-text-field--filled mb-4">
           <input id="email" v-model="email" v-bind="emailAttrs" type="text" class="mdc-text-field__input" placeholder="Enter your email" />

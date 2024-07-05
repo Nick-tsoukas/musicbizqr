@@ -1,11 +1,14 @@
 <template>
-  <header class="bg-purple-600 text-white shadow-lg">
+  <header class="bg-neon-purple text-white shadow-lg">
     <div class="container mx-auto flex items-center justify-between px-4 py-4">
       <div class="text-xl font-bold">MusicBizQR</div>
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
-        <NuxtLink to="/signup" class="nav-link">Signup</NuxtLink>
-        <NuxtLink to="/login" class="nav-link">Login</NuxtLink>
+        <NuxtLink v-if="user" to="/dashboard" class="nav-link">Dashbord</NuxtLink>
+        <NuxtLink v-if="user" to="/createqr" class="nav-link"> + Create QR</NuxtLink>
+        <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
+        <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
+        <p v-if="user" @click="logoutUser" class="nav-link">logout</p>
         <NuxtLink to="/contact" class="nav-link">Contact</NuxtLink>
       </nav>
       <button @click="toggleMenu" class="md:hidden focus:outline-none">
@@ -35,13 +38,16 @@
       </button>
     </div>
     <nav
-      class="fixed top-20 left-0 w-full bg-white text-purple-600 transform transition-transform md:hidden"
+      class="fixed top-[75px] left-0 w-full h-[100vh] justify-center bg-white text-purple-600 transform transition-transform md:hidden"
       :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
     >
-      <div class="flex flex-col items-center space-y-4 py-4">
+      <div class="flex flex-col h-[calc(100vh -75px)] items-center space-y-4 py-4">
         <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Home</NuxtLink>
-        <NuxtLink to="/signup" @click="toggleMenu" class="mobile-nav-link">Signup</NuxtLink>
-        <NuxtLink to="/login" @click="toggleMenu" class="mobile-nav-link">Login</NuxtLink>
+        <NuxtLink v-if="user" to="/dashboard" @click="toggleMenu" class="mobile-nav-link">Dashboard</NuxtLink>
+        <NuxtLink v-if="user" to="/createqr" @click="toggleMenu" class="mobile-nav-link">+ Create QR</NuxtLink>
+        <NuxtLink v-if="!user" to="/signup" @click="toggleMenu" class="mobile-nav-link">Signup</NuxtLink>
+        <NuxtLink v-if="!user" to="/login" @click="toggleMenu" class="mobile-nav-link">Login</NuxtLink>
+        <NuxtLink to="/" @click="logoutUserMobile" class="mobile-nav-link">Logout</NuxtLink>
         <NuxtLink to="/contact" @click="toggleMenu" class="mobile-nav-link">Contact</NuxtLink>
       </div>
     </nav>
@@ -51,6 +57,21 @@
 
 
 <script  setup>
+const user = useStrapiUser()
+const { logout } = useStrapiAuth()
+const router = useRouter()
+
+
+const logoutUser =  () => {
+   logout();
+ 
+   router.push('/')
+}
+
+const logoutUserMobile = () => {
+  logout()
+  router.push('/')
+}
   const isMenuOpen = ref(false);
 
   const toggleMenu = () => {
@@ -59,6 +80,9 @@
   }
 </script>
 <style scoped>
+.m-header-height {
+  height: calc(100vh-75px)
+}
 .nav-link {
   @apply text-white hover:bg-purple-700 rounded px-4 py-2 transition-colors;
 }
