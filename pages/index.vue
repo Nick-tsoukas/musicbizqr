@@ -72,49 +72,6 @@
 
     </section>
     <!-- features   -->
-    <section class="mx-4 mt-10">
-      <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">Create Powerful Landing Pages for Artists
-      </h2>
-      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Band Page
-      </h3>
-      <PhoneMockup img="https://images.unsplash.com/photo-1568495732369-3a3f5b5290dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Phone Screen" />
-      <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-  <h2 class="text-xl font-extrabold text-gray-900 dark:text-white mb-8">Features of Our Band Landing Page</h2>
-  <ul class="space-y-6">
-    <li class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Exclusive Content</h3>
-      <p class="text-gray-700 dark:text-gray-300">
-        Offer behind-the-scenes videos, early access to new music, or special discounts to create a sense of exclusivity and reward loyal fans.
-      </p>
-    </li>
-    <li class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Fan Engagement</h3>
-      <p class="text-gray-700 dark:text-gray-300">
-        Use sign-up forms, surveys, or contests to gather fan information and increase engagement.
-      </p>
-    </li>
-    <li class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Album Launches</h3>
-      <p class="text-gray-700 dark:text-gray-300">
-        Create dedicated pages for new album releases, featuring music previews, artist insights, and options to purchase or stream the album.
-      </p>
-    </li>
-    <li class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Event Information</h3>
-      <p class="text-gray-700 dark:text-gray-300">
-        Provide comprehensive details about upcoming events, including dates, venues, and ticket purchasing links to drive attendance.
-      </p>
-    </li>
-    <li class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Analytics Integration</h3>
-      <p class="text-gray-700 dark:text-gray-300">
-        Use analytics tools to track visitor behavior, measure engagement, and understand conversion rates to optimize your campaigns.
-      </p>
-    </li>
-  </ul>
-</div>
-
-    </section>
 
     <div class="flex justify-around w-[80vw] mx-auto mt-8">
       <nuxt-link to="/signup" class="btn text-center w-[40%] grow-1">Sign Up</nuxt-link>

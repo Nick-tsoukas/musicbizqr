@@ -180,7 +180,7 @@ const saveQrCode = async () => {
       q_type : route.query.type,
       link: link.value,
       name: name.value,
-      scanTime: [{date: 'some date one '}, {date: 'some date two'}]
+      // scanTime: [{date: 'some date one '}, {date: 'some date two'}]
     }
 
     const blob = await qrCodeStyling.getRawData('image/png')
@@ -197,6 +197,9 @@ const saveQrCode = async () => {
     console.log(props.type , 'test target', )
     if(props.type === 'externalURL') {
       router.push('/dashboard')
+    }
+    if(props.type === 'bandProfile') {
+      router.push({ name: 'createband', query: { qrId: data.id } });
     }
   } catch (error) {
     console.error(error);

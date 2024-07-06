@@ -5,7 +5,7 @@
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
         <NuxtLink v-if="user" to="/dashboard" class="nav-link">Dashbord</NuxtLink>
-        <NuxtLink v-if="user" to="/createqr" class="nav-link"> + Create QR</NuxtLink>
+        <NuxtLink v-if="user" to="/qrtype" class="nav-link"> + Create QR</NuxtLink>
         <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
         <p v-if="user" @click="logoutUser" class="nav-link">logout</p>
@@ -44,7 +44,7 @@
       <div class="flex  flex-col h-[calc(100vh -75px)] items-center space-y-4 py-4">
         <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Home</NuxtLink>
         <NuxtLink v-if="user" to="/dashboard" @click="toggleMenu" class="mobile-nav-link">Dashboard</NuxtLink>
-        <NuxtLink v-if="user" to="/createqr" @click="toggleMenu" class="mobile-nav-link">+ Create QR</NuxtLink>
+        <NuxtLink v-if="user" to="/qrtype" @click="toggleMenu" class="mobile-nav-link">+ Create QR</NuxtLink>
         <NuxtLink v-if="!user" to="/signup" @click="toggleMenu" class="mobile-nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" @click="toggleMenu" class="mobile-nav-link">Login</NuxtLink>
         <NuxtLink to="/" @click="logoutUserMobile" class="mobile-nav-link">Logout</NuxtLink>
