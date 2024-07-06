@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-neon-purple text-white shadow-lg">
+  <header class="bg-[#2C2C2C] text-[#F5F5F5] shadow-lg">
     <div class="container mx-auto flex items-center justify-between px-4 py-4">
       <div class="text-xl font-bold">MusicBizQR</div>
       <nav class="hidden md:flex space-x-4">
@@ -38,10 +38,10 @@
       </button>
     </div>
     <nav
-      class="fixed top-[75px] left-0 w-full h-[100vh] justify-center bg-white text-purple-600 transform transition-transform md:hidden"
+      class="fixed z-50 top-[75px] left-0 w-full h-[100vh] justify-center bg-white text-black transform transition-transform md:hidden"
       :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
     >
-      <div class="flex flex-col h-[calc(100vh -75px)] items-center space-y-4 py-4">
+      <div class="flex  flex-col h-[calc(100vh -75px)] items-center space-y-4 py-4">
         <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Home</NuxtLink>
         <NuxtLink v-if="user" to="/dashboard" @click="toggleMenu" class="mobile-nav-link">Dashboard</NuxtLink>
         <NuxtLink v-if="user" to="/createqr" @click="toggleMenu" class="mobile-nav-link">+ Create QR</NuxtLink>
@@ -88,7 +88,7 @@ const logoutUserMobile = () => {
 }
 
 .mobile-nav-link {
-  @apply text-purple-600 text-xl hover:bg-purple-100 rounded px-4 py-2 transition-colors;
+  @apply text-black text-xl hover:bg-purple-100 rounded px-4 py-2 transition-colors;
 }
 
 .translate-x-0 {

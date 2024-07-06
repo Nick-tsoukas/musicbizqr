@@ -1,6 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   css: ['@/assets/css/tailwind.css'],
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap',
+        },
+      ],
+    },
+  },
   devtools: { enabled: true },
   modules: [
     "@nuxtjs/tailwindcss",
