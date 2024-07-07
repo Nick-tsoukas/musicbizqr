@@ -8,21 +8,21 @@
 
         <!-- Band Name -->
         <div class="mdc-text-field">
-          <input type="text" id="band-name" class="mdc-text-field__input" v-model="bandName" placeholder=" " required />
+          <input type="text" id="band-name" class="mdc-text-field__input" v-model="bandName" placeholder=" "  />
           <label class="mdc-floating-label" for="band-name">Band Name</label>
           <div class="mdc-line-ripple"></div>
         </div>
 
         <!-- Genre -->
         <div class="mdc-text-field">
-          <input type="text" id="genre" class="mdc-text-field__input" v-model="genre" placeholder=" " required />
+          <input type="text" id="genre" class="mdc-text-field__input" v-model="genre" placeholder=" "  />
           <label class="mdc-floating-label" for="genre">Genre</label>
           <div class="mdc-line-ripple"></div>
         </div>
 
         <!-- Bio -->
         <div class="mdc-text-field">
-          <textarea id="bio" class="mdc-text-field__input" v-model="bio" placeholder=" " required></textarea>
+          <textarea id="bio" class="mdc-text-field__input" v-model="bio" placeholder=" " ></textarea>
           <label class="mdc-floating-label" for="bio">Bio</label>
           <div class="mdc-line-ripple"></div>
         </div>
@@ -43,12 +43,12 @@
         <h2 class="mb-8 font-semibold">Band Members</h2>
         <div v-for="(member, index) in members" :key="index" class="member-container">
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" " required />
+            <input type="text" :id="'member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" "  />
             <label class="mdc-floating-label" :for="'member-name-' + index">Member Name</label>
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" " required />
+            <input type="text" :id="'instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" "  />
             <label class="mdc-floating-label" :for="'instrument-' + index">Instrument</label>
             <div class="mdc-line-ripple"></div>
           </div>
@@ -69,12 +69,12 @@
         <h2 class="mb-8 font-semibold">Albums</h2>
         <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" " required />
+            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" "  />
             <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album Title</label>
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mdc-text-field mb-4">
-            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album.releaseDate" placeholder=" " required />
+            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album.releaseDate" placeholder=" "  />
             <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
             <div class="mdc-line-ripple"></div>
           </div>
@@ -89,7 +89,7 @@
           <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
           <div v-for="(song, songIndex) in album.songs" :key="songIndex" class="song-container">
             <div class="mdc-text-field mb-4">
-              <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" " required />
+              <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
               <label class="mdc-floating-label" :for="'song-title-' + albumIndex + '-' + songIndex">Song Title</label>
               <div class="mdc-line-ripple"></div>
             </div>
@@ -155,6 +155,8 @@
 const route = useRoute();
 const router = useRouter();
 const { create } = useStrapi();
+const client = useStrapiClient()
+
 
 const bandName = ref('');
 const genre = ref('');
@@ -218,82 +220,69 @@ const removeSong = (albumIndex, songIndex) => {
   albums.value[albumIndex].songs.splice(songIndex, 1);
 };
 
+
 const submitForm = async () => {
-  const formData = new FormData();
-  formData.append('data[name]', bandName.value);
-  formData.append('data[genre]', genre.value);
-  formData.append('data[bio]', bio.value);
-  if (bandImg.value) {
-    formData.append('files.bandImg', bandImg.value);
-  }
-  formData.append('data[facebook]', facebook.value);
-  formData.append('data[instagram]', instagram.value);
-  formData.append('data[twitch]', twitch.value);
-  formData.append('data[appleMusic]', appleMusic.value);
-  formData.append('data[spotify]', spotify.value);
-  formData.append('data[soundcloud]', soundcloud.value);
-
-  console.log('Basic Band Data:', {
-    name: bandName.value,
-    genre: genre.value,
-    bio: bio.value,
-    facebook: facebook.value,
-    instagram: instagram.value,
-    twitch: twitch.value,
-    appleMusic: appleMusic.value,
-    spotify: spotify.value,
-    soundcloud: soundcloud.value
-  });
-
-  members.value.forEach((member, index) => {
-    formData.append(`data[members][${index}][name]`, member.name);
-    formData.append(`data[members][${index}][instrument]`, member.instrument);
-    if (member.image) {
-      formData.append(`files.members[${index}].image`, member.image);
-    }
-    console.log(`Member ${index}:`, {
-      name: member.name,
-      instrument: member.instrument,
-      image: member.image
-    });
-  });
-
-  albums.value.forEach((album, albumIndex) => {
-    formData.append(`data[albums][${albumIndex}][title]`, album.title);
-    formData.append(`data[albums][${albumIndex}][releaseDate]`, album.releaseDate);
-    if (album.cover) {
-      formData.append(`files.albums[${albumIndex}].cover`, album.cover);
-    }
-    console.log(`Album ${albumIndex}:`, {
-      title: album.title,
-      releaseDate: album.releaseDate,
-      cover: album.cover
-    });
-    album.songs.forEach((song, songIndex) => {
-      formData.append(`data[albums][${albumIndex}][songs][${songIndex}][title]`, song.title);
-      if (song.file) {
-        formData.append(`files.albums[${albumIndex}].songs[${songIndex}].file`, song.file);
-      }
-      console.log(`Album ${albumIndex} - Song ${songIndex}:`, {
-        title: song.title,
-        file: song.file
-      });
-    });
-  });
-
   try {
-    const { data, error } = await create('bands', formData);
-    console.log('FormData:', formData);
-    if (error) {
-      console.error('Failed to create band profile:', error);
-    } else {
-      console.log('Band profile created successfully:', data);
-      router.push('/success'); // Adjust the route as necessary
+    console.log('Submitting form with values:');
+    console.log('Band Name:', bandName.value);
+    console.log('Genre:', genre.value);
+    console.log('Bio:', bio.value);
+
+    // Create a form object with the necessary fields
+    const form = {
+      name: bandName.value || null,
+      genre: genre.value || null,
+      bio: bio.value || null,
+      instagram: instagram.value || null,
+      members: members.value.map((member) => ({
+        name: member.name || null,
+        instrument: member.instrument || null,
+      })),
+    };
+
+    // Remove null or empty values from the form object
+    for (const key in form) {
+      if (form[key] === null || form[key] === '' || (Array.isArray(form[key]) && form[key].length === 0)) {
+        delete form[key];
+      }
     }
+
+    // Log the form object
+    console.log('Form Data:', form);
+
+    // Initialize FormData
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(form));
+
+    // Append member images if they exist
+    members.value.forEach((member, index) => {
+      if (member.image) {
+        formData.append(`files.members[${index}].image`, member.image);
+      }
+    });
+
+    // Log the FormData entries
+    console.log('FormData:', Array.from(formData.entries()));
+
+    // Use Strapi client to make the API call
+    const client = useStrapiClient();
+    const { data } = await client('/bands', {
+      method: 'POST',
+      body: formData
+    });
+
+    console.log('Band profile created successfully:', data);
+    router.push('/dashboard'); // Redirect to dashboard
   } catch (error) {
     console.error('Error creating band profile:', error);
   }
 };
+
+
+
+
+
+
 </script>
 
 
