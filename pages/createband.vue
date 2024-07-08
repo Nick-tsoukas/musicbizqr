@@ -254,6 +254,11 @@ const submitForm = async () => {
     const formData = new FormData();
     formData.append('data', JSON.stringify(form));
 
+    // Append band image file if it exists
+    if (bandImg.value) {
+      formData.append('files.bandImg', bandImg.value);
+    }
+
     // Append member images if they exist
     members.value.forEach((member, index) => {
       if (member.image) {
@@ -264,19 +269,54 @@ const submitForm = async () => {
     // Log the FormData entries
     console.log('FormData:', Array.from(formData.entries()));
 
-    // Use Strapi client to make the API call
+    // Use Strapi client to create the band
     const client = useStrapiClient();
-    const { data } = await client('/bands', {
+    const { data: bandData } = await client('/bands', {
       method: 'POST',
       body: formData
     });
 
-    console.log('Band profile created successfully:', data);
+    console.log('Band profile created successfully:', bandData);
+
+    // Create albums and associate them with the created band
+    for (const album of albums.value) {
+      const albumForm = new FormData();
+      const albumData = {
+        title: album.title,
+        releaseDate: album.releaseDate,
+        band: bandData.id, // Associate the album with the created band
+        songs: album.songs.map((song) => ({
+          title: song.title,
+        })),
+      };
+
+      albumForm.append('data', JSON.stringify(albumData));
+
+      if (album.cover) {
+        albumForm.append('files.cover', album.cover);
+      }
+
+      album.songs.forEach((song, songIndex) => {
+        if (song.file) {
+          albumForm.append(`files.songs[${songIndex}].file`, song.file);
+        }
+      });
+
+      const { data: albumResponse } = await client('/albums', {
+        method: 'POST',
+        body: albumForm,
+      });
+
+      console.log('Album created successfully:', albumResponse);
+    }
+
     router.push('/dashboard'); // Redirect to dashboard
   } catch (error) {
     console.error('Error creating band profile:', error);
   }
 };
+
+
 
 
 
