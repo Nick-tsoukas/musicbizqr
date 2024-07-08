@@ -1,37 +1,38 @@
 <template>
-  <div v-if="band" class="hero">
-    <img :src="band.data.attributes.bandImg.data.attributes.url" alt="Band Image" class="hero__image" />
-    <div class="hero__content">
-      <div class="hero__social">
-        <!-- <ul>
-          <li v-if="band.data.attributes.instagram">
-            <a :href="band.data.attributes.instagram" target="_blank">
-              <img src="/icons/instagram.png" alt="Instagram" class="social-icon" />
-            </a>
-          </li>
-          <li v-if="band.data.attributes.facebook">
-            <a :href="band.data.attributes.facebook" target="_blank">
-              <img src="/icons/facebook.png" alt="Facebook" class="social-icon" />
-            </a>
-          </li>
-          <li v-if="band.data.attributes.twitch">
-            <a :href="band.data.attributes.twitch" target="_blank">
-              <img src="/icons/twitch.png" alt="Twitch" class="social-icon" />
-            </a>
-          </li>
-          <li v-if="band.data.attributes.appleMusic">
-            <a :href="band.data.attributes.appleMusic" target="_blank">
-              <img src="/icons/applemusic.png" alt="Apple Music" class="social-icon" />
-            </a>
-          </li>
-          <li v-if="band.data.attributes.soundcloud">
-            <a :href="band.data.attributes.soundcloud" target="_blank">
-              <img src="/icons/soundcloud.png" alt="SoundCloud" class="social-icon" />
-            </a>
-          </li>
-        </ul> -->
+  <div>
+    <div v-if="band" class="hero">
+      <img :src="band.data.attributes.bandImg.data.attributes.url" alt="Band Image" class="hero__image" />
+      <div class="hero__content">
+        <div class="hero__social">
+          <ul>
+            <li v-if="band.data.attributes.instagram">
+              <a :href="band.data.attributes.instagram" target="_blank">
+                <img src="@/assets/facebook-icon.svg" alt="Facebook" class="social-icon" />              </a>
+            </li>
+            <li v-if="band.data.attributes.facebook">
+              <a :href="band.data.attributes.facebook" target="_blank">
+                <img src="@/assets/facebook-icon.svg" alt="Facebook" class="social-icon" />
+              </a>
+            </li>
+            <li v-if="band.data.attributes.twitch">
+              <a :href="band.data.attributes.twitch" target="_blank">
+                <img src="@/assets/facebook-icon.svg" alt="Facebook" class="social-icon" />              </a>
+            </li>
+            <li v-if="band.data.attributes.appleMusic">
+              <a :href="band.data.attributes.appleMusic" target="_blank">
+                <img src="@/assets/facebook-icon.svg" alt="Facebook" class="social-icon" />              </a>
+            </li>
+            <li v-if="band.data.attributes.soundcloud">
+              <a :href="band.data.attributes.soundcloud" target="_blank">
+                <img src="@/assets/facebook-icon.svg" alt="Facebook" class="social-icon" />              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
+    <section>
+      <pre>{{ band.data.attributes.albums.data }}</pre>
+    </section>
   </div>
 </template>
 
@@ -46,7 +47,7 @@ const { data: band } = useFetch(`http://localhost:1337/api/bands/${route.params.
 .hero {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 75px);
   overflow: hidden;
 }
 
