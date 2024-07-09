@@ -115,9 +115,9 @@
    
     </section>
 
-    <section>
-       <pre>{{ albums[0] }}</pre>
-      <AudioPlayer  class="grid place-items-center"/>
+    <section  v-if="albums[0]">
+     
+      <AudioPlayer :album="albums[0]"  class="grid place-items-center"/>
     </section>
 
   </div>
