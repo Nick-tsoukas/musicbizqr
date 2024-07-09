@@ -1,6 +1,59 @@
 <template>
   <div>
-    <div v-if="band" class="hero">
+<!-- header -->
+<!-- <pre>{{ band }}</pre> -->
+  <!-- <div class="bg-[#F5F5F5] text-[#2C2C2C] shadow-lg">
+    <div class="container mx-auto flex items-center justify-between px-4 py-4">
+      <div class="text-xl font-bold">{{ band.data.attributes.name }}</div>
+      <nav class="hidden md:flex space-x-4">
+        <NuxtLink to="/" class="nav-link">Bio</NuxtLink>
+        <NuxtLink to="/events" class="nav-link">Events</NuxtLink>
+        <NuxtLink to="/albums" class="nav-link">Albums</NuxtLink>
+        <NuxtLink to="/merch" class="nav-link">Merch</NuxtLink>
+        <NuxtLink to="/tours" class="nav-link">Tours</NuxtLink>
+      </nav>
+      <button @click="toggleMenu" class="md:hidden focus:outline-none">
+        <svg
+          class="w-6 h-6 transition-transform transform"
+          :class="{ 'rotate-45': isMenuOpen, 'rotate-0': !isMenuOpen }"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            v-if="!isMenuOpen"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
+          <path
+            v-else
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <nav
+      class="fixed z-50 top-[75px] left-0 w-full h-[100vh] bg-white text-black transform transition-transform md:hidden"
+      :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
+    >
+      <div class="flex flex-col items-center space-y-4 py-4">
+        <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Bio</NuxtLink>
+        <NuxtLink to="/events" @click="toggleMenu" class="mobile-nav-link">Events</NuxtLink>
+        <NuxtLink to="/albums" @click="toggleMenu" class="mobile-nav-link">Albums</NuxtLink>
+        <NuxtLink to="/merch" @click="toggleMenu" class="mobile-nav-link">Merch</NuxtLink>
+        <NuxtLink to="/tours" @click="toggleMenu" class="mobile-nav-link">Tours</NuxtLink>
+      </div>
+    </nav>
+  </div> -->
+
+    <!-- hero content  -->
+    <div  v-if="band" class="hero  ">
       <img :src="band.data.attributes.bandImg.data.attributes.url" alt="Band Image" class="hero__image" />
       <div class="hero__content">
         <div class="hero__social">
@@ -30,37 +83,15 @@
         </div>
       </div>
     </div>
-  <!--
-  Welcome to Tailwind Play, the official Tailwind CSS playground!
-
-  Everything here works just like it does when you're running Tailwind locally
-  with a real build pipeline. You can customize your config file, use features
-  like `@apply`, or even add third-party plugins.
-
-  Feel free to play with this example if you're just learning, or trash it and
-  start from scratch if you know enough to be dangerous. Have fun!
--->
-
-<!-- album grid -->
-<!-- <div class="relative flex  flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12">
-  <div class="max-w-screen-md mx-auto">
-    <div class="grid grid-cols-3 gap-6">
-
-      <div v-for="album in albums" :key="album.id" class="group pb-24 relative overflow-hidden">
-        <img :src="album.attributes.cover.data.attributes.url"  alt="">
-      </div>
-   </div>
-  </div>
-  </div> -->
-
-  <!-- audio player -->
-<!-- component -->
-<main class="grid place-items-center min-h-screen bg-gradient-to-t from-blue-200 to-indigo-900 p-5">
+ 
+<!-- album page content -->
+<main class="grid place-items-center min-h-screen background__gradient p-5 animate-slideinview">
   <div>
     <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-gray-200 mb-5">Albums</h1>
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <!-- CARD 1 -->
       <div v-for="album in albums" :key="album.id" class="bg-gray-900 shadow-lg rounded p-3">
+     
         <div class="group relative">
           <img class="w-full md:w-72 block rounded" src="https://upload.wikimedia.org/wikipedia/en/f/f1/Tycho_-_Epoch.jpg" alt="" />
           <div class="absolute bg-black rounded bg-opacity-0 group-hover:bg-opacity-60 w-full h-full top-0 flex items-center group-hover:opacity-100 transition justify-evenly">
@@ -84,8 +115,8 @@
           </div>
         </div>
         <div class="p-5">
-          <h3 class="text-white text-lg">Epoch</h3>
-          <p class="text-gray-400">Tycho</p>
+          <h3 class="text-white text-lg">{{album.attributes.title}}</h3>
+      
         </div>
       </div>
       <!-- END OF CARD 1 -->
@@ -119,11 +150,15 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.background__gradient {
+  background: linear-gradient(to top, rgba(51, 51, 51, 1) 0%, rgba(51, 51, 51, 1) 15%, rgba(51, 51, 51, .95) 35%, rgba(51, 51, 51, .7) 100%);
+}
 .hero {
-  position: relative;
+  position: fixed;
   width: 100%;
   height: calc(100vh - 75px);
   overflow: hidden;
+  z-index: -999;
 }
 
 .hero__image {

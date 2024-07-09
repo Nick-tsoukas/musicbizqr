@@ -1,5 +1,7 @@
 <template>
-  <header class="bg-[#2C2C2C] text-[#F5F5F5] shadow-lg">
+  <!-- <header class="bg-[#2C2C2C] text-[#F5F5F5] shadow-lg"> -->
+    <header class="bg-[#F5F5F5] text-[#2C2C2C] shadow-lg">
+
     <div class="container mx-auto flex items-center justify-between px-4 py-4">
       <div class="text-xl font-bold">MusicBizQR</div>
       <nav class="hidden md:flex space-x-4">
@@ -84,7 +86,7 @@ const logoutUserMobile = () => {
   height: calc(100vh-75px)
 }
 .nav-link {
-  @apply text-white hover:bg-purple-700 rounded px-4 py-2 transition-colors;
+  @apply text-[#2C2C2C] hover:bg-purple-700 rounded px-4 py-2 transition-colors;
 }
 
 .mobile-nav-link {
