@@ -116,7 +116,8 @@
     </section>
 
     <section>
-      <SongList class="grid place-items-center"/>
+       <pre>{{ albums[0] }}</pre>
+      <AudioPlayer  class="grid place-items-center"/>
     </section>
 
   </div>
@@ -133,15 +134,12 @@ const { data: band } = useFetch(`http://localhost:1337/api/bands/${route.params.
 
 const albums = ref([]);
 
-onMounted(async () => {
-  const albumIds = band.value.data.attributes.albums.data.map(album => album.id);
-  console.log(albumIds)
-  const albumFetches = albumIds.map(id => $fetch(`http://localhost:1337/api/albums/${id}?populate=*`));
+const albumIds = band.value.data.attributes.albums.data.map(album => album.id);
+  const albumFetches = albumIds.map(id =>
+    $fetch(`http://localhost:1337/api/albums/${id}?populate=cover,songs`)
+  );
   const albumResponses = await Promise.all(albumFetches);
-  console.log(albumFetches)
   albums.value = albumResponses.map(response => response.data);
-
-});
 
 </script>
 
