@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  css: ['@/assets/css/tailwind.css'],
+  css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css'],
   app: {
     head: {
       link: [
@@ -8,6 +8,10 @@ export default defineNuxtConfig({
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap',
         },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/icon?family=Material+Icons'
+        }
       ],
     },
   },
