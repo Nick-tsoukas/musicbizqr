@@ -133,13 +133,13 @@ const route = useRoute();
 const { data: band } = useFetch(`http://localhost:1337/api/bands/${route.params.id}?populate=*`);
 
 const albums = ref([]);
-
-const albumIds = band.value.data.attributes.albums.data.map(album => album.id);
-  const albumFetches = albumIds.map(id =>
-    $fetch(`http://localhost:1337/api/albums/${id}?populate=cover,songs`)
-  );
+onMounted(async () => {
+  const albumIds = band.value.data.attributes.albums.data.map(album => album.id);
+  const albumFetches = albumIds.map(id => $fetch(`http://localhost:1337/api/albums/${id}?populate=cover&populate=songs.file`));
   const albumResponses = await Promise.all(albumFetches);
   albums.value = albumResponses.map(response => response.data);
+});
+
 
 </script>
 
