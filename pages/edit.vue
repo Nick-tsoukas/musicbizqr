@@ -2,12 +2,15 @@
   <div>
     
     <component :is="currentComponent" v-bind="props"></component>
+    <pre>{{ props }}</pre>
   </div>
 </template>
 
 <script setup>
 
 import EditLinkQr from '@/components/EditLinkQr.vue' // Adjust the path as necessary
+import EditBandQr from '@/components/EditBandQr.vue' // Adjust the path as necessary
+
 
 // Retrieve the route object
 const route = useRoute()
@@ -17,7 +20,8 @@ const props  = ref(null)
 
 // Define the map of component types to component names
 const editComponentRender = {
-  externalURL: EditLinkQr
+  externalURL: EditLinkQr,
+  bandProfile: EditBandQr
 }
 
 

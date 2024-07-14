@@ -154,10 +154,10 @@
 <script setup>
 const route = useRoute();
 const router = useRouter();
-const { create } = useStrapi();
-const client = useStrapiClient()
+const { create, update } = useStrapi();
+const client = useStrapiClient();
 
-
+// get qr id log it, then update the qr with the band id after band creatiion, then move on the edit page 
 const bandName = ref('');
 const genre = ref('');
 const bio = ref('');
@@ -172,6 +172,8 @@ const appleMusic = ref('');
 const spotify = ref('');
 const soundcloud = ref('');
 
+
+console.log(route.query.qrId )
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   bandImg.value = file;
@@ -271,10 +273,20 @@ const submitForm = async () => {
 
     // Use Strapi client to create the band
     const client = useStrapiClient();
-    const { data: bandData } = await client('/bands', {
+try {
+  const { data: bandData } = await client('/bands', {
       method: 'POST',
       body: formData
     });
+
+  const updatedQr = update('qrs', route.query.qrId, {
+    band: bandData.id
+  })
+  console.log(updatedQr)
+  
+} catch (error) {
+  console.log(error, 'in band creatiion')
+}
 
     console.log('Band profile created successfully:', bandData);
 
