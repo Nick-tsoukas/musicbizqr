@@ -148,7 +148,7 @@
 
       <button type="submit" class="mdc-button w-full">Create Profile</button>
     </form>
-  </div>
+     </div>
 </template>
 
 <script setup>
@@ -157,6 +157,8 @@ const router = useRouter();
 const { create, findOne } = useStrapi();
 const client = useStrapiClient();
 
+console.log(route.params)
+// const { data: band } = findOne('bands', params.bandProfile.id)
 
 const bandName = ref('');
 const genre = ref('');
@@ -173,8 +175,67 @@ const spotify = ref('');
 const soundcloud = ref('');
 
 
-const qr = await findOne('qrs', route.params.id)
-console.log(qr.data)
+try {
+  const qr = await findOne('qrs', route.params.id,{
+    populate: {
+          "*": true,
+          band: {
+            populate: {
+              "*": true,
+              members: {
+                populate: {
+                  image: true
+                }
+              },
+              albums: {
+                populate: {
+                  cover: true,
+                  songs: {
+                    populate: {
+                      file: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+  })
+
+  console.log('this is my log statement ',qr.data[0].attributes.band.data.attributes.albums.data)
+  bandName.value = qr.data[0].attributes.band.data.attributes.name;
+    genre.value = qr.data[0].attributes.band.data.attributes.genre;
+    bio.value = qr.data[0].attributes.band.data.attributes.bio;
+    facebook.value = qr.data[0].attributes.band.data.attributes.facebook;
+    instagram.value = qr.data[0].attributes.band.data.attributes.instagram;
+    twitch.value = qr.data[0].attributes.band.data.attributes.twitch;
+    appleMusic.value = qr.data[0].attributes.band.data.attributes.appleMusic;
+    spotify.value = qr.data[0].attributes.band.data.attributes.spotify;
+    soundcloud.value = qr.data[0].attributes.band.data.attributes.soundcloud;
+  
+    members.value = qr.data[0].attributes.band.data.attributes.members.map(member => ({
+      ...member,
+      imageUrl: member.image ? member.image.data.attributes.url : null
+    }));
+  
+    albums.value = qr.data[0].attributes.band.data.attributes.albums.data.map(album => ({
+  id: album.id,
+  title: album.attributes.title,
+  releaseDate: album.attributes.releaseDate,
+  coverUrl: album.attributes.cover ? album.attributes.cover.data.attributes.url : null,
+  cover: null, // This will be updated if a new cover is uploaded
+  songs: album.attributes.songs.map(song => ({
+    id: song.id,
+    title: song.attributes.title,
+    fileUrl: song.attributes.file ? song.attributes.file.data.attributes.url : null,
+    file: null // This will be updated if a new file is uploaded
+  }))
+}));
+
+console.log('this should be albums ref ', albums.value)
+} catch (error) {
+  
+}
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -187,7 +248,6 @@ const handleMemberImageUpload = (event, index) => {
   members.value[index].image = file;
   members.value[index].imageUrl = URL.createObjectURL(file);
 };
-
 const handleAlbumCoverUpload = (event, index) => {
   const file = event.target.files[0];
   albums.value[index].cover = file;
@@ -224,35 +284,24 @@ const removeSong = (albumIndex, songIndex) => {
   albums.value[albumIndex].songs.splice(songIndex, 1);
 };
 
-
 const submitForm = async () => {
   try {
-    console.log('Submitting form with values:');
-    console.log('Band Name:', bandName.value);
-    console.log('Genre:', genre.value);
-    console.log('Bio:', bio.value);
-
     // Create a form object with the necessary fields
     const form = {
       name: bandName.value || null,
       genre: genre.value || null,
       bio: bio.value || null,
       instagram: instagram.value || null,
-      members: members.value.map((member) => ({
+      facebook: facebook.value || null,
+      twitch: twitch.value || null,
+      appleMusic: appleMusic.value || null,
+      spotify: spotify.value || null,
+      soundcloud: soundcloud.value || null,
+      members: members.value.map(member => ({
         name: member.name || null,
         instrument: member.instrument || null,
       })),
     };
-
-    // Remove null or empty values from the form object
-    for (const key in form) {
-      if (form[key] === null || form[key] === '' || (Array.isArray(form[key]) && form[key].length === 0)) {
-        delete form[key];
-      }
-    }
-
-    // Log the form object
-    console.log('Form Data:', form);
 
     // Initialize FormData
     const formData = new FormData();
@@ -270,26 +319,20 @@ const submitForm = async () => {
       }
     });
 
-    // Log the FormData entries
-    console.log('FormData:', Array.from(formData.entries()));
-
-    // Use Strapi client to create the band
-    const client = useStrapiClient();
-    const { data: bandData } = await client('/bands', {
-      method: 'POST',
+    // Use Strapi client to update the band
+    const { data: bandData } = await client(`/bands/${qr.data.attributes.band.data.id}`, {
+      method: 'PUT',
       body: formData
     });
 
-    console.log('Band profile created successfully:', bandData);
-
-    // Create albums and associate them with the created band
+    // Update albums and associate them with the band
     for (const album of albums.value) {
       const albumForm = new FormData();
       const albumData = {
         title: album.title,
         releaseDate: album.releaseDate,
-        band: bandData.id, // Associate the album with the created band
-        songs: album.songs.map((song) => ({
+        band: bandData.id, // Associate the album with the band
+        songs: album.songs.map(song => ({
           title: song.title,
         })),
       };
@@ -306,28 +349,17 @@ const submitForm = async () => {
         }
       });
 
-      const { data: albumResponse } = await client('/albums', {
-        method: 'POST',
+      await client(`/albums/${album.id}`, {
+        method: 'PUT',
         body: albumForm,
       });
-
-      console.log('Album created successfully:', albumResponse);
     }
 
     router.push('/dashboard'); // Redirect to dashboard
   } catch (error) {
-    console.error('Error creating band profile:', error);
+    console.error('Error updating band profile:', error);
   }
 };
-
-
-
-
-
-
-
-
-
 </script>
 
 
