@@ -1,6 +1,6 @@
 <template>
   <div class="container-mdc">
-    <h1 class="title">Create Band Profile</h1>
+    <h1 class="title">Update Band Profile</h1>
     <form @submit.prevent="submitForm">
       <!-- Band Details Section -->
       <div class="form-group">
@@ -65,7 +65,7 @@
       </div>
 
       <!-- Albums Section -->
-      <div class="form-group">
+      <!-- <div class="form-group">
         <h2 class="mb-8 font-semibold">Albums</h2>
         <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
           <div class="mdc-text-field mb-4">
@@ -104,7 +104,7 @@
           <button type="button" class="mdc-button mb-4 w-full" @click="removeAlbum(albumIndex)">Remove Album</button>
         </div>
         <button type="button" class="mdc-button mb-8 w-full" @click="addAlbum">+ Add Album</button>
-      </div>
+      </div> -->
 
       <!-- Social Media Links Section -->
       <div class="form-group">
@@ -146,8 +146,9 @@
         </div>
       </div>
 
-      <button type="submit" class="mdc-button w-full">Create Profile</button>
+      <button type="submit" class="mdc-button w-full">Update Band</button>
     </form>
+    <!-- <pre>{{ qr }}</pre> -->
      </div>
 </template>
 
@@ -173,6 +174,7 @@ const twitch = ref('');
 const appleMusic = ref('');
 const spotify = ref('');
 const soundcloud = ref('');
+const bandId = ref(null)
 
 
 try {
@@ -182,6 +184,7 @@ try {
           band: {
             populate: {
               "*": true,
+              bandImg: true,
               members: {
                 populate: {
                   image: true
@@ -202,8 +205,10 @@ try {
         }
   })
 
-  console.log('this is my log statement ',qr.data[0].attributes.band.data.attributes.albums.data)
-  bandName.value = qr.data[0].attributes.band.data.attributes.name;
+  console.log(qr.data[0].attributes.band.data.attributes.members , 'this is the band data log i need now ')
+  bandImgUrl.value = qr.data[0].attributes.band.data.attributes.bandImg.data.attributes.url
+    bandId.value =  await qr.data[0].attributes.band.data.id
+    bandName.value = qr.data[0].attributes.band.data.attributes.name;
     genre.value = qr.data[0].attributes.band.data.attributes.genre;
     bio.value = qr.data[0].attributes.band.data.attributes.bio;
     facebook.value = qr.data[0].attributes.band.data.attributes.facebook;
@@ -212,29 +217,82 @@ try {
     appleMusic.value = qr.data[0].attributes.band.data.attributes.appleMusic;
     spotify.value = qr.data[0].attributes.band.data.attributes.spotify;
     soundcloud.value = qr.data[0].attributes.band.data.attributes.soundcloud;
-  
+    qr.data[0].attributes.band.data.attributes.members.forEach(member => {
+      console.log(member)
+    })
     members.value = qr.data[0].attributes.band.data.attributes.members.map(member => ({
-      ...member,
-      imageUrl: member.image ? member.image.data.attributes.url : null
+      id: member.id,
+  name: member.name,
+  instrument: member.instrument,
+  imageUrl: member.image ? member.image.data.attributes.url : null,
+  imageId: member.image ? member.image.data.id : null, // Include image ID
+  image: null // This will be updated if a new image is uploaded
+  
     }));
-  
-    albums.value = qr.data[0].attributes.band.data.attributes.albums.data.map(album => ({
-  id: album.id,
-  title: album.attributes.title,
-  releaseDate: album.attributes.releaseDate,
-  coverUrl: album.attributes.cover ? album.attributes.cover.data.attributes.url : null,
-  cover: null, // This will be updated if a new cover is uploaded
-  songs: album.attributes.songs.map(song => ({
-    id: song.id,
-    title: song.attributes.title,
-    fileUrl: song.attributes.file ? song.attributes.file.data.attributes.url : null,
-    file: null // This will be updated if a new file is uploaded
-  }))
-}));
+    qr.data[0].attributes.band.data.attributes.albums.data.forEach((album) => {
+      console.log(album.attributes, 'this is the forEach')
+    })
+   // imageUrl: member.image ? member.image.data.attributes.url : null
+//     albums.value = qr.data[0].attributes.band.data.attributes.albums.data.map(album => ({
+//   id: album.id,
+//   title: album.attributes.title,
+//   releaseDate: album.attributes.releaseDate,
+//   coverUrl: album.attributes.cover ? album.attributes.cover.data.attributes.url : null,
+//   cover: null, // This will be updated if a new cover is uploaded
+//   songs: album.attributes.songs.map(song => ({
+//     id: song.id,
+//     title: song.title,
+//     fileUrl: song.file ? song.file.data.attributes.url : null,
+//     // file: null // This will be updated if a new file is uploaded
+//   }))
+// }));
 
-console.log('this should be albums ref ', albums.value)
+// [
+//     {
+//         "id": 24,
+//         "name": "fsdfsdfsdfsdfsdf",
+//         "instrument": "sdfsdfsdffsdfsdfsdfsfsdf",
+//         "image": {
+//             "data": {
+//                 "id": 232,
+//                 "attributes": {
+//                     "name": "qrcode_eea6e1bd8d.png",
+//                     "alternativeText": null,
+//                     "caption": null,
+//                     "width": 300,
+//                     "height": 300,
+//                     "formats": {
+//                         "thumbnail": {
+//                             "name": "thumbnail_qrcode_eea6e1bd8d.png",
+//                             "hash": "thumbnail_qrcode_eea6e1bd8d_f78add8df9",
+//                             "ext": ".png",
+//                             "mime": "image/png",
+//                             "path": null,
+//                             "width": 156,
+//                             "height": 156,
+//                             "size": 24.71,
+//                             "sizeInBytes": 24713,
+//                             "url": "https://qrcode101.s3.us-east-1.amazonaws.com/thumbnail_qrcode_eea6e1bd8d_f78add8df9.png"
+//                         }
+//                     },
+//                     "hash": "qrcode_eea6e1bd8d_f78add8df9",
+//                     "ext": ".png",
+//                     "mime": "image/png",
+//                     "size": 6.1,
+//                     "url": "https://qrcode101.s3.us-east-1.amazonaws.com/qrcode_eea6e1bd8d_f78add8df9.png",
+//                     "previewUrl": null,
+//                     "provider": "aws-s3",
+//                     "provider_metadata": null,
+//                     "createdAt": "2024-07-17T01:19:06.673Z",
+//                     "updatedAt": "2024-07-17T01:19:06.673Z"
+//                 }
+//             }
+//         }
+//     }
+// ]
+console.log('this should be members ref ', members.value)
 } catch (error) {
-  
+  console.log(error , 'this is the error in the bind form funciton and call to get data')
 }
 
 const handleImageUpload = (event) => {
@@ -298,8 +356,10 @@ const submitForm = async () => {
       spotify: spotify.value || null,
       soundcloud: soundcloud.value || null,
       members: members.value.map(member => ({
+        id: member.id || null, // Include the member ID for updates
         name: member.name || null,
         instrument: member.instrument || null,
+        image: member.imageId // Reference to the existing image ID
       })),
     };
 
@@ -320,40 +380,40 @@ const submitForm = async () => {
     });
 
     // Use Strapi client to update the band
-    const { data: bandData } = await client(`/bands/${qr.data.attributes.band.data.id}`, {
+    const { data: bandData } = await client(`/bands/${bandId.value}`, {
       method: 'PUT',
       body: formData
     });
 
     // Update albums and associate them with the band
-    for (const album of albums.value) {
-      const albumForm = new FormData();
-      const albumData = {
-        title: album.title,
-        releaseDate: album.releaseDate,
-        band: bandData.id, // Associate the album with the band
-        songs: album.songs.map(song => ({
-          title: song.title,
-        })),
-      };
+    // for (const album of albums.value) {
+    //   const albumForm = new FormData();
+    //   const albumData = {
+    //     title: album.title,
+    //     releaseDate: album.releaseDate,
+    //     band: bandId.value, // Associate the album with the band
+    //     songs: album.songs.map(song => ({
+    //       title: song.title,
+    //     })),
+    //   };
 
-      albumForm.append('data', JSON.stringify(albumData));
+    //   albumForm.append('data', JSON.stringify(albumData));
 
-      if (album.cover) {
-        albumForm.append('files.cover', album.cover);
-      }
+    //   if (album.cover) {
+    //     albumForm.append('files.cover', album.cover);
+    //   }
 
-      album.songs.forEach((song, songIndex) => {
-        if (song.file) {
-          albumForm.append(`files.songs[${songIndex}].file`, song.file);
-        }
-      });
+    //   album.songs.forEach((song, songIndex) => {
+    //     if (song.file) {
+    //       albumForm.append(`files.songs[${songIndex}].file`, song.file);
+    //     }
+    //   });
 
-      await client(`/albums/${album.id}`, {
-        method: 'PUT',
-        body: albumForm,
-      });
-    }
+    //   await client(`/albums/${album.id}`, {
+    //     method: 'PUT',
+    //     body: albumForm,
+    //   });
+    // }
 
     router.push('/dashboard'); // Redirect to dashboard
   } catch (error) {
