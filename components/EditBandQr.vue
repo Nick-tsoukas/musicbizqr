@@ -1,7 +1,7 @@
 <template>
   <div class="container-mdc">
     <h1 class="title">Update Band Profile</h1>
-    <form @submit.prevent="submitForm">
+    <form :class="{hidden: isPopUp}" @submit.prevent="submitForm">
       <!-- Band Details Section -->
       <div class="form-group">
         <h2 class="mb-8 font-semibold">Band Details</h2>
@@ -145,10 +145,73 @@
           <div class="mdc-line-ripple"></div>
         </div>
       </div>
+      <!-- albunm list form-group adding the border and sets width plus drop shaddow   -->
+    
+      <section v-if="albumList.data.length" class="form-group">
+        <h2 class="mb-8 font-semibold">Album List</h2>
+        <div v-for="album in albumList.data" :key="album.title"  class="flex gap-2 items-center w-full mb-4">
+          <div class=" w-[60px] h-[60px]">
+            <img :src="album.attributes.cover.data.attributes.url" alt="">
+          </div>
+          <div class="grow">{{ album.attributes.title }}</div>
+          <div class="flex items-center"> <img @click="toggle" src="@/assets/edit-icon.svg" alt=""></div>
+        </div>
+      </section>
+
 
       <button type="submit" class="mdc-button w-full">Update Band</button>
+   
     </form>
-    <!-- <pre>{{ qr }}</pre> -->
+      <!-- <pre>{{ albumList }}</pre> -->
+
+      <!-- modal popup box -->
+      <section :class="{ hidden: !isPopUp }" class="w-screen h-screen z-[9999999] absolute top-0 left-0 overflow-scroll bg-[#fff] p-2 ">
+        <!-- top bar -->
+     
+      <div class="form-group bg-[#fff]">
+       <div class="flex">
+        <h2 class="mb-8 font-semibold">Albums</h2>
+        <img class="ml-auto self-baseline" @click="toggle" src="@/assets/edit-icon.svg" alt="">
+       </div>
+        <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
+          <div class="mdc-text-field mb-4">
+            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" "  />
+            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album Title</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album.releaseDate" placeholder=" "  />
+            <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mb-4">
+            <input type="file" :id="'album-cover-' + albumIndex" class="styled-file-input" @change="(event) => handleAlbumCoverUpload(event, albumIndex)" accept="image/*" />
+            <label :for="'album-cover-' + albumIndex" class="styled-file-label">Choose Album Cover</label>
+          </div>
+          <div v-if="album.coverUrl" class="mb-4">
+            <img :src="album.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
+          </div>
+
+          <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
+          <div v-for="(song, songIndex) in album.songs" :key="songIndex" class="song-container">
+            <div class="mdc-text-field mb-4">
+              <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
+              <label class="mdc-floating-label" :for="'song-title-' + albumIndex + '-' + songIndex">Song Title</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <div class="mb-4">
+              <input type="file" :id="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-input" @change="(event) => handleSongFileUpload(event, albumIndex, songIndex)" accept="audio/*" />
+              <label :for="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-label">Choose Song File</label>
+            </div>
+            <button type="button" class="mdc-button mb-4 w-full" @click="removeSong(albumIndex, songIndex)">Remove Song</button>
+          </div>
+          <button type="button" class="mdc-button mb-8 w-full" @click="addSong(albumIndex)">+ Add Song</button>
+
+          <button type="button" class="mdc-button mb-4 w-full" @click="removeAlbum(albumIndex)">Remove Album</button>
+        </div>
+        <button type="button" class="mdc-button mb-8 w-full" @click="addAlbum">+ Add Album</button>
+      </div> 
+      </section>
      </div>
 </template>
 
@@ -160,7 +223,7 @@ const client = useStrapiClient();
 
 console.log(route.params)
 // const { data: band } = findOne('bands', params.bandProfile.id)
-
+const isPopUp = ref(false)
 const bandName = ref('');
 const genre = ref('');
 const bio = ref('');
@@ -174,7 +237,14 @@ const twitch = ref('');
 const appleMusic = ref('');
 const spotify = ref('');
 const soundcloud = ref('');
-const bandId = ref(null)
+const bandId = ref(null);
+const qr = ref (null);
+const albumList = ref([])
+
+
+const toggle = () => {
+  isPopUp.value = !isPopUp.value
+}
 
 
 try {
@@ -205,7 +275,8 @@ try {
         }
   })
 
-  console.log(qr.data[0].attributes.band.data.attributes.members , 'this is the band data log i need now ')
+  albumList.value = qr.data[0].attributes.band.data.attributes.albums
+  console.log(qr.data[0].attributes.band.data.attributes.albums.data[0].attributes.cover.data.attributes.url,'this is the band album log i need now ')
   bandImgUrl.value = qr.data[0].attributes.band.data.attributes.bandImg.data.attributes.url
     bandId.value =  await qr.data[0].attributes.band.data.id
     bandName.value = qr.data[0].attributes.band.data.attributes.name;
@@ -434,8 +505,8 @@ const submitForm = async () => {
 
 .container-mdc {
   max-width: 500px;
-  margin: 2rem auto;
-  padding: 2rem;
+  margin: .5rem auto;
+  padding: .5rem;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

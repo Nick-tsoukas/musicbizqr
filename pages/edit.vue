@@ -2,7 +2,7 @@
   <div>
     
     <component :is="currentComponent" v-bind="props"></component>
-    <pre>{{ props }}</pre>
+
   </div>
 </template>
 
