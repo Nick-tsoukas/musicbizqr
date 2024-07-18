@@ -176,7 +176,7 @@
         <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
           <div class="mdc-text-field mb-4">
             <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album Title</label>
+            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album {{album}}</label>
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mdc-text-field mb-4">
