@@ -173,14 +173,15 @@
         <h2 class="mb-8 font-semibold">Albums</h2>
         <img class="ml-auto self-baseline" @click="toggle" src="@/assets/edit-icon.svg" alt="">
        </div>
-        <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
+        <div v-for="(album, albumIndex) in albumList" :key="albumIndex" class="album-container">
+          <pre>{{ album }}</pre>
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album {{album}}</label>
+            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album[0].attributes.title" placeholder=" "  />
+            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album </label>
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mdc-text-field mb-4">
-            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album.releaseDate" placeholder=" "  />
+            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album[0].attributes.releaseDate" placeholder=" "  />
             <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
             <div class="mdc-line-ripple"></div>
           </div>
@@ -191,9 +192,13 @@
           <div v-if="album.coverUrl" class="mb-4">
             <img :src="album.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
           </div>
+          <div v-if="album[0].attributes.cover.data.attributes.url" class="mb-4">
+            <img :src="album[0].attributes.cover.data.attributes.url" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
+          </div>
+
 
           <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
-          <div v-for="(song, songIndex) in album.songs" :key="songIndex" class="song-container">
+          <div v-for="(song, songIndex) in album[0].attributes.songs" :key="songIndex" class="song-container">
             <div class="mdc-text-field mb-4">
               <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
               <label class="mdc-floating-label" :for="'song-title-' + albumIndex + '-' + songIndex">Song Title</label>
@@ -223,7 +228,7 @@ const client = useStrapiClient();
 
 console.log(route.params)
 // const { data: band } = findOne('bands', params.bandProfile.id)
-const isPopUp = ref(false)
+const isPopUp = ref(true)
 const bandName = ref('');
 const genre = ref('');
 const bio = ref('');

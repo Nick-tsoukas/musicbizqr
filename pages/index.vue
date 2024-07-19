@@ -20,15 +20,15 @@
     </div>
     </div>
    
-
+<!-- 
     <div class="flex flex-col items-center justify-center mx-2  mb-6">
       <h2 class="pb-8 text-3xl font-bold text-center mt-4  text-black">Get Your Sound Out</h2>
       <p class="text-center text w-[80vw]">
         Amplify your music's reach with our dynamic QR codes, designed specifically for the music industry.
       </p>
-    </div>
+    </div> -->
     <!-- band page  -->
-    <section class="mx-4 mt-10">
+    <!-- <section class="mx-4 mt-10">
       <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">Create Powerful Landing Pages for Artists
       </h2>
       <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Band Page
@@ -70,13 +70,13 @@
   </ul>
 </div>
 
-    </section>
+    </section> -->
     <!-- features   -->
 
-    <div class="flex justify-around w-[80vw] mx-auto mt-8">
+    <!-- <div class="flex justify-around w-[80vw] mx-auto mt-8">
       <nuxt-link to="/signup" class="btn text-center w-[40%] grow-1">Sign Up</nuxt-link>
       <nuxt-link to="/login" class="btn text-center w-[40%] grow-1">Log In</nuxt-link>
-    </div>
+    </div> -->
   
   </div>
 </template>
