@@ -151,13 +151,13 @@
       <section v-if="albumList" class="form-group">
         <h2 class="mb-8 font-semibold">Album List</h2>
         <!-- <pre>{{ albumList }}</pre> -->
-        <div v-for="album in albumList.data" :key="album.attributes.title"  class="flex gap-2 items-center w-full mb-4">
+        <div v-for="(album, index) in albumList.data" :key="album.attributes.title"  class="flex gap-2 items-center w-full mb-4">
         
           <div class=" w-[60px] h-[60px]">
             <img :src="album.attributes.cover.data.attributes.url" alt="">
           </div>
           <div class="grow">{{ album.attributes.title }}</div>
-          <div class="flex items-center"> <img @click="toggle" src="@/assets/edit-icon.svg" alt=""></div>
+          <div class="flex items-center"> <img @click="toggle(index)" src="@/assets/edit-icon.svg" alt=""></div>
         </div>
       </section>
 
@@ -170,52 +170,56 @@
       <!-- modal popup box -->
       <section :class="{ hidden: !isPopUp }" class="w-screen h-screen z-[9999999] absolute top-0 left-0 overflow-scroll bg-[#fff] p-2 ">
         <!-- top bar -->
-     
-      <div class="form-group bg-[#fff]">
+     <!-- work here album popup -->
+      <div v-if="currentAlbum" class="form-group bg-[#fff]">
+        
        <div class="flex">
         <h2 class="mb-8 font-semibold">Albums</h2>
         <img class="ml-auto self-baseline" @click="toggle" src="@/assets/edit-icon.svg" alt="">
        </div>
-        <div v-for="(album, albumIndex) in albumList" :key="albumIndex" class="album-container">
-          <pre>{{ album }}</pre>
+        <div  class="album-container">
+         
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album[0].attributes.title" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album </label>
+            <input type="text" :id="'album-title-'" class="mdc-text-field__input" v-model="currentAlbum.attributes.title" placeholder=" "  />
+            <label class="mdc-floating-label" :for="'album-title-' ">Album </label>
             <div class="mdc-line-ripple"></div>
           </div>
+          <!-- album cover -->
           <div class="mdc-text-field mb-4">
-            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album[0].attributes.releaseDate" placeholder=" "  />
+            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="currentAlbum.attributes.releaseDate" placeholder=" "  />
             <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mb-4">
-            <input type="file" :id="'album-cover-' + albumIndex" class="styled-file-input" @change="(event) => handleAlbumCoverUploadUpdate(event, albumIndex)" accept="image/*" />
-            <label :for="'album-cover-' + albumIndex" class="styled-file-label">Edit Album Cover</label>
+            <input type="file" :id="'album-cover-' " class="styled-file-input" @change="(event) => handleAlbumCoverUploadUpdate(event)" accept="image/*" />
+            <label :for="'album-cover-' " class="styled-file-label">Edit Album Cover</label>
           </div>
-          <!-- <div v-if="album.coverUrl" class="mb-4">
-            <img :src="album.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
+
+
+          <div v-if="currentAlbum.coverUrl" class="mb-4">
+            <img :src="currentAlbum.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
           </div>
-          <div v-if="album[0].attributes.cover.data.attributes.url" class="mb-4">
-            <img :src="album[0].attributes.cover.data.attributes.url" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-          </div> -->
+          <div v-if="currentAlbum.attributes.cover.data.attributes.url" class="mb-4">
+            <img :src="currentAlbum.attributes.cover.data.attributes.url" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
+          </div>
 
 
           <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
-          <div v-for="(song, songIndex) in album[0].attributes.songs" :key="songIndex" class="song-container divide-solid">
+           <div v-for="(song, songIndex) in currentAlbum.attributes.songs" :key="songIndex" class="song-container divide-solid">
             <div class="mdc-text-field mb-4">
-              <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
-              <label class="mdc-floating-label" :for="'song-title-' + albumIndex + '-' + songIndex">Song Title</label>
+              <input type="text" :id="'song-title-' + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
+              <label class="mdc-floating-label" :for="'song-title-' + '-' + songIndex">Song Title</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mb-4">
-              <input type="file" :id="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-input" @change="(event) => handleSongFileUploadUpdate(event, albumIndex, songIndex)" accept="audio/*" />
-              <label :for="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-label">Edit Song File</label>
+              <input type="file" :id="'song-file-'  + '-' + songIndex" class="styled-file-input" @change="(event) => handleSongFileUploadUpdate(event, songIndex)" accept="audio/*" />
+              <label :for="'song-file-'  + '-' + songIndex" class="styled-file-label">Edit Song File</label>
             </div>
-            <button type="button" class="mdc-button mb-12 w-full" @click="removeSong(albumIndex, songIndex)">Remove Song</button>
+            <!-- <button type="button" class="mdc-button mb-12 w-full" @click="removeSong(albumIndex, songIndex)">Remove Song</button> -->
           </div>
-          <button type="button" class="mdc-button mb-8 w-full" @click="addSong(albumIndex)">+ Add Song</button>
+          <!-- <button type="button" class="mdc-button mb-8 w-full" @click="addSong(albumIndex)">+ Add Song</button>  -->
 
-          <button type="button" class="mdc-button mb-4 w-full" @click="updateAlbum(albumIndex)">Update Album</button>
+          <button type="button" class="mdc-button mb-4 w-full" @click="updateAlbum">Update Album</button>
         </div>
         <button type="button" class="mdc-button mb-8 w-full" @click="addAlbum">+ Add Album</button>
       </div> 
@@ -248,10 +252,20 @@ const soundcloud = ref('');
 const bandId = ref(null);
 const qr = ref (null);
 const albumList = ref([{ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] }]);
+const albumIndex = ref(null);
+const currentAlbum = ref(null);
 
-
-const toggle = () => {
+const toggle = (index) => {
+ if(isPopUp){
+  albumIndex.value = index
+  console.log(albumList.value)
+  currentAlbum.value = albumList.value.data[index]
+  console.log(currentAlbum.value, 'the current album')
   isPopUp.value = !isPopUp.value
+ }  else {
+  isPopUp.value = !isPopUp.value
+ }
+ 
 }
 
 
@@ -308,9 +322,10 @@ try {
   image: null // This will be updated if a new image is uploaded
   
     }));
-    qr.data[0].attributes.band.data.attributes.albums.data.forEach((album) => {
-      console.log(album.attributes, 'this is the forEach')
-    })
+
+    // qr.data[0].attributes.band.data.attributes.albums.data.forEach((album) => {
+    //   console.log(album.attributes, 'this is the forEach')
+    // })
    // imageUrl: member.image ? member.image.data.attributes.url : null
 //     albums.value = qr.data[0].attributes.band.data.attributes.albums.data.map(album => ({
 //   id: album.id,
@@ -369,7 +384,6 @@ try {
 //         }
 //     }
 // ]
-console.log('this should be members ref ', members.value)
 } catch (error) {
   console.log(error , 'this is the error in the bind form funciton and call to get data')
 }
@@ -385,16 +399,20 @@ const handleMemberImageUpload = (event, index) => {
   members.value[index].image = file;
   members.value[index].imageUrl = URL.createObjectURL(file);
 };
-const handleAlbumCoverUpload = (event, index) => {
+const handleAlbumCoverUpload = (event)=> {
   const file = event.target.files[0];
-  albums.value[index].cover = file;
-  albums.value[index].coverUrl = URL.createObjectURL(file);
+
+  currentAlbum.value.cover = file;
+  currentAlbum.value.coverUrl = URL.createObjectURL(file);
+  console.log(currentAlbum, ' update file for album')
 };
 // update 
 const handleAlbumCoverUploadUpdate = (event, index) => {
   const file = event.target.files[0];
-  albumList.value.data[0].attributes.cover = file;
-  albumList.value.data[0].attributes.cover.coverUrl = URL.createObjectURL(file);
+  console.log(file)
+  currentAlbum.value.cover = file;
+  currentAlbum.value.coverUrl = URL.createObjectURL(file);
+  console.log(currentAlbum.value, ' update file for album')
 };
 
 const handleSongFileUpload = (event, albumIndex, songIndex) => {
@@ -404,10 +422,11 @@ const handleSongFileUpload = (event, albumIndex, songIndex) => {
 };
 // update song
 
-const handleSongFileUploadUpdate = (event, albumIndex, songIndex) => {
+const handleSongFileUploadUpdate = (event, songIndex) => {
   const file = event.target.files[0];
-  albumList.value[albumIndex].songs[songIndex].file = file;
-  albumList.value[albumIndex].songs[songIndex].fileUrl = URL.createObjectURL(file);
+  currentAlbum.value.attributes.songs[songIndex].file = file;
+  currentAlbum.value.attributes.songs[songIndex].fileUrl = URL.createObjectURL(file);
+  console.log('song file update ', currentAlbum.value)
 };
 
 const addMember = () => {
@@ -437,38 +456,42 @@ const removeSong = (albumIndex, songIndex) => {
 const updateAlbum = async () => {
   console.log(albumList.value.data[0].id)
   try {
-    // console.log(albumList.value.data[0], 'this is the data that i need ')
+    const albumForm = new FormData();
+    const albumData = {
+      title: currentAlbum.value.attributes.title,
+      releaseDate: currentAlbum.value.attributes.releaseDate,
+      band: bandId.value,
+      songs: currentAlbum.value.attributes.songs.map(song => ({
+        id: song.id,
+        title: song.title,
+      })),
+    };
 
-      const albumForm = new FormData();
-      const albumData = {
-        title: albumList.value.data[0].attributes.title,
-        releaseDate: albumList.value.data[0].attributes.releaseDate,
-        band: bandId.value, // Associate the album with the band
-        // songs: album.songs.map(song => ({
-        //   title: song.title,
-        // })),
-      };
-      // console.log(albumData)
+    albumForm.append('data', JSON.stringify(albumData));
+    console.log('cur val at cover', currentAlbum.value.attributes);
+    
+    if (currentAlbum.value.cover) {
+      console.log('update album cover');
+      albumForm.append('files.cover', currentAlbum.value.cover);
+    }
 
-      albumForm.append('data', JSON.stringify(albumData));
-    console.log(albumList.value.data[0].attributes.cover, 'this is new album cover ')
-      if (albumList.value.data[0].attributes.cover) {
-        console.log('update album cover')
-        console.log(albumList.value.data[0].attributes.cover, 'this is new album cover ')
-
-        albumForm.append('files.cover', albumList.value.data[0].attributes.cover);
+    currentAlbum.value.attributes.songs.forEach((song, songIndex) => {
+      if (song.file) {
+        albumForm.append(`files.songs[${songIndex}].file`, song.file);
       }
+    });
 
-      // album.songs.forEach((song, songIndex) => {
-      //   if (song.file) {
-      //     albumForm.append(`files.songs[${songIndex}].file`, song.file);
-      //   }
-      // });
+    await client(`/albums/${currentAlbum.value.id}`, {
+      method: 'PUT',
+      body: albumForm,
+    });
+    const updatedAlbum = {
+      ...currentAlbum.value,
+      coverUrl: currentAlbum.value.coverUrl,
+    };
 
-      await client(`/albums/${albumList.value.data[0].id}`, {
-        method: 'PUT',
-        body: albumForm,
-      });
+    albumList.value[0] = updatedAlbum;
+    router.go(0);
     // }
   } catch (error) {
     console.log(error, 'error in update album function ')
