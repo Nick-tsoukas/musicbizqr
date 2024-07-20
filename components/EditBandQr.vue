@@ -1,7 +1,7 @@
 <template>
   <div class="container-mdc">
     <h1 class="title">Update Band Profile</h1>
-    <form :class="{hidden: isPopUp}" @submit.prevent="submitForm">
+    <form :class="{hidden: isPopUp, hidden: isCreatingAlbum}" @submit.prevent="submitForm">
       <!-- Band Details Section -->
       <div class="form-group">
         <h2 class="mb-8 font-semibold">Band Details</h2>
@@ -153,23 +153,74 @@
         <!-- <pre>{{ albumList }}</pre> -->
         <div v-for="(album, index) in albumList.data" :key="album.attributes.title"  class="flex gap-2 items-center w-full mb-4">
         
-          <div class=" w-[60px] h-[60px]">
+          <div v-if="album.attributes.cover" class=" w-[60px] h-[60px]">
             <img :src="album.attributes.cover.data.attributes.url" alt="">
           </div>
           <div class="grow">{{ album.attributes.title }}</div>
           <div class="flex items-center"> <img @click="toggle(index)" src="@/assets/edit-icon.svg" alt=""></div>
         </div>
+        <button type="button" class="mdc-button mb-8 w-full" @click="toggleCreateAlbum">+ Add Album</button>
+
       </section>
 
-
+      
       <button type="submit" class="mdc-button w-full">Update Band</button>
    
     </form>
-      <!-- <pre>{{ albumList }}</pre> -->
+
+      <!-- album overlay add -->
+      <!-- Album Creation Overlay creatingalbum -->
+<section v-if="isCreatingAlbum" class="w-screen h-screen z-[9999999] absolute top-0 left-0 overflow-scroll bg-[#fff] p-2">
+  <pre>{{ newAlbum }} this is the new album </pre>
+  <div class="form-group bg-[#fff]">
+    <div class="flex">
+      <h2 class="mb-8 font-semibold">Create New Album</h2>
+      <img class="ml-auto self-baseline" @click="toggleCreateAlbum" src="@/assets/close-icon.svg" alt="Close">
+    </div>
+    <div>
+      <div class="mdc-text-field mb-4">
+        <input type="text" id="new-album-title" class="mdc-text-field__input" v-model="newAlbum.title" placeholder=" " />
+        <label class="mdc-floating-label" for="new-album-title">Album Title</label>
+        <div class="mdc-line-ripple"></div>
+      </div>
+      <div class="mdc-text-field mb-4">
+        <input type="date" id="new-release-date" class="mdc-text-field__input" v-model="newAlbum.releaseDate" placeholder=" " />
+        <label class="mdc-floating-label" for="new-release-date">Release Date</label>
+        <div class="mdc-line-ripple"></div>
+      </div>
+      <div class="mb-4">
+        <input type="file" id="new-album-cover" class="styled-file-input" @change="handleNewAlbumCoverUpload" accept="image/*" />
+        <label for="new-album-cover" class="styled-file-label">Choose Album Cover</label>
+      </div>
+      <div v-if="newAlbum.coverUrl" class="mb-4">
+        <img :src="newAlbum.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
+      </div>
+      <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
+      <div v-for="(song, songIndex) in newAlbum.songs" :key="songIndex" class="song-container">
+        <div class="mdc-text-field mb-4">
+          <input type="text" :id="'new-song-title-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" " />
+          <label class="mdc-floating-label" :for="'new-song-title-' + songIndex">Song Title</label>
+          <div class="mdc-line-ripple"></div>
+        </div>
+        <div class="mb-4">
+          <input type="file" :id="'new-song-file-' + songIndex" class="styled-file-input" @change="(event) => handleNewSongFileUpload(event, songIndex)" accept="audio/*" />
+          <label :for="'new-song-file-' + songIndex" class="styled-file-label">Choose Song File</label>
+        </div>
+        <button type="button" class="mdc-button mb-4 w-full" @click="removeNewSong(songIndex)">Remove Song</button>
+      </div>
+      <button type="button" class="mdc-button mb-8 w-full" @click="addNewSong">+ Add Song</button>
+      <button type="button" class="mdc-button mb-4 w-full" @click="submitNewAlbum">Create Album</button>
+    </div>
+  </div>
+</section>
+
 
       <!-- modal popup box -->
       <section :class="{ hidden: !isPopUp }" class="w-screen h-screen z-[9999999] absolute top-0 left-0 overflow-scroll bg-[#fff] p-2 ">
         <!-- top bar -->
+   
+
+
      <!-- work here album popup -->
       <div v-if="currentAlbum" class="form-group bg-[#fff]">
         
@@ -235,6 +286,7 @@ const client = useStrapiClient();
 
 console.log(route.params)
 // const { data: band } = findOne('bands', params.bandProfile.id)
+const isCreatingAlbum = ref(false)
 const isPopUp = ref(false)
 const bandName = ref('');
 const genre = ref('');
@@ -254,6 +306,11 @@ const qr = ref (null);
 const albumList = ref([{ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] }]);
 const albumIndex = ref(null);
 const currentAlbum = ref(null);
+const newAlbum = ref({ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] })
+
+const toggleCreateAlbum = () => {
+  isCreatingAlbum.value = !isCreatingAlbum.value;
+};
 
 const toggle = (index) => {
  if(isPopUp){
@@ -430,7 +487,8 @@ const handleSongFileUploadUpdate = (event, songIndex) => {
 };
 
 const addMember = () => {
-  members.value.push({ name: '', instrument: '', image: null, imageUrl: null });
+  members.value.push({ name: '', instrument: '', image: null, imageUrl: null, id: null });
+
 };
 
 const removeMember = (index) => {
@@ -497,6 +555,63 @@ const updateAlbum = async () => {
     console.log(error, 'error in update album function ')
   }
 }
+const handleNewAlbumCoverUpload = (event) => {
+  const file = event.target.files[0];
+  newAlbum.value.cover = file;
+  newAlbum.value.coverUrl = URL.createObjectURL(file);
+};
+
+const handleNewSongFileUpload = (event, songIndex) => {
+  const file = event.target.files[0];
+  newAlbum.value.songs[songIndex].file = file;
+  newAlbum.value.songs[songIndex].fileUrl = URL.createObjectURL(file);
+};
+
+const addNewSong = () => {
+  newAlbum.value.songs.push({ title: '', file: null, fileUrl: null });
+};
+
+const removeNewSong = (songIndex) => {
+  newAlbum.value.songs.splice(songIndex, 1);
+};
+
+const submitNewAlbum = async () => {
+  try {
+    const albumForm = new FormData();
+    const albumData = {
+      title: newAlbum.value.title,
+      releaseDate: newAlbum.value.releaseDate,
+      band: bandId.value,
+      songs: newAlbum.value.songs.map(song => ({
+        title: song.title,
+      })),
+    };
+
+    albumForm.append('data', JSON.stringify(albumData));
+
+    if (newAlbum.value.cover) {
+      albumForm.append('files.cover', newAlbum.value.cover);
+    }
+
+    newAlbum.value.songs.forEach((song, songIndex) => {
+      if (song.file) {
+        albumForm.append(`files.songs[${songIndex}].file`, song.file);
+      }
+    });
+
+    const response = await client(`/albums`, {
+      method: 'POST',
+      body: albumForm,
+    });
+
+    // albumList.value.push(response.data);
+    toggleCreateAlbum();
+    router.go(0); // Refresh the page
+  } catch (error) {
+    console.error('Error creating new album:', error);
+  }
+};
+
 
 const submitForm = async () => {
   try {
@@ -512,10 +627,10 @@ const submitForm = async () => {
       spotify: spotify.value || null,
       soundcloud: soundcloud.value || null,
       members: members.value.map(member => ({
-        id: member.id || null, // Include the member ID for updates
-        name: member.name || null,
-        instrument: member.instrument || null,
-        image: member.imageId // Reference to the existing image ID
+        id: member.id || undefined, // Only include id if it exists
+        name: member.name,
+        instrument: member.instrument,
+        image: member.imageId || undefined, // Only include imageId if it exists
       })),
     };
 
@@ -534,6 +649,7 @@ const submitForm = async () => {
         formData.append(`files.members[${index}].image`, member.image);
       }
     });
+    
 
     // Use Strapi client to update the band
     const { data: bandData } = await client(`/bands/${bandId.value}`, {
