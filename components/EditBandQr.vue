@@ -565,6 +565,7 @@ const handleNewSongFileUpload = (event, songIndex) => {
   const file = event.target.files[0];
   newAlbum.value.songs[songIndex].file = file;
   newAlbum.value.songs[songIndex].fileUrl = URL.createObjectURL(file);
+  console.log('new song file updated the newalbum ')
 };
 
 const addNewSong = () => {
@@ -577,6 +578,7 @@ const removeNewSong = (songIndex) => {
 
 const submitNewAlbum = async () => {
   try {
+    console.log('submit new album ')
     const albumForm = new FormData();
     const albumData = {
       title: newAlbum.value.title,
