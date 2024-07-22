@@ -40,7 +40,7 @@
       </button>
     </div>
     <nav
-      class="fixed z-50 top-[75px] left-0 w-full h-[100vh] justify-center bg-white text-black transform transition-transform md:hidden"
+      class="fixed overAll top-[75px] left-0 w-screen h-[100vh] justify-center bg-white text-black transform transition-transform md:hidden"
       :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
     >
       <div class="flex  flex-col h-[calc(100vh -75px)] items-center space-y-4 py-4">
@@ -49,7 +49,7 @@
         <NuxtLink v-if="user" to="/qrtype" @click="toggleMenu" class="mobile-nav-link">+ Create QR</NuxtLink>
         <NuxtLink v-if="!user" to="/signup" @click="toggleMenu" class="mobile-nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" @click="toggleMenu" class="mobile-nav-link">Login</NuxtLink>
-        <NuxtLink to="/" @click="logoutUserMobile" class="mobile-nav-link">Logout</NuxtLink>
+        <NuxtLink v-if="user"to="/" @click="logoutUserMobile" class="mobile-nav-link">Logout</NuxtLink>
         <NuxtLink to="/contact" @click="toggleMenu" class="mobile-nav-link">Contact</NuxtLink>
       </div>
     </nav>
@@ -72,6 +72,7 @@ const logoutUser =  () => {
 
 const logoutUserMobile = () => {
   logout()
+  toggleMenu()
   router.push('/')
 }
   const isMenuOpen = ref(false);
@@ -82,6 +83,10 @@ const logoutUserMobile = () => {
   }
 </script>
 <style scoped>
+.overAll {
+  z-index: 999999999999
+}
+
 .m-header-height {
   height: calc(100vh-75px)
 }

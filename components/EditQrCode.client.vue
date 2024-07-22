@@ -139,6 +139,7 @@ const url = `https://localhost:3000/directqr?id=${uuid}`
 const { data } = await findOne('qrs', route.params.id)
 
 const qrcode = ref(null)
+const q_type = ref(null)
 const link = ref(null)
 const color = ref('#ffffff')
 const name = ref(data.attributes.name || 'add name')
@@ -220,35 +221,41 @@ const handleSelection = (type) => {
     selectedAlbum.value = null
     selectedTour.value = null
     selectedEvent.value = null
+    q_type.value = 'link'
   } else {
     link.value = null
     if (type === 'band') {
       selectedAlbum.value = null
       selectedTour.value = null
       selectedEvent.value = null
+      q_type.value = 'band'
+      console.log(selectedBand.value)
       if (selectedBand.value === 'createNew') {
-        router.push({ name: 'createband' })
+        router.push('/createband')
       }
     } else if (type === 'album') {
       selectedBand.value = null
       selectedTour.value = null
       selectedEvent.value = null
+      q_type.value = 'album'
       if (selectedAlbum.value === 'createNew') {
-        router.push({ name: 'createalbum' })
+        router.push('newalbum')
       }
     } else if (type === 'tour') {
       selectedBand.value = null
       selectedAlbum.value = null
       selectedEvent.value = null
+      q_type.value = 'tour'
       if (selectedTour.value === 'createNew') {
-        router.push({ name: 'createtour' })
+        router.push('/newtour')
       }
     } else if (type === 'event') {
       selectedBand.value = null
       selectedAlbum.value = null
       selectedTour.value = null
+      q_type.value = 'event'
       if (selectedEvent.value === 'createNew') {
-        router.push({ name: 'createevent' })
+        router.push('/newevent' )
       }
     }
   }
@@ -265,9 +272,16 @@ const updateQrCodeSubmit = async () => {
     const form = {
       url: options.data,
       users_permissions_user: { id: user.value.id },
-      q_type: route.query.type,
+      q_type: q_type.value,
       link: link.value,
       name: name.value,
+      options: options.value,
+      band: selectedBand.value || null,
+      album: selectedAlbum.value || null,
+      event: selectedEvent.value || null,
+      tour: selectedTour.value || null
+
+
     }
 
     const blob = await qrCodeStyling.getRawData('image/png')
@@ -281,7 +295,7 @@ const updateQrCodeSubmit = async () => {
       body: formData,
     })
 
-    router.push('dashboard')
+    router.push('/dashboard')
   } catch (error) {
     console.error('Error updating QR code:', error)
   }

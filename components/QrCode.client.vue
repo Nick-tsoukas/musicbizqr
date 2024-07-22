@@ -128,6 +128,8 @@ const options = reactive({
   }
 })
 
+console.log({...options})
+
 const gradient = {
   type: 'linear',
   rotation: 0,
@@ -173,6 +175,7 @@ onMounted(() => {
 })
 
 const saveQrCode = async () => {
+  console.log(options.value, 'this is the options ')
   try {
     const form = {
       url: options.data,
@@ -180,6 +183,7 @@ const saveQrCode = async () => {
       q_type : route.query.type,
       link: link.value,
       name: name.value,
+      options:{ ...options }
       // scanTime: [{date: 'some date one '}, {date: 'some date two'}]
     }
 
@@ -200,6 +204,8 @@ const saveQrCode = async () => {
     }
     if(props.type === 'bandProfile') {
       router.push({ name: 'createband', query: { qrId: data.id } });
+    } else {
+      router.push('/dashboard')
     }
   } catch (error) {
     console.error(error);

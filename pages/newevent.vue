@@ -66,7 +66,7 @@
         <button type="submit" class="mdc-button mb-4 w-full">Create Event</button>
       </div>
     </form>
-    <pre>{{ bands }} this is band </pre>
+
   </div>
 </template>
 
