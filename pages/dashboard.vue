@@ -178,9 +178,13 @@ const albumItems = computed(() => albums.value.map(album => ({
             <img :src="qr.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
             <span>{{ qr.title }}</span>
           </div>
+         <div class="flex items-center gap-2">
+         
           <button @click="editItem(qr.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
           </button>
+         </div>
+        
         </li>
       </ul>
     </div>
@@ -213,9 +217,15 @@ const albumItems = computed(() => albums.value.map(album => ({
             <img :src="band.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
             <span>{{ band.title }}</span>
           </div>
-          <button @click="editItem(band.id, 'editband')" class="text-blue-600 hover:text-blue-900">
+          <div class="flex items-center gap-2">
+            <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
           </button>
+          <button @click="editItem(band.id, 'editband')" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+          </button>
+         
+         </div>
         </li>
       </ul>
     </div>
@@ -247,9 +257,14 @@ const albumItems = computed(() => albums.value.map(album => ({
             <img :src="event.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
             <span>{{ event.title }}</span>
           </div>
+          <div class="flex items-center gap-2">
+          <button @click="router.push(`/event/${event.id}`)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+          </button>
           <button @click="editItem(event.id, 'editevent')" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
           </button>
+         </div>
         </li>
       </ul>
     </div>
@@ -282,9 +297,14 @@ const albumItems = computed(() => albums.value.map(album => ({
             <img :src="tour.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
             <span>{{ tour.title }}</span>
           </div>
+          <div class="flex items-center gap-2">
+          <button @click="router.push(`/tour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+          </button>
           <button @click="editItem(tour.id, 'edittour')" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
           </button>
+         </div>
         </li>
       </ul>
     </div>
@@ -317,9 +337,14 @@ const albumItems = computed(() => albums.value.map(album => ({
             <img :src="album.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
             <span>{{ album.title }}</span>
           </div>
+          <div class="flex items-center gap-2">
+          <button @click="router.push(`/album/${album.id}`)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+          </button>
           <button @click="editItem(album.id, 'editalbum')" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
           </button>
+         </div>
         </li>
       </ul>
     </div>
