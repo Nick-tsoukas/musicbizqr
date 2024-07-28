@@ -1,15 +1,18 @@
 <script setup>
 
-const { find } = useStrapi()
-const user = useStrapiUser()
-const router = useRouter()
+import SkeletonLoader from '@/components/SkeletonLoader.vue';
 
+const user = useStrapiUser();
+const router = useRouter();
+const client = useStrapiClient();
+const {find} = useStrapi();
 
-const qrs = ref([])
-const bands = ref([])
-const events = ref([])
-const tours = ref([])
-const albums = ref([])
+const loading = ref(true);
+const qrs = ref([]);
+const bands = ref([]);
+const events = ref([]);
+const tours = ref([]);
+const albums = ref([]);
 
 const fetchData = async () => {
   if (user.value) {
@@ -20,10 +23,12 @@ const fetchData = async () => {
       await fetchTours();
       await fetchAlbums();
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching data:', error);
+    } finally {
+      loading.value = false;
     }
   }
-}
+};
 
 const fetchBands = async () => {
   try {
@@ -36,12 +41,12 @@ const fetchBands = async () => {
         }
       },
       populate: '*'
-    })
-    bands.value = response.data
+    });
+    bands.value = response.data;
   } catch (error) {
-    console.error('Error fetching bands:', error)
+    console.error('Error fetching bands:', error);
   }
-}
+};
 
 const fetchQrs = async () => {
   try {
@@ -54,12 +59,12 @@ const fetchQrs = async () => {
         }
       },
       populate: '*'
-    })
-    qrs.value = response.data
+    });
+    qrs.value = response.data;
   } catch (error) {
-    console.error('Error fetching QR codes:', error)
+    console.error('Error fetching QR codes:', error);
   }
-}
+};
 
 const fetchEvents = async () => {
   try {
@@ -72,12 +77,12 @@ const fetchEvents = async () => {
         }
       },
       populate: '*'
-    })
-    events.value = response.data
+    });
+    events.value = response.data;
   } catch (error) {
-    console.error('Error fetching events:', error)
+    console.error('Error fetching events:', error);
   }
-}
+};
 
 const fetchTours = async () => {
   try {
@@ -90,12 +95,12 @@ const fetchTours = async () => {
         }
       },
       populate: '*'
-    })
-    tours.value = response.data
+    });
+    tours.value = response.data;
   } catch (error) {
-    console.error('Error fetching tours:', error)
+    console.error('Error fetching tours:', error);
   }
-}
+};
 
 const fetchAlbums = async () => {
   try {
@@ -108,51 +113,48 @@ const fetchAlbums = async () => {
         }
       },
       populate: '*'
-    })
-    albums.value = response.data
+    });
+    albums.value = response.data;
   } catch (error) {
-    console.error('Error fetching albums:', error)
+    console.error('Error fetching albums:', error);
   }
-}
+};
 
-onMounted(fetchData)
+onMounted(fetchData);
 
 const editItem = (id, page) => {
-  console.log('Edit item:', id)
   router.push({ path: `/${page}/${id}` });
-  // Handle edit action, e.g., navigate to edit page
-}
+};
 
-// Computed properties to transform the data for display
 const qrItems = computed(() => qrs.value.map(qr => ({
   id: qr.id,
   title: qr.attributes.name,
   imageUrl: qr.attributes.q_image?.data?.attributes?.url || '',
-})))
+})));
 
 const bandItems = computed(() => bands.value.map(band => ({
   id: band.id,
   title: band.attributes.name,
   imageUrl: band.attributes.bandImg?.data?.attributes?.url || '',
-})))
+})));
 
 const eventItems = computed(() => events.value.map(event => ({
   id: event.id,
   title: event.attributes.title,
   imageUrl: event.attributes.image?.data?.attributes?.url || '',
-})))
+})));
 
 const tourItems = computed(() => tours.value.map(tour => ({
   id: tour.id,
   title: tour.attributes.title,
   imageUrl: tour.attributes.image?.data?.attributes?.url || '',
-})))
+})));
 
 const albumItems = computed(() => albums.value.map(album => ({
   id: album.id,
   title: album.attributes.title,
   imageUrl: album.attributes.cover?.data?.attributes?.url || '',
-})))
+})));
 </script>
 
 <template>
@@ -160,7 +162,10 @@ const albumItems = computed(() => albums.value.map(album => ({
     <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
 
     <!-- QR Codes Section -->
-    <div v-if="qrItems.length" class="mb-6 border-2 rounded-md">
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="qrItems.length" class="mb-6 border-2 rounded-md">
       <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
         <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">QR Codes</h2>
         <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -179,9 +184,23 @@ const albumItems = computed(() => albums.value.map(album => ({
         </li>
       </ul>
     </div>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Qrs</h2>
+        <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Qr
+        </NuxtLink>
+      </div>
+      <div>
+        <h2 class="text-center my-4">No Qrs found</h2>
+      </div>
+    </div>
 
     <!-- Bands Section -->
-    <div v-if="bandItems.length" class="mb-6 border-2 rounded-md">
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="bandItems.length" class="mb-6 border-2 rounded-md">
       <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
         <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Bands</h2>
         <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -200,9 +219,22 @@ const albumItems = computed(() => albums.value.map(album => ({
         </li>
       </ul>
     </div>
-
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Bands</h2>
+        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+        </NuxtLink>
+      </div>
+      <div>
+        <h2 class="text-center my-4">No Bands found</h2>
+      </div>
+    </div>
     <!-- Events Section -->
-    <div v-if="eventItems.length" class="mb-6 border-2 rounded-md">
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="eventItems.length" class="mb-6 border-2 rounded-md">
       <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
         <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Events</h2>
         <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -221,9 +253,23 @@ const albumItems = computed(() => albums.value.map(album => ({
         </li>
       </ul>
     </div>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Events</h2>
+        <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
+        </NuxtLink>
+      </div>
+      <div>
+        <h2 class="text-center my-4">No Events found</h2>
+      </div>
+    </div>
 
     <!-- Tours Section -->
-    <div v-if="tourItems.length" class="mb-6 border-2 rounded-md">
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="tourItems.length" class="mb-6 border-2 rounded-md">
       <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
         <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Tours</h2>
         <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -242,9 +288,23 @@ const albumItems = computed(() => albums.value.map(album => ({
         </li>
       </ul>
     </div>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Tours</h2>
+        <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
+        </NuxtLink>
+      </div>
+      <div>
+        <h2 class="text-center my-4">No Tours found</h2>
+      </div>
+    </div>
 
     <!-- Albums Section -->
-    <div v-if="albumItems.length" class="mb-6 border-2 rounded-md">
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="albumItems.length" class="mb-6 border-2 rounded-md">
       <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
         <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Albums</h2>
         <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -263,6 +323,16 @@ const albumItems = computed(() => albums.value.map(album => ({
         </li>
       </ul>
     </div>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Albums</h2>
+        <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Albums
+        </NuxtLink>
+      </div>
+      <div>
+        <h2 class="text-center my-4">No Albums found</h2>
+      </div>
+    </div>
   </div>
 </template>
-

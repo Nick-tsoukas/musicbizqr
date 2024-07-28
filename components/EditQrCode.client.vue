@@ -1,6 +1,22 @@
 <template>
   <div class="flex flex-col items-center p-4">
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
+    
+      <div class="text-left w-full my-4" >
+        <h2 class="font-bold mb-2">Qr type</h2>
+        <p  v-if="data.attributes.q_type" >{{ data.attributes.q_type }}</p>
+
+        <div>
+          <!-- <pre>{{ data }}</pre> -->
+          <p v-if="data.attributes.q_type === 'band'">{{data.attributes.band.data.attributes.name}}</p>
+          <p v-if="data.attributes.q_type === 'event'">{{data.attributes.event.data.attributes.title}}</p>
+          <p v-if="data.attributes.q_type === 'tour'">{{data.attributes.tour.data.attributes.title}}</p>
+        <p v-if="data.attributes.q_type === 'album'">{{data.attributes.album.data.attributes.title}}</p>
+
+
+
+        </div>
+      </div>
     <div class="mt-4 flex flex-col space-y-4 w-full max-w-md">
       <label class="mdc-text-field mdc-text-field--filled mb-4">
         <span class="mb-1 text-gray-700">Name of QR:</span>
@@ -136,11 +152,26 @@ const uuid = uuidv4()
 
 const url = `https://localhost:3000/directqr?id=${uuid}`
 
-const { data } = await findOne('qrs', route.params.id)
+const { data } = await findOne('qrs', route.params.id, {
+  populate: {
+    event: {
+      populate : "*"
+    },
+    tour: {
+      populate : "*"
+    },
+    album: {
+      populate : "*"
+    },
+    band: {
+      populate : "*"
+    }
+  }
+})
 
 const qrcode = ref(null)
-const q_type = ref(null)
-const link = ref(null)
+const q_type = ref(data.attributes.q_type || null)
+const link = ref(data.attributes.link || null)
 const color = ref('#ffffff')
 const name = ref(data.attributes.name || 'add name')
 const options = reactive(data.attributes.options)
@@ -150,10 +181,12 @@ const events = ref([])
 const tours = ref([])
 const albums = ref([])
 
-const selectedBand = ref(null)
-const selectedEvent = ref(null)
-const selectedTour = ref(null)
-const selectedAlbum = ref(null)
+
+const selectedEvent = ref(data.attributes.event?.data?.id ?? null)
+const selectedTour = ref(data.attributes.tour.data?.id ?? null)
+const selectedAlbum = ref( data.attributes.album?.data?.id ?? null)
+const selectedBand = ref( data.attributes.band?.data?.id ?? null)
+
 
 const fetchUserRelatedData = async () => {
   try {
@@ -229,34 +262,23 @@ const handleSelection = (type) => {
       selectedTour.value = null
       selectedEvent.value = null
       q_type.value = 'band'
-      console.log(selectedBand.value)
-      if (selectedBand.value === 'createNew') {
-        router.push('/createband')
-      }
     } else if (type === 'album') {
       selectedBand.value = null
       selectedTour.value = null
       selectedEvent.value = null
       q_type.value = 'album'
-      if (selectedAlbum.value === 'createNew') {
-        router.push('newalbum')
-      }
-    } else if (type === 'tour') {
+        } else if (type === 'tour') {
       selectedBand.value = null
       selectedAlbum.value = null
       selectedEvent.value = null
       q_type.value = 'tour'
-      if (selectedTour.value === 'createNew') {
-        router.push('/newtour')
-      }
+     
     } else if (type === 'event') {
       selectedBand.value = null
       selectedAlbum.value = null
       selectedTour.value = null
       q_type.value = 'event'
-      if (selectedEvent.value === 'createNew') {
-        router.push('/newevent' )
-      }
+    
     }
   }
 }
@@ -275,13 +297,11 @@ const updateQrCodeSubmit = async () => {
       q_type: q_type.value,
       link: link.value,
       name: name.value,
-      options: options.value,
-      band: selectedBand.value || null,
-      album: selectedAlbum.value || null,
-      event: selectedEvent.value || null,
-      tour: selectedTour.value || null
-
-
+      options: options,
+      band: selectedBand.value !== 'createNew' ? selectedBand.value : null,
+      album: selectedAlbum.value !== 'createNew' ? selectedAlbum.value : null,
+      event: selectedEvent.value !== 'createNew' ? selectedEvent.value : null,
+      tour: selectedTour.value !== 'createNew' ? selectedTour.value : null
     }
 
     const blob = await qrCodeStyling.getRawData('image/png')
@@ -295,11 +315,27 @@ const updateQrCodeSubmit = async () => {
       body: formData,
     })
 
-    router.push('/dashboard')
+    // Routing after successful update based on selected values
+    if (selectedBand.value === 'createNew') {
+      q_type.value = 'band'
+      router.push({ path: '/createband', query: { createnew: 'createNew', qrId: qrId } })
+    } else if (selectedAlbum.value === 'createNew') {
+      q_type.value = 'album'
+      router.push({ path: '/newalbum', query: { createnew: 'createNew', qrId: qrId } })
+    } else if (selectedTour.value === 'createNew') {
+      q_type.value = 'tour'
+      router.push({ path: '/newtour', query: { createnew: 'createNew', qrId: qrId } })
+    } else if (selectedEvent.value === 'createNew') {
+      q_type.value = 'event'
+      router.push({ path: '/newevent', query: { createnew: 'createNew', qrId: qrId } })
+    } else {
+      router.push('/dashboard')
+    }
   } catch (error) {
     console.error('Error updating QR code:', error)
   }
 }
+
 
 watch(() => options, updateQrCode, { deep: true })
 </script>

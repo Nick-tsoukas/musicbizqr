@@ -74,8 +74,10 @@
 
 
 const router = useRouter();
+const route = useRoute();
 const client = useStrapiClient();
 const user = useStrapiUser()
+const { update } = useStrapi();
 
 const newEvent = ref({
   title: '',
@@ -133,12 +135,18 @@ const submitNewEvent = async () => {
       eventForm.append('files.image', newEvent.value.image);
     }
 
-    await client('/events', {
+    const {data: event} = await client('/events', {
       method: 'POST',
       body: eventForm,
     });
 
-    // router.push('/events'); // Redirect to events page or any other page after successful creation
+    if(route.query.qrId){
+    await update('qrs', route.query.qrId, {
+      event: event.id
+    });
+   }
+
+    router.push('/dashboard'); // Redirect to events page or any other page after successful creation
   } catch (error) {
     console.error('Error creating new event:', error);
   }

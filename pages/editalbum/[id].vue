@@ -79,17 +79,17 @@ const fetchAlbum = async () => {
     if (response.data) {
       const attributes = response.data.attributes;
       album.value = {
-        title: attributes.title,
-        releaseDate: attributes.releaseDate,
-        cover: attributes.cover ? attributes.cover.data : null,
-        imageUrl: attributes.cover ? attributes.cover.data.attributes.url : null,
-        band: attributes.band ? attributes.band.data.id : null,
-        songs: attributes.songs ? attributes.songs.map(song => ({
-          title: song.title,
-          file: song.file ? song.file.data : null,
-          fileUrl: song.file ? song.file.data.attributes.url : null,
-        })) : [],
-      };
+  title: attributes.title ?? '',
+  releaseDate: attributes.releaseDate ?? '',
+  cover: attributes.cover?.data ?? null,
+  imageUrl: attributes.cover?.data?.attributes.url ?? null,
+  band: attributes.band?.data?.id ?? null,
+  songs: attributes.songs?.map(song => ({
+    title: song.title ?? '',
+    file: song.file?.data ?? null,
+    fileUrl: song.file?.data?.attributes.url ?? null,
+  })) ?? [],
+};
       console.log('Fetched album data:', album.value);
     } else {
       console.log('No data found for album ID:', albumId);
@@ -161,7 +161,7 @@ const submitEditAlbum = async () => {
       body: albumForm,
     });
 
-    router.push('/albums');
+    router.push('/dashboard');
   } catch (error) {
     console.error('Error updating album:', error);
   }

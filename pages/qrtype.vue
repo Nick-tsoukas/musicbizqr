@@ -13,7 +13,7 @@
         
         <!-- Band Profiles Card -->
         <div class="bg-white shadow-lg h-auto rounded-lg overflow-hidden pb-2">
-          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbc.jpg" alt="Band Profiles" class="w-full h-32 sm:h-48 object-cover"/>
+          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbchttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=" alt="Band Profiles" class="w-full h-32 sm:h-48 object-cover"/>
           <div class="p-4">
             <h3 class="text-xl font-semibold">Band Profiles</h3>
             <p class="mt-2">Showcase your band’s bio, discography, and social media links. Give your fans an in-depth look at your journey and connect with them on multiple platforms.</p>
@@ -35,7 +35,7 @@
 
         <!-- Event Pages Card -->
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbc.jpg" alt="Event Pages" class="w-full h-32 sm:h-48 object-cover"/>
+          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbchttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=" alt="Event Pages" class="w-full h-32 sm:h-48 object-cover"/>
           <div class="p-4">
             <h3 class="text-xl font-semibold">Event Pages</h3>
             <p class="mt-2">Create dedicated pages for upcoming events, complete with dates, locations, and ticketing information. Ensure your fans never miss a show.</p>
@@ -57,9 +57,9 @@
 
         <!-- Tip Jars Card -->
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbc.jpg" alt="Tip Jars" class="w-full h-32 sm:h-48 object-cover"/>
+          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbchttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=" alt="Tip Jars" class="w-full h-32 sm:h-48 object-cover"/>
           <div class="p-4">
-            <h3 class="text-xl font-semibold">Tip Jars</h3>
+            <h3 class="text-xl font-semibold">Tours</h3>
             <p class="mt-2">Enable fans to support you directly through integrated tip jars. Make it easy for your audience to show their appreciation and contribute to your success.</p>
             <ul class="list-disc list-inside mt-2">
               <li><strong>Support</strong>: Allow fans to tip you directly.</li>
@@ -67,7 +67,7 @@
             </ul>
           </div>
           <div class="flex flex-col gap-4">
-            <NuxtLink :to="{ path: '/createqr', query: { type: 'tipJar' } }" class="btn text-center">
+            <NuxtLink :to="{ path: '/createqr', query: { type: 'tours' } }" class="btn text-center">
              Tip Jar Page
             </NuxtLink>
             <button class="btn">
@@ -78,9 +78,9 @@
 
         <!-- Custom Audio Players Card -->
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbc.jpg" alt="Custom Audio Players" class="w-full h-32 sm:h-48 object-cover"/>
+          <NuxtImg src="https://qrcode101.s3.us-east-1.amazonaws.com/ts_sergey_Aw76e_FV_8h_E_unsplash_ce7b20cbbchttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://media.istockphoto.com/id/1308479862/photo/grayscale-shot-of-a-caucasian-female-with-sunglasses-holding-the-violinhttps://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=?s=2048x2048&w=is&k=20&c=H2J2FI52ha0hbSnC--vltfefNx_oPwaKSsD_MyTEieQ=" alt="Custom Audio Players" class="w-full h-32 sm:h-48 object-cover"/>
           <div class="p-4">
-            <h3 class="text-xl font-semibold">Custom Audio Players</h3>
+            <h3 class="text-xl font-semibold">Albums</h3>
             <p class="mt-2">Share your tracks or playlists seamlessly with embedded audio players. Let your music be heard instantly, right from the web template.</p>
             <ul class="list-disc list-inside mt-2">
               <li><strong>Track Sharing</strong>: Embed individual tracks.</li>
@@ -89,7 +89,7 @@
             </ul>
           </div>
           <div class="flex flex-col gap-4">
-            <NuxtLink :to="{ path: '/createqr', query: { type: 'audioPlayer' } }" class="btn text-center">
+            <NuxtLink :to="{ path: '/createqr', query: { type: 'albums' } }" class="btn text-center">
              Create Audio Page
             </NuxtLink>
             <button class="btn">
@@ -106,7 +106,7 @@
         <li><strong>Instant Access</strong>: Provide fans with quick access to your latest releases, tour dates, or merchandise.</li>
         <li><strong>Versatile Use</strong>: Perfect for posters, flyers, business cards, and more.</li>
       </ul>
-      <NuxtLink :to="{ path: 'createqr', query: { type: 'externalURL' } }" class="btn text-center">
+      <NuxtLink :to="{ path: 'createqr', query: { type: 'link' } }" class="btn text-center">
             Create External Link
       </NuxtLink>
     </div>

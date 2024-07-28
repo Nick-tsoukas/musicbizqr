@@ -7,8 +7,8 @@
         <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
         <span class="mdc-line-ripple"></span>
       </label>
-      <label v-if="type === 'externalURL'" class="mdc-text-field mdc-text-field--filled mb-4">
-        <span class="mb-1 text-gray-700">Data URL:</span>
+      <label v-if="type === 'link'" class="mdc-text-field mdc-text-field--filled mb-4">
+        <span class="mb-1 text-gray-700">External Link:</span>
         <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
         <span class="mdc-line-ripple"></span>
       </label>
@@ -198,13 +198,20 @@ const saveQrCode = async () => {
       body: formData
     })
 
-    console.log(props.type , 'test target', )
+   
     if(props.type === 'externalURL') {
       router.push('/dashboard')
     }
     if(props.type === 'bandProfile') {
       router.push({ name: 'createband', query: { qrId: data.id } });
-    } else {
+    } else if(props.type === 'events') {
+      router.push({ name: 'newevent', query: { qrId: data.id } });
+    } else if(props.type === 'tours') {
+      router.push({ name: 'newtour', query: { qrId: data.id } });
+    } else if(props.type === 'albums') {
+      router.push({ name: 'newalbum', query: { qrId: data.id } });
+    }
+    else {
       router.push('/dashboard')
     }
   } catch (error) {

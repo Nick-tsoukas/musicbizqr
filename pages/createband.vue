@@ -1,6 +1,7 @@
 <template>
   <div class="container-mdc">
     <h1 class="title">Create Band Profile</h1>
+    <pre>{{ route }}</pre>
     <form @submit.prevent="submitForm">
       <!-- Band Details Section -->
       <div class="form-group">
@@ -8,21 +9,21 @@
 
         <!-- Band Name -->
         <div class="mdc-text-field">
-          <input type="text" id="band-name" class="mdc-text-field__input" v-model="bandName" placeholder=" "  />
+          <input type="text" id="band-name" class="mdc-text-field__input" v-model="bandName" placeholder=" " />
           <label class="mdc-floating-label" for="band-name">Band Name</label>
           <div class="mdc-line-ripple"></div>
         </div>
 
         <!-- Genre -->
         <div class="mdc-text-field">
-          <input type="text" id="genre" class="mdc-text-field__input" v-model="genre" placeholder=" "  />
+          <input type="text" id="genre" class="mdc-text-field__input" v-model="genre" placeholder=" " />
           <label class="mdc-floating-label" for="genre">Genre</label>
           <div class="mdc-line-ripple"></div>
         </div>
 
         <!-- Bio -->
         <div class="mdc-text-field">
-          <textarea id="bio" class="mdc-text-field__input" v-model="bio" placeholder=" " ></textarea>
+          <textarea id="bio" class="mdc-text-field__input" v-model="bio" placeholder=" "></textarea>
           <label class="mdc-floating-label" for="bio">Bio</label>
           <div class="mdc-line-ripple"></div>
         </div>
@@ -43,12 +44,12 @@
         <h2 class="mb-8 font-semibold">Band Members</h2>
         <div v-for="(member, index) in members" :key="index" class="member-container">
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" "  />
+            <input type="text" :id="'member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" " />
             <label class="mdc-floating-label" :for="'member-name-' + index">Member Name</label>
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mdc-text-field mb-4">
-            <input type="text" :id="'instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" "  />
+            <input type="text" :id="'instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" " />
             <label class="mdc-floating-label" :for="'instrument-' + index">Instrument</label>
             <div class="mdc-line-ripple"></div>
           </div>
@@ -62,48 +63,6 @@
           <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(index)">Remove Member</button>
         </div>
         <button type="button" class="mdc-button mb-8 w-full" @click="addMember">+ Add Member</button>
-      </div>
-
-      <!-- Albums Section -->
-      <div class="form-group">
-        <h2 class="mb-8 font-semibold">Albums</h2>
-        <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
-          <div class="mdc-text-field mb-4">
-            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album Title</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album.releaseDate" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mb-4">
-            <input type="file" :id="'album-cover-' + albumIndex" class="styled-file-input" @change="(event) => handleAlbumCoverUpload(event, albumIndex)" accept="image/*" />
-            <label :for="'album-cover-' + albumIndex" class="styled-file-label">Choose Album Cover</label>
-          </div>
-          <div v-if="album.coverUrl" class="mb-4">
-            <img :src="album.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-          </div>
-
-          <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
-          <div v-for="(song, songIndex) in album.songs" :key="songIndex" class="song-container">
-            <div class="mdc-text-field mb-4">
-              <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
-              <label class="mdc-floating-label" :for="'song-title-' + albumIndex + '-' + songIndex">Song Title</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <div class="mb-4">
-              <input type="file" :id="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-input" @change="(event) => handleSongFileUpload(event, albumIndex, songIndex)" accept="audio/*" />
-              <label :for="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-label">Choose Song File</label>
-            </div>
-            <button type="button" class="mdc-button mb-4 w-full" @click="removeSong(albumIndex, songIndex)">Remove Song</button>
-          </div>
-          <button type="button" class="mdc-button mb-8 w-full" @click="addSong(albumIndex)">+ Add Song</button>
-
-          <button type="button" class="mdc-button mb-4 w-full" @click="removeAlbum(albumIndex)">Remove Album</button>
-        </div>
-        <button type="button" class="mdc-button mb-8 w-full" @click="addAlbum">+ Add Album</button>
       </div>
 
       <!-- Social Media Links Section -->
@@ -152,19 +111,20 @@
 </template>
 
 <script setup>
-const route = useRoute();
-const router = useRouter();
-const { create, update } = useStrapi();
-const client = useStrapiClient();
 
-// get qr id log it, then update the qr with the band id after band creatiion, then move on the edit page 
+
+const router = useRouter();
+const route = useRoute();
+const client = useStrapiClient();
+const { update } = useStrapi();
+const user = useStrapiUser();
+
 const bandName = ref('');
 const genre = ref('');
 const bio = ref('');
 const bandImg = ref(null);
 const bandImgUrl = ref(null);
 const members = ref([{ name: '', instrument: '', image: null, imageUrl: null }]);
-const albums = ref([{ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] }]);
 const facebook = ref('');
 const instagram = ref('');
 const twitch = ref('');
@@ -172,8 +132,6 @@ const appleMusic = ref('');
 const spotify = ref('');
 const soundcloud = ref('');
 
-
-console.log(route.query.qrId )
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   bandImg.value = file;
@@ -186,18 +144,6 @@ const handleMemberImageUpload = (event, index) => {
   members.value[index].imageUrl = URL.createObjectURL(file);
 };
 
-const handleAlbumCoverUpload = (event, index) => {
-  const file = event.target.files[0];
-  albums.value[index].cover = file;
-  albums.value[index].coverUrl = URL.createObjectURL(file);
-};
-
-const handleSongFileUpload = (event, albumIndex, songIndex) => {
-  const file = event.target.files[0];
-  albums.value[albumIndex].songs[songIndex].file = file;
-  albums.value[albumIndex].songs[songIndex].fileUrl = URL.createObjectURL(file);
-};
-
 const addMember = () => {
   members.value.push({ name: '', instrument: '', image: null, imageUrl: null });
 };
@@ -205,23 +151,6 @@ const addMember = () => {
 const removeMember = (index) => {
   members.value.splice(index, 1);
 };
-
-const addAlbum = () => {
-  albums.value.push({ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] });
-};
-
-const removeAlbum = (index) => {
-  albums.value.splice(index, 1);
-};
-
-const addSong = (albumIndex) => {
-  albums.value[albumIndex].songs.push({ title: '', file: null, fileUrl: null });
-};
-
-const removeSong = (albumIndex, songIndex) => {
-  albums.value[albumIndex].songs.splice(songIndex, 1);
-};
-
 
 const submitForm = async () => {
   try {
@@ -235,7 +164,13 @@ const submitForm = async () => {
       name: bandName.value || null,
       genre: genre.value || null,
       bio: bio.value || null,
+      facebook: facebook.value || null,
       instagram: instagram.value || null,
+      twitch: twitch.value || null,
+      appleMusic: appleMusic.value || null,
+      spotify: spotify.value || null,
+      soundcloud: soundcloud.value || null,
+      users_permissions_user: user.value.id, // Add the current user's ID
       members: members.value.map((member) => ({
         name: member.name || null,
         instrument: member.instrument || null,
@@ -272,72 +207,25 @@ const submitForm = async () => {
     console.log('FormData:', Array.from(formData.entries()));
 
     // Use Strapi client to create the band
-    const client = useStrapiClient();
-try {
-  const { data: bandData } = await client('/bands', {
+    const { data: bandData } = await client('/bands', {
       method: 'POST',
       body: formData
     });
 
-  const updatedQr = update('qrs', route.query.qrId, {
-    band: bandData.id
-  })
-  console.log(updatedQr)
-  
-} catch (error) {
-  console.log(error, 'in band creatiion')
-}
+    // Update the QR entry with the band ID
+   if(route.query.qrId){
+    await update('qrs', route.query.qrId, {
+      band: bandData.id
+    });
+   }
 
     console.log('Band profile created successfully:', bandData);
-
-    // Create albums and associate them with the created band
-    for (const album of albums.value) {
-      const albumForm = new FormData();
-      const albumData = {
-        title: album.title,
-        releaseDate: album.releaseDate,
-        band: bandData.id, // Associate the album with the created band
-        songs: album.songs.map((song) => ({
-          title: song.title,
-        })),
-      };
-
-      albumForm.append('data', JSON.stringify(albumData));
-
-      if (album.cover) {
-        albumForm.append('files.cover', album.cover);
-      }
-
-      album.songs.forEach((song, songIndex) => {
-        if (song.file) {
-          albumForm.append(`files.songs[${songIndex}].file`, song.file);
-        }
-      });
-
-      const { data: albumResponse } = await client('/albums', {
-        method: 'POST',
-        body: albumForm,
-      });
-
-      console.log('Album created successfully:', albumResponse);
-    }
-
     router.push('/dashboard'); // Redirect to dashboard
   } catch (error) {
     console.error('Error creating band profile:', error);
   }
 };
-
-
-
-
-
-
-
-
-
 </script>
-
 
 <style scoped>
 @tailwind base;
@@ -481,7 +369,7 @@ try {
   background-color: #3700b3;
 }
 
-.member-container, .album-container, .song-container {
+.member-container {
   margin: 0;
 }
 

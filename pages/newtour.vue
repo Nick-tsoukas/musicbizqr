@@ -54,6 +54,8 @@
 const router = useRouter();
 const client = useStrapiClient();
 const user = useStrapiUser();
+const route = useRoute();
+const { update } = useStrapi();
 
 const newTour = ref({
   title: '',
@@ -91,12 +93,19 @@ const submitNewTour = async () => {
       tourForm.append('files.image', newTour.value.image);
     }
 
-    await client('/tours', {
+   const {data : tour } = await client('/tours', {
       method: 'POST',
       body: tourForm,
     });
 
-    router.push('/tours'); // Redirect to tours page or any other page after successful creation
+    
+    if(route.query.qrId){
+    await update('qrs', route.query.qrId, {
+      tour: tour.id
+    });
+   }
+
+    router.push('/dashboard'); // Redirect to tours page or any other page after successful creation
   } catch (error) {
     console.error('Error creating new tour:', error);
   }
