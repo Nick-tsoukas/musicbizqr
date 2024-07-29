@@ -219,11 +219,12 @@ const albumItems = computed(() => albums.value.map(album => ({
           </div>
           <div class="flex items-center gap-2">
             <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
-          </button>
-          <button @click="editItem(band.id, 'editband')" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
           </button>
+            <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
+          </button>
+         
          
          </div>
         </li>

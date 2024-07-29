@@ -1,8 +1,8 @@
 <template>
-  <div class="list-container">
+  <div class="list-container w-full">
     <!-- Album img and band title -->
-    <div class="min-h-36 bg-black w-full flex p-6 gap-5">
-      <div class="h-24 w-24 rounded-lg bg-slate-500">
+    <div class="min-h-36 bg-black w-full flex p-6 gap-5" @click="playFirstSong">
+      <div class="h-24 w-24 rounded-lg bg-black">
         <img :src="album.attributes.cover.data.attributes.url" alt="Album Cover" class="h-full w-full rounded-lg object-cover" />
       </div>
       <div>
@@ -33,12 +33,8 @@
   </div>
 </template>
 
-
-
-
-
 <script setup>
-
+import { ref, onMounted, watch } from 'vue'
 
 // Define props
 const props = defineProps({
@@ -126,20 +122,21 @@ watch(currentSong, (newSong) => {
     }
   }
 })
+
+// Play the first song of the album when the album is clicked
+const playFirstSong = () => {
+  if (album.attributes.songs.length > 0) {
+    playSong(album.attributes.songs[0])
+  }
+}
 </script>
-
-
-
-
 
 <style scoped>
 .list-container {
-  @apply w-full max-w-md mx-auto my-4 bg-white shadow-md rounded-lg;
+  @apply mx-auto my-4 bg-white shadow-md rounded-lg;
 }
 
 .list {
   @apply divide-y divide-gray-200;
 }
-
-
 </style>

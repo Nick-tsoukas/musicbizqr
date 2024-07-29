@@ -121,16 +121,16 @@ const submitEditEvent = async () => {
   try {
     const eventForm = new FormData();
     const eventData = {
-      title: event.value.title,
-      description: event.value.description,
-      date: event.value.date,
-      time: event.value.time,
-      city: event.value.city,
-      state: event.value.state,
-      venue: event.value.venue,
-      address: event.value.address,
-      link: event.value.link,
-      users_permissions_user: user.value.id,
+      title: event.value.title ?? undefined,
+  description: event.value.description ?? undefined,
+  date: event.value.date ?? undefined,
+  time: event.value.time ?? undefined,
+  city: event.value.city ?? undefined,
+  state: event.value.state ?? undefined,
+  venue: event.value.venue ?? undefined,
+  address: event.value.address ?? undefined,
+  link: event.value.link ?? undefined,
+  users_permissions_user: user.value.id,
     };
 
     if (event.value.band) {
