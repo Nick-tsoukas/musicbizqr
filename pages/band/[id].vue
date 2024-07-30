@@ -1,21 +1,21 @@
 <template>
   <div v-if="band" class="bg-[#000] w-screen ">
     <!-- hero content  -->
-    <div v-if="band" class="band-image-container relative w-screen bg-red-500">
+    <div v-if="band" class="band-image-container relative w-screen ">
       <img
         class="w-screen h-full lg:object-cover object-contain lg:object-center object-top"
         :src="band.data.attributes.bandImg.data.attributes.url"
         alt="Band Image"
       />
       <div class="band-name-bar">
-        <h1 class="text-3xl font-bold">{{ band.data.attributes.name }}</h1>
+        <h1 class="text-lg md:text-3xl font-bold">{{ band.data.attributes.name }}</h1>
       </div>
     </div>
 
     <!-- album page content -->
     <main class="p-5  w-[90vw] mx-auto">
       <div>
-        <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-20">Albums</h1>
+        <h1 class="text-3xl sm:text-3xl md:text-4xl font-bold text-white my-10">Albums</h1>
         <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div
             v-for="album in albums"
@@ -65,7 +65,7 @@
           <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Events</h1>
 
           <!-- Events Slider -->
-          <div ref="eventsSlider" class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
+          <div  class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
             <div v-for="event in events" :key="event.id" class="shadow-lg rounded-lg flex-none w-[85vw] sm:w-[60vw] md:w-[33vw] bg-white">
               <img
                 v-if="event.attributes.image"
@@ -75,15 +75,15 @@
               />
               <div class="p-5">
                 <h3 class="text-2xl text-black mb-2">{{ event.attributes.title }}</h3>
-                <p class="text-black mb-4">{{ event.attributes.description ?? 'No description available' }}</p>
+                <!-- <p class="text-black mb-4">{{ event.attributes.description ?? 'No description available' }}</p> -->
                 <p class="text-black">{{ new Date(event.attributes.date ?? new Date()).toLocaleDateString() }}</p>
-                <p class="text-black">{{ event.attributes.time ?? 'Time not specified' }}</p>
+                <!-- <p class="text-black">{{ event.attributes.time ?? 'Time not specified' }}</p> -->
                 <p class="text-black">{{ event.attributes.venue ?? 'Venue not specified' }}</p>
                 <p class="text-black">{{ event.attributes.city ?? 'City not specified' }}</p>
-                <p class="text-black">{{ event.attributes.address ?? 'Address not specified' }}</p>
-                <p class="text-black">{{ event.attributes.link ?? 'No link available' }}</p>
+                <!-- <p class="text-black">{{ event.attributes.address ?? 'Address not specified' }}</p> -->
+                <!-- <p class="text-black">{{ event.attributes.link ?? 'No link available' }}</p> -->
                 <button 
-                  @click="viewEvent(event.id)" 
+                  @click="router.push(`/event/${event.id}`)" 
                   class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
                 >
                   View Event
@@ -94,7 +94,7 @@
         </div>
 
         <div v-if="tours.length" class="mt-10 w-[90vw] mx-auto">
-          <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Tours</h1>
+          <h1 class="text-3xl sm:text-3xl md:text-3xl font-bold text-white my-16">Tours</h1>
 
           <!-- Tours Slider -->
           <div ref="toursSlider" class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
@@ -107,11 +107,11 @@
               />
               <div class="p-5">
                 <h3 class="text-2xl text-black mb-2">{{ tour.attributes.title }}</h3>
-                <p class="text-black mb-4">{{ tour.attributes.description ?? 'No description available' }}</p>
+                <!-- <p class="text-black mb-4">{{ tour.attributes.description ?? 'No description available' }}</p> -->
                 <p class="text-black">{{ new Date(tour.attributes.startDate ?? new Date()).toLocaleDateString() }} - {{ new Date(tour.attributes.endDate ?? new Date()).toLocaleDateString() }}</p>
                 <button 
-                  @click="viewTour(tour.id)" 
-                  class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+                @click="router.push(`/tour/${tour.id}`)" 
+                class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
                 >
                   View Tour
                 </button>
@@ -168,10 +168,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { routerKey, useRoute } from 'vue-router';
 const { find, findOne } = useStrapi();
 
 const route = useRoute();
+const router = useRouter();
 const band = ref(null);
 const albums = ref([]);
 const events = ref([]);
@@ -251,12 +252,26 @@ onMounted(async () => {
 @media (max-width: 640px) {
   .band-image-container {
     height: auto; /* Let the image take its natural height on smaller screens */
+    
+  }
+
+  .band-name-bar {
+    padding: 1rem 0;
   }
 
   .band-image-container img {
     height: auto; /* Ensure the image height is auto on smaller screens */
     max-height: calc(100vh - 90px); /* Ensure the image doesn't exceed the viewport height minus 90px */
   }
+}
+
+@media (max-width: 440px) {
+
+  .band-name-bar {
+    padding: 1rem 0;
+  }
+
+
 }
 
 .no-scrollbar::-webkit-scrollbar {
