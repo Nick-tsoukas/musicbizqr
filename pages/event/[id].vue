@@ -1,61 +1,100 @@
 <template>
   <div>
-   <div class="container mx-auto">
-    <div v-if="eventData" class="">
-      <img :src="eventData.image.data.attributes.url" class="object-fit  animate__animated animate__fadeIn " alt="">
+    <div class="container mx-auto my-10">
+      <div v-if="eventData.image" class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8">
+        <img
+          :src="eventData.image.data.attributes.url"
+          alt="Event Hero Image"
+          class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end p-4 rounded-b-lg">
+          <h1 class="text-4xl md:text-6xl text-white font-bold">{{ eventData.title }}</h1>
+        </div>
+      </div>
     </div>
-   </div>
 
-   
- <div class="container mx-auto px-2 md:px-0" >
-  <h2 class="text-3xl sm:text-3xl md:text-7xl font-bold text-black  my-6">{{ eventData.title }}</h2>
-     
-     <div class="container mr-auto pb-10"  >
-      <p class="mt-0 mb-4 text-xl font-semibold md:text-4xl">Date & Time</p>
-      <p class="text-lg md:text-2xl" >{{ eventData.date }}</p>
-      <p class="text-lg mb-2 md:text-2xl" >{{ eventData.time }}</p>
-       <p class="mt-0 mb-4 text-xl font-semibold  md:text-4xl ">Desciption</p>
-       <p class="text-lg md:text-2xl">{{ eventData.description }}</p>
-       <p class=" mb-4 text-xl font-semibold mt-4  md:text-4xl">Location</p>
-       <p class="text-lg mt-4 md:text-2xl">{{eventData.venue}}</p>
-       <p class="text-lg md:text-2xl">{{ eventData.address }}</p>
-       <p class="text-lg md:text-2xl"> {{ eventData.city }}, {{ eventData.state }}</p>
-       <button type="button" class="mdc-button my-4 w-full">Ticket Link</button>
+    <div class="container mx-auto px-4 md:px-0">
+      <div class="bg-white shadow-lg rounded-lg p-6 md:p-10 mb-10">
+        <section>
+          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Date & Time</h2>
 
-     </div>
- </div>
-  
-     
-  
-  </div> 
+          <p class="text-lg md:text-2xl">{{ formatDate(eventData.date) }}</p>
+          <p class="text-lg md:text-2xl">{{ formatTime(eventData.time) }}</p>
+        </section>
+
+        <section class="mt-8">
+          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Description</h2>
+          <p class="text-lg md:text-2xl">{{ eventData.description }}</p>
+        </section>
+
+        <section class="mt-8">
+          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Location</h2>
+          <p class="text-lg md:text-2xl">{{ eventData.venue }}</p>
+          <p class="text-lg md:text-2xl">{{ eventData.address }}</p>
+          <p class="text-lg md:text-2xl">{{ eventData.city }}, {{ eventData.state }}</p>
+        </section>
+
+        <div class="mt-8">
+          <a :href="eventData.link" target="_blank" class="mdc-button mdc-button--raised w-full md:w-auto text-center">
+            Ticket Link
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script  setup>
+<script setup>
+
+import { format, parseISO  } from 'date-fns';
+
 const route = useRoute();
 const { findOne } = useStrapi();
 
-const eventData = ref({})
+const eventData = ref({});
 
-try {
-  const { data: event } = await findOne('events', route.params.id, {
-    populate : {
-      image: true
-    }
-  })
-   eventData.value = event.attributes
+onMounted(async () => {
+  try {
+    const { data: event } = await findOne('events', route.params.id, {
+      populate: {
+        image: true
+      }
+    });
+    eventData.value = event.attributes;
+  } catch (error) {
+    console.error(error);
+  }
+});
 
-} catch (error) {
-  console.log(error)
+const formatDate = (dateStr) => {
+  return format(parseISO(dateStr), 'MMMM d, yyyy');
+};
+
+const formatTime = (timeStr) => {
+  const date = new Date(`1970-01-01T${timeStr}Z`);
+  return format(date, 'hh:mm a');
+};
+</script>
+
+<style scoped>
+.mdc-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  color: #fff;
+  background-color: #6200ee;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
- </script>
 
-<style>
-.img-height {
-  height: calc(100vh - 90px);
-  width: 100vw;
+.mdc-button:hover {
+  background-color: #3700b3;
 }
 
-.detail-box {
-  margin-top : -250px
+.shadow-lg {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 </style>
