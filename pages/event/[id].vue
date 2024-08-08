@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container mx-auto my-10">
+    <div v-if="eventData" class="container mx-auto my-10">
       <div v-if="eventData.image" class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8">
         <img
           :src="eventData.image.data.attributes.url"
@@ -15,9 +15,8 @@
 
     <div class="container mx-auto px-4 md:px-0">
       <div class="bg-white shadow-lg rounded-lg p-6 md:p-10 mb-10">
-        <section>
+        <section v-if="eventData.date" >
           <h2 class="text-2xl md:text-4xl font-semibold mb-2">Date & Time</h2>
-
           <p class="text-lg md:text-2xl">{{ formatDate(eventData.date) }}</p>
           <p class="text-lg md:text-2xl">{{ formatTime(eventData.time) }}</p>
         </section>
@@ -35,7 +34,7 @@
         </section>
 
         <div class="mt-8">
-          <a :href="eventData.link" target="_blank" class="mdc-button mdc-button--raised w-full md:w-auto text-center">
+          <a :href="eventData.link" target="_blank" class="mdc-button ">
             Ticket Link
           </a>
         </div>
@@ -46,7 +45,7 @@
 
 <script setup>
 
-import { format, parseISO  } from 'date-fns';
+import { format, parseISO, parse } from 'date-fns';
 
 const route = useRoute();
 const { findOne } = useStrapi();
@@ -71,9 +70,10 @@ const formatDate = (dateStr) => {
 };
 
 const formatTime = (timeStr) => {
-  const date = new Date(`1970-01-01T${timeStr}Z`);
-  return format(date, 'hh:mm a');
+  const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
+  return format(parsedTime, 'hh:mm a');
 };
+
 </script>
 
 <style scoped>

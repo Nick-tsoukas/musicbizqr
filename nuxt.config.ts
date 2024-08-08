@@ -17,6 +17,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   modules: [
+    'nuxt-headlessui',
     "@nuxtjs/tailwindcss",
     "@nuxtjs/strapi",
     '@vee-validate/nuxt',

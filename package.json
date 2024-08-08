@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.1.5",
     "@nuxt/image": "^1.7.0",
     "@nuxt/ui-pro": "^1.4.0",
     "@nuxtjs/strapi": "^1.12.0",
@@ -33,6 +34,7 @@
     "@nuxt/typescript-build": "^3.0.2",
     "@nuxtjs/date-fns": "^1.5.0",
     "autoprefixer": "^10.4.19",
+    "nuxt-headlessui": "^1.2.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5"
