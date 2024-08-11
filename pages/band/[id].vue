@@ -1,7 +1,7 @@
 <template>
   <div v-if="band" class="bg-[#000] w-screen ">
     <!-- hero content  -->
-    <div v-if="band" class="band-image-container relative w-screen ">
+    <div v-if="band" class="band-image-container relative w-screen max-h-[500px] ">
       <img
         class="w-screen h-full lg:object-cover object-contain lg:object-center object-top"
         :src="band.data.attributes.bandImg.data.attributes.url"
@@ -16,11 +16,11 @@
     <main class="p-5  w-[90vw] mx-auto">
       <div>
         <h1 class="text-3xl sm:text-3xl md:text-4xl font-bold text-white my-10">Albums</h1>
-        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <section class="flex gap-4  overflow-x-scroll no-scrollbar">
           <div
             v-for="album in albums"
             :key="album.id"
-            class="bg-black shadow-lg rounded p-3"
+            class="bg-black shadow-lg rounded p-3 min-w-[500px] h-[450px]"
           >
             <div class="group relative">
               <img
@@ -56,8 +56,16 @@
           </div>
         </section>
 
-        <section v-if="albumPlay" class="w-full my-20">
-          <AudioPlayer :album="albumPlay" class="w-full mx-auto" />
+        <section v-if="albumPlay" class="w-full flex gap-4 my-20">
+          <AudioPlayer :album="albumPlay" class="w-[66%]  mx-0" />
+          <div class="flex flex-col gap-6 w-[44%] justify-start px-4" >
+            <button class="mdc-button-green w-full" >Spotify</button>
+            <button class="mdc-button-green w-full" >Apple music</button>
+            <button class="mdc-button-green w-full" >Sound Cloud</button>
+            <button class="mdc-button-green w-full" >Youtube music</button>
+
+
+          </div>
         </section>
 
         <!-- Enhanced Events Section -->
@@ -66,25 +74,25 @@
 
           <!-- Events Slider -->
           <div  class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
-            <div v-for="event in events" :key="event.id" class="shadow-lg rounded-lg flex-none w-[85vw] sm:w-[60vw] md:w-[33vw] bg-white">
+            <div v-for="event in events" :key="event.id" class="shadow-lg rounded-lg p-[15px] flex-none w-[85vw] sm:w-[60vw] md:w-[500px] bg-black text-white">
               <img
                 v-if="event.attributes.image"
-                class="w-full h-72 object-cover"
+                class="w-full h-72 object-cover rounded-md"
                 :src="event.attributes.image.data.attributes.url"
                 alt="Event Image"
               />
               <div class="p-5">
-                <h3 class="text-2xl text-black mb-2">{{ event.attributes.title }}</h3>
+                <h3 class="text-2xl text-white font-bold mb-2">{{ event.attributes.title }}</h3>
                 <!-- <p class="text-black mb-4">{{ event.attributes.description ?? 'No description available' }}</p> -->
-                <p class="text-black">{{ new Date(event.attributes.date ?? new Date()).toLocaleDateString() }}</p>
+                <p class="text-white">{{ new Date(event.attributes.date ?? new Date()).toLocaleDateString() }}</p>
                 <!-- <p class="text-black">{{ event.attributes.time ?? 'Time not specified' }}</p> -->
-                <p class="text-black">{{ event.attributes.venue ?? 'Venue not specified' }}</p>
-                <p class="text-black">{{ event.attributes.city ?? 'City not specified' }}</p>
+                <p class="text-white">{{ event.attributes.venue ?? 'Venue not specified' }}</p>
+                <p class="text-white">{{ event.attributes.city ?? 'City not specified' }}</p>
                 <!-- <p class="text-black">{{ event.attributes.address ?? 'Address not specified' }}</p> -->
                 <!-- <p class="text-black">{{ event.attributes.link ?? 'No link available' }}</p> -->
                 <button 
                   @click="router.push(`/event/${event.id}`)" 
-                  class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+                  class="mdc-button-green mt-2"
                 >
                   View Event
                 </button>
@@ -94,11 +102,11 @@
         </div>
 
         <div v-if="tours.length" class="mt-10 w-[90vw] mx-auto">
-          <h1 class="text-3xl sm:text-3xl md:text-3xl font-bold text-white my-16">Tours</h1>
+          <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Events</h1>
 
           <!-- Tours Slider -->
           <div ref="toursSlider" class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
-            <div v-for="tour in tours" :key="tour.id" class="shadow-lg rounded-lg flex-none w-[85vw] sm:w-[60vw] md:w-[33vw] bg-white">
+            <div v-for="tour in tours" :key="tour.id" class="shadow-lg rounded-lg p-[15px] flex-none w-[85vw] sm:w-[60vw] md:w-[500px] bg-black text-white">
               <img
                 v-if="tour.attributes.image"
                 class="w-full h-72 object-cover"
@@ -106,12 +114,12 @@
                 alt="Tour Image"
               />
               <div class="p-5">
-                <h3 class="text-2xl text-black mb-2">{{ tour.attributes.title }}</h3>
+                <h3 class="text-2xl text-white mb-2">{{ tour.attributes.title }}</h3>
                 <!-- <p class="text-black mb-4">{{ tour.attributes.description ?? 'No description available' }}</p> -->
-                <p class="text-black">{{ new Date(tour.attributes.startDate ?? new Date()).toLocaleDateString() }} - {{ new Date(tour.attributes.endDate ?? new Date()).toLocaleDateString() }}</p>
+                <p class="text-white">{{ new Date(tour.attributes.startDate ?? new Date()).toLocaleDateString() }} - {{ new Date(tour.attributes.endDate ?? new Date()).toLocaleDateString() }}</p>
                 <button 
                 @click="router.push(`/tour/${tour.id}`)" 
-                class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+                class="mdc-button-green mt-2"
                 >
                   View Tour
                 </button>
@@ -246,7 +254,7 @@ onMounted(async () => {
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
   text-align: center;
-  padding: 3rem 0;
+  padding: 2rem 0;
 }
 
 @media (max-width: 640px) {

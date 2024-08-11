@@ -133,7 +133,7 @@ const playFirstSong = () => {
 
 <style scoped>
 .list-container {
-  @apply mx-auto my-4 bg-white shadow-md rounded-lg;
+  @apply   bg-white shadow-md rounded-lg;
 }
 
 .list {

@@ -4,7 +4,7 @@
       <div class="text-xl font-bold">MusicBizQR</div>
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
-        <NuxtLink v-if="user" to="/dashboard" class="nav-link">Dashboard</NuxtLink>
+        <NuxtLink v-if="user" to="/dashboard" class="nav-link ">Dashboard</NuxtLink>
         <NuxtLink v-if="user" to="/qrtype" class="nav-link">+ Create QR</NuxtLink>
         <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
