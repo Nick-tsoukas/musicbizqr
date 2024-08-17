@@ -22,11 +22,12 @@ module.exports = {
           DEFAULT: '#2C2C2C',
         },
         colors: {
-          'off-black': '#2C2C2C',
+          'off-black': '#191414',
           'off-white': '#F5F5F5',
           // Override default black and white
-          black: '#2C2C2C',
+          black: '#191414',
           white: '#F5F5F5',
+          green: '#1db954',
           'neon-green': '#39FF14',
           'neon-purple': '#9100FF',
           'accent': '#FF00FF',

@@ -113,8 +113,8 @@ const options = reactive({
     type: 'rounded',
   },
   backgroundOptions: {
-    color: '#ffffff',
-  },
+        color: "transparent", // Setting the background to transparent
+    },
   imageOptions: {
     crossOrigin: 'anonymous',
     margin: 20,

@@ -19,17 +19,17 @@
     </div>
     <!-- List of songs -->
     <ul class="list w-full">
-      <li v-for="song in album.attributes.songs" :key="song.id" class="flex w-full py-6 px-6 gap-2">
+      <li v-for="song in album.attributes.songs" :key="song.id" class="flex w-full text-white py-6 px-6 gap-2">
         <div>
-          <img v-if="!playingSong(song)" @click="playSong(song)" src="@/assets/play-black.svg" alt="Play">
-          <img v-if="playingSong(song)" @click="pauseSong" src="@/assets/pause-black.svg" alt="Pause">
+          <img v-if="!playingSong(song)" @click="playSong(song)" src="@/assets/play-icon.svg" alt="Play">
+          <img v-if="playingSong(song)" @click="pauseSong" src="@/assets/pause-icon.svg" alt="Pause">
         </div>
-        <div class="grow">{{ song.title }}</div>
+        <div class="grow flex items-center text-white">{{ song.title }}</div>
         <div>5:00</div> <!-- Adjust if duration is available -->
       </li>
     </ul>
     <!-- Audio element -->
-    <audio ref="audioPlayer" @ended="nextSong" @loadeddata="onAudioLoaded" controls class="w-full"></audio>
+    <audio ref="audioPlayer" @ended="nextSong" @loadeddata="onAudioLoaded" controls  class="w-full bg-black text-green-500 rounded-none"></audio>
   </div>
 </template>
 
@@ -133,10 +133,12 @@ const playFirstSong = () => {
 
 <style scoped>
 .list-container {
-  @apply   bg-white shadow-md rounded-lg;
+  @apply  bg-[#000] shadow-md rounded-lg;
 }
 
-.list {
+
+
+/* .list {
   @apply divide-y divide-gray-200;
-}
+} */
 </style>

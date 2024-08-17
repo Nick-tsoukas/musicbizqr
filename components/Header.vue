@@ -1,6 +1,6 @@
 <template>
-  <header class="bg-[#F5F5F5] text-[#2C2C2C] shadow-lg">
-    <div class="container mx-auto flex items-center justify-between px-4 py-4">
+  <header class="bg-[#000] text-white shadow-lg">
+    <div class=" p-5 mx-auto flex items-center justify-between px-4 py-4">
       <div class="text-xl font-bold">MusicBizQR</div>
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
