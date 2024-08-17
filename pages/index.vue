@@ -85,6 +85,12 @@
 
          </div>
       </section>
+      <!-- Chart  -->
+      <section class="w-[70vw] mx-auto mt-28 ">
+        <h2 class=" text-6xl mb-14 text-center font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Advanced Analytics</h2>
+        <p class="text-white text-2xl mb-14 text-center ">Enhance your campaign ROI with our comprehensive analytics, turning QR code scans into actionable insights. Leverage state-of-the-art data visualization and tracking technologies to boost user engagement and elevate your marketing strategies.</p>
+        <BarChart class="mx-auto"/>
+      </section>
     
     </main>
   </div>
@@ -275,10 +281,46 @@ const testimonials = [
     background: -webkit-linear-gradient(to right, #78ffd6, #a8ff78); /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #78ffd6, #a8ff78); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   }
+
 .btn {
   @apply bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:bg-purple-700;
 }
+
 .animated-path {
   transition: fill 1s ease;
 }
+
+
+
+/* General body styling */
+
+
+/* Bar chart container */
+.bar-chart {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+/* Individual bar styling */
+.bar {
+    width: 40px;
+    background-color: #4CAF50;
+    height: 20%; /* Initial height */
+    animation: grow-bar 2s ease-in-out infinite;
+}
+
+/* Animation keyframes */
+@keyframes grow-bar {
+    0%, 100% {
+        height: 20%;
+    }
+    50% {
+        height: var(--bar-height);
+    }
+}
+
+
+
+  
 </style>
