@@ -21,17 +21,17 @@
       <div class="relative isolate h-[50vh] ">
        
      
-        <div class="mx-auto w-[90vw]  px-6 py-4 lg:flex  lg:gap-x-10 lg:px-8 ">
-          <div class="mx-auto max-w-2xl lg:mx-0 text-white lg:flex-auto">
-            <h1 class="mt-10 max-w-lg text-4xl text-white font-bold tracking-tight  text-center sm:text-6xl md:text-left">Get your sound out</h1>
-            <p class="mt-6 text-lg leading-8 ">Effortlessly create branded QR codes and generate personalized splash pages with custom audio players and more. Showcase band pages, tour dates, and seamlessly connect all your social media links and streaming services. </p>
-            <div class="mt-10 flex flex-col md:flex-row items-center gap-x-6">
+        <div class="mx-auto w-[90vw]  px-6 py-10 lg:flex  lg:gap-x-10 lg:px-8 ">
+          <div class="mx-auto w-[45%]  lg:mx-0 text-white lg:flex-auto">
+            <h1 class="mb-16  text-8xl text-white font-extrabold tracking-tight  text-center  md:text-left">Get your sound out</h1>
+            <p class=" text-xl  leading-10 ">Effortlessly create branded QR codes and generate personalized splash pages with custom audio players and more. Showcase band pages, tour dates, and seamlessly connect all your social media links and streaming services. </p>
+            <div class="mt-16 flex flex-col md:flex-row items-center gap-x-6">
               <NuxtLink to="/signup" class="mdc-button mb-4 w-full md:mb-0 md:w-auto">Get started</NuxtLink>
               <NuxtLink to="/login" class="mdc-button w-full md:w-auto">Login </NuxtLink>
             </div>
           </div>
           <div class="mt-16 sm:mt-24 md:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
-            <img src="@/assets/qrimagehome.png" alt="">
+            <img src="@/assets/qrcode.png" alt="" class="h-[450px]" >
           </div>
           <!-- <div>
             <img src="@/assets/albumcover.jpg" alt="">

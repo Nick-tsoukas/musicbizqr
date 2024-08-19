@@ -4,14 +4,14 @@
       <div class="text-xl font-bold">MusicBizQR</div>
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
-        <NuxtLink v-if="user" to="/dashboard" class="nav-link ">Dashboard</NuxtLink>
+        <NuxtLink v-if="user" to="/dashboard" class="nav-link  ">Dashboard</NuxtLink>
         <NuxtLink v-if="user" to="/qrtype" class="nav-link">+ Create QR</NuxtLink>
         <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
         <p v-if="user" @click="logoutUser" class="nav-link">Logout</p>
         <NuxtLink to="/contact" class="nav-link">Contact</NuxtLink>
       </nav>
-      <button @click="toggleMenu" class="md:hidden focus:outline-none">
+      <button @click="toggleMenu" class="animated__animate__slideInDown md:hidden focus:outline-none">
         <svg
           class="w-6 h-6 transition-transform transform"
           :class="{ 'rotate-45': isMenuOpen, 'rotate-0': !isMenuOpen }"
@@ -38,7 +38,7 @@
       </button>
     </div>
     <nav
-      :class="['fixed top-[75px] left-0 w-screen h-[calc(100vh-75px)] justify-center bg-white text-black transition-transform md:hidden z-50', isMenuOpen ? 'block' : 'hidden']"
+      :class="['fixed top-[75px] left-0 w-screen h-[calc(100vh-75px)] justify-center bg-[#000] text-black transition-transform md:hidden z-50', isMenuOpen ? 'block' : 'hidden']"
     >
       <div class="flex flex-col h-full items-center space-y-4 py-4">
         <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Home</NuxtLink>
@@ -80,16 +80,14 @@ const logoutUserMobile = () => {
 
 <style scoped>
 .nav-link {
-  @apply text-[#2C2C2C] hover:bg-purple-700 rounded px-4 py-2 transition-colors;
+  @apply text-white hover:bg-purple-700 rounded px-4 py-2 transition-colors;
 }
 
 .mobile-nav-link {
-  @apply text-black text-xl hover:bg-purple-100 rounded px-4 py-2 transition-colors;
+  @apply text-white text-xl hover:bg-purple-100 rounded px-4 py-2 transition-colors;
 }
 
-.hidden {
-  display: none;
-}
+
 
 .block {
   display: block;

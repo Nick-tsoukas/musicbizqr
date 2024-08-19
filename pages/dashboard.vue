@@ -1,7 +1,5 @@
 <script setup>
 
-import SkeletonLoader from '@/components/SkeletonLoader.vue';
-
 const user = useStrapiUser();
 const router = useRouter();
 const client = useStrapiClient();
@@ -120,7 +118,11 @@ const fetchAlbums = async () => {
   }
 };
 
-onMounted(fetchData);
+
+onMounted(() => {
+  fetchData()
+});
+
 
 const editItem = (id, page) => {
   router.push({ path: `/${page}/${id}` });
@@ -155,42 +157,44 @@ const albumItems = computed(() => albums.value.map(album => ({
   title: album.attributes.title,
   imageUrl: album.attributes.cover?.data?.attributes?.url || '',
 })));
+
 </script>
 
 <template>
-  <div class="container mx-auto p-4">
+<div class="bg-[#000]" >
+  <div class="container bg-[#000] mx-auto p-4">
     <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
 
     <!-- QR Codes Section -->
     <div v-if="loading">
       <SkeletonLoader />
     </div>
-    <div v-else-if="qrItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">QR Codes</h2>
+    <div v-else-if="qrItems.length" class="mb-6 border-2 border-white rounded-lg">
+      <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-8 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">QR Codes</h2>
         <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
         </NuxtLink>
       </div>
-      <ul>
+      <ul class="px-6 py-6" >
         <li v-for="qr in qrItems" :key="qr.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
-            <img :src="qr.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
+            <img :src="qr.imageUrl" alt="" class="h-[150px] w-[150px] rounded mr-4">
             <span>{{ qr.title }}</span>
           </div>
-         <div class="flex items-center gap-2">
+         <div class="flex items-center gap-4">
          
           <button @click="editItem(qr.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
          </div>
         
         </li>
       </ul>
     </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Qrs</h2>
+    <div v-else class="mb-6 border-2  px-6 py-4 rounded-md">
+      <div class="flex flex-col bg-[#000]  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-semibold md:text-left">Qrs</h2>
         <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Qr
         </NuxtLink>
@@ -204,25 +208,25 @@ const albumItems = computed(() => albums.value.map(album => ({
     <div v-if="loading">
       <SkeletonLoader />
     </div>
-    <div v-else-if="bandItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Bands</h2>
+    <div v-else-if="bandItems.length" class="mb-6   border-2 rounded-md">
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Bands</h2>
         <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
         </NuxtLink>
       </div>
-      <ul>
+      <ul class="px-6 py-6" >
         <li v-for="band in bandItems" :key="band.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
-            <img :src="band.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
+            <img :src="band.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
             <span>{{ band.title }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-4">
             <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
             <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
          
          
@@ -231,8 +235,8 @@ const albumItems = computed(() => albums.value.map(album => ({
       </ul>
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Bands</h2>
+      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Bands</h2>
         <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
         </NuxtLink>
@@ -246,32 +250,32 @@ const albumItems = computed(() => albums.value.map(album => ({
       <SkeletonLoader />
     </div>
     <div v-else-if="eventItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Events</h2>
+      <div class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Events</h2>
         <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
         </NuxtLink>
       </div>
-      <ul>
+      <ul class="p-6" >
         <li v-for="event in eventItems" :key="event.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
-            <img :src="event.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
+            <img :src="event.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
             <span>{{ event.title }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-4">
           <button @click="router.push(`/event/${event.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
           <button @click="editItem(event.id, 'editevent')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
          </div>
         </li>
       </ul>
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Events</h2>
+      <div class="flex flex-col bg-[#00} px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-white font-semibold md:text-left">Events</h2>
         <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
         </NuxtLink>
@@ -286,34 +290,34 @@ const albumItems = computed(() => albums.value.map(album => ({
       <SkeletonLoader />
     </div>
     <div v-else-if="tourItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Tours</h2>
+      <div class="flex flex-col border-b-2 p-6 bg-gradient-to-r from-pink-500 to-violet-500 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Tours</h2>
         <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
         </NuxtLink>
       </div>
-      <ul>
+      <ul class="p-6" >
         <li v-for="tour in tourItems" :key="tour.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
-            <img :src="tour.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
+            <img :src="tour.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
             <span>{{ tour.title }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-4">
           <button @click="router.push(`/tour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
           <button @click="editItem(tour.id, 'edittour')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
          </div>
         </li>
       </ul>
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Tours</h2>
+      <div class="flex flex-col border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 p-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-white font-semibold md:text-left">Tours</h2>
         <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
+          <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Tour
         </NuxtLink>
       </div>
       <div>
@@ -325,34 +329,34 @@ const albumItems = computed(() => albums.value.map(album => ({
     <div v-if="loading">
       <SkeletonLoader />
     </div>
-    <div v-else-if="albumItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Albums</h2>
+    <div v-else-if="albumItems.length" class="mb-6  border-2 rounded-md">
+      <div class="flex flex-col border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  p-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Albums</h2>
         <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Album
+          <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Album
         </NuxtLink>
       </div>
-      <ul>
+      <ul class="p-6">
         <li v-for="album in albumItems" :key="album.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
-            <img :src="album.imageUrl" alt="" class="h-12 w-12 rounded mr-4">
+            <img :src="album.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
             <span>{{ album.title }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-4">
           <button @click="router.push(`/album/${album.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
           <button @click="editItem(album.id, 'editalbum')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-5 w-5" aria-hidden="true" />
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
          </div>
         </li>
       </ul>
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-white px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-black font-semibold md:text-left">Albums</h2>
-        <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+      <div class="flex flex-col bg-[#00} px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Albums</h2>
+        <NuxtLink to="/newalbum"  class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Albums
         </NuxtLink>
       </div>
@@ -361,4 +365,15 @@ const albumItems = computed(() => albums.value.map(album => ({
       </div>
     </div>
   </div>
+</div>
 </template>
+
+<style scoped>
+.mdc-button {
+  border: 1px solid white;
+  background: transparent
+};
+
+</style>
+
+

@@ -30,7 +30,7 @@ const loginUser = async () => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center w-screen h-screen">
+  <div class="flex justify-center items-center w-screen custom_height">
     <div class="container-mdc">
       <div>
         <div>
@@ -58,3 +58,11 @@ const loginUser = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.custom_height {
+
+ height:  calc(100vh - 89px);
+}
+
+</style>
