@@ -78,9 +78,10 @@
               </foreignObject>
             </svg>
           </div>
+          <!-- grid of screens  -->
           <div class="flex flex-wrap w-full p-4 gap-2  ">
-           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index)" class="w-[30%] p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4" src="@/assets/microphone.svg" alt="">{{ page }}</div>
-
+           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index)" class="w-[30%] p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4 h-[50px]" :src="splashImages[index]" alt="">{{ page }}  <h1 class="text-white" ></h1></div>
+              
         </div>
 
          </div>
@@ -91,12 +92,88 @@
         <p class="text-white text-2xl mb-14 text-center ">Enhance your campaign ROI with our comprehensive analytics, turning QR code scans into actionable insights. Leverage state-of-the-art data visualization and tracking technologies to boost user engagement and elevate your marketing strategies.</p>
         <BarChart class="mx-auto"/>
       </section>
-    
+
+          <!-- Pricing section -->
+          <div class="isolate overflow-hidden">
+        <div class="flow-root bg-[#000] py-16 sm:pt-32 lg:pb-0">
+          <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="relative z-10">
+              <h1 class="mx-auto max-w-4xl text-center text-5xl font-bold tracking-tight text-white">Simple pricing, no commitment</h1>
+              <p class="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-white/60">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Velit numquam eligendi quos odit doloribus molestiae voluptatum quos odit doloribus.</p>
+              <div class="mt-16 flex justify-center">
+                <fieldset aria-label="Payment frequency">
+                  <RadioGroup v-model="frequency" class="grid grid-cols-2 gap-x-1 rounded-full bg-white/5 p-1 text-center text-xs font-semibold leading-5 text-white">
+                    <RadioGroupOption as="template" v-for="option in pricing.frequencies" :key="option.value" :value="option" v-slot="{ checked }">
+                      <div :class="[checked ? 'bg-indigo-500' : '', 'cursor-pointer rounded-full px-2.5 py-1']">{{ option.label }}</div>
+                    </RadioGroupOption>
+                  </RadioGroup>
+                </fieldset>
+              </div>
+            </div>
+            <div class="relative mx-auto mt-10 grid max-w-md grid-cols-1 gap-y-8 lg:mx-0 lg:-mb-14 lg:max-w-none lg:grid-cols-3">
+              <svg viewBox="0 0 1208 1024" aria-hidden="true" class="absolute -bottom-48 left-1/2 h-[64rem] -translate-x-1/2 translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] lg:-top-48 lg:bottom-auto lg:translate-y-0">
+                <ellipse cx="604" cy="512" fill="url(#d25c25d4-6d43-4bf9-b9ac-1842a30a4867)" rx="604" ry="512" />
+                <defs>
+                  <radialGradient id="d25c25d4-6d43-4bf9-b9ac-1842a30a4867">
+                    <stop stop-color="#7775D6" />
+                    <stop offset="1" stop-color="#E935C1" />
+                  </radialGradient>
+                </defs>
+              </svg>
+              <div class="hidden lg:absolute lg:inset-x-px lg:bottom-0 lg:top-4 lg:block lg:rounded-t-2xl lg:bg-gray-800/80 lg:ring-1 lg:ring-white/10" aria-hidden="true" />
+              <div v-for="tier in pricing.tiers" :key="tier.id" :class="[tier.featured ? 'z-10 bg-white shadow-xl ring-1 ring-gray-900/10' : 'bg-gray-800/80 ring-1 ring-white/10 lg:bg-transparent lg:pb-14 lg:ring-0', 'relative rounded-2xl']">
+                <div class="p-8 lg:pt-12 xl:p-10 xl:pt-14">
+                  <h2 :id="tier.id" :class="[tier.featured ? 'text-gray-900' : 'text-white', 'text-sm font-semibold leading-6']">{{ tier.name }}</h2>
+                  <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:flex-col lg:items-stretch">
+                    <div class="mt-2 flex items-center gap-x-4">
+                      <p :class="[tier.featured ? 'text-gray-900' : 'text-white', 'text-4xl font-bold tracking-tight']">{{ tier.price[frequency.value] }}</p>
+                      <div class="text-sm leading-5">
+                        <p :class="tier.featured ? 'text-gray-900' : 'text-white'">USD</p>
+                        <p :class="tier.featured ? 'text-gray-500' : 'text-gray-400'">{{ `Billed ${frequency.value}` }}</p>
+                      </div>
+                    </div>
+                    <a :href="tier.href" :aria-describedby="tier.id" :class="[tier.featured ? 'bg-indigo-600 shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600' : 'bg-white/10 hover:bg-white/20 focus-visible:outline-white', 'rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2']">Buy this plan</a>
+                  </div>
+                  <div class="mt-8 flow-root sm:mt-10">
+                    <ul role="list" :class="[tier.featured ? 'divide-gray-900/5 border-gray-900/5 text-gray-600' : 'divide-white/5 border-white/5 text-white', '-my-2 divide-y border-t text-sm leading-6 lg:border-t-0']">
+                      <li v-for="mainFeature in tier.mainFeatures" :key="mainFeature" class="flex gap-x-3 py-2">
+                        <CheckIcon :class="[tier.featured ? 'text-indigo-600' : 'text-gray-500', 'h-6 w-5 flex-none']" aria-hidden="true" />
+                        {{ mainFeature }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
     </main>
+    <Footer />
   </div>
 </template>
 
 <script setup lang="ts">
+
+import musicSvg from '@/assets/music.svg';
+import microphoneSvg from '@/assets/microphone.svg';
+import recordSvg from '@/assets/record.svg';
+import streamingSvg from '@/assets/streaming.svg'
+import facebookSvg from '@/assets/facebook-icon-white.svg'
+import websiteSvg from '@/assets/website.svg'
+import videoSvg from '@/assets/video.svg'
+
+
+import { defineComponent, h,  } from 'vue'
+import { Dialog, DialogPanel, RadioGroup, RadioGroupOption } from '@headlessui/vue'
+import { Bars3Icon, XMarkIcon as XMarkIconOutline } from '@heroicons/vue/24/outline'
+import { CheckIcon, XMarkIcon as XMarkIconMini } from '@heroicons/vue/20/solid'
+import { ChevronRightIcon, CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/vue/20/solid'
+
+
+
+
 import { ref, useRuntimeConfig } from '#imports'
 import { loadFull } from 'tsparticles'
 import { tsParticles } from '@tsparticles/engine'
@@ -105,12 +182,88 @@ const { mode } = useRuntimeConfig().public.particles
 
 const show = ref(false)
 
+
 const splashPages = ref(['Band Page', 'Album Player', "Streaming Links", "Social links", "Website Url", "Video Grid"])
-const splashImages = ref(['@/assets/bandmobilescreen.png', '@/assets/bandmobilescreen.png', '@/assets/bandmobilescreen.png', '@/assets/bandmobilescreen.png', '@/assets/bandmobilescreen.png', '@/assets/bandmobilescreen.png'])
 
-const selectedPage = ref(0)
+const splashImages = ref([
+  musicSvg, recordSvg, streamingSvg, facebookSvg, websiteSvg, videoSvg,
+  
+]);const selectedPage = ref(0)
 
-import { ChevronRightIcon, CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/vue/20/solid'
+
+const pricing = {
+  frequencies: [
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'annually', label: 'Annually' },
+  ],
+  tiers: [
+    {
+      name: 'Starter',
+      id: 'tier-starter',
+      href: '#',
+      featured: false,
+      description: 'All your essential business finances, taken care of.',
+      price: { monthly: '$15', annually: '$144' },
+      mainFeatures: ['Basic invoicing', 'Easy to use accounting', 'Mutli-accounts'],
+    },
+    {
+      name: 'Scale',
+      id: 'tier-scale',
+      href: '#',
+      featured: true,
+      description: 'The best financial services for your thriving business.',
+      price: { monthly: '$60', annually: '$576' },
+      mainFeatures: [
+        'Advanced invoicing',
+        'Easy to use accounting',
+        'Mutli-accounts',
+        'Tax planning toolkit',
+        'VAT & VATMOSS filing',
+        'Free bank transfers',
+      ],
+    },
+    {
+      name: 'Growth',
+      id: 'tier-growth',
+      href: '#',
+      featured: false,
+      description: 'Convenient features to take your business to the next level.',
+      price: { monthly: '$30', annually: '$288' },
+      mainFeatures: ['Basic invoicing', 'Easy to use accounting', 'Mutli-accounts', 'Tax planning toolkit'],
+    },
+  ],
+  sections: [
+    {
+      name: 'Catered for business',
+      features: [
+        { name: 'Tax Savings', tiers: { Starter: true, Scale: true, Growth: true } },
+        { name: 'Easy to use accounting', tiers: { Starter: true, Scale: true, Growth: true } },
+        { name: 'Multi-accounts', tiers: { Starter: '3 accounts', Scale: 'Unlimited accounts', Growth: '7 accounts' } },
+        { name: 'Invoicing', tiers: { Starter: '3 invoices', Scale: 'Unlimited invoices', Growth: '10 invoices' } },
+        { name: 'Exclusive offers', tiers: { Starter: false, Scale: true, Growth: true } },
+        { name: '6 months free advisor', tiers: { Starter: false, Scale: true, Growth: true } },
+        { name: 'Mobile and web access', tiers: { Starter: false, Scale: true, Growth: false } },
+      ],
+    },
+    {
+      name: 'Other perks',
+      features: [
+        { name: '24/7 customer support', tiers: { Starter: true, Scale: true, Growth: true } },
+        { name: 'Instant notifications', tiers: { Starter: true, Scale: true, Growth: true } },
+        { name: 'Budgeting tools', tiers: { Starter: true, Scale: true, Growth: true } },
+        { name: 'Digital receipts', tiers: { Starter: true, Scale: true, Growth: true } },
+        { name: 'Pots to separate money', tiers: { Starter: false, Scale: true, Growth: true } },
+        { name: 'Free bank transfers', tiers: { Starter: false, Scale: true, Growth: false } },
+        { name: 'Business debit card', tiers: { Starter: false, Scale: true, Growth: false } },
+      ],
+    },
+  ],
+}
+
+
+
+const frequency = ref(pricing.frequencies[0])
+
 
 const options = {
   style: {
@@ -183,6 +336,8 @@ const primaryFeatures = [
     icon: ServerIcon,
   },
 ]
+
+
 
 const secondaryFeatures = [
   {
