@@ -94,7 +94,7 @@
       </section>
 
           <!-- Pricing section -->
-          <div class="isolate overflow-hidden">
+          <div class="isolate ">
         <div class="flow-root bg-[#000] py-16 sm:pt-32 lg:pb-0">
           <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="relative z-10">
@@ -110,8 +110,8 @@
                 </fieldset>
               </div>
             </div>
-            <div class="relative mx-auto mt-10 grid max-w-md grid-cols-1 gap-y-8 lg:mx-0 lg:-mb-14 lg:max-w-none lg:grid-cols-3">
-              <svg viewBox="0 0 1208 1024" aria-hidden="true" class="absolute -bottom-48 left-1/2 h-[64rem] -translate-x-1/2 translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] lg:-top-48 lg:bottom-auto lg:translate-y-0">
+            <div class="flex justify-center items-center gap-20">
+              <!-- <svg viewBox="0 0 1208 1024" aria-hidden="true" class="absolute -bottom-48 left-1/2 h-[64rem] -translate-x-1/2 translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] lg:-top-48 lg:bottom-auto lg:translate-y-0">
                 <ellipse cx="604" cy="512" fill="url(#d25c25d4-6d43-4bf9-b9ac-1842a30a4867)" rx="604" ry="512" />
                 <defs>
                   <radialGradient id="d25c25d4-6d43-4bf9-b9ac-1842a30a4867">
@@ -119,8 +119,9 @@
                     <stop offset="1" stop-color="#E935C1" />
                   </radialGradient>
                 </defs>
-              </svg>
-              <div class="hidden lg:absolute lg:inset-x-px lg:bottom-0 lg:top-4 lg:block lg:rounded-t-2xl lg:bg-gray-800/80 lg:ring-1 lg:ring-white/10" aria-hidden="true" />
+              </svg> -->
+              <div class="" aria-hidden="true" />
+
               <div v-for="tier in pricing.tiers" :key="tier.id" :class="[tier.featured ? 'z-10 bg-white shadow-xl ring-1 ring-gray-900/10' : 'bg-gray-800/80 ring-1 ring-white/10 lg:bg-transparent lg:pb-14 lg:ring-0', 'relative rounded-2xl']">
                 <div class="p-8 lg:pt-12 xl:p-10 xl:pt-14">
                   <h2 :id="tier.id" :class="[tier.featured ? 'text-gray-900' : 'text-white', 'text-sm font-semibold leading-6']">{{ tier.name }}</h2>
@@ -144,6 +145,7 @@
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -202,35 +204,43 @@ const pricing = {
       id: 'tier-starter',
       href: '#',
       featured: false,
-      description: 'All your essential business finances, taken care of.',
-      price: { monthly: '$15', annually: '$144' },
-      mainFeatures: ['Basic invoicing', 'Easy to use accounting', 'Mutli-accounts'],
-    },
-    {
-      name: 'Scale',
-      id: 'tier-scale',
-      href: '#',
-      featured: true,
-      description: 'The best financial services for your thriving business.',
-      price: { monthly: '$60', annually: '$576' },
+      description: 'write a descripton .',
+      price: { monthly: '$15', annually: '$100' },
       mainFeatures: [
-        'Advanced invoicing',
-        'Easy to use accounting',
-        'Mutli-accounts',
-        'Tax planning toolkit',
-        'VAT & VATMOSS filing',
-        'Free bank transfers',
+       'feature one',
+       'feature one',
+       'feature one'
+       
       ],
     },
     {
-      name: 'Growth',
-      id: 'tier-growth',
+      name: 'Starter',
+      id: 'tier-starter',
       href: '#',
       featured: false,
-      description: 'Convenient features to take your business to the next level.',
-      price: { monthly: '$30', annually: '$288' },
-      mainFeatures: ['Basic invoicing', 'Easy to use accounting', 'Mutli-accounts', 'Tax planning toolkit'],
+      description: 'write a descripton .',
+      price: { monthly: '$15', annually: '$100' },
+      mainFeatures: [
+       'feature one',
+       'feature one',
+       'feature one'
+       
+      ],
     },
+    // {
+    //   name: 'Growth',
+    //   id: 'tier-growth',
+    //   href: '#',
+    //   featured: false,
+    //   description: 'write a description ',
+    //   price: { monthly: 'Call for quote', annually: 'Clall for quote' },
+    //   mainFeatures: [
+    //    'feature one',
+    //    'feature one',
+    //    'feature one'
+       
+    //   ],
+    // },
   ],
   sections: [
     {
