@@ -1,14 +1,28 @@
-<template>
-  <div class="container-mdc">
-    <h1 class="title">Create New Tour</h1>
+<template  >
+  <div class="container mx-auto">
+    <h1 class="font-bold text-white text-3xl mb-10">Create New Tour</h1>
     <form @submit.prevent="submitNewTour">
-      <div class="form-group">
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="new-tour-title" class="mdc-text-field__input" v-model="newTour.title" placeholder=" " />
-          <label class="mdc-floating-label" for="new-tour-title">Tour Title</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
+  
+
+      <div class="mb-10" >
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Event Details</h2>
+          </div>
+          <div class="bg-white p-6" >
+            <div class="mdc-text-field mb-4">
+            <input type="text" id="new-tour-title" class="mdc-text-field__input" v-model="newTour.title" placeholder=" " />
+            <label class="mdc-floating-label" for="new-tour-title">Tour Title</label>
+           <div class="mdc-line-ripple"></div>
+           </div>
+          </div>
+      </div>
+
+      <div class="bg-white" >
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Event date</h2>
+          </div>
+        <div class="p-6 mt-6">
+          <div class="mdc-text-field mb-4">
           <input type="date" id="new-tour-start-date" class="mdc-text-field__input" v-model="newTour.startDate" placeholder=" " />
           <label class="mdc-floating-label" for="new-tour-start-date">Start Date</label>
           <div class="mdc-line-ripple"></div>
@@ -18,14 +32,30 @@
           <label class="mdc-floating-label" for="new-tour-end-date">End Date</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <div class="mb-4">
+        </div>
+      </div>
+
+       <div class="bg-white mt-10">
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Event Image </h2>
+          </div>
+        <div class="mb-4 p-6">
           <input type="file" id="new-tour-image" class="styled-file-input" @change="handleNewTourImageUpload" accept="image/*" />
-          <label for="new-tour-image" class="styled-file-label">Choose Tour Image</label>
+          <label for="new-tour-image" class="styled-file-label w-full text-center ">Choose Tour Image</label>
         </div>
         <div v-if="newTour.imageUrl" class="mb-4">
           <img :src="newTour.imageUrl" alt="Tour Image" class="w-full h-auto rounded-lg shadow-md" />
         </div>
-        <div class="mdc-text-field mb-4">
+       </div>
+
+
+
+      <div class="bg-white my-10" >
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Choose Band </h2>
+          </div>
+          <div class="p-6 mt-6">
+            <div class="mdc-text-field mb-4">
           <select v-model="newTour.bands"  class="mdc-text-field__input">
             <option value="" disabled>Select Bands (Optional)</option>
             <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
@@ -33,6 +63,15 @@
           <label class="mdc-floating-label" for="new-tour-bands">Select Bands</label>
           <div class="mdc-line-ripple"></div>
         </div>
+          </div>
+      </div>
+
+        
+     <div class="bg-white">
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Select Event </h2>
+          </div>
+      <div class="p-6 mt-6">
         <div class="mdc-text-field mb-4">
           <select v-model="newTour.events" multiple class="mdc-text-field__input">
             <option value="" disabled>Select Events (Optional)</option>
@@ -41,8 +80,10 @@
           <label class="mdc-floating-label" for="new-tour-events">Select Events</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <button type="submit" class="mdc-button mb-4 w-full">Create Tour</button>
       </div>
+     </div>
+        <button type="submit" class="mdc-button mb-4 mt-10 w-full">Create Tour</button>
+      
     </form>
   </div>
 </template>
@@ -166,7 +207,7 @@ onMounted(async () => {
 .form-group {
   padding: 1.5rem;
   margin-bottom: 2rem;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -190,7 +231,7 @@ onMounted(async () => {
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 4px;
   outline: none;
   width: 100%;
@@ -283,7 +324,7 @@ onMounted(async () => {
 .styled-select {
   width: 100%;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 4px;
   outline: none;
   font-size: 1rem;

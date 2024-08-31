@@ -59,10 +59,9 @@
 }
 /* end of phone  */
 .container-mdc {
-    max-width: 500px;
     margin: 2rem auto;
     padding: 2rem;
-    background-color: #fff;
+    border:1px solid black;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -153,6 +152,15 @@
     cursor: pointer;
     transition: background-color 0.2s;
   }
+
+  .form-group {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
   .mdc-button-green {
     display: inline-flex;
     align-items: center;

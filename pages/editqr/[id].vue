@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mx-auto max-w-5xl" >
     <ClientOnly>
       <EditQrCode />
     </ClientOnly>

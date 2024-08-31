@@ -1,7 +1,7 @@
 <template>
-   <div>
+   <div class="bg-black"  >
       <Header/>
-      <NuxtPage />
+      <NuxtPage  />
    </div> 
 </template>
 <script setup>

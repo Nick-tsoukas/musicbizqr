@@ -225,7 +225,7 @@ const albumItems = computed(() => albums.value.map(album => ({
             <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
-            <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
+            <button @click="router.push(`/editband/${band.id}`)" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
          

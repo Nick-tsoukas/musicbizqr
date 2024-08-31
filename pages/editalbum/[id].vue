@@ -1,9 +1,14 @@
 <template>
-  <div class="container-mdc">
-    <h1 class="title">Edit Album</h1>
+  <div class=" w-[90vw] mx-auto">
+    <h1 class="text-white text-2xl font-bold mb-10">Edit Album</h1>
     <form @submit.prevent="submitEditAlbum">
-      <div class="form-group">
-        <div class="mdc-text-field mb-4">
+      <div >
+    <div class="bg-white" >
+      <div class="flex flex-col  p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+       <h2 class="text-white text-xl font-semibold" >ALbum details </h2>
+      </div>
+ <div class="p-6" >
+  <div class="mdc-text-field mb-4">
           <input type="text" id="edit-album-title" class="mdc-text-field__input" v-model="album.title" placeholder=" " required />
           <label class="mdc-floating-label" for="edit-album-title">Album Title</label>
           <div class="mdc-line-ripple"></div>
@@ -13,38 +18,55 @@
           <label class="mdc-floating-label" for="edit-album-releaseDate">Release Date</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <div class="mb-4">
+ </div>
+    </div>
+        
+    <div class="mt-10 bg-white" >
+      <div class="flex flex-col  p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+       <h2 class="text-white text-xl font-semibold" >ALbum Image </h2>
+      </div>
+      <div class="bg-white p-6" >
+        <div v-if="album.imageUrl" class="my-10">
+          <img :src="album.imageUrl" alt="Album Cover" class="w-50% mx-auto h-auto rounded-lg shadow-md" />
+        </div>
+        <div class="my-10 ">
           <input type="file" id="edit-album-cover" class="styled-file-input" @change="handleAlbumCoverUpload" accept="image/*" />
-          <label for="edit-album-cover" class="styled-file-label">Choose Album Cover</label>
+          <label for="edit-album-cover " class="styled-file-label w-full text-center">Choose Album Cover</label>
         </div>
-        <div v-if="album.imageUrl" class="mb-4">
-          <img :src="album.imageUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-        </div>
-        <div class="mdc-text-field mb-4">
-          <select v-model="album.band" class="mdc-text-field__input">
-            <option value="" disabled>Select Band</option>
-            <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
-          </select>
-          <label class="mdc-floating-label" for="edit-album-band">Select Band</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <label class="mdc-floating-label">Songs</label>
-          <div v-for="(song, index) in album.songs" :key="index" class="mb-4">
-            <div class="mdc-text-field mb-2">
-              <input type="text" :id="'song-title-' + index" class="mdc-text-field__input" v-model="song.title" placeholder=" " />
-              <label class="mdc-floating-label" :for="'song-title-' + index">Song Title</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <div class="mb-2">
-              <input type="file" :id="'song-file-' + index" class="styled-file-input" @change="handleSongFileUpload($event, index)" accept="audio/*" />
-              <label :for="'song-file-' + index" class="styled-file-label">Choose Song File</label>
-            </div>
-            <button type="button" class="mdc-button mb-2 w-full" @click="removeSong(index)">Remove Song</button>
-          </div>
-          <button type="button" class="mdc-button mb-4 w-full" @click="addSong">Add Song</button>
-        </div>
-        <button type="submit" class="mdc-button mb-4 w-full">Save Changes</button>
+      </div>
+    </div>
+
+    <div class="flex flex-col mt-10  p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+       <h2 class="text-white text-xl font-semibold" >ALbum Image </h2>
+      </div>
+    <div class="bg-white p-6" >
+      <div class="mdc-text-field my-6">
+       
+       <select v-model="album.band" class="mdc-text-field__input pt-6">
+         <option value="" disabled>Select Band</option>
+         <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
+       </select>
+       <label class="mdc-floating-label" for="edit-album-band">Select Band</label>
+       <div class="mdc-line-ripple"></div>
+     </div>
+     <div class="mdc-text-field mb-4">
+       <label class="mdc-floating-label">Songs</label>
+       <div v-for="(song, index) in album.songs" :key="index" class="mb-4">
+         <div class="mdc-text-field mb-2">
+           <input type="text" :id="'song-title-' + index" class="mdc-text-field__input" v-model="song.title" placeholder=" " />
+           <label class="mdc-floating-label" :for="'song-title-' + index">Song Title</label>
+           <div class="mdc-line-ripple"></div>
+         </div>
+         <div class="mb-2">
+           <input type="file" :id="'song-file-' + index" class="styled-file-input" @change="handleSongFileUpload($event, index)" accept="audio/*" />
+           <label :for="'song-file-' + index" class="styled-file-label">Choose Song File</label>
+         </div>
+         <button type="button" class="mdc-button mb-2 w-full" @click="removeSong(index)">Remove Song</button>
+       </div>
+       <button type="button" class="mdc-button mb-4 w-full" @click="addSong">Add Song</button>
+     </div>
+    </div>
+        <button type="submit" class="mdc-button mb-4 w-full mt-10">Save Changes</button>
       </div>
     </form>
   </div>

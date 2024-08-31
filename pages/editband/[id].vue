@@ -1,69 +1,109 @@
 <template>
-  <div class="container-mdc">
-    <h1 class="title">Edit Band</h1>
-    <form @submit.prevent="submitEditBand">
-      <div class="form-group">
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-name" class="mdc-text-field__input" v-model="band.name" placeholder=" " required />
-          <label class="mdc-floating-label" for="edit-band-name">Band Name</label>
-          <div class="mdc-line-ripple"></div>
+  <div class="bg-[#000] w-[90vw] mx-auto">
+    <div class="container-mdc bg-black max-w-5xl">
+      <h1 class="title text-black">Edit Band</h1>
+      <form @submit.prevent="submitEditBand" class=" rounded-md p-4">
+        <div class="form-group">
+
+          <!-- Band Name -->  
+          <div class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+           <h2 class="text-white text-xl font-semibold" >Band Details</h2>
+          </div>
+          <div class="bg-white p-10" >  
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-band-name" class="mdc-text-field__input" v-model="band.name" placeholder=" " required />
+            <label class="mdc-floating-label" for="edit-band-name">Band Name</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <!-- Genre -->
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-band-genre" class="mdc-text-field__input" v-model="band.genre" placeholder=" " required />
+            <label class="mdc-floating-label" for="edit-band-genre">Genre</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <!-- Bio -->
+          <div class="mdc-text-field">
+            <textarea id="edit-band-bio" class="mdc-text-field__input" v-model="band.bio" placeholder=" " required></textarea>
+            <label class="mdc-floating-label" for="edit-band-bio">Bio</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          </div>
+          <!-- Band Image Upload -->
+          <div class="flex flex-col p-6 mt-10 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 ">
+
+          <h3 class=" font-semibold text-white text-xl">Upload Image</h3>
+          </div>
+          <div class="bg-white p-4" >
+      
+          <div v-if="band.imageUrl" class="mb-4">
+            <img :src="band.imageUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md mb-4" />
+            <input type="file" id="edit-band-image" class="styled-file-input" @change="handleBandImageUpload" accept="image/*" />
+            <label for="edit-band-image" class="styled-file-label w-full text-center">Choose Band Image</label>
+          </div>
+          </div>
+
+          <!-- Social Media Links -->
+          <div class="flex flex-col p-6 mt-10 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 ">
+
+          <h3 class=" font-semibold text-white text-xl">Social Media Links</h3>
+          </div>
+       <div class="bg-white p-4" >
+        <div class="mdc-text-field my-4">
+            <input type="url" id="edit-band-facebook" class="mdc-text-field__input" v-model="band.facebook" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-facebook">Facebook</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-instagram" class="mdc-text-field__input" v-model="band.instagram" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-instagram">Instagram</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-twitch" class="mdc-text-field__input" v-model="band.twitch" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-twitch">Twitch</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+       </div>
+
+          <!-- Streaming Links -->
+          <div class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+
+          <h3 class="font-semibold text-white text-xl">Streaming Links</h3>
         </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-genre" class="mdc-text-field__input" v-model="band.genre" placeholder=" " required />
-          <label class="mdc-floating-label" for="edit-band-genre">Genre</label>
-          <div class="mdc-line-ripple"></div>
+         <div class="bg-white p-4" >
+          <div class="mdc-text-field my-4">
+            <input type="url" id="edit-band-appleMusic" class="mdc-text-field__input" v-model="band.appleMusic" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-appleMusic">Apple Music</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-spotify" class="mdc-text-field__input" v-model="band.spotify" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-spotify">Spotify</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-soundcloud" class="mdc-text-field__input" v-model="band.soundcloud" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-soundcloud">SoundCloud</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+         </div>
+
+          <!-- Save Button -->
+          <button type="submit" class="mdc-button w-full mt-10">Save Changes</button>
         </div>
-        <div class="mdc-text-field mb-4">
-          <textarea id="edit-band-bio" class="mdc-text-field__input" v-model="band.bio" placeholder=" " required></textarea>
-          <label class="mdc-floating-label" for="edit-band-bio">Bio</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mb-4">
-          <input type="file" id="edit-band-image" class="styled-file-input" @change="handleBandImageUpload" accept="image/*" />
-          <label for="edit-band-image" class="styled-file-label">Choose Band Image</label>
-        </div>
-        <div v-if="band.imageUrl" class="mb-4">
-          <img :src="band.imageUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md" />
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-facebook" class="mdc-text-field__input" v-model="band.facebook" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-band-facebook">Facebook</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-instagram" class="mdc-text-field__input" v-model="band.instagram" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-band-instagram">Instagram</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-twitch" class="mdc-text-field__input" v-model="band.twitch" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-band-twitch">Twitch</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-appleMusic" class="mdc-text-field__input" v-model="band.appleMusic" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-band-appleMusic">Apple Music</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-band-soundcloud" class="mdc-text-field__input" v-model="band.soundcloud" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-band-soundcloud">SoundCloud</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <button type="submit" class="mdc-button mb-4 w-full">Save Changes</button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-
-
 const route = useRoute();
 const router = useRouter();
 const { findOne } = useStrapi();
 const user = useStrapiUser();
-const client = useStrapiClient()
+const client = useStrapiClient();
 
 const band = ref({
   name: '',
@@ -75,11 +115,12 @@ const band = ref({
   instagram: '',
   twitch: '',
   appleMusic: '',
+  spotify: '',
   soundcloud: '',
 });
+
 const fetchBand = async () => {
   const bandId = route.params.id;
-  console.log('Getting band with ID:', bandId);
   try {
     const response = await findOne('bands', bandId, {
       populate: ['bandImg'],
@@ -97,11 +138,9 @@ const fetchBand = async () => {
         instagram: attributes.instagram || '',
         twitch: attributes.twitch || '',
         appleMusic: attributes.appleMusic || '',
+        spotify: attributes.spotify || '',
         soundcloud: attributes.soundcloud || '',
       };
-      console.log('Fetched band data:', band.value);
-    } else {
-      console.log('No data found for band ID:', bandId);
     }
   } catch (error) {
     console.error('Error fetching band:', error);
@@ -126,6 +165,7 @@ const submitEditBand = async () => {
       instagram: band.value.instagram,
       twitch: band.value.twitch,
       appleMusic: band.value.appleMusic,
+      spotify: band.value.spotify,
       soundcloud: band.value.soundcloud,
       users_permissions_user: user.value.id,
     };
@@ -155,30 +195,22 @@ onMounted(fetchBand);
 @tailwind components;
 @tailwind utilities;
 
+/* Container */
 .container-mdc {
-  max-width: 500px;
   margin: 1rem auto;
   padding: 1rem;
-  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Title */
 .title {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
-  color: #333;
 }
 
-.form-group {
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
+/* Text Fields */
 .mdc-text-field {
   position: relative;
   margin-bottom: 1.5rem;
@@ -198,8 +230,8 @@ onMounted(fetchBand);
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #000;
+  border-radius: 10px;
   outline: none;
   width: 100%;
 }
@@ -240,6 +272,7 @@ onMounted(fetchBand);
   transform: scaleX(1);
 }
 
+/* Button */
 .mdc-button {
   display: inline-flex;
   align-items: center;
@@ -261,10 +294,7 @@ onMounted(fetchBand);
   background-color: #3700b3;
 }
 
-.mdc-button:focus {
-  outline: none;
-}
-
+/* File Input */
 .styled-file-input {
   display: none;
 }
@@ -288,35 +318,25 @@ onMounted(fetchBand);
   background-color: #3700b3;
 }
 
-.styled-select {
-  width: 100%;
-  padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  outline: none;
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
-  background-color: white;
-  appearance: none;
-  position: relative;
-  background-image: none;
-}
-
-.select-arrow {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 12px;
-  color: #aaa;
-}
-
-.styled-label {
+.styled-file-label.w-full {
   display: block;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  color: #aaa;
+  width: 100%;
+  text-align: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.rounded-lg {
+  border-radius: 8px;
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

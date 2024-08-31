@@ -1,14 +1,28 @@
 <template>
-  <div class="container-mdc">
-    <h1 class="title">Edit Tour page</h1>
+  <div class="container mx-auto">
+    <h1 class="text-white text-3xl font-bold mb-10">Edit Tour page</h1>
     <form @submit.prevent="submitEditTour">
-      <div class="form-group">
-        <div class="mdc-text-field mb-4">
+      <div >
+
+        <div class="bg-white" >
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Event Title</h2>
+          </div>
+        <div class="p-6 mt-6" >
+          <div class="mdc-text-field mb-4">
           <input type="text" id="edit-tour-title" class="mdc-text-field__input" v-model="tour.title" placeholder=" " />
           <label class="mdc-floating-label" for="edit-tour-title">Tour Title</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <div class="mdc-text-field mb-4">
+        </div>
+        </div>
+
+       <div class="bg-white mt-10">
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Event Title</h2>
+          </div>
+          <div class="p-6 mt-6" >
+            <div class="mdc-text-field mb-4">
           <input type="date" id="edit-tour-start-date" class="mdc-text-field__input" v-model="tour.startDate" placeholder=" " />
           <label class="mdc-floating-label" for="edit-tour-start-date">Start Date</label>
           <div class="mdc-line-ripple"></div>
@@ -18,28 +32,54 @@
           <label class="mdc-floating-label" for="edit-tour-end-date">End Date</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <div class="mb-4">
+          </div>
+       </div>
+
+       <div class="bg-white my-10">
+       <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Event Image</h2>
+          </div>
+        <div class="mb-4 p-6">
           <input type="file" id="edit-tour-image" class="styled-file-input" @change="handleTourImageUpload" accept="image/*" />
-          <label for="edit-tour-image" class="styled-file-label">Choose Tour Image</label>
+          <label for="edit-tour-image" class="styled-file-label w-full text-center">Choose Tour Image</label>
         </div>
-        <div v-if="tour.imageUrl" class="mb-4">
+        <!-- <div v-if="tour.imageUrl" class="mb-4">
           <img :src="tour.imageUrl" alt="Tour Image" class="w-full h-auto rounded-lg shadow-md" />
-        </div>
-        <div class="mdc-text-field mb-4">
+        </div> -->
+       </div>
+
+
+    <div class="bg-white">
+      <div class="flex flex-col bg-[#000] p-6 mt-10 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Choose Band</h2>
+          </div>
+      <div class="p-6" >
+        <div class="mdc-text-field mt-10 ">
           <select v-model="tour.bands" class="mdc-text-field__input" multiple>
             <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
           </select>
           <label class="mdc-floating-label" for="edit-tour-bands">Select Bands</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <div class="mdc-text-field mb-4">
+      </div>
+    </div>
+        
+      <div class="bg-white">
+        <div class="flex flex-col bg-[#000] p-6 mt-10 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Choose Events</h2>
+          </div>
+        <div class="p-6">
+        <div class="mdc-text-field my-10">
           <select v-model="tour.events" class="mdc-text-field__input" multiple>
             <option v-for="event in events" :key="event.id" :value="event.id">{{ event.attributes.title }}</option>
           </select>
           <label class="mdc-floating-label" for="edit-tour-events">Select Events</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <button type="submit" class="mdc-button mb-4 w-full">Save Changefdfs</button>
+      </div>
+      </div>
+
+        <button type="submit" class="mdc-button my-10 w-full">Save Changes</button>
       </div>
     </form>
   

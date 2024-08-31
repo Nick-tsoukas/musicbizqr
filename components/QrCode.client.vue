@@ -1,81 +1,3 @@
-<template>
-  <div class="flex flex-col items-center p-4">
-    <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
-    <div class="mt-4 flex flex-col space-y-4 w-full max-w-md">
-      <label class="mdc-text-field mdc-text-field--filled mb-4">
-        <span class="mb-1 text-gray-700">Name of QR:</span>
-        <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
-        <span class="mdc-line-ripple"></span>
-      </label>
-      <label v-if="type === 'link'" class="mdc-text-field mdc-text-field--filled mb-4">
-        <span class="mb-1 text-gray-700">External Link:</span>
-        <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
-        <span class="mdc-line-ripple"></span>
-      </label>
-      <h2 class="font-bold">Background Options</h2>
-      <label class="color-picker-label mb-4">
-        <span class="mb-1 text-gray-700">Background Color:</span>
-        <div class="color-picker">
-          <input v-model="options.backgroundOptions.color" type="text" class="color-text-input" />
-          <input v-model="options.backgroundOptions.color" type="color" class="color-input" />
-        </div>
-      </label>
-      <h2 class="font-bold">Dot Options</h2>
-      <label class="color-picker-label mb-4">
-        <span class="mb-1 text-gray-700">Dot Color:</span>
-        <div class="color-picker">
-          <input v-model="options.dotsOptions.color" type="text" class="color-text-input" />
-          <input type="color" id="color" v-model="options.dotsOptions.color" class="color-input" />
-        </div>
-      </label>
-      <label class="mdc-text-field mdc-text-field--filled mb-4">
-        <span class="mb-1 text-gray-700">Dot Type:</span>
-        <select v-model="options.dotsOptions.type" class="mdc-text-field__input">
-          <option value="rounded">Rounded</option>
-          <option value="dots">Dots</option>
-          <option value="classy">Classy</option>
-          <option value="classy-rounded">Classy Rounded</option>
-          <option value="square">Square</option>
-          <option value="extra-rounded">Extra Rounded</option>
-        </select>
-        <span class="mdc-line-ripple"></span>
-      </label>
-      <h2 class="font-bold">Corner Options</h2>
-      <label class="color-picker-label mb-4">
-        <span class="mb-1 text-gray-700">Corner Square Color:</span>
-        <div class="color-picker">
-          <input v-model="options.cornersSquareOptions.color" type="text" class="color-text-input" />
-          <input v-model="options.cornersSquareOptions.color" type="color" class="color-input" />
-        </div>
-      </label>
-      <label class="mdc-text-field mdc-text-field--filled mb-4">
-        <span class="mb-1 text-gray-700">Corner Square Type:</span>
-        <select v-model="options.cornersSquareOptions.type" class="mdc-text-field__input">
-          <option value="dot">Dot</option>
-          <option value="square">Square</option>
-          <option value="extra-rounded">Extra Rounded</option>
-        </select>
-        <span class="mdc-line-ripple"></span>
-      </label>
-      <label class="color-picker-label mb-4">
-        <span class="mb-1 text-gray-700">Corner Dot Color:</span>
-        <div class="color-picker">
-          <input v-model="options.cornersDotOptions.color" type="text" class="color-text-input" />
-          <input v-model="options.cornersDotOptions.color" type="color" class="color-input" />
-        </div>
-      </label>
-      <h2 class="font-bold">Image Options</h2>
-      <label class="mdc-text-field mdc-text-field--filled mb-4">
-        <span class="mb-1 text-gray-700">Upload Logo:</span>
-        <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
-        <span class="mdc-line-ripple"></span>
-      </label>
-      <button @click="saveQrCode" class="mdc-button mdc-button--raised w-full mt-4">
-        Save QR Code
-      </button>
-    </div>
-  </div>
-</template>
 
 
 
@@ -84,7 +6,10 @@
 // https://codepen.io/JamieCurnow/pen/KKPjraK
 import { ref, reactive, onMounted, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
-import QRCodeStyling from 'qr-code-styling'
+import QRCodeStyling from 'qr-code-styling';
+
+
+
 
 const props = defineProps({
   type: String,
@@ -113,7 +38,7 @@ const options = reactive({
     type: 'rounded',
   },
   backgroundOptions: {
-        color: "transparent", // Setting the background to transparent
+        color: "white", // Setting the background to transparent
     },
   imageOptions: {
     crossOrigin: 'anonymous',
@@ -223,10 +148,126 @@ watch(() => options, updateQrCode, { deep: true })
 </script>
 
 
+<template  class="  " >
+  <div class="flex flex-col items-center p-4 ">
+    <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
+    <div class="mt-4 flex flex-col space-y-4 w-full  ">
+   <div class="bg-white rounded-md " >
+    <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <span class="mb-1 text-white text-xl font-semibold">Name</span>
+      </div>
+   <div class="p-4">
+    <label class="mdc-text-field mb-4">
+    
+    <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
+    <span class="mdc-line-ripple"></span>
+  </label>
+   </div>
+    </div>
+    <div v-if="type === 'link'" class="bg-white rounded-md p-4">
+      <label  class="mdc-text-field mb-4">
+        <span class="mb-1 text-gray-700">External Link:</span>
+        <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
+        <span class="mdc-line-ripple"></span>
+      </label>
+    </div>
+    <div class="bg-white rounded-md" >
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+      <h2 class="font-semibold text-white text-xl">Background Options</h2>
+      </div>
+     <div class="p-4" >
+      <label class="color-picker-label mb-4">
+        <span class="mb-1 text-white">Background Color:</span>
+        <div class="color-picker">
+           <input v-model="options.backgroundOptions.color" type="text" class="color-text-input" />
+           <input v-model="options.backgroundOptions.color" type="color" class="color-input" />
+
+        </div>
+</label>
+     </div>
+    </div>
+    <div class="bg-white rounded-md " >
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+      <h2 class="font-semibold text-white text-xl">Dot Options</h2>
+      </div>
+    <div class="p-4" >
+    <label class="color-picker-label mb-4">
+        <span class="mb-1 text-white   ">Dot Color:</span>
+        <div class="color-picker">
+          <input v-model="options.dotsOptions.color" type="text" class="color-text-input" />
+          <input type="color" id="color" v-model="options.dotsOptions.color" class="color-input" />
+        </div>
+      </label>
+      </div> 
+     
+      <label class="mdc-text-field mb-4">
+        <span class="mb-1 text-gray-700">Dot Type:</span>
+        <select v-model="options.dotsOptions.type" class="mdc-text-field__input">
+          <option value="rounded">Rounded</option>
+          <option value="dots">Dots</option>
+          <option value="classy">Classy</option>
+          <option value="classy-rounded">Classy Rounded</option>
+          <option value="square">Square</option>
+          <option value="extra-rounded">Extra Rounded</option>
+        </select>
+        <span class="mdc-line-ripple"></span>
+      </label>
+    </div>
+    <div class="bg-white rounded-md" >
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+      <h2 class="text-white font-semibold text-xl">Corner Options</h2>
+      </div>
+      <div class="p-4" >
+        <label class="color-picker-label mb-4">
+        <span class="mb-1 text-gray-700">Corner Square Color:</span>
+        <div class="color-picker">
+          <input v-model="options.cornersSquareOptions.color" type="text" class="color-text-input" />
+          <input v-model="options.cornersSquareOptions.color" type="color" class="color-input" />
+        </div>
+      </label>
+   
+      <label class="mdc-text-field mb-4">
+        <span class="mb-1 text-gray-700">Corner Square Type:</span>
+        <select v-model="options.cornersSquareOptions.type" class="mdc-text-field__input">
+          <option value="dot">Dot</option>
+          <option value="square">Square</option>
+          <option value="extra-rounded">Extra Rounded</option>
+        </select>
+        <span class="mdc-line-ripple"></span>
+      </label>
+      <label class="color-picker-label mb-4">
+        <span class="mb-1 text-gray-700">Corner Dot Color:</span>
+        <div class="color-picker">
+          <input v-model="options.cornersDotOptions.color" type="text" class="color-text-input" />
+          <input v-model="options.cornersDotOptions.color" type="color" class="color-input" />
+        </div>
+      </label>
+    </div>
+      </div>
+      <div class="bg-white rounded-md " >
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+      <h2 class=" font-semibold text-white text-xl">Image Options</h2>
+      </div>
+     <div class="p-4" >
+      <label class="mdc-text-field mb-4">
+        <span class="mb-1 text-gray-700">Upload Logo:</span>
+        <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
+        <span class="mdc-line-ripple"></span>
+      </label>
+     </div>
+      </div>
+      <button @click="saveQrCode" class="mdc-button w-full mt-4">
+        Save QR Code
+      </button>
+    </div>
+  </div>
+</template>
+
+
+
 <style scoped>
 /* Basic Container Styling */
 .container-mdc {
-  max-width: 500px;
   margin: 2rem auto;
   padding: 2rem;
   background-color: #fff;
@@ -254,8 +295,8 @@ watch(() => options, updateQrCode, { deep: true })
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #000;
+  border-radius: 10px;
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -308,7 +349,7 @@ watch(() => options, updateQrCode, { deep: true })
   text-transform: uppercase;
   letter-spacing: 0.0892857143em;
   color: #fff;
-  background-color: #6200ee;
+  background-color: #2C2C2C;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -321,16 +362,6 @@ watch(() => options, updateQrCode, { deep: true })
 
 .mdc-button:focus {
   outline: none;
-}
-
-.cancel-icon {
-  position: absolute;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
 }
 
 /* Color Picker Styling */
@@ -348,19 +379,23 @@ watch(() => options, updateQrCode, { deep: true })
   height: 36px;
   padding: 0;
   cursor: pointer;
-   border-radius: 50%; /* Makes the input rounded */
+  border-radius: 50%; /* Makes the input rounded */
 }
 
 .color-text-input {
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 2.5rem 0.75rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #000;
+  border-radius: 10px;
   outline: none;
   width: 100%;
   box-sizing: border-box;
   position: relative;
   padding-right: 36px; /* Adjust padding to accommodate the color input */
+}
+
+.font-bold {
+  font-weight: 700;
 }
 </style>

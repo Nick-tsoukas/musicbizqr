@@ -1,716 +1,268 @@
 <template>
-  <div class="container-mdc">
-    <h1 class="title">Update Band Profile</h1>
-    <form :class="{hidden: isPopUp, hidden: isCreatingAlbum}" @submit.prevent="submitForm">
-      <!-- Band Details Section -->
-      <div class="form-group">
-        <h2 class="mb-8 font-semibold">Band Details</h2>
+  <div class="bg-[#000] w-[90vw] mx-auto">
+    <div class="container-mdc bg-black max-w-5xl">
+      <h1 class="title text-black">Edit Band Profile</h1>
 
-        <!-- Band Name -->
-        <div class="mdc-text-field">
-          <input type="text" id="band-name" class="mdc-text-field__input" v-model="bandName" placeholder=" "  />
-          <label class="mdc-floating-label" for="band-name">Band Name</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
+      <form class="form-group" @submit.prevent="submitEditBand">
+        <!-- Band Details Section -->
+        <div class="bg-[#fff] rounded-md">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Band Details</h2>
+          </div>
+          <div class="p-4">
+            <!-- Band Name -->
+            <div class="mdc-text-field">
+              <input type="text" id="edit-band-name" class="mdc-text-field__input" v-model="band.name" placeholder=" " required />
+              <label class="mdc-floating-label" for="edit-band-name">Band Name</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
 
-        <!-- Genre -->
-        <div class="mdc-text-field">
-          <input type="text" id="genre" class="mdc-text-field__input" v-model="genre" placeholder=" "  />
-          <label class="mdc-floating-label" for="genre">Genre</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
+            <!-- Genre -->
+            <div class="mdc-text-field">
+              <input type="text" id="edit-band-genre" class="mdc-text-field__input" v-model="band.genre" placeholder=" " required />
+              <label class="mdc-floating-label" for="edit-band-genre">Genre</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
 
-        <!-- Bio -->
-        <div class="mdc-text-field">
-          <textarea id="bio" class="mdc-text-field__input" v-model="bio" placeholder=" " ></textarea>
-          <label class="mdc-floating-label" for="bio">Bio</label>
-          <div class="mdc-line-ripple"></div>
+            <!-- Bio -->
+            <div class="mdc-text-field">
+              <textarea id="edit-band-bio" class="mdc-text-field__input" v-model="band.bio" placeholder=" " required></textarea>
+              <label class="mdc-floating-label" for="edit-band-bio">Bio</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Band Image -->
-        <h3 class="mt-8 mb-4 font-semibold">Upload Image</h3>
-        <div class="mb-4">
-          <input type="file" id="band-img" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
-          <label for="band-img" class="styled-file-label">Choose Band Image</label>
+        <div class="bg-[#fff] rounded-md mt-10">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
+          </div>
+          <div class="p-4">
+            <input type="file" id="edit-band-image" class="styled-file-input" @change="handleBandImageUpload" accept="image/*" />
+            <label for="edit-band-image" class="styled-file-label w-full text-center">Choose Band Image</label>
+            <div v-if="band.imageUrl" class="mb-4">
+              <img :src="band.imageUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md" />
+            </div>
+          </div>
         </div>
-        <div v-if="bandImgUrl" class="mb-4">
-          <img :src="bandImgUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md" />
+
+        <!-- Band Members Section -->
+        <div class="bg-white rounded-md mt-10">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Band Members</h2>
+          </div>
+          <div class="p-4">
+            <div v-for="(member, index) in band.members" :key="index" class="member-container">
+              <div class="mdc-text-field mb-4">
+                <input type="text" :id="'edit-member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" " />
+                <label class="mdc-floating-label" :for="'edit-member-name-' + index">Member Name</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
+              <div class="mdc-text-field mb-4">
+                <input type="text" :id="'edit-instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" " />
+                <label class="mdc-floating-label" :for="'edit-instrument-' + index">Instrument</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
+              <div class="mb-4">
+                <input type="file" :id="'edit-member-img-' + index" class="styled-file-input" @change="(event) => handleMemberImageUpload(event, index)" accept="image/*" />
+                <label :for="'edit-member-img-' + index" class="styled-file-label w-full text-center">Choose Member Image</label>
+              </div>
+              <div v-if="member.imageUrl" class="mb-4">
+                <img :src="member.imageUrl" alt="Member Image" class="w-full h-auto rounded-lg shadow-md" />
+              </div>
+              <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(index)">Remove Member</button>
+            </div>
+            <button type="button" class="mdc-button mb-8 w-full" @click="addMember">+ Add Member</button>
+          </div>
         </div>
-      </div>
 
-      <!-- Band Members Section -->
-      <div class="form-group">
-        <h2 class="mb-8 font-semibold">Band Members</h2>
-        <div v-for="(member, index) in members" :key="index" class="member-container">
-          <div class="mdc-text-field mb-4">
-            <input type="text" :id="'member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'member-name-' + index">Member Name</label>
-            <div class="mdc-line-ripple"></div>
+        <!-- Social Media Links Section -->
+        <div class="bg-[#fff] rounded-md mt-10">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Social Media Links</h2>
           </div>
-          <div class="mdc-text-field mb-4">
-            <input type="text" :id="'instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'instrument-' + index">Instrument</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mb-4">
-            <input type="file" :id="'member-img-' + index" class="styled-file-input" @change="(event) => handleMemberImageUpload(event, index)" accept="image/*" />
-            <label :for="'member-img-' + index" class="styled-file-label">Choose Member Image</label>
-          </div>
-          <div v-if="member.imageUrl" class="mb-4">
-            <img :src="member.imageUrl" alt="Member Image" class="w-full h-auto rounded-lg shadow-md" />
-          </div>
-          <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(index)">Remove Member</button>
-        </div>
-        <button type="button" class="mdc-button mb-8 w-full" @click="addMember">+ Add Member</button>
-      </div>
-
-      <!-- Albums Section -->
-      <!-- <div class="form-group">
-        <h2 class="mb-8 font-semibold">Albums</h2>
-        <div v-for="(album, albumIndex) in albums" :key="albumIndex" class="album-container">
-          <div class="mdc-text-field mb-4">
-            <input type="text" :id="'album-title-' + albumIndex" class="mdc-text-field__input" v-model="album.title" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'album-title-' + albumIndex">Album Title</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="album.releaseDate" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mb-4">
-            <input type="file" :id="'album-cover-' + albumIndex" class="styled-file-input" @change="(event) => handleAlbumCoverUpload(event, albumIndex)" accept="image/*" />
-            <label :for="'album-cover-' + albumIndex" class="styled-file-label">Choose Album Cover</label>
-          </div>
-          <div v-if="album.coverUrl" class="mb-4">
-            <img :src="album.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-          </div>
-
-          <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
-          <div v-for="(song, songIndex) in album.songs" :key="songIndex" class="song-container">
+          <div class="p-4">
             <div class="mdc-text-field mb-4">
-              <input type="text" :id="'song-title-' + albumIndex + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
-              <label class="mdc-floating-label" :for="'song-title-' + albumIndex + '-' + songIndex">Song Title</label>
+              <input type="url" id="edit-facebook" class="mdc-text-field__input" v-model="band.facebook" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-facebook">Facebook</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <div class="mb-4">
-              <input type="file" :id="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-input" @change="(event) => handleSongFileUpload(event, albumIndex, songIndex)" accept="audio/*" />
-              <label :for="'song-file-' + albumIndex + '-' + songIndex" class="styled-file-label">Choose Song File</label>
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="edit-instagram" class="mdc-text-field__input" v-model="band.instagram" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-instagram">Instagram</label>
+              <div class="mdc-line-ripple"></div>
             </div>
-            <button type="button" class="mdc-button mb-4 w-full" @click="removeSong(albumIndex, songIndex)">Remove Song</button>
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="edit-twitch" class="mdc-text-field__input" v-model="band.twitch" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-twitch">Twitch</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
           </div>
-          <button type="button" class="mdc-button mb-8 w-full" @click="addSong(albumIndex)">+ Add Song</button>
+        </div>
 
-          <button type="button" class="mdc-button mb-4 w-full" @click="removeAlbum(albumIndex)">Remove Album</button>
-        </div>
-        <button type="button" class="mdc-button mb-8 w-full" @click="addAlbum">+ Add Album</button>
-      </div> -->
-
-      <!-- Social Media Links Section -->
-      <div class="form-group">
-        <h2 class="mb-8 font-semibold">Social Media Links</h2>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="facebook" class="mdc-text-field__input" v-model="facebook" placeholder=" " />
-          <label class="mdc-floating-label" for="facebook">Facebook</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="instagram" class="mdc-text-field__input" v-model="instagram" placeholder=" " />
-          <label class="mdc-floating-label" for="instagram">Instagram</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="twitch" class="mdc-text-field__input" v-model="twitch" placeholder=" " />
-          <label class="mdc-floating-label" for="twitch">Twitch</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-      </div>
-
-      <!-- Streaming Links Section -->
-      <div class="form-group">
-        <h2 class="mb-8 font-semibold">Streaming Links</h2>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="appleMusic" class="mdc-text-field__input" v-model="appleMusic" placeholder=" " />
-          <label class="mdc-floating-label" for="appleMusic">Apple Music</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="spotify" class="mdc-text-field__input" v-model="spotify" placeholder=" " />
-          <label class="mdc-floating-label" for="spotify">Spotify</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="soundcloud" class="mdc-text-field__input" v-model="soundcloud" placeholder=" " />
-          <label class="mdc-floating-label" for="soundcloud">SoundCloud</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-      </div>
-      <!-- albunm list form-group adding the border and sets width plus drop shaddow   -->
-    
-    <!-- work here -->
-      <section v-if="albumList" class="form-group">
-        <h2 class="mb-8 font-semibold">Album List</h2>
-        <!-- <pre>{{ albumList }}</pre> -->
-        <div v-for="(album, index) in albumList.data" :key="album.attributes.title"  class="flex gap-2 items-center w-full mb-4">
-        
-          <div v-if="album.attributes.cover" class=" w-[60px] h-[60px]">
-            <img :src="album.attributes.cover.data.attributes.url" alt="">
+        <!-- Streaming Links Section -->
+        <div class="bg-[#fff] rounded-md mt-10">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Streaming Links</h2>
           </div>
-          <div class="grow">{{ album.attributes.title }}</div>
-          <div class="flex items-center"> <img @click="toggle(index)" src="@/assets/edit-icon.svg" alt=""></div>
+          <div class="p-4">
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="edit-appleMusic" class="mdc-text-field__input" v-model="band.appleMusic" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-appleMusic">Apple Music</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="edit-spotify" class="mdc-text-field__input" v-model="band.spotify" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-spotify">Spotify</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="edit-soundcloud" class="mdc-text-field__input" v-model="band.soundcloud" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-soundcloud">SoundCloud</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
         </div>
-        <button type="button" class="mdc-button mb-8 w-full" @click="toggleCreateAlbum">+ Add Album</button>
 
-      </section>
-
-      
-      <button type="submit" class="mdc-button w-full">Update Band</button>
-   
-    </form>
-
-      <!-- album overlay add -->
-      <!-- Album Creation Overlay creatingalbum -->
-<section v-if="isCreatingAlbum" class="w-screen h-screen z-[9999999] absolute top-0 left-0 overflow-scroll bg-[#fff] p-2">
-  <pre>{{ newAlbum }} this is the new album </pre>
-  <div class="form-group bg-[#fff]">
-    <div class="flex">
-      <h2 class="mb-8 font-semibold">Create New Album</h2>
-      <img class="ml-auto self-baseline" @click="toggleCreateAlbum" src="@/assets/close-icon.svg" alt="Close">
-    </div>
-    <div>
-      <div class="mdc-text-field mb-4">
-        <input type="text" id="new-album-title" class="mdc-text-field__input" v-model="newAlbum.title" placeholder=" " />
-        <label class="mdc-floating-label" for="new-album-title">Album Title</label>
-        <div class="mdc-line-ripple"></div>
-      </div>
-      <div class="mdc-text-field mb-4">
-        <input type="date" id="new-release-date" class="mdc-text-field__input" v-model="newAlbum.releaseDate" placeholder=" " />
-        <label class="mdc-floating-label" for="new-release-date">Release Date</label>
-        <div class="mdc-line-ripple"></div>
-      </div>
-      <div class="mb-4">
-        <input type="file" id="new-album-cover" class="styled-file-input" @change="handleNewAlbumCoverUpload" accept="image/*" />
-        <label for="new-album-cover" class="styled-file-label">Choose Album Cover</label>
-      </div>
-      <div v-if="newAlbum.coverUrl" class="mb-4">
-        <img :src="newAlbum.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-      </div>
-      <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
-      <div v-for="(song, songIndex) in newAlbum.songs" :key="songIndex" class="song-container">
-        <div class="mdc-text-field mb-4">
-          <input type="text" :id="'new-song-title-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" " />
-          <label class="mdc-floating-label" :for="'new-song-title-' + songIndex">Song Title</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mb-4">
-          <input type="file" :id="'new-song-file-' + songIndex" class="styled-file-input" @change="(event) => handleNewSongFileUpload(event, songIndex)" accept="audio/*" />
-          <label :for="'new-song-file-' + songIndex" class="styled-file-label">Choose Song File</label>
-        </div>
-        <button type="button" class="mdc-button mb-4 w-full" @click="removeNewSong(songIndex)">Remove Song</button>
-      </div>
-      <button type="button" class="mdc-button mb-8 w-full" @click="addNewSong">+ Add Song</button>
-      <button type="button" class="mdc-button mb-4 w-full" @click="submitNewAlbum">Create Album</button>
+        <!-- Save Button -->
+        <button type="submit" class="mdc-button w-full mt-10">Save Changes</button>
+      </form>
     </div>
   </div>
-</section>
-
-
-      <!-- modal popup box -->
-      <section :class="{ hidden: !isPopUp }" class="w-screen h-screen z-[9999999] absolute top-0 left-0 overflow-scroll bg-[#fff] p-2 ">
-        <!-- top bar -->
-   
-
-
-     <!-- work here album popup -->
-      <div v-if="currentAlbum" class="form-group bg-[#fff]">
-        
-       <div class="flex">
-        <h2 class="mb-8 font-semibold">Albums</h2>
-        <img class="ml-auto self-baseline" @click="toggle" src="@/assets/edit-icon.svg" alt="">
-       </div>
-        <div  class="album-container">
-         
-          <div class="mdc-text-field mb-4">
-            <input type="text" :id="'album-title-'" class="mdc-text-field__input" v-model="currentAlbum.attributes.title" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'album-title-' ">Album </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <!-- album cover -->
-          <div class="mdc-text-field mb-4">
-            <input type="date" :id="'release-date-' + albumIndex" class="mdc-text-field__input" v-model="currentAlbum.attributes.releaseDate" placeholder=" "  />
-            <label class="mdc-floating-label" :for="'release-date-' + albumIndex">Release Date</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mb-4">
-            <input type="file" :id="'album-cover-' " class="styled-file-input" @change="(event) => handleAlbumCoverUploadUpdate(event)" accept="image/*" />
-            <label :for="'album-cover-' " class="styled-file-label">Edit Album Cover</label>
-          </div>
-
-
-          <div v-if="currentAlbum.coverUrl" class="mb-4">
-            <img :src="currentAlbum.coverUrl" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-          </div>
-          <div v-if="currentAlbum.attributes.cover.data.attributes.url" class="mb-4">
-            <img :src="currentAlbum.attributes.cover.data.attributes.url" alt="Album Cover" class="w-full h-auto rounded-lg shadow-md" />
-          </div>
-
-
-          <h3 class="mt-8 mb-4 font-semibold">Songs</h3>
-           <div v-for="(song, songIndex) in currentAlbum.attributes.songs" :key="songIndex" class="song-container divide-solid">
-            <div class="mdc-text-field mb-4">
-              <input type="text" :id="'song-title-' + '-' + songIndex" class="mdc-text-field__input" v-model="song.title" placeholder=" "  />
-              <label class="mdc-floating-label" :for="'song-title-' + '-' + songIndex">Song Title</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <div class="mb-4">
-              <input type="file" :id="'song-file-'  + '-' + songIndex" class="styled-file-input" @change="(event) => handleSongFileUploadUpdate(event, songIndex)" accept="audio/*" />
-              <label :for="'song-file-'  + '-' + songIndex" class="styled-file-label">Edit Song File</label>
-            </div>
-            <!-- <button type="button" class="mdc-button mb-12 w-full" @click="removeSong(albumIndex, songIndex)">Remove Song</button> -->
-          </div>
-          <!-- <button type="button" class="mdc-button mb-8 w-full" @click="addSong(albumIndex)">+ Add Song</button>  -->
-
-          <button type="button" class="mdc-button mb-4 w-full" @click="updateAlbum">Update Album</button>
-        </div>
-        <button type="button" class="mdc-button mb-8 w-full" @click="addAlbum">+ Add Album</button>
-      </div> 
-      </section>
-     </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStrapi, useStrapiClient, useStrapiUser } from '@nuxtjs/strapi';
+
 const route = useRoute();
 const router = useRouter();
-const { create, findOne } = useStrapi();
+const { findOne } = useStrapi();
 const client = useStrapiClient();
+const user = useStrapiUser();
 
-console.log(route.params)
-// const { data: band } = findOne('bands', params.bandProfile.id)
-const isCreatingAlbum = ref(false)
-const isPopUp = ref(false)
-const bandName = ref('');
-const genre = ref('');
-const bio = ref('');
-const bandImg = ref(null);
-const bandImgUrl = ref(null);
-const members = ref([{ name: '', instrument: '', image: null, imageUrl: null }]);
-const albums = ref([{ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] }]);
-const facebook = ref('');
-const instagram = ref('');
-const twitch = ref('');
-const appleMusic = ref('');
-const spotify = ref('');
-const soundcloud = ref('');
-const bandId = ref(null);
-const qr = ref (null);
-const albumList = ref([{ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] }]);
-const albumIndex = ref(null);
-const currentAlbum = ref(null);
-const newAlbum = ref({ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] })
+const band = ref({
+  name: '',
+  genre: '',
+  bio: '',
+  bandImg: null,
+  imageUrl: null,
+  facebook: '',
+  instagram: '',
+  twitch: '',
+  appleMusic: '',
+  spotify: '',
+  soundcloud: '',
+  members: [{ name: '', instrument: '', image: null, imageUrl: null }]
+});
 
-const toggleCreateAlbum = () => {
-  isCreatingAlbum.value = !isCreatingAlbum.value;
+const fetchBand = async () => {
+  const bandId = route.params.id;
+  try {
+    const response = await findOne('bands', bandId, { populate: ['bandImg', 'members'] });
+    if (response.data) {
+      const attributes = response.data.attributes;
+      band.value = {
+        name: attributes.name,
+        genre: attributes.genre,
+        bio: attributes.bio,
+        bandImg: attributes.bandImg ? attributes.bandImg.data : null,
+        imageUrl: attributes.bandImg ? attributes.bandImg.data.attributes.url : null,
+        facebook: attributes.facebook || '',
+        instagram: attributes.instagram || '',
+        twitch: attributes.twitch || '',
+        appleMusic: attributes.appleMusic || '',
+        spotify: attributes.spotify || '',
+        soundcloud: attributes.soundcloud || '',
+        members: attributes.members.map(member => ({
+          name: member.name,
+          instrument: member.instrument,
+          imageUrl: member.image ? member.image.url : null,
+          image: null
+        }))
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching band:', error);
+  }
 };
 
-const toggle = (index) => {
- if(isPopUp){
-  albumIndex.value = index
-  console.log(albumList.value)
-  currentAlbum.value = albumList.value.data[index]
-  console.log(currentAlbum.value, 'the current album')
-  isPopUp.value = !isPopUp.value
- }  else {
-  isPopUp.value = !isPopUp.value
- }
- 
-}
-
-
-try {
-  const qr = await findOne('qrs', route.params.id,{
-    populate: {
-          "*": true,
-          band: {
-            populate: {
-              "*": true,
-              bandImg: true,
-              members: {
-                populate: {
-                  image: true
-                }
-              },
-              albums: {
-                populate: {
-                  cover: true,
-                  songs: {
-                    populate: {
-                      file: true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-  })
-
-  albumList.value = qr.data[0].attributes.band.data.attributes.albums
-  console.log(qr.data[0].attributes.band.data.attributes.albums.data[0].attributes.cover.data.attributes.url,'this is the band album log i need now ')
-  bandImgUrl.value = qr.data[0].attributes.band.data.attributes.bandImg.data.attributes.url
-    bandId.value =  await qr.data[0].attributes.band.data.id
-    bandName.value = qr.data[0].attributes.band.data.attributes.name;
-    genre.value = qr.data[0].attributes.band.data.attributes.genre;
-    bio.value = qr.data[0].attributes.band.data.attributes.bio;
-    facebook.value = qr.data[0].attributes.band.data.attributes.facebook;
-    instagram.value = qr.data[0].attributes.band.data.attributes.instagram;
-    twitch.value = qr.data[0].attributes.band.data.attributes.twitch;
-    appleMusic.value = qr.data[0].attributes.band.data.attributes.appleMusic;
-    spotify.value = qr.data[0].attributes.band.data.attributes.spotify;
-    soundcloud.value = qr.data[0].attributes.band.data.attributes.soundcloud;
-    qr.data[0].attributes.band.data.attributes.members.forEach(member => {
-      console.log(member)
-    })
-    members.value = qr.data[0].attributes.band.data.attributes.members.map(member => ({
-      id: member.id,
-  name: member.name,
-  instrument: member.instrument,
-  imageUrl: member.image ? member.image.data.attributes.url : null,
-  imageId: member.image ? member.image.data.id : null, // Include image ID
-  image: null // This will be updated if a new image is uploaded
-  
-    }));
-
-    // qr.data[0].attributes.band.data.attributes.albums.data.forEach((album) => {
-    //   console.log(album.attributes, 'this is the forEach')
-    // })
-   // imageUrl: member.image ? member.image.data.attributes.url : null
-//     albums.value = qr.data[0].attributes.band.data.attributes.albums.data.map(album => ({
-//   id: album.id,
-//   title: album.attributes.title,
-//   releaseDate: album.attributes.releaseDate,
-//   coverUrl: album.attributes.cover ? album.attributes.cover.data.attributes.url : null,
-//   cover: null, // This will be updated if a new cover is uploaded
-//   songs: album.attributes.songs.map(song => ({
-//     id: song.id,
-//     title: song.title,
-//     fileUrl: song.file ? song.file.data.attributes.url : null,
-//     // file: null // This will be updated if a new file is uploaded
-//   }))
-// }));
-
-// [
-//     {
-//         "id": 24,
-//         "name": "fsdfsdfsdfsdfsdf",
-//         "instrument": "sdfsdfsdffsdfsdfsdfsfsdf",
-//         "image": {
-//             "data": {
-//                 "id": 232,
-//                 "attributes": {
-//                     "name": "qrcode_eea6e1bd8d.png",
-//                     "alternativeText": null,
-//                     "caption": null,
-//                     "width": 300,
-//                     "height": 300,
-//                     "formats": {
-//                         "thumbnail": {
-//                             "name": "thumbnail_qrcode_eea6e1bd8d.png",
-//                             "hash": "thumbnail_qrcode_eea6e1bd8d_f78add8df9",
-//                             "ext": ".png",
-//                             "mime": "image/png",
-//                             "path": null,
-//                             "width": 156,
-//                             "height": 156,
-//                             "size": 24.71,
-//                             "sizeInBytes": 24713,
-//                             "url": "https://qrcode101.s3.us-east-1.amazonaws.com/thumbnail_qrcode_eea6e1bd8d_f78add8df9.png"
-//                         }
-//                     },
-//                     "hash": "qrcode_eea6e1bd8d_f78add8df9",
-//                     "ext": ".png",
-//                     "mime": "image/png",
-//                     "size": 6.1,
-//                     "url": "https://qrcode101.s3.us-east-1.amazonaws.com/qrcode_eea6e1bd8d_f78add8df9.png",
-//                     "previewUrl": null,
-//                     "provider": "aws-s3",
-//                     "provider_metadata": null,
-//                     "createdAt": "2024-07-17T01:19:06.673Z",
-//                     "updatedAt": "2024-07-17T01:19:06.673Z"
-//                 }
-//             }
-//         }
-//     }
-// ]
-} catch (error) {
-  console.log(error , 'this is the error in the bind form funciton and call to get data')
-}
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  bandImg.value = file;
-  bandImgUrl.value = URL.createObjectURL(file);
+const handleBandImageUpload = (e) => {
+  const file = e.target.files[0];
+  band.value.bandImg = file;
+  band.value.imageUrl = URL.createObjectURL(file);
 };
 
 const handleMemberImageUpload = (event, index) => {
   const file = event.target.files[0];
-  members.value[index].image = file;
-  members.value[index].imageUrl = URL.createObjectURL(file);
-};
-const handleAlbumCoverUpload = (event)=> {
-  const file = event.target.files[0];
-
-  currentAlbum.value.cover = file;
-  currentAlbum.value.coverUrl = URL.createObjectURL(file);
-  console.log(currentAlbum, ' update file for album')
-};
-// update 
-const handleAlbumCoverUploadUpdate = (event, index) => {
-  const file = event.target.files[0];
-  console.log(file)
-  currentAlbum.value.cover = file;
-  currentAlbum.value.coverUrl = URL.createObjectURL(file);
-  console.log(currentAlbum.value, ' update file for album')
-};
-
-const handleSongFileUpload = (event, albumIndex, songIndex) => {
-  const file = event.target.files[0];
-  albums.value[albumIndex].songs[songIndex].file = file;
-  albums.value[albumIndex].songs[songIndex].fileUrl = URL.createObjectURL(file);
-};
-// update song
-
-const handleSongFileUploadUpdate = (event, songIndex) => {
-  const file = event.target.files[0];
-  currentAlbum.value.attributes.songs[songIndex].file = file;
-  currentAlbum.value.attributes.songs[songIndex].fileUrl = URL.createObjectURL(file);
-  console.log('song file update ', currentAlbum.value)
+  band.value.members[index].image = file;
+  band.value.members[index].imageUrl = URL.createObjectURL(file);
 };
 
 const addMember = () => {
-  members.value.push({ name: '', instrument: '', image: null, imageUrl: null, id: null });
-
+  band.value.members.push({ name: '', instrument: '', image: null, imageUrl: null });
 };
 
 const removeMember = (index) => {
-  members.value.splice(index, 1);
+  band.value.members.splice(index, 1);
 };
 
-const addAlbum = () => {
-  albums.value.push({ title: '', releaseDate: '', cover: null, coverUrl: null, songs: [{ title: '', file: null, fileUrl: null }] });
-};
-
-const removeAlbum = (index) => {
-  albums.value.splice(index, 1);
-};
-
-const addSong = (albumIndex) => {
-  albums.value[albumIndex].songs.push({ title: '', file: null, fileUrl: null });
-};
-
-const removeSong = (albumIndex, songIndex) => {
-  albums.value[albumIndex].songs.splice(songIndex, 1);
-};
-
-const updateAlbum = async () => {
-  console.log(albumList.value.data[0].id)
+const submitEditBand = async () => {
+  const bandId = route.params.id;
   try {
-    const albumForm = new FormData();
-    const albumData = {
-      title: currentAlbum.value.attributes.title,
-      releaseDate: currentAlbum.value.attributes.releaseDate,
-      band: bandId.value,
-      songs: currentAlbum.value.attributes.songs.map(song => ({
-        id: song.id,
-        title: song.title,
-      })),
-    };
-
-    albumForm.append('data', JSON.stringify(albumData));
-    console.log('cur val at cover', currentAlbum.value.attributes);
-    
-    if (currentAlbum.value.cover) {
-      console.log('update album cover');
-      albumForm.append('files.cover', currentAlbum.value.cover);
-    }
-
-    currentAlbum.value.attributes.songs.forEach((song, songIndex) => {
-      if (song.file) {
-        albumForm.append(`files.songs[${songIndex}].file`, song.file);
-      }
-    });
-
-    await client(`/albums/${currentAlbum.value.id}`, {
-      method: 'PUT',
-      body: albumForm,
-    });
-    const updatedAlbum = {
-      ...currentAlbum.value,
-      coverUrl: currentAlbum.value.coverUrl,
-    };
-
-    albumList.value[0] = updatedAlbum;
-    router.go(0);
-    // }
-  } catch (error) {
-    console.log(error, 'error in update album function ')
-  }
-}
-const handleNewAlbumCoverUpload = (event) => {
-  const file = event.target.files[0];
-  newAlbum.value.cover = file;
-  newAlbum.value.coverUrl = URL.createObjectURL(file);
-};
-
-const handleNewSongFileUpload = (event, songIndex) => {
-  const file = event.target.files[0];
-  newAlbum.value.songs[songIndex].file = file;
-  newAlbum.value.songs[songIndex].fileUrl = URL.createObjectURL(file);
-  console.log('new song file updated the newalbum ')
-};
-
-const addNewSong = () => {
-  newAlbum.value.songs.push({ title: '', file: null, fileUrl: null });
-};
-
-const removeNewSong = (songIndex) => {
-  newAlbum.value.songs.splice(songIndex, 1);
-};
-
-const submitNewAlbum = async () => {
-  try {
-    console.log('submit new album ')
-    const albumForm = new FormData();
-    const albumData = {
-      title: newAlbum.value.title,
-      releaseDate: newAlbum.value.releaseDate,
-      band: bandId.value,
-      songs: newAlbum.value.songs.map(song => ({
-        title: song.title,
-      })),
-    };
-
-    albumForm.append('data', JSON.stringify(albumData));
-
-    if (newAlbum.value.cover) {
-      albumForm.append('files.cover', newAlbum.value.cover);
-    }
-
-    newAlbum.value.songs.forEach((song, songIndex) => {
-      if (song.file) {
-        albumForm.append(`files.songs[${songIndex}].file`, song.file);
-      }
-    });
-
-    const response = await client(`/albums`, {
-      method: 'POST',
-      body: albumForm,
-    });
-
-    // albumList.value.push(response.data);
-    toggleCreateAlbum();
-    router.go(0); // Refresh the page
-  } catch (error) {
-    console.error('Error creating new album:', error);
-  }
-};
-
-
-const submitForm = async () => {
-  try {
-    // Create a form object with the necessary fields
-    const form = {
-      name: bandName.value || null,
-      genre: genre.value || null,
-      bio: bio.value || null,
-      instagram: instagram.value || null,
-      facebook: facebook.value || null,
-      twitch: twitch.value || null,
-      appleMusic: appleMusic.value || null,
-      spotify: spotify.value || null,
-      soundcloud: soundcloud.value || null,
-      members: members.value.map(member => ({
-        id: member.id || undefined, // Only include id if it exists
+    const bandForm = new FormData();
+    const bandData = {
+      name: band.value.name,
+      genre: band.value.genre,
+      bio: band.value.bio,
+      facebook: band.value.facebook,
+      instagram: band.value.instagram,
+      twitch: band.value.twitch,
+      appleMusic: band.value.appleMusic,
+      spotify: band.value.spotify,
+      soundcloud: band.value.soundcloud,
+      users_permissions_user: user.value.id,
+      members: band.value.members.map(member => ({
         name: member.name,
-        instrument: member.instrument,
-        image: member.imageId || undefined, // Only include imageId if it exists
-      })),
+        instrument: member.instrument
+      }))
     };
 
-    // Initialize FormData
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(form));
+    bandForm.append('data', JSON.stringify(bandData));
 
-    // Append band image file if it exists
-    if (bandImg.value) {
-      formData.append('files.bandImg', bandImg.value);
+    if (band.value.bandImg) {
+      bandForm.append('files.bandImg', band.value.bandImg);
     }
 
-    // Append member images if they exist
-    members.value.forEach((member, index) => {
+    band.value.members.forEach((member, index) => {
       if (member.image) {
-        formData.append(`files.members[${index}].image`, member.image);
+        bandForm.append(`files.members[${index}].image`, member.image);
       }
     });
-    
 
-    // Use Strapi client to update the band
-    const { data: bandData } = await client(`/bands/${bandId.value}`, {
-      method: 'PUT',
-      body: formData
-    });
+    await client(`/bands/${bandId}`, { method: 'PUT', body: bandForm });
 
-    // Update albums and associate them with the band
-    // for (const album of albums.value) {
-    //   const albumForm = new FormData();
-    //   const albumData = {
-    //     title: album.title,
-    //     releaseDate: album.releaseDate,
-    //     band: bandId.value, // Associate the album with the band
-    //     songs: album.songs.map(song => ({
-    //       title: song.title,
-    //     })),
-    //   };
-
-    //   albumForm.append('data', JSON.stringify(albumData));
-
-    //   if (album.cover) {
-    //     albumForm.append('files.cover', album.cover);
-    //   }
-
-    //   album.songs.forEach((song, songIndex) => {
-    //     if (song.file) {
-    //       albumForm.append(`files.songs[${songIndex}].file`, song.file);
-    //     }
-    //   });
-
-    //   await client(`/albums/${album.id}`, {
-    //     method: 'PUT',
-    //     body: albumForm,
-    //   });
-    // }
-
-    router.push('/dashboard'); // Redirect to dashboard
+    router.push('/dashboard');
   } catch (error) {
-    console.error('Error updating band profile:', error);
+    console.error('Error updating band:', error);
   }
 };
+
+onMounted(fetchBand);
 </script>
 
-
 <style scoped>
+/* Same styles as the Create Band page */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.btn {
-  @apply bg-neon-green hover:bg-neon-purple text-black font-bold py-2 px-4 rounded shadow-lg;
-}
-
 .container-mdc {
-  max-width: 500px;
-  margin: .5rem auto;
-  padding: .5rem;
-  background-color: #fff;
+  margin: 1rem auto;
+  padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -719,15 +271,6 @@ const submitForm = async () => {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
-  color: #333;
-}
-
-.form-group {
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .mdc-text-field {
@@ -749,8 +292,8 @@ const submitForm = async () => {
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #000;
+  border-radius: 10px;
   outline: none;
   width: 100%;
 }
@@ -839,7 +382,7 @@ const submitForm = async () => {
   background-color: #3700b3;
 }
 
-.member-container, .album-container, .song-container {
+.member-container {
   margin: 0;
 }
 

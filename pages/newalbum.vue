@@ -1,8 +1,13 @@
 <template>
   <div class="container-mdc">
-    <h1 class="title">Create New Album</h1>
+    <h1 class="text-white text-2xl font-bold p-6">Create New Album</h1>
     <form @submit.prevent="submitNewAlbum">
       <div class="form-group">
+        <div class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-white font-semibold text-xl" >Album Details</h2>
+        </div>
+
+      <div class="bg-white p-4" >
         <div class="mdc-text-field mb-4">
           <input type="text" id="new-album-title" class="mdc-text-field__input" v-model="newAlbum.title" placeholder=" " />
           <label class="mdc-floating-label" for="new-album-title">Album Title</label>
@@ -28,10 +33,15 @@
           <label class="mdc-floating-label" for="new-album-band">Select Band</label>
           <div class="mdc-line-ripple"></div>
         </div>
+      </div>
         
-        <div class="mb-4">
-          <h2 class="title">Add Songs</h2>
-          <div v-for="(song, index) in newAlbum.songs" :key="index" class="mb-4">
+        <div class="mt-10">
+          <div class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+
+          <h2 class="text-white font-semibold text-xl ">Add Songs</h2>
+          </div>
+          <div class="bg-white p-4" >
+            <div v-for="(song, index) in newAlbum.songs" :key="index" class="mb-4">
             <div class="mdc-text-field mb-2">
               <input type="text" :id="'song-title-' + index" class="mdc-text-field__input" v-model="song.title" placeholder=" " />
               <label class="mdc-floating-label" :for="'song-title-' + index">Song Title</label>
@@ -43,9 +53,10 @@
             </div>
           </div>
           <button type="button" class="mdc-button mb-4" @click="addSong">Add Another Song</button>
+          </div>
         </div>
 
-        <button type="submit" class="mdc-button mb-4 w-full">Create Album</button>
+        <button type="submit" class="mdc-button mb-4 w-full mt-10">Create Album</button>
       </div>
     </form>
   </div>

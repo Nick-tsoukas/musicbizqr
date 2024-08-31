@@ -98,8 +98,8 @@
         <div class="flow-root bg-[#000] py-16 sm:pt-32 lg:pb-0">
           <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="relative z-10">
-              <h1 class="mx-auto max-w-4xl text-center text-5xl font-bold tracking-tight text-white">Simple pricing, no commitment</h1>
-              <p class="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-white/60">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Velit numquam eligendi quos odit doloribus molestiae voluptatum quos odit doloribus.</p>
+              <h1 class="mx-auto max-w-4xl text-center text-5xl font-bold tracking-tight text-white">Simple pricing, cancel anytime </h1>
+              <p class="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-white/60"></p>
               <div class="mt-16 flex justify-center">
                 <fieldset aria-label="Payment frequency">
                   <RadioGroup v-model="frequency" class="grid grid-cols-2 gap-x-1 rounded-full bg-white/5 p-1 text-center text-xs font-semibold leading-5 text-white">
@@ -214,12 +214,12 @@ const pricing = {
       ],
     },
     {
-      name: 'Starter',
+      name: 'Pro',
       id: 'tier-starter',
       href: '#',
       featured: false,
       description: 'write a descripton .',
-      price: { monthly: '$15', annually: '$100' },
+      price: { monthly: '$30', annually: '$250' },
       mainFeatures: [
        'feature one',
        'feature one',

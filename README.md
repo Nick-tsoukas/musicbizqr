@@ -1,10 +1,44 @@
-# hit list 
+# task list 
 
- - [] add styles to date and time 
-    - [] calendar icon and time format
+- [] need to change the design of create tour page and edit tour page 
 
-- [] add a wisiwig for the description 
-   - check it out 
+- [] change font color on login and signup page 
+
+- [] color button on all create edit pages 
+
+- [] make the qr code larger in the create qr 
+
+- [] add white border to form section 
+
+- [] make width of all forms the same 
+
+- [] make album page full screen minimum 
+
+- [] add charts and analytics for qr scans 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import { ref, useRuntimeConfig } from '#imports'
 import { loadFull } from 'tsparticles'

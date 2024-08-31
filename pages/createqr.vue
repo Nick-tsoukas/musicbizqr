@@ -5,7 +5,7 @@ const type = route.query.type
 </script>
 
 <template>
-  <div>
+  <div class="mx-auto max-w-5xl" >
 
     <ClientOnly>
       <QrCode :type="type"/>

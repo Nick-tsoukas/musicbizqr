@@ -1,8 +1,13 @@
 <template>
-  <div class="container-mdc">
-    <h1 class="title">Edit Event</h1>
+  <div class="container mx-auto max-w-5xl">
+    <h1 class="text-white text-3xl font-bold mb-10 ">Edit Event</h1>
     <form @submit.prevent="submitEditEvent">
-      <div class="form-group">
+      <div class="">
+        <div class="bg-white mb-10" >
+        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+          <h2 class="font-semibold text-white text-2xl">Event Details</h2>
+        </div>
+        <div class="p-6">
         <div class="mdc-text-field mb-4">
           <input type="text" id="edit-event-title" class="mdc-text-field__input" v-model="event.title" placeholder=" " />
           <label class="mdc-floating-label" for="edit-event-title">Event Title</label>
@@ -13,11 +18,31 @@
           <label class="mdc-floating-label" for="edit-event-description">Event Description</label>
           <div class="mdc-line-ripple"></div>
         </div>
+      </div>
+     </div>
+        <div class="bg-white ">
+          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+          <h2 class="font-semibold text-white text-2xl">Event Details</h2>
+        </div>
+        <div class="p-6" >
         <div class="mdc-text-field mb-4">
           <input type="date" id="edit-event-date" class="mdc-text-field__input" v-model="event.date" placeholder=" " />
           <label class="mdc-floating-label" for="edit-event-date">Event Date</label>
           <div class="mdc-line-ripple"></div>
         </div>
+        <div class="mdc-text-field mb-4">
+          <input type="time" id="edit-event-time" class="mdc-text-field__input" v-model="event.time" placeholder=" " />
+          <label class="mdc-floating-label" for="edit-event-time">Event Time</label>
+          <div class="mdc-line-ripple"></div>
+        </div>
+        </div>
+      </div>
+
+        <div class="bg-white mt-10" >
+          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+          <h2 class="font-semibold text-white text-2xl">Event Location and Link</h2>
+        </div>
+        <div class="p-6" >
         <div class="mdc-text-field mb-4">
           <input type="text" id="edit-event-venue" class="mdc-text-field__input" v-model="event.venue" placeholder=" " />
           <label class="mdc-floating-label" for="edit-event-venue">Venue</label>
@@ -39,22 +64,30 @@
           <div class="mdc-line-ripple"></div>
         </div>
         <div class="mdc-text-field mb-4">
-          <input type="time" id="edit-event-time" class="mdc-text-field__input" v-model="event.time" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-time">Event Time</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
           <input type="url" id="edit-event-link" class="mdc-text-field__input" v-model="event.link" placeholder=" " />
           <label class="mdc-floating-label" for="edit-event-link">Event Link</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <div class="mb-4">
-          <input type="file" id="edit-event-image" class="styled-file-input" @change="handleEventImageUpload" accept="image/*" />
-          <label for="edit-event-image" class="styled-file-label">Choose Event Image</label>
+      </div>
+      </div>
+     
+        <div class="mt-10 bg-white" >
+          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+          <h2 class="font-semibold text-white text-2xl">Event Image</h2>
         </div>
-        <div v-if="event.imageUrl" class="mb-4">
+        <div class="mb-4 p-6">
+          <input type="file" id="edit-event-image" class="styled-file-input" @change="handleEventImageUpload" accept="image/*" />
+          <label for="edit-event-image" class="styled-file-label w-full text-center ">Choose Event Image</label>
+        </div>
+        <div v-if="event.imageUrl" class="mb-4  mx-auto max-w-[500px]">
           <img :src="event.imageUrl" alt="Event Image" class="w-full h-auto rounded-lg shadow-md" />
         </div>
+      </div>
+        <div class="mt-10 bg-white">
+          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+          <h2 class="font-semibold text-white text-2xl">Choose Band</h2>
+        </div>
+       <div class="p-6" >
         <div class="mdc-text-field mb-4">
           <select v-model="event.band" class="mdc-text-field__input">
             <option value="" disabled>Select Band (Optional)</option>
@@ -63,7 +96,11 @@
           <label class="mdc-floating-label" for="edit-event-band">Select Band</label>
           <div class="mdc-line-ripple"></div>
         </div>
-        <button type="submit" class="mdc-button mb-4 w-full">Save Changes</button>
+      </div>
+
+      </div>
+
+        <button type="submit" class="mdc-button mb-4 w-full mt-10">Save Changes</button>
       </div>
     </form>
   </div>
@@ -173,7 +210,132 @@ onMounted(async () => {
   }
 });
 </script>
+<style scoped>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-<style>
-/* Add your styles here */
+.container-mdc {
+  max-width: 90vw;
+  margin: 1rem auto;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.mdc-text-field {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  width: 100%;
+}
+
+.mdc-text-field__input::placeholder {
+  color: transparent;
+}
+
+.mdc-text-field__input:focus::placeholder {
+  color: #aaa;
+}
+
+.mdc-text-field__input {
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid #000;
+  border-radius: 10px;
+  outline: none;
+  width: 100%;
+}
+
+.mdc-floating-label {
+  position: absolute;
+  z-index: 99999;
+  top: 0.75rem;
+  left: 0.5rem;
+  padding-left: .2em;
+  padding-right: .2em;
+  font-size: 1rem;
+  background: white;
+  line-height: 1;
+  color: #aaa;
+  pointer-events: none;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.mdc-text-field__input:focus + .mdc-floating-label,
+.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
+  transform: translateY(-1.5rem);
+  color: #6200ee;
+}
+
+.mdc-line-ripple {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #6200ee;
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+
+.mdc-text-field__input:focus ~ .mdc-line-ripple {
+  transform: scaleX(1);
+}
+
+.mdc-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.0892857143em;
+  color: #fff;
+  background-color: #2C2C2C;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mdc-button:hover {
+  background-color: #3700b3;
+}
+
+.mdc-button:focus {
+  outline: none;
+}
+
+.styled-file-input {
+  display: none;
+}
+
+.styled-file-label {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.0892857143em;
+  color: #fff;
+  background-color: #2C2C2C;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.styled-file-label:hover {
+  background-color: #3700b3;
+}
 </style>
