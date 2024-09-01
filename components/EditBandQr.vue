@@ -133,9 +133,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useStrapi, useStrapiClient, useStrapiUser } from '@nuxtjs/strapi';
+
 
 const route = useRoute();
 const router = useRouter();
