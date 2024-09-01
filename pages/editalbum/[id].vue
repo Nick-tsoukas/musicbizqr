@@ -1,5 +1,5 @@
 <template>
-  <div class=" w-[90vw] mx-auto">
+  <div class="container mx-auto">
     <h1 class="text-white text-2xl font-bold mb-10">Edit Album</h1>
     <form @submit.prevent="submitEditAlbum">
       <div >
@@ -219,7 +219,7 @@ onMounted(async () => {
 .form-group {
   padding: 1.5rem;
   margin-bottom: 2rem;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -243,7 +243,7 @@ onMounted(async () => {
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 4px;
   outline: none;
   width: 100%;
@@ -336,7 +336,7 @@ onMounted(async () => {
 .styled-select {
   width: 100%;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 4px;
   outline: none;
   font-size: 1rem;

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto my-10">
+  <div class="container mx-auto my-10 min-h-screen">
     
     <div v-if="albumData" >
       <div v-if="albumData.attributes.cover" class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8">

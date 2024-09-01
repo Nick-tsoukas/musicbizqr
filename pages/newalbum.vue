@@ -1,5 +1,5 @@
 <template>
-  <div class="container-mdc">
+  <div class="container mx-auto ">
     <h1 class="text-white text-2xl font-bold p-6">Create New Album</h1>
     <form @submit.prevent="submitNewAlbum">
       <div class="form-group">

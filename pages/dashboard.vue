@@ -117,11 +117,35 @@ const fetchAlbums = async () => {
     console.error('Error fetching albums:', error);
   }
 };
+const imageURL = ref('')
+const qrView = ref(false)
 
+const viewQr = (img) => {
+  imageURL.value = img
+  qrView.value = !qrView.value
+
+}
 
 onMounted(() => {
   fetchData()
 });
+
+
+
+const downloadImage = () => {
+  // Create an anchor element
+  const link = document.createElement('a');
+  // Set the download attribute with a filename
+  link.download = 'downloaded-image.jpg';
+  // Set the href to the image URL
+  link.href = imageURL.value;
+  // Append the anchor to the body (necessary for Firefox)
+  document.body.appendChild(link);
+  // Programmatically click the anchor to trigger the download
+  link.click();
+  // Remove the anchor from the document
+  document.body.removeChild(link);
+};
 
 
 const editItem = (id, page) => {
@@ -180,10 +204,12 @@ const albumItems = computed(() => albums.value.map(album => ({
         <li v-for="qr in qrItems" :key="qr.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
             <img :src="qr.imageUrl" alt="" class="h-[150px] w-[150px] rounded mr-4">
-            <span>{{ qr.title }}</span>
+            <span class="text-white text-xl" >{{ qr.title }}</span>
           </div>
          <div class="flex items-center gap-4">
-         
+          <button @click="viewQr(qr.imageUrl)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+          </button>
           <button @click="editItem(qr.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
             <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
           </button>
@@ -219,7 +245,7 @@ const albumItems = computed(() => albums.value.map(album => ({
         <li v-for="band in bandItems" :key="band.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
             <img :src="band.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span>{{ band.title }}</span>
+            <span class="text-white text-xl">{{ band.title }}</span>
           </div>
           <div class="flex items-center gap-4">
             <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
@@ -260,7 +286,7 @@ const albumItems = computed(() => albums.value.map(album => ({
         <li v-for="event in eventItems" :key="event.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
             <img :src="event.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span>{{ event.title }}</span>
+            <span class="text-white text-xl" >{{ event.title }}</span>
           </div>
           <div class="flex items-center gap-4">
           <button @click="router.push(`/event/${event.id}`)" class="text-blue-600 hover:text-blue-900">
@@ -300,7 +326,7 @@ const albumItems = computed(() => albums.value.map(album => ({
         <li v-for="tour in tourItems" :key="tour.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
             <img :src="tour.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span>{{ tour.title }}</span>
+            <span class="text-white text-xl">{{ tour.title }}</span>
           </div>
           <div class="flex items-center gap-4">
           <button @click="router.push(`/tour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
@@ -321,7 +347,7 @@ const albumItems = computed(() => albums.value.map(album => ({
         </NuxtLink>
       </div>
       <div>
-        <h2 class="text-center my-4">No Tours found</h2>
+        <h2 class="text-center text-white text-2xl my-4">No Tours found</h2>
       </div>
     </div>
 
@@ -340,7 +366,7 @@ const albumItems = computed(() => albums.value.map(album => ({
         <li v-for="album in albumItems" :key="album.id" class="flex justify-between items-center mb-4 p-2">
           <div class="flex items-center">
             <img :src="album.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span>{{ album.title }}</span>
+            <span class="text-white text-xl" >{{ album.title }}</span>
           </div>
           <div class="flex items-center gap-4">
           <button @click="router.push(`/album/${album.id}`)" class="text-blue-600 hover:text-blue-900">
@@ -361,9 +387,21 @@ const albumItems = computed(() => albums.value.map(album => ({
         </NuxtLink>
       </div>
       <div>
-        <h2 class="text-center my-4">No Albums found</h2>
+        <h2 class="text-center text-white text-2xl font-semibold my-4">No Albums found</h2>
       </div>
     </div>
+  </div>
+  <!-- VIEW QR popup -->
+  <div v-if="qrView" class="h-screen w-screen bg-black z-50 fixed overflow-hidden top-0 right-0 flex justify-center items-center" style="z-index: 99990999999999" >
+    
+   <div class="flex flex-col gap-4">
+    <img :src="imageURL" class="max-h-[67vh]" alt="">
+    <button @click="downloadImage" class="px-4 py-2 bg-blue-500 text-white rounded">Download Image</button>
+   </div>
+
+     <div class="absolute bottom-10 right-10" >
+      <h2 @click="viewQr" class="text-white cursor-pointer">Close</h2>
+     </div>
   </div>
 </div>
 </template>

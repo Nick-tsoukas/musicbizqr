@@ -321,7 +321,6 @@
 
 <script setup>
 // https://codepen.io/JamieCurnow/pen/KKPjraK
-import { ref, reactive, onMounted, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
 import QRCodeStyling from 'qr-code-styling'
 
