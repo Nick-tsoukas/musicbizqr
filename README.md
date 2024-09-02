@@ -1,6 +1,6 @@
 # task list 
 
-- [] need to change the design of create tour page and edit tour page 
+- [x] need to change the design of create tour page and edit tour page 
 
 - [] change font color on login and signup page 
 
@@ -10,9 +10,9 @@
 
 - [] add white border to form section 
 
-- [] make width of all forms the same 
+- [x] make width of all forms the same 
 
-- [] make album page full screen minimum 
+- [x] make album page full screen minimum 
 
 - [] add charts and analytics for qr scans 
 

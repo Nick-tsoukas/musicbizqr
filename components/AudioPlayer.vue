@@ -1,5 +1,5 @@
 <template>
-  <div class="list-container w-full">
+  <div class="list-container w-full mb-10">
     <!-- Album img and band title -->
     <div class="min-h-36 bg-black w-full flex p-6 gap-5" @click="playFirstSong">
       <div class="h-24 w-24 rounded-lg bg-black">
@@ -18,14 +18,14 @@
       <img v-if="playing" @click="togglePlay" src="@/assets/pause-icon.svg" alt="Pause">
     </div>
     <!-- List of songs -->
-    <ul class="list w-full">
+    <ul class="list w-full mb-10">
       <li v-for="song in album.attributes.songs" :key="song.id" class="flex w-full text-white py-6 px-6 gap-2">
         <div>
           <img v-if="!playingSong(song)" @click="playSong(song)" src="@/assets/play-icon.svg" alt="Play">
           <img v-if="playingSong(song)" @click="pauseSong" src="@/assets/pause-icon.svg" alt="Pause">
         </div>
-        <div class="grow flex items-center text-white">{{ song.title }}</div>
-        <div>5:00</div> <!-- Adjust if duration is available -->
+        <div class="grow flex items-center "><span class="text-white" >{{ song.title }}</span> </div>
+        <div class="text-white" >5:00</div> <!-- Adjust if duration is available -->
       </li>
     </ul>
     <!-- Audio element -->

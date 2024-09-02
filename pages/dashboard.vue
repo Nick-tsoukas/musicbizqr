@@ -11,6 +11,7 @@ const bands = ref([]);
 const events = ref([]);
 const tours = ref([]);
 const albums = ref([]);
+const streams = ref([])
 
 const fetchData = async () => {
   if (user.value) {
@@ -20,6 +21,7 @@ const fetchData = async () => {
       await fetchEvents();
       await fetchTours();
       await fetchAlbums();
+      await fetchStreams();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -99,6 +101,26 @@ const fetchTours = async () => {
     console.error('Error fetching tours:', error);
   }
 };
+
+const fetchStreams = async () => {
+  try {
+    const response = await find('streams', {
+      filters: {
+        users_permissions_user: {
+          id: {
+            $eq: user.value.id
+          }
+        }
+      },
+      populate: '*'
+    });
+    console.log(response.data, ' this is the stream ')
+    streams.value = response.data;
+  } catch (error) {
+    console.error('Error fetching tours:', error);
+  }
+};
+
 
 const fetchAlbums = async () => {
   try {
@@ -271,6 +293,50 @@ const albumItems = computed(() => albums.value.map(album => ({
         <h2 class="text-center my-4">No Bands found</h2>
       </div>
     </div>
+
+    <!-- stream section -->
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="streams.length" class="mb-6   border-2 rounded-md">
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Streams</h2>
+        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream Page
+        </NuxtLink>
+      </div>
+      <ul class="px-6 py-6" >
+        <li v-for="stream in streams" :key="stream.id" class="flex justify-between items-center mb-4 p-2">
+          <div class="flex items-center">
+           <span v-if="stream.attributes.img" > <img :src="stream.attributes.img.data.attributes.url" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4"></span>
+            <span class="text-white text-xl">something here</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <button @click="router.push(`/stream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+          </button>
+            <button @click="router.push(`/editstream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+          </button>
+         
+         
+         </div>
+        </li>
+      </ul>
+    </div>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Bands</h2>
+        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+        </NuxtLink>
+      </div>
+      <div>
+        <h2 class="text-center my-4">No Bands found</h2>
+      </div>
+    </div>
+
+
     <!-- Events Section -->
     <div v-if="loading">
       <SkeletonLoader />
