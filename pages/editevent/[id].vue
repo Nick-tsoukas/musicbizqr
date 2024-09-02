@@ -1,110 +1,116 @@
 <template>
   <div class="container mx-auto max-w-5xl">
-    <h1 class="text-white text-3xl font-bold mb-10 ">Edit Event</h1>
+    <h1 class="text-white text-3xl font-bold mb-10">Edit Event</h1>
     <form @submit.prevent="submitEditEvent">
-      <div class="">
-        <div class="bg-white mb-10" >
-        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+      <!-- Event Details Section -->
+      <div class="bg-white mb-10">
+        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-2xl">Event Details</h2>
         </div>
         <div class="p-6">
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-event-title" class="mdc-text-field__input" v-model="event.title" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-title">Event Title</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <textarea id="edit-event-description" class="mdc-text-field__input" v-model="event.description" placeholder=" "></textarea>
-          <label class="mdc-floating-label" for="edit-event-description">Event Description</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-      </div>
-     </div>
-        <div class="bg-white ">
-          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
-          <h2 class="font-semibold text-white text-2xl">Event Details</h2>
-        </div>
-        <div class="p-6" >
-        <div class="mdc-text-field mb-4">
-          <input type="date" id="edit-event-date" class="mdc-text-field__input" v-model="event.date" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-date">Event Date</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="time" id="edit-event-time" class="mdc-text-field__input" v-model="event.time" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-time">Event Time</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-event-title" class="mdc-text-field__input" v-model="event.title" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-title">Event Title</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <textarea id="edit-event-description" class="mdc-text-field__input" v-model="event.description" placeholder=" "></textarea>
+            <label class="mdc-floating-label" for="edit-event-description">Event Description</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
         </div>
       </div>
 
-        <div class="bg-white mt-10" >
-          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+      <!-- Event Date and Time Section -->
+      <div class="bg-white">
+        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="font-semibold text-white text-2xl">Event Details</h2>
+        </div>
+        <div class="p-6">
+          <div class="mdc-text-field mb-4">
+            <input type="date" id="edit-event-date" class="mdc-text-field__input" v-model="event.date" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-date">Event Date</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="time" id="edit-event-time" class="mdc-text-field__input" v-model="event.time" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-time">Event Time</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Location and Link Section -->
+      <div class="bg-white mt-10">
+        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-2xl">Event Location and Link</h2>
         </div>
-        <div class="p-6" >
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-event-venue" class="mdc-text-field__input" v-model="event.venue" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-venue">Venue</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-event-city" class="mdc-text-field__input" v-model="event.city" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-city">City</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-event-state" class="mdc-text-field__input" v-model="event.state" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-state">State</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="text" id="edit-event-address" class="mdc-text-field__input" v-model="event.address" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-address">Street Address</label>
-          <div class="mdc-line-ripple"></div>
-        </div>
-        <div class="mdc-text-field mb-4">
-          <input type="url" id="edit-event-link" class="mdc-text-field__input" v-model="event.link" placeholder=" " />
-          <label class="mdc-floating-label" for="edit-event-link">Event Link</label>
-          <div class="mdc-line-ripple"></div>
+        <div class="p-6">
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-event-venue" class="mdc-text-field__input" v-model="event.venue" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-venue">Venue</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-event-city" class="mdc-text-field__input" v-model="event.city" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-city">City</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-event-state" class="mdc-text-field__input" v-model="event.state" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-state">State</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="text" id="edit-event-address" class="mdc-text-field__input" v-model="event.address" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-address">Street Address</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-event-link" class="mdc-text-field__input" v-model="event.link" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-event-link">Event Link</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
         </div>
       </div>
-      </div>
-     
-        <div class="mt-10 bg-white" >
-          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+
+      <!-- Event Image Section -->
+      <div class="mt-10 bg-white">
+        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-2xl">Event Image</h2>
         </div>
         <div class="mb-4 p-6">
           <input type="file" id="edit-event-image" class="styled-file-input" @change="handleEventImageUpload" accept="image/*" />
-          <label for="edit-event-image" class="styled-file-label w-full text-center ">Choose Event Image</label>
+          <label for="edit-event-image" class="styled-file-label w-full text-center">Choose Event Image</label>
         </div>
-        <div v-if="event.imageUrl" class="mb-4  mx-auto max-w-[500px]">
+        <div v-if="event.imageUrl" class="mb-4 mx-auto max-w-[500px]">
           <img :src="event.imageUrl" alt="Event Image" class="w-full h-auto rounded-lg shadow-md" />
         </div>
       </div>
-        <div class="mt-10 bg-white">
-          <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0" >
+
+      <!-- Select Band Section -->
+      <div class="mt-10 bg-white">
+        <div class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-2xl">Choose Band</h2>
         </div>
-       <div class="p-6" >
-        <div class="mdc-text-field mb-4">
-          <select v-model="event.band" class="mdc-text-field__input">
-            <option value="" disabled>Select Band (Optional)</option>
-            <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
-          </select>
-          <label class="mdc-floating-label" for="edit-event-band">Select Band</label>
-          <div class="mdc-line-ripple"></div>
+        <div class="p-6">
+          <div class="mdc-text-field mb-4">
+            <select v-model="event.band" class="mdc-text-field__input">
+              <option value="" disabled>Select Band (Optional)</option>
+              <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
+            </select>
+            <label class="mdc-floating-label" for="edit-event-band">Select Band</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
         </div>
       </div>
 
-      </div>
-
-        <button type="submit" class="mdc-button mb-4 w-full mt-10">Save Changes</button>
-      </div>
+      <!-- Save Changes Button -->
+      <button type="submit" class="mdc-button mb-4 w-full mt-10">Save Changes</button>
     </form>
   </div>
 </template>
+
 
 <script setup>
 

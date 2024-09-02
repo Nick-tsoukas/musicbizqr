@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto">
+  <div class="container mx-auto px-6">
     <h1 class="text-white text-3xl font-bold mb-10">Edit Tour page</h1>
     <form @submit.prevent="submitEditTour">
       <div >

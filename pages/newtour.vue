@@ -6,12 +6,25 @@
 
       <div class="mb-10" >
         <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-            <h2 class="font-semibold text-white text-2xl">Event Details</h2>
+            <h2 class="font-semibold text-white text-2xl">Tour Title</h2>
           </div>
           <div class="bg-white p-6" >
             <div class="mdc-text-field mb-4">
             <input type="text" id="new-tour-title" class="mdc-text-field__input" v-model="newTour.title" placeholder=" " />
             <label class="mdc-floating-label" for="new-tour-title">Tour Title</label>
+           <div class="mdc-line-ripple"></div>
+           </div>
+          </div>
+      </div>
+
+      <div class="mb-10" >
+        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Tour Description</h2>
+          </div>
+          <div class="bg-white p-6" >
+            <div class="mdc-text-field mb-4">
+            <textarea type="text" id="new-tour-description" class="mdc-text-field__input" v-model="newTour.description" placeholder=" " />
+            <label class="mdc-floating-label" for="new-tour-description">Tour Description</label>
            <div class="mdc-line-ripple"></div>
            </div>
           </div>
@@ -104,6 +117,7 @@ const newTour = ref({
   endDate: '',
   image: null,
   imageUrl: null,
+  description: '',
   bands: [],  // Optional association with bands
   events: [], // Optional association with events
 });
@@ -118,6 +132,7 @@ const handleNewTourImageUpload = (event) => {
 
 const submitNewTour = async () => {
   try {
+    console.log('submit')
     const tourForm = new FormData();
     const tourData = {
       title: newTour.value.title,
@@ -125,8 +140,11 @@ const submitNewTour = async () => {
       endDate: newTour.value.endDate,
       bands: newTour.value.bands,
       events: newTour.value.events,
+      description: newTour.value.description,
       users_permissions_user: user.value.id, // Associate the tour with the current user
     };
+
+    console.log(tourData)
 
     tourForm.append('data', JSON.stringify(tourData));
 
@@ -145,8 +163,9 @@ const submitNewTour = async () => {
       tour: tour.id
     });
    }
-
+   console.log('above router push')
     router.push('/dashboard'); // Redirect to tours page or any other page after successful creation
+    console.log('below router push ')
   } catch (error) {
     console.error('Error creating new tour:', error);
   }

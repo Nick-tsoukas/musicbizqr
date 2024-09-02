@@ -1,15 +1,21 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8">
+  <div v-if="tour" class="container mx-auto px-4 py-8">
+    <div class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-6">
       <img
         :src="tourImage"
         alt="Tour Hero Image"
         class="w-full h-full object-cover"
       />
-      <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end mb-4 justify-center ">
+      <div class="absolute inset-0 flex items-end mb-4 justify-center ">
         <h1 class="text-4xl md:text-6xl text-white font-bold">{{ tourTitle }}</h1>
       </div>
     </div>
+
+    <section v-if="tour" class="mt-8">
+          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Description</h2>
+          <p v-if="tour.attributes.description" class="text-lg md:text-2xl text-white">{{ tour.attributes.description }}</p>
+        
+        </section>
 
     <h2 class="text-3xl font-bold text-center mb-8">Upcoming Tour Events</h2>
     <div class="space-y-8">
@@ -59,8 +65,9 @@ const events = ref([]);
 
 onMounted(async () => {
   try {
-    const response = await findOne('tours', 4, {
+    const response = await findOne('tours', route.params.id, {
       populate: {
+      
         events: {
           populate: 'image'
         }
