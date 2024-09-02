@@ -74,13 +74,13 @@
               <path fill="#4B5563" d="M363.315 64.213C363.315 22.99 341.312 1 300.092 1H66.751C25.53 1 3.528 22.99 3.528 64.213v44.68l-.857.143A2 2 0 0 0 1 111.009v24.611a2 2 0 0 0 1.671 1.973l.95.158a2.26 2.26 0 0 1-.093.236v26.173c.212.1.398.296.541.643l-1.398.233A2 2 0 0 0 1 167.009v47.611a2 2 0 0 0 1.671 1.973l1.368.228c-.139.319-.314.533-.511.653v16.637c.221.104.414.313.56.689l-1.417.236A2 2 0 0 0 1 237.009v47.611a2 2 0 0 0 1.671 1.973l1.347.225c-.135.294-.302.493-.49.607v377.681c0 41.213 22 63.208 63.223 63.208h95.074c.947-.504 2.717-.843 4.745-.843l.141.001h.194l.086-.001 33.704.005c1.849.043 3.442.37 4.323.838h95.074c41.222 0 63.223-21.999 63.223-63.212v-394.63c-.259-.275-.48-.796-.63-1.47l-.011-.133 1.655-.276A2 2 0 0 0 366 266.62v-77.611a2 2 0 0 0-1.671-1.973l-1.712-.285c.148-.839.396-1.491.698-1.811V64.213Z" />
               <path fill="#343E4E" d="M16 59c0-23.748 19.252-43 43-43h246c23.748 0 43 19.252 43 43v615c0 23.196-18.804 42-42 42H58c-23.196 0-42-18.804-42-42V59Z" />
               <foreignObject width="316" height="684" transform="translate(24 24)" clip-path="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)">
-                <img src="@/assets/bandmobilescreen.png" alt="" />
+                <img :src="imageToRender" alt="" />
               </foreignObject>
             </svg>
           </div>
           <!-- grid of screens  -->
           <div class="flex flex-wrap w-full p-4 gap-2  ">
-           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index)" class="w-[30%] p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4 h-[50px]" :src="splashImages[index]" alt="">{{ page }}  <h1 class="text-white" ></h1></div>
+           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index, page)" class="w-[30%] p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4 h-[50px]" :src="splashImages[index]" alt="">{{ page }}  <h1 class="text-white" ></h1></div>
               
         </div>
 
@@ -166,6 +166,12 @@ import facebookSvg from '@/assets/facebook-icon-white.svg'
 import websiteSvg from '@/assets/website.svg'
 import videoSvg from '@/assets/video.svg'
 
+import bandScreen from '@/assets/bandmobilescreen.png'
+import albumScreen from '@/assets/albumpage.png'
+import streamScreen from '@/assets/streamlinkspage.png'
+
+
+
 
 import { defineComponent, h,  } from 'vue'
 import { Dialog, DialogPanel, RadioGroup, RadioGroupOption } from '@headlessui/vue'
@@ -181,6 +187,7 @@ import { loadFull } from 'tsparticles'
 import { tsParticles } from '@tsparticles/engine'
 
 const { mode } = useRuntimeConfig().public.particles
+const imageToRender = ref(bandScreen)
 
 const show = ref(false)
 
@@ -190,7 +197,8 @@ const splashPages = ref(['Band Page', 'Album Player', "Streaming Links", "Social
 const splashImages = ref([
   musicSvg, recordSvg, streamingSvg, facebookSvg, websiteSvg, videoSvg,
   
-]);const selectedPage = ref(0)
+]);
+const selectedPage = ref(0)
 
 
 const pricing = {
@@ -301,8 +309,32 @@ const options = {
   }
 }
 
-function selectPage(i) {
+function selectPage(i, page) {
+ if(page == 'Band Page'){
+   // somevaluie is set to bandmobilescreen.png
+   imageToRender.value = bandScreen
+ }
+ if(page == 'Album Player'){
+  // change image to Album player screenshot and get url 
+  imageToRender.value = albumScreen
+
+ }
+ if(page == 'Streaming Links'){
+  // change image to Streaming screenshot and get url 
+  imageToRender.value = streamScreen
+
+ }
+ if(page == 'Social Links'){
+  imageToRender.value = '/assets/streamsplash.png'
+ }
+ if(page == 'Webiste Url'){
+   imageToRender.value = bandScreen
+ }
+//  if(page == 'Video Grid'){
+//   // Video Grid 
+//  }
   selectedPage.value  = i
+  
 }
 
 function getRandomColor() {
