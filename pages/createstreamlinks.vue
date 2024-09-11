@@ -5,11 +5,16 @@
 
       <form class="form-group" @submit.prevent="submitForm">
         <!-- Band Title -->
-        <div class="bg-[#fff] rounded-md p-4">
-          <div class="mdc-text-field mb-4">
+        <div class="bg-[#fff] rounded-md ">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-2xl text-white">Band Title</h2>
+          </div>
+          <div class="p-4" >
+            <div class="mdc-text-field mb-4">
             <input type="text" id="bandTitle" class="mdc-text-field__input" v-model="bandTitle" placeholder=" " />
             <label class="mdc-floating-label" for="bandTitle">Band Title</label>
             <div class="mdc-line-ripple"></div>
+          </div>
           </div>
         </div>
 
@@ -92,6 +97,7 @@ const handleImageUpload = (event) => {
 // Function to handle form submission
 const submitForm = async () => {
   try {
+    console.log('creating stream')
     // Create the form object with streaming link values
     const form = {
       bandTitle: bandTitle.value || null,
@@ -124,7 +130,7 @@ const submitForm = async () => {
       body: formData,
     });
 
-    console.log('Streaming links created successfully:', streamData);
+    console.log('Streaming links created successfully:');
     router.push('/dashboard'); // Redirect to dashboard or another page
   } catch (error) {
     console.error('Error creating streaming links:', error);

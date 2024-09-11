@@ -150,7 +150,9 @@ html {
     text-transform: uppercase;
     letter-spacing: 0.0892857143em;
     color: #fff;
-    background-color: #2C2C2C;
+    /* background-color: #2C2C2C; */
+    background: linear-gradient(to right, #ec4899, #8b5cf6);
+
     border: none;
     border-radius: 4px;
     cursor: pointer;

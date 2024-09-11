@@ -301,7 +301,7 @@ const albumItems = computed(() => albums.value.map(album => ({
     <div v-else-if="streams.length" class="mb-6   border-2 rounded-md">
       <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
         <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Streams</h2>
-        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+        <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
           <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream Page
         </NuxtLink>
       </div>

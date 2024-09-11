@@ -18,53 +18,40 @@
           id="tsparticles"
           :options="options"
         />
-      <div class="relative isolate h-[50vh] ">
+      <div class="relative isolate min-h-[50vh] ">
        
+       <!-- mobile  -->
+       <!-- <h1 class="mb-16  text-8xl text-white font-extrabold tracking-tight  text-center  md:text-left ">Get your sound out</h1> -->
      
-        <div class="mx-auto w-[90vw]  px-6 py-10 lg:flex  lg:gap-x-10 lg:px-8 ">
-          <div class="mx-auto w-[45%]  lg:mx-0 text-white lg:flex-auto">
-            <h1 class="mb-16  text-8xl text-white font-extrabold tracking-tight  text-center  md:text-left">Get your sound out</h1>
-            <p class=" text-xl  leading-10 ">Effortlessly create branded QR codes and generate personalized splash pages with custom audio players and more. Showcase band pages, tour dates, and seamlessly connect all your social media links and streaming services. </p>
-            <div class="mt-16 flex flex-col md:flex-row items-center gap-x-6">
+        <div class=" mx-auto  w-[90vw]  px-6 py-10 2xl:flex   2xl:gap-x-10 2xl:px-8 ">
+          <div class="mx-auto w-full 2xl:w-[45%]   lg:mx-0 text-white lg:flex-auto ">
+            <h1 class="mb-16 text-center   text-white font-extrabold tracking-tight text-7xl  md:text-8xl lg:text-left ">Get your sound out</h1>
+            <div class="flex justify-center mb-12 2xl:hidden" >
+              <img src="@/assets/qrcode.png" alt="" class="h-[350px]" >
+            </div>
+            <p class=" text-xl text-center  leading-10 2xl:text-left ">Effortlessly create branded QR codes and generate personalized splash pages with custom audio players and more. Showcase band pages, tour dates, and seamlessly connect all your social media links and streaming services. </p>
+            <div class="mt-16 justify-center  mb-10 flex flex-col md:flex-row xl:justify-start items-center  gap-x-6">
               <NuxtLink to="/signup" class="mdc-button mb-4 w-full md:mb-0 md:w-auto">Get started</NuxtLink>
               <NuxtLink to="/login" class="mdc-button w-full md:w-auto">Login </NuxtLink>
             </div>
           </div>
-          <div class="mt-16 sm:mt-24 md:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+          <div class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow ">
             <img src="@/assets/qrcode.png" alt="" class="h-[450px]" >
           </div>
-          <!-- <div>
-            <img src="@/assets/albumcover.jpg" alt="">
-          </div> -->
-
-          <!-- <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
-            <svg viewBox="0 0 366 729" role="img" class="mx-auto w-[22.875rem] max-w-full drop-shadow-xl">
-              <title>App screenshot</title>
-              <defs>
-                <clipPath id="2ade4387-9c63-4fc4-b754-10e687a0d332">
-                  <rect width="316" height="684" rx="36" />
-                </clipPath>
-              </defs>
-              <path fill="#4B5563" d="M363.315 64.213C363.315 22.99 341.312 1 300.092 1H66.751C25.53 1 3.528 22.99 3.528 64.213v44.68l-.857.143A2 2 0 0 0 1 111.009v24.611a2 2 0 0 0 1.671 1.973l.95.158a2.26 2.26 0 0 1-.093.236v26.173c.212.1.398.296.541.643l-1.398.233A2 2 0 0 0 1 167.009v47.611a2 2 0 0 0 1.671 1.973l1.368.228c-.139.319-.314.533-.511.653v16.637c.221.104.414.313.56.689l-1.417.236A2 2 0 0 0 1 237.009v47.611a2 2 0 0 0 1.671 1.973l1.347.225c-.135.294-.302.493-.49.607v377.681c0 41.213 22 63.208 63.223 63.208h95.074c.947-.504 2.717-.843 4.745-.843l.141.001h.194l.086-.001 33.704.005c1.849.043 3.442.37 4.323.838h95.074c41.222 0 63.223-21.999 63.223-63.212v-394.63c-.259-.275-.48-.796-.63-1.47l-.011-.133 1.655-.276A2 2 0 0 0 366 266.62v-77.611a2 2 0 0 0-1.671-1.973l-1.712-.285c.148-.839.396-1.491.698-1.811V64.213Z" />
-              <path fill="#343E4E" d="M16 59c0-23.748 19.252-43 43-43h246c23.748 0 43 19.252 43 43v615c0 23.196-18.804 42-42 42H58c-23.196 0-42-18.804-42-42V59Z" />
-              <foreignObject width="316" height="684" transform="translate(24 24)" clip-path="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)">
-                <img src="@/assets/dash.png" alt="" />
-              </foreignObject>
-            </svg>
-          </div> -->
           
         </div>
         
       </div>
 
       <!-- grid of main features and branded qrs -->
-      <section class="mx-auto  w-[90vw] px-6 mt-0 mb-20" >
-        <h2 class="text-5xl text-white font-bold  mt-0 "> <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Splash Pages</span> for your branded  <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 italic ">QRS</span></h2>
+      <section class="text-center 2xl:text-left mb-2 mx-auto  px-2 w-full  lg:w-[90vw] lg:px-6 mt-0 lg:mb-20" >
+        <h2 class=" text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold  mt-0 "> <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Splash Pages</span> for your branded  <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 italic ">QRS</span></h2>
       </section>
-      <section class="mx-auto  w-[90vw] px-6" >
-         <div class="flex" >
+      
+      <section class="mx-auto px-1 pt-6 2xl:pt-0  w-[90vw] 2xl:px-6" >
+         <div class="flex flex-col 2xl:flex-row" >
           <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 ">
-            <svg viewBox="0 0 366 729" role="img" class="mx-auto w-[22.875rem] max-w-full drop-shadow-xl animate__animated animate__slideInLeft">
+            <svg viewBox="0 0 366 729" role="img" class="mx-auto w-[15rem] 2xl:w-[22.875rem] max-w-full drop-shadow-xl animate__animated animate__slideInLeft">
               <title>App screenshot</title>
               <defs>
                 <clipPath id="2ade4387-9c63-4fc4-b754-10e687a0d332">
@@ -79,17 +66,17 @@
             </svg>
           </div>
           <!-- grid of screens  -->
-          <div class="flex flex-wrap w-full p-4 gap-2  ">
-           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index, page)" class="w-[30%] p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4 h-[50px]" :src="splashImages[index]" alt="">{{ page }}  <h1 class="text-white" ></h1></div>
+          <div class="flex flex-row overflow-scroll lg:justify-center  2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2  ">
+           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-52 2xl:h-20 2xl:w-[30%]  p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl">{{ page }}</span>  </div>
               
         </div>
 
          </div>
       </section>
       <!-- Chart  -->
-      <section class="w-[70vw] mx-auto mt-28 ">
-        <h2 class=" text-6xl mb-14 text-center font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Advanced Analytics</h2>
-        <p class="text-white text-2xl mb-14 text-center ">Enhance your campaign ROI with our comprehensive analytics, turning QR code scans into actionable insights. Leverage state-of-the-art data visualization and tracking technologies to boost user engagement and elevate your marketing strategies.</p>
+      <section class="w-[70vw] mx-auto mt-10 2xl:mt-28 ">
+        <h2 class=" text-4xl  md:text-4xl lg:text-6xl mb-14 text-center font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Advanced Analytics</h2>
+        <p class="text-white text-lg lg:text-2xl mb-14 text-center ">Enhance your campaign ROI with our comprehensive analytics, turning QR code scans into actionable insights. Leverage state-of-the-art data visualization and tracking technologies to boost user engagement and elevate your marketing strategies.</p>
         <BarChart class="mx-auto"/>
       </section>
 
@@ -98,7 +85,7 @@
         <div class="flow-root bg-[#000] py-16 sm:pt-32 lg:pb-0">
           <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="relative z-10">
-              <h1 class="mx-auto max-w-4xl text-center text-5xl font-bold tracking-tight text-white">Simple pricing, cancel anytime </h1>
+              <h1 class="mx-auto max-w-4xl text-center text-2xl lg:text-5xl font-bold tracking-tight text-white">Simple pricing, cancel anytime </h1>
               <p class="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-white/60"></p>
               <div class="mt-16 flex justify-center">
                 <fieldset aria-label="Payment frequency">
@@ -110,7 +97,7 @@
                 </fieldset>
               </div>
             </div>
-            <div class="flex justify-center items-center gap-20">
+            <div class="flex flex-col lg:flex lg:flex-row justify-center items-center gap-20">
               <!-- <svg viewBox="0 0 1208 1024" aria-hidden="true" class="absolute -bottom-48 left-1/2 h-[64rem] -translate-x-1/2 translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] lg:-top-48 lg:bottom-auto lg:translate-y-0">
                 <ellipse cx="604" cy="512" fill="url(#d25c25d4-6d43-4bf9-b9ac-1842a30a4867)" rx="604" ry="512" />
                 <defs>
