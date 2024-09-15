@@ -15,6 +15,8 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+
   devtools: { enabled: true },
   modules: [
     'nuxt-headlessui',
@@ -28,6 +30,7 @@ export default defineNuxtConfig({
     mode: 'full',
     lazy: true
   },
+  
 
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
