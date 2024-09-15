@@ -8,7 +8,7 @@ const [password, passwordAttrs] = defineField('password')
 
 const signUp = async () => {
   try {
-
+    console.log(value.emai, values.passwordl)
     await register({ username: values.email, email: values.email, password: values.password})
     router.push('/dashboard')
   } catch (e) {
