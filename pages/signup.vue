@@ -8,7 +8,7 @@ const [password, passwordAttrs] = defineField('password')
 
 const signUp = async () => {
   try {
-    console.log(value.emai, values.passwordl)
+    console.log(values.emai, values.passwordl)
     await register({ username: values.email, email: values.email, password: values.password})
     router.push('/dashboard')
   } catch (e) {
@@ -29,14 +29,14 @@ const signUp = async () => {
         </div>
         <div class="mb-4">
           <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-          <input v-model="email" v-bind="emailAttrs" id="email" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your email" />
+          <input v-model="values.email" v-bind="emailAttrs" id="email" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your email" />
         </div>
         <div class="mb-8">
           <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-          <input v-model="password" v-bind="passwordAttrs" id="password" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Create a password" />
+          <input v-model="values.password" v-bind="passwordAttrs" id="password" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Create a password" />
         </div>
         <div >
-          <button @click="register" class="btn w-full mb-4">
+          <button @click="signUp" class="btn w-full mb-4">
             Sign up
           </button>
           <p class="text-right">Already have an account? <NuxtLink to="login" class="text-underline text-blue-800 ">LOGIN</NuxtLink></p>
