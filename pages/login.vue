@@ -20,7 +20,8 @@ const signUp = async () => {
 }
 const loginUser = async () => {
   try {
-    await login({identifier: values.email, password: value.password})
+    console.log(values)
+    await login({identifier: values.email, password: values.password})
     router.push('/dashboard')
   } catch (error) {
     console.log(error)
@@ -32,6 +33,7 @@ const loginUser = async () => {
 <template>
   <div class="flex justify-center items-center w-screen custom_height">
     <div class="container-mdc">
+      <pre class="bg-red-500" >{{ values }}</pre>
       <div>
         <div>
           <h2 class="text-xl mb-6">Login </h2>
