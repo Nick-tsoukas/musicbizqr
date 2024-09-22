@@ -151,7 +151,7 @@ const saveQrCode = async () => {
       router.push('/dashboard')
     }
   } catch (error) {
-    console.error(error);
+    console.error('error in save qr error next then formdata ',error, formData);
   }
 };
 
