@@ -106,54 +106,64 @@ const handleImageUpload = (event) => {
 
 onMounted(() => {
   initializeQrCode()
+  console.log(user, 'this is the user ')
+ 
 })
-
 const saveQrCode = async () => {
-  console.log(options.value, 'this is the options ')
   try {
+    console.log(options.value, 'this is the options ');
+    console.log(user.value.id, 'this is user create options');
+    console.log(route.query.type, 'this is the type');
+
     const form = {
       url: options.data,
       users_permissions_user: { id: user.value.id },
-      q_type : route.query.type,
+      q_type: route.query.type,
       link: link.value,
       name: name.value,
-      options:{ ...options }
-      // scanTime: [{date: 'some date one '}, {date: 'some date two'}]
-    }
+      options: { ...options }
+    };
 
-    const blob = await qrCodeStyling.getRawData('image/png')
-    const file = new File([blob], 'qrcode.png')
+    const blob = await qrCodeStyling.getRawData('image/png');
+    const file = new File([blob], 'qrcode.png');
     const formData = new FormData();
     formData.append('files.q_image', file, 'qrcode.png');
-    formData.append('data', JSON.stringify(form))
+    formData.append('data', JSON.stringify(form));
 
+    // Saving the QR code
     const { data } = await client(`/qrs`, {
       method: 'POST',
       body: formData
-    })
+    });
 
-   
-    if(props.type === 'externalURL') {
-      router.push('/dashboard')
+    console.log('QR code saved successfully:', data);
+
+    // Only proceed with routing if the QR code is saved and data.id exists
+    if (data && data.id) {
+      if (props.type === 'externalURL') {
+        router.push('/dashboard');
+      } else if (route.query.type === 'bandProfile') {
+        router.push({ name: 'createband', query: { qrId: data.id } });
+      } else if (route.query.type === 'events') {
+        router.push({ name: 'newevent', query: { qrId: data.id } });
+      } else if (route.query.type === 'tours') {
+        router.push({ name: 'newtour', query: { qrId: data.id } });
+      } else if (route.query.type === 'albums') {
+        router.push({ name: 'newalbum', query: { qrId: data.id } });
+      } else if (route.query.type === 'stream') {
+        router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
+      } else {
+        router.push('/dashboard');
+      }
+    } else {
+      console.error('QR code was not saved, no ID found.');
     }
-    if(props.type === 'bandProfile') {
-      router.push({ name: 'createband', query: { qrId: data.id } });
-    } else if(props.type === 'events') {
-      router.push({ name: 'newevent', query: { qrId: data.id } });
-    } else if(props.type === 'tours') {
-      router.push({ name: 'newtour', query: { qrId: data.id } });
-    } else if(props.type === 'albums') {
-      router.push({ name: 'newalbum', query: { qrId: data.id } });
-    }  else if(props.type === 'stream') {
-      router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
-    }
-    else {
-      router.push('/dashboard')
-    }
+
   } catch (error) {
-    console.error('error in save qr error next then formdata ',error, formData);
+    console.error('Error during QR code save:', error.response ? error.response.data : error);
   }
 };
+
 
 watch(() => options, updateQrCode, { deep: true })
 </script>

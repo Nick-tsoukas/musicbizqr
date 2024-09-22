@@ -150,6 +150,7 @@ const viewQr = (img) => {
 
 onMounted(() => {
   fetchData()
+  console.log('this is user from dashboar', user.value)
 });
 
 
