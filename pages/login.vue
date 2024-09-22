@@ -33,7 +33,7 @@ const loginUser = async () => {
 <template>
   <div class="flex justify-center items-center w-screen custom_height">
     <div class="container-mdc">
-      <pre class="bg-red-500" >{{ values }}</pre>
+    
       <div>
         <div>
           <h2 class="text-xl mb-6">Login </h2>

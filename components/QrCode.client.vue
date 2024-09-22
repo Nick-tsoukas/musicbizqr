@@ -83,6 +83,15 @@ const updateQrCode = () => {
   }
 }
 
+const selectType = (selected) => {
+  router.push({
+    query: {
+      ...route.query, // Preserve other query params if any
+      type: selected
+    }
+  });
+}
+
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -135,6 +144,8 @@ const saveQrCode = async () => {
       router.push({ name: 'newtour', query: { qrId: data.id } });
     } else if(props.type === 'albums') {
       router.push({ name: 'newalbum', query: { qrId: data.id } });
+    }  else if(props.type === 'stream') {
+      router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
     }
     else {
       router.push('/dashboard')
@@ -164,6 +175,65 @@ watch(() => options, updateQrCode, { deep: true })
   </label>
    </div>
     </div>
+    <!-- chhose type  -->
+    <div class="bg-white rounded-md " >
+    <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <span class="mb-1 text-white text-xl font-semibold">Choose Qr Type</span>
+      </div>
+   <div class="p-4">
+    <div class="flex gap-4">
+      <div 
+    @click="selectType('bandProfile')"  
+    :class="{ 'border-green': route.query.type == 'bandProfile', 'border-black': route.query.type !== 'bandProfile' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Band</span>
+  </div>
+
+  <div 
+    @click="selectType('events')" 
+    :class="{ 'border-green': route.query.type == 'events', 'border-black': route.query.type !== 'events' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Event</span>
+  </div>
+
+  <div 
+    @click="selectType('tours')" 
+    :class="{ 'border-green': route.query.type == 'tours', 'border-black': route.query.type !== 'tours' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Tour</span>
+  </div>
+
+  <div 
+    @click="selectType('albums')" 
+    :class="{ 'border-green': route.query.type == 'albums', 'border-black': route.query.type !== 'albums' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Album</span>
+  </div>
+
+  <div 
+    @click="selectType('stream')" 
+    :class="{ 'border-green': route.query.type == 'stream', 'border-black': route.query.type !== 'stream' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Stream</span>
+  </div>
+
+  <div 
+    @click="selectType('externalURL')" 
+    :class="{ 'border-green': route.query.type == 'externalURL', 'border-black': route.query.type !== 'externalURL' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Link URL</span>
+  </div>
+
+    </div>
+   </div>
+    </div>
+
     <div v-if="type === 'link'" class="bg-white rounded-md p-4">
       <label  class="mdc-text-field mb-4">
         <span class="mb-1 text-gray-700">External Link:</span>
@@ -192,15 +262,15 @@ watch(() => options, updateQrCode, { deep: true })
       </div>
     <div class="p-4" >
     <label class="color-picker-label mb-4">
-        <span class="mb-1 text-white   ">Dot Color:</span>
+        <span class="mb-1   text-gray-700  ">Dot Color:</span>
         <div class="color-picker">
           <input v-model="options.dotsOptions.color" type="text" class="color-text-input" />
           <input type="color" id="color" v-model="options.dotsOptions.color" class="color-input" />
         </div>
       </label>
-      </div> 
+      
      
-      <label class="mdc-text-field mb-4">
+      <label class="mdc-text-field mb-4 mt-4">
         <span class="mb-1 text-gray-700">Dot Type:</span>
         <select v-model="options.dotsOptions.type" class="mdc-text-field__input">
           <option value="rounded">Rounded</option>
@@ -212,6 +282,7 @@ watch(() => options, updateQrCode, { deep: true })
         </select>
         <span class="mdc-line-ripple"></span>
       </label>
+    </div> 
     </div>
     <div class="bg-white rounded-md" >
       <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
@@ -226,7 +297,7 @@ watch(() => options, updateQrCode, { deep: true })
         </div>
       </label>
    
-      <label class="mdc-text-field mb-4">
+      <label class="mdc-text-field mb-4 mt-4">
         <span class="mb-1 text-gray-700">Corner Square Type:</span>
         <select v-model="options.cornersSquareOptions.type" class="mdc-text-field__input">
           <option value="dot">Dot</option>

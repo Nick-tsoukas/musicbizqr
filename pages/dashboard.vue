@@ -240,15 +240,15 @@ const albumItems = computed(() => albums.value.map(album => ({
         </li>
       </ul>
     </div>
-    <div v-else class="mb-6 border-2  px-6 py-4 rounded-md">
-      <div class="flex flex-col bg-[#000]  py-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-semibold md:text-left">Qrs</h2>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">QRS</h2>
         <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Qr
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
         </NuxtLink>
       </div>
-      <div>
-        <h2 class="text-center my-4">No Qrs found</h2>
+      <div class="p-16">
+        <h2 class="text-center my-4 text-white text-xl">Create Your First QR</h2>
       </div>
     </div>
 
@@ -290,7 +290,7 @@ const albumItems = computed(() => albums.value.map(album => ({
         </NuxtLink>
       </div>
       <div>
-        <h2 class="text-center my-4">No Bands found</h2>
+        <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Band</h2>
       </div>
     </div>
 
@@ -326,13 +326,13 @@ const albumItems = computed(() => albums.value.map(album => ({
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
       <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Bands</h2>
-        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Streaming</h2>
+        <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream 
         </NuxtLink>
       </div>
-      <div>
-        <h2 class="text-center my-4">No Bands found</h2>
+      <div class="p-16">
+        <h2 class="text-center my-4 text-white text-xl">Create Your First Stream Page</h2>
       </div>
     </div>
 
@@ -366,14 +366,14 @@ const albumItems = computed(() => albums.value.map(album => ({
       </ul>
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#00} px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-white font-semibold md:text-left">Events</h2>
+      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Events</h2>
         <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event 
         </NuxtLink>
       </div>
-      <div>
-        <h2 class="text-center my-4">No Events found</h2>
+      <div class="p-16" >
+        <h2 class="text-center my-4 text-white text-xl">Create Your First Event</h2>
       </div>
     </div>
 
@@ -412,8 +412,8 @@ const albumItems = computed(() => albums.value.map(album => ({
           <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Tour
         </NuxtLink>
       </div>
-      <div>
-        <h2 class="text-center text-white text-2xl my-4">No Tours found</h2>
+      <div class="p-16">
+        <h2 class="text-center text-white text-xl my-4">Create Your First Tour</h2>
       </div>
     </div>
 
@@ -446,14 +446,14 @@ const albumItems = computed(() => albums.value.map(album => ({
       </ul>
     </div>
     <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#00} px-2 py-4 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Albums</h2>
-        <NuxtLink to="/newalbum"  class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Albums
+      <div class="flex flex-col border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 p-6 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-xl text-center grow w-full text-white font-semibold md:text-left">Ablums</h2>
+        <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Album
         </NuxtLink>
       </div>
-      <div>
-        <h2 class="text-center text-white text-2xl font-semibold my-4">No Albums found</h2>
+      <div class="p-16">
+        <h2 class="text-center text-white text-xl my-4">Create Your First Album</h2>
       </div>
     </div>
   </div>
