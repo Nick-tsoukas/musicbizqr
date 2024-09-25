@@ -138,6 +138,21 @@ html {
   .mdc-text-field__input:focus ~ .mdc-line-ripple {
     transform: scaleX(1);
   }
+
+  /*  spinner */
+  .spinner {
+    border: 4px solid rgba(0, 255, 0, 0.3); /* Light green border */
+    border-top: 4px solid #39ff14; /* Neon green top */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
   
   /* Button Styling */
   .mdc-button {

@@ -7,10 +7,10 @@ const type = route.query.type
 <template>
   <div class="mx-auto max-w-5xl" >
 
-    <ClientOnly>
+    <ClientOnly v-eles>
       <QrCode />
     </ClientOnly>
-  </div>
+
 </template>
 
 
