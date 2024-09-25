@@ -8,6 +8,8 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
 import QRCodeStyling from 'qr-code-styling';
 
+const config = useRuntimeConfig(); // Access runtime configuration
+const apiUrl = config.public.strapiUrl; // Get the API base URL
 
 
 
@@ -22,7 +24,7 @@ const route = useRoute()
 const client = useStrapiClient()
 const uuid = uuidv4();
 
-const url = `https://localhost:3000/directqr?id=${uuid}`;
+const url = `${apiUrl}/directqr?id=${uuid}`;
 
 const qrcode = ref(null)
 const link = ref(null)
@@ -32,7 +34,7 @@ const name = ref('name')
 const options = reactive({
   width: 300,
   height: 300,
-  data: `https://localhost:3000/directqr?id=${uuid}`,
+  data: `${apiUrl}/directqr?id=${uuid}`,
   dotsOptions: {
     color: '#000000',
     type: 'rounded',
