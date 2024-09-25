@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css'],
   runtimeConfig: {
     public: {
-      strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+      url: process.env.STRAPI_URL || 'http://localhost:1337',
     },
   },
   app: {
