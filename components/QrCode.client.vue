@@ -172,7 +172,7 @@ watch(() => options, updateQrCode, { deep: true })
 
 
 <template  class="  " >
-<div>
+
     <div class="flex flex-col items-center p-4 ">
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
     <div class="mt-4 flex flex-col space-y-4 w-full  ">
