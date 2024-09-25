@@ -66,10 +66,14 @@ onMounted(async () => {
 });
 
 const formatDate = (dateStr) => {
+  console.log('Time String:', dateStr);
+
   return format(parseISO(dateStr), 'MMMM d, yyyy');
 };
 
 const formatTime = (timeStr) => {
+  console.log('Time String:', timeStr);
+
   const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
   return format(parsedTime, 'hh:mm a');
 };
