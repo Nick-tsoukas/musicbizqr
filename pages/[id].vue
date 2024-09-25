@@ -118,7 +118,7 @@ onMounted(async () => {
   // Fetching albums data
   if (band.value?.data?.attributes?.albums?.data?.length) {
     const albumIds = band.value.data.attributes.albums.data.map(album => album.id)
-    const albumFetches = albumIds.map(id => fetch(`http://localhost:1337/api/albums/${id}?populate=cover,songs.file`))
+    const albumFetches = albumIds.map(id => fetch(`${apiUrl}/api/albums/${id}?populate=cover,songs.file`))
     const albumResponses = await Promise.all(albumFetches)
     const albumData = await Promise.all(albumResponses.map(response => response.json()))
     albums.value = albumData.map(response => response.data)
