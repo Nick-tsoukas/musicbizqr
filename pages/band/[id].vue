@@ -222,6 +222,8 @@
 import { ref, onMounted } from 'vue';
 import { routerKey, useRoute } from 'vue-router';
 const { find, findOne } = useStrapi();
+const config = useRuntimeConfig(); // Access runtime configuration
+const apiUrl = config.public.strapiUrl; // Get the API base URL
 
 const route = useRoute();
 const router = useRouter();
