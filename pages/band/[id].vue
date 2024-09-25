@@ -225,7 +225,7 @@ const { find, findOne } = useStrapi();
 
 const route = useRoute();
 const router = useRouter();
-const band = ref(null);
+const band = ref([null]);
 const albums = ref([]);
 const events = ref([]);
 const tours = ref([]);
@@ -251,7 +251,7 @@ onMounted(async () => {
   document.body.classList.add('custom-page-body')
 
   const bandResponse = await fetch(
-    `http://localhost:1337/api/bands/${route.params.id}?populate[events][populate]=image&populate[tours][populate]=*&populate[albums][populate]=cover,songs.file&populate=bandImg`
+    `${strapiUrl}/api/bands/${route.params.id}?populate[events][populate]=image&populate[tours][populate]=*&populate[albums][populate]=cover,songs.file&populate=bandImg`
   );
   const bandData = await bandResponse.json();
   band.value = bandData;
@@ -259,7 +259,7 @@ onMounted(async () => {
   // Fetching albums data
   if (band.value?.data?.attributes?.albums?.data?.length) {
     const albumIds = band.value.data.attributes.albums.data.map((album) => album.id);
-    const albumFetches = albumIds.map((id) => fetch(`http://localhost:1337/api/albums/${id}?populate=cover,songs.file`));
+    const albumFetches = albumIds.map((id) => fetch(`${strapiUrl}/api/albums/${id}?populate=cover,songs.file`));
     const albumResponses = await Promise.all(albumFetches);
     const albumData = await Promise.all(albumResponses.map((response) => response.json()));
     albums.value = albumData.map((response) => response.data);
