@@ -74,7 +74,7 @@ const formatDate = (dateStr) => {
 const formatTime = (timeStr) => {
   console.log('Time String:', timeStr);
 
-  const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
+  const parsedTime = parse(timeStr, 'HH:mm:ss', new Date());
   return format(parsedTime, 'hh:mm a');
 };
 
