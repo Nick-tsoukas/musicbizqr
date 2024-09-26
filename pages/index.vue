@@ -25,7 +25,7 @@
      
         <div class=" mx-auto  w-[90vw]  px-6 py-10 2xl:flex   2xl:gap-x-10 2xl:px-8 ">
           <div class="mx-auto w-full 2xl:w-[45%]   lg:mx-0 text-white lg:flex-auto ">
-            <h1 class="mb-16 text-center   text-white font-extrabold tracking-tight text-7xl  md:text-8xl lg:text-left ">Get your sound out</h1>
+            <h1 class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center   font-extrabold tracking-tight text-7xl  md:text-8xl lg:text-left ">Get your sound out</h1>
             <div class="flex justify-center mb-12 2xl:hidden" >
               <img src="@/assets/qrcode.png" alt="" class="h-[350px]" >
             </div>
@@ -36,7 +36,7 @@
             </div>
           </div>
           <div class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow ">
-            <img src="@/assets/qrcode.png" alt="" class="h-[450px]" >
+            <img src="@/assets/qrcode.png" alt="" class="h-[275px] md:h-[450px]" >
           </div>
           
         </div>
@@ -148,7 +148,7 @@
 import musicSvg from '@/assets/music.svg';
 import microphoneSvg from '@/assets/microphone.svg';
 import recordSvg from '@/assets/record.svg';
-import streamingSvg from '@/assets/streaming.svg'
+import streamingSvg from '@/assets/streaminglinknew.svg'
 import facebookSvg from '@/assets/facebook-icon-white.svg'
 import websiteSvg from '@/assets/website.svg'
 import videoSvg from '@/assets/video.svg'
