@@ -9,11 +9,11 @@ const [password, passwordAttrs] = defineField('password')
 
 const signUp = async () => {
   try {
-    console.log(values.email, values.password, )
-    await register({ username: values.email, email: values.email, password: values.password})
+    console.log(values.email, values.password)
+    await register({ username: values.email, email: values.email, password: values.password })
     router.push('/dashboard')
   } catch (e) {
-    console.log('there was an error')
+    console.error('Registration error:', e.response ? e.response.data : e)
   }
 }
 
