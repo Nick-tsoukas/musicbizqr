@@ -1,20 +1,11 @@
 # task list 
 
-- [x] need to change the design of create tour page and edit tour page 
+- [] update button for upload on album page 
+- [] Add option to create new band on add album page 
+- [] change all images to nuxt img for preformance 
+- [] add more space between form containers 
+- [] add the right images for the homescreen phone  
 
-- [] change font color on login and signup page 
-
-- [] color button on all create edit pages 
-
-- [] make the qr code larger in the create qr 
-
-- [] add white border to form section 
-
-- [x] make width of all forms the same 
-
-- [x] make album page full screen minimum 
-
-- [] add charts and analytics for qr scans 
 
 
 

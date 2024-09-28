@@ -4,10 +4,10 @@ const route = useRoute()
 const type = route.query.type
 </script>
 
-<template>
+<template >
 
 
-    <ClientOnly v-eles>
+    <ClientOnly >
       <QrCode />
     </ClientOnly>
 

@@ -11,7 +11,10 @@ const bands = ref([]);
 const events = ref([]);
 const tours = ref([]);
 const albums = ref([]);
-const streams = ref([])
+const streams = ref([]);
+const socials = ref([]);
+
+
 
 const fetchData = async () => {
   if (user.value) {
@@ -22,6 +25,7 @@ const fetchData = async () => {
       await fetchTours();
       await fetchAlbums();
       await fetchStreams();
+      await fetchSocials();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -81,6 +85,24 @@ const fetchEvents = async () => {
     events.value = response.data;
   } catch (error) {
     console.error('Error fetching events:', error);
+  }
+};
+
+const fetchSocials = async () => {
+  try {
+    const response = await find('socialpages', {
+      filters: {
+        users_permissions_user: {
+          id: {
+            $eq: user.value.id
+          }
+        }
+      },
+      populate: '*'
+    });
+    events.value = response.data;
+  } catch (error) {
+    console.error('Error fetching social pages :', error);
   }
 };
 
@@ -199,6 +221,12 @@ const tourItems = computed(() => tours.value.map(tour => ({
   imageUrl: tour.attributes.image?.data?.attributes?.url || '',
 })));
 
+const socialItems = computed(() => socials.value.map(social => ({
+  id: social.id,
+  title: social.attributes.title,
+  imageUrl: social.attributes.image?.data?.attributes?.url || '',
+})));
+
 const albumItems = computed(() => albums.value.map(album => ({
   id: album.id,
   title: album.attributes.title,
@@ -292,6 +320,48 @@ const albumItems = computed(() => albums.value.map(album => ({
       </div>
       <div>
         <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Band</h2>
+      </div>
+    </div>
+
+
+    <!-- social section  -->
+    <div v-if="loading">
+      <SkeletonLoader />
+    </div>
+    <div v-else-if="qrItems.length" class="mb-6 border-2 border-white rounded-lg">
+      <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-8 gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">QR Codes</h2>
+        <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
+        </NuxtLink>
+      </div>
+      <ul class="px-6 py-6" >
+        <li v-for="socialpage in socialItems" :key="socialpage.id" class="flex justify-between items-center mb-4 p-2">
+          <div class="flex items-center">
+            <img :src="socialpage.imageUrl" alt="" class="h-[150px] w-[150px] rounded mr-4">
+            <span class="text-white text-xl" >{{ socialpage.title }}</span>
+          </div>
+         <div class="flex items-center gap-4">
+          <button @click="viewQr(socialpage.imageUrl)" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+          </button>
+          <button @click="editItem(socialpage.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
+            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+          </button>
+         </div>
+        
+        </li>
+      </ul>
+    </div>
+    <div v-else class="mb-6 border-2 rounded-md">
+      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
+        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Social Page</h2>
+        <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Social  
+        </NuxtLink>
+      </div>
+      <div class="p-16">
+        <h2 class="text-center my-4 text-white text-xl">Create Your First Social Page</h2>
       </div>
     </div>
 

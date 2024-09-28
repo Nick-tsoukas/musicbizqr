@@ -113,9 +113,7 @@ onMounted(() => {
 })
 const saveQrCode = async () => {
   try {
-    console.log(options.value, 'this is the options ');
-    console.log(user.value.id, 'this is user create options');
-    console.log(route.query.type, 'this is the type');
+  
 
     const form = {
       url: options.data,
@@ -154,6 +152,9 @@ const saveQrCode = async () => {
         router.push({ name: 'newalbum', query: { qrId: data.id } });
       } else if (route.query.type === 'stream') {
         router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
+      } else if (route.query.type === 'social') {
+        router.push({ name: 'socialpage', query: { qrId: data.id } });
+  
       } else {
         router.push('/dashboard');
       }
@@ -171,8 +172,8 @@ watch(() => options, updateQrCode, { deep: true })
 </script>
 
 
-<template  class="container mx-auto  " >
-  <div class="flex flex-col items-center p-4 ">
+<template  class="container mx-auto " >
+  <div class="flex flex-col items-center p-4  max-w-5xl  mx-auto ">
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
     <div class="mt-4 flex flex-col space-y-4 w-full  ">
    <div class="bg-white rounded-md " >
@@ -224,6 +225,14 @@ watch(() => options, updateQrCode, { deep: true })
     class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
   >
     <span>Album</span>
+  </div>
+
+  <div 
+    @click="selectType('social')" 
+    :class="{ 'border-green': route.query.type == 'social', 'border-black': route.query.type !== 'social' }" 
+    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+  >
+    <span>Social Links</span>
   </div>
 
   <div 
