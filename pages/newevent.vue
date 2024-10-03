@@ -1,5 +1,8 @@
 <template>
-  <div class="bg-[#000] container mx-auto max-w-5xl">
+  <div class="bg-[#000] container mx-auto max-w-5xl px-6">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <div class=" bg-black ">
       <h1 class="title text-white">Create New Event</h1>
       
@@ -111,7 +114,7 @@ const route = useRoute();
 const client = useStrapiClient();
 const user = useStrapiUser();
 const { update } = useStrapi();
-
+const loading = ref(false)
 const newEvent = ref({
   title: '',
   description: '',
@@ -142,6 +145,7 @@ const handleNewEventImageUpload = (event) => {
 
 const submitNewEvent = async () => {
   try {
+    loading.value = true;
     const eventForm = new FormData();
     const eventData = {
       title: newEvent.value.title,
@@ -179,6 +183,7 @@ const submitNewEvent = async () => {
 
     router.push('/dashboard');
   } catch (error) {
+    loading.value = false
     console.error('Error creating new event:', error);
   }
 };

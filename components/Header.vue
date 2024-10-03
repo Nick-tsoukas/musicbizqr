@@ -38,7 +38,7 @@
       </button>
     </div>
     <nav
-      :class="['fixed top-[75px] left-0 w-screen h-[calc(100vh-75px)] justify-center bg-[#000] text-black transition-transform md:hidden z-50', isMenuOpen ? 'block' : 'hidden']"
+      :class="['fixed top-[75px] left-0 showfully w-screen h-[calc(100vh-75px)] justify-center bg-[#000] text-black transition-transform md:hidden z-50', isMenuOpen ? 'block' : 'hidden']"
     >
       <div class="flex flex-col h-full items-center space-y-4 py-4">
         <NuxtLink to="/" @click="toggleMenu" class="mobile-nav-link">Home</NuxtLink>
@@ -76,6 +76,9 @@ const logoutUserMobile = () => {
   toggleMenu();
   router.push('/');
 };
+
+
+
 </script>
 
 <style scoped>
@@ -87,7 +90,9 @@ const logoutUserMobile = () => {
   @apply text-white text-xl hover:bg-purple-100 rounded px-4 py-2 transition-colors;
 }
 
-
+.showfully {
+  z-index: 9999999999999;
+}
 
 .block {
   display: block;

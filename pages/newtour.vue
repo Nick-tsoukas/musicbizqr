@@ -1,5 +1,8 @@
 <template  >
-  <div class="container mx-auto">
+  <div class="container mx-auto px-6">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <h1 class="font-bold text-white text-3xl mb-10">Create New Tour</h1>
     <form @submit.prevent="submitNewTour">
   
@@ -110,6 +113,7 @@ const client = useStrapiClient();
 const user = useStrapiUser();
 const route = useRoute();
 const { update } = useStrapi();
+const loading = ref(false)
 
 const newTour = ref({
   title: '',
@@ -132,6 +136,7 @@ const handleNewTourImageUpload = (event) => {
 
 const submitNewTour = async () => {
   try {
+    loading.value = true
     console.log('submit')
     const tourForm = new FormData();
     const tourData = {
@@ -167,6 +172,7 @@ const submitNewTour = async () => {
     router.push('/dashboard'); // Redirect to tours page or any other page after successful creation
     console.log('below router push ')
   } catch (error) {
+    loading.value = false
     console.error('Error creating new tour:', error);
   }
 };

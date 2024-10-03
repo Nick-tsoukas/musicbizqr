@@ -1,5 +1,8 @@
 <template>
   <div class="container mx-auto">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <h1 class="text-white text-2xl font-bold mb-10">Edit Album</h1>
     <form @submit.prevent="submitEditAlbum">
       <div >
@@ -79,7 +82,7 @@ const router = useRouter();
 const { findOne } = useStrapi();
 const user = useStrapiUser();
 const client = useStrapiClient()
-
+const loading = ref(false)
 const album = ref({
   title: '',
   releaseDate: '',
@@ -155,6 +158,7 @@ const removeSong = (index) => {
 const submitEditAlbum = async () => {
   const albumId = route.params.id;
   try {
+    loading.value = true;
     const albumForm = new FormData();
     const albumData = {
       title: album.value.title,
@@ -185,6 +189,7 @@ const submitEditAlbum = async () => {
 
     router.push('/dashboard');
   } catch (error) {
+    loading.value = false;
     console.error('Error updating album:', error);
   }
 };

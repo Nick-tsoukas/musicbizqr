@@ -6,10 +6,12 @@ const type = route.query.type
 
 <template >
 
-
+<div>
+  
     <ClientOnly >
       <QrCode />
     </ClientOnly>
+  </div>
 
 </template>
 

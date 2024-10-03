@@ -1,5 +1,8 @@
 <template>
   <div class="container mx-auto px-6">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <h1 class="text-white text-3xl font-bold mb-10">Edit Tour page</h1>
     <form @submit.prevent="submitEditTour">
       <div >
@@ -96,7 +99,7 @@ const { findOne } = useStrapi();
 const user = useStrapiUser();
 const client = useStrapiClient()
 console.log('file is running ')
-
+const loading = ref(false)
 const tour = ref({
   title: '',
   startDate: '',
@@ -148,7 +151,7 @@ const handleTourImageUpload = (e) => {
 const submitEditTour = async () => {
   const tourId = route.params.id;
   try {
-    
+    loading.value = true;
     const tourForm = new FormData();
     const tourData = {
       title: tour.value.title,

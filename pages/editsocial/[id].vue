@@ -1,12 +1,12 @@
 <template>
-  <div class="container mx-auto max-w-5xl px-6">
+  <div class="container mx-auto max-w-5xl px-6 mb-10">
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-    <h1 class="font-bold text-white text-3xl mb-10">Create Social Page Links</h1>
-    <form @submit.prevent="submitForm">
+    <h1 class="text-white text-3xl font-bold mb-10 text-center pt-6 md:text-left">Edit Social Links</h1>
+    <form @submit.prevent="submitEditSocialPage">
       
-      <!-- Title Section -->
+      <!-- Social Page Title Section -->
       <div class="mb-10">
         <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-2xl">Social Page Title</h2>
@@ -86,18 +86,15 @@
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" class="mdc-button w-full mt-10">Create Social Page Links</button>
+      <button type="submit" class="mdc-button w-full mt-10">Save Changes</button>
     </form>
   </div>
 </template>
 
-
 <script setup>
-
-
+const route = useRoute();
 const router = useRouter();
 const client = useStrapiClient();
-const user = useStrapiUser();
 const loading = ref(false)
 const socialpage = ref({
   title: '',
@@ -108,10 +105,43 @@ const socialpage = ref({
   tictok: '',
   img: null,
   imgUrl: null,
-  band: '',  // To hold the selected band ID
+  band: '',
 });
-
 const bands = ref([]);
+
+const fetchSocialPage = async () => {
+  const socialPageId = route.params.id;
+  try {
+    const response = await client(`/socialpages/${socialPageId}`, {
+      params: { populate: 'img' }, 
+    });
+    const data = response.data;
+
+    socialpage.value = {
+      title: data.attributes.title,
+      facebook: data.attributes.facebook,
+      snapchat: data.attributes.snapchat,
+      whatsapp: data.attributes.whatsapp,
+      twitch: data.attributes.twitch,
+      tictok: data.attributes.tictok,
+      band: data.attributes.band?.data?.id || '',
+      imgUrl: data.attributes.img ? data.attributes.img.data.attributes.url : null,
+    };
+  } catch (error) {
+    console.error('Error fetching social page:', error);
+  }
+};
+
+const fetchBands = async () => {
+  try {
+    const response = await client('/bands', {
+      params: { populate: '*' },
+    });
+    bands.value = response.data;
+  } catch (error) {
+    console.error('Error fetching bands:', error);
+  }
+};
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -119,21 +149,8 @@ const handleImageUpload = (event) => {
   socialpage.value.imgUrl = URL.createObjectURL(file);
 };
 
-const fetchBands = async () => {
-  try {
-    const response = await client('/bands', user.id, {
-      params: {
-        populate: '*',
-      },
-    });
-    bands.value = response.data;
-    console.log(bands, 'this is bands')
-  } catch (error) {
-    console.error('Error fetching bands:', error);
-  }
-};
-
-const submitForm = async () => {
+const submitEditSocialPage = async () => {
+  const socialPageId = route.params.id;
   try {
     loading.value = true;
     const formData = new FormData();
@@ -145,7 +162,6 @@ const submitForm = async () => {
       twitch: socialpage.value.twitch || null,
       tictok: socialpage.value.tictok || null,
       band: socialpage.value.band || null,
-      users_permissions_user: user.value.id,
     };
 
     for (const key in socialPageData) {
@@ -160,57 +176,43 @@ const submitForm = async () => {
       formData.append('files.img', socialpage.value.img);
     }
 
-    const { data: socialPageDataResponse } = await client('/socialpages', {
-      method: 'POST',
+    await client(`/socialpages/${socialPageId}`, {
+      method: 'PUT',
       body: formData,
     });
 
-    console.log('Social page created successfully:', socialPageDataResponse);
     router.push('/dashboard');
   } catch (error) {
     loading.value = false;
-    console.error('Error creating social page:', error);
+    console.error('Error updating social page:', error);
   }
 };
 
 onMounted(() => {
+  fetchSocialPage();
   fetchBands();
 });
 </script>
 
 <style scoped>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.mdc-text-field {
-  position: relative;
-  margin-bottom: 1.5rem;
-  display: inline-block;
-  width: 100%;
-}
-
-.mdc-text-field__input::placeholder {
-  color: transparent;
-}
-
-.mdc-text-field__input:focus::placeholder {
-  color: #aaa;
-}
-
 .mdc-text-field__input {
   font-size: 1rem;
   line-height: 1.5;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #000;
-  border-radius: 10px;
+  border: 1px solid #000; /* Add this line for the border */
+  border-radius: 0.375rem; /* Optional: for rounded corners */
   outline: none;
   width: 100%;
+  background-color: white; /* Ensure the background is white */
+}
+
+.mdc-text-field__input:focus {
+  border-color: #6200ee; /* Optional: Change the border color on focus */
 }
 
 .mdc-floating-label {
   position: absolute;
-  z-index: 99999;
+  z-index: 9999;
   top: 0.75rem;
   left: 0.5rem;
   padding-left: 0.2em;
@@ -221,12 +223,6 @@ onMounted(() => {
   color: #aaa;
   pointer-events: none;
   transition: transform 0.2s, color 0.2s;
-}
-
-.mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
-  transform: translateY(-1.5rem);
-  color: #6200ee;
 }
 
 .mdc-line-ripple {
@@ -244,52 +240,9 @@ onMounted(() => {
   transform: scaleX(1);
 }
 
-.mdc-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #2c2c2c;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.mdc-button:hover {
-  background-color: #3700b3;
-}
-
-.mdc-button:focus {
-  outline: none;
-}
-
-.styled-file-input {
-  display: none;
-}
-
-.styled-file-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #2c2c2c;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  text-align: center;
-}
-
-.styled-file-label:hover {
-  background-color: #3700b3;
-}
+/* Add relevant styles for your form and components */
 </style>

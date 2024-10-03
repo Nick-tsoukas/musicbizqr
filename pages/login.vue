@@ -34,9 +34,9 @@ const loginUser = async () => {
   <div class="flex justify-center items-center w-screen custom_height">
     <div class="container-mdc">
     
-      <div>
+      <div class="bg-white p-8 rounded-sm" >
         <div>
-          <h2 class="text-xl mb-6">Login </h2>
+          <h2 class="text-xl mb-6 text-black font-semibold">Login </h2>
         </div>
         <div class="mdc-text-field mdc-text-field--filled mb-4">
           <input id="email" v-model="email" v-bind="emailAttrs" type="text" class="mdc-text-field__input" placeholder="Enter your email" />

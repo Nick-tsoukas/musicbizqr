@@ -1,9 +1,10 @@
 <script setup>
 
+
 const user = useStrapiUser();
 const router = useRouter();
 const client = useStrapiClient();
-const {find} = useStrapi();
+const { find } = useStrapi();
 
 const loading = ref(true);
 const qrs = ref([]);
@@ -14,18 +15,18 @@ const albums = ref([]);
 const streams = ref([]);
 const socials = ref([]);
 
-
-
 const fetchData = async () => {
   if (user.value) {
     try {
-      await fetchBands();
-      await fetchQrs();
-      await fetchEvents();
-      await fetchTours();
-      await fetchAlbums();
-      await fetchStreams();
-      await fetchSocials();
+      await Promise.all([
+        fetchBands(),
+        fetchQrs(),
+        fetchEvents(),
+        fetchTours(),
+        fetchAlbums(),
+        fetchStreams(),
+        fetchSocials(),
+      ]);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -40,11 +41,11 @@ const fetchBands = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
     bands.value = response.data;
   } catch (error) {
@@ -58,11 +59,11 @@ const fetchQrs = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
     qrs.value = response.data;
   } catch (error) {
@@ -76,11 +77,11 @@ const fetchEvents = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
     events.value = response.data;
   } catch (error) {
@@ -94,15 +95,15 @@ const fetchSocials = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
-    events.value = response.data;
+    socials.value = response.data;
   } catch (error) {
-    console.error('Error fetching social pages :', error);
+    console.error('Error fetching social pages:', error);
   }
 };
 
@@ -112,11 +113,11 @@ const fetchTours = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
     tours.value = response.data;
   } catch (error) {
@@ -130,19 +131,17 @@ const fetchStreams = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
-    console.log(response.data, ' this is the stream ')
     streams.value = response.data;
   } catch (error) {
-    console.error('Error fetching tours:', error);
+    console.error('Error fetching streams:', error);
   }
 };
-
 
 const fetchAlbums = async () => {
   try {
@@ -150,405 +149,474 @@ const fetchAlbums = async () => {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id
-          }
-        }
+            $eq: user.value.id,
+          },
+        },
       },
-      populate: '*'
+      populate: '*',
     });
     albums.value = response.data;
   } catch (error) {
     console.error('Error fetching albums:', error);
   }
 };
-const imageURL = ref('')
-const qrView = ref(false)
+
+const deleteItem = async (id, type) => {
+  try {
+    if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+      return;
+    }
+
+    loading.value = true;
+
+    await client(`/${type}s/${id}`, {
+      method: 'DELETE',
+    });
+
+    await fetchData();
+
+    loading.value = false;
+
+    alert(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully.`);
+  } catch (error) {
+    loading.value = false;
+    console.error(`Error deleting ${type}:`, error);
+    alert(`Failed to delete ${type}. Please try again.`);
+  }
+};
+
+const imageURL = ref('');
+const qrView = ref(false);
 
 const viewQr = (img) => {
-  imageURL.value = img
-  qrView.value = !qrView.value
-
-}
-
-onMounted(() => {
-  fetchData()
-  console.log('this is user from dashboar', user.value)
-});
-
-
+  imageURL.value = img;
+  qrView.value = !qrView.value;
+};
 
 const downloadImage = () => {
-  // Create an anchor element
   const link = document.createElement('a');
-  // Set the download attribute with a filename
   link.download = 'downloaded-image.jpg';
-  // Set the href to the image URL
   link.href = imageURL.value;
-  // Append the anchor to the body (necessary for Firefox)
   document.body.appendChild(link);
-  // Programmatically click the anchor to trigger the download
   link.click();
-  // Remove the anchor from the document
   document.body.removeChild(link);
 };
 
+onMounted(() => {
+  fetchData();
+});
 
 const editItem = (id, page) => {
   router.push({ path: `/${page}/${id}` });
 };
 
-const qrItems = computed(() => qrs.value.map(qr => ({
-  id: qr.id,
-  title: qr.attributes.name,
-  imageUrl: qr.attributes.q_image?.data?.attributes?.url || '',
-})));
+const qrItems = computed(() =>
+  qrs.value.map((qr) => ({
+    id: qr.id,
+    title: qr.attributes.name,
+    imageUrl: qr.attributes.q_image?.data?.attributes?.url || '',
+  }))
+);
 
-const bandItems = computed(() => bands.value.map(band => ({
-  id: band.id,
-  title: band.attributes.name,
-  imageUrl: band.attributes.bandImg?.data?.attributes?.url || '',
-})));
+const bandItems = computed(() =>
+  bands.value.map((band) => ({
+    id: band.id,
+    title: band.attributes.name,
+    imageUrl: band.attributes.bandImg?.data?.attributes?.url || '',
+  }))
+);
 
-const eventItems = computed(() => events.value.map(event => ({
-  id: event.id,
-  title: event.attributes.title,
-  imageUrl: event.attributes.image?.data?.attributes?.url || '',
-})));
+const eventItems = computed(() =>
+  events.value.map((event) => ({
+    id: event.id,
+    title: event.attributes.title,
+    imageUrl: event.attributes.image?.data?.attributes?.url || '',
+  }))
+);
 
-const tourItems = computed(() => tours.value.map(tour => ({
-  id: tour.id,
-  title: tour.attributes.title,
-  imageUrl: tour.attributes.image?.data?.attributes?.url || '',
-})));
+const tourItems = computed(() =>
+  tours.value.map((tour) => ({
+    id: tour.id,
+    title: tour.attributes.title,
+    imageUrl: tour.attributes.image?.data?.attributes?.url || '',
+  }))
+);
 
-const socialItems = computed(() => socials.value.map(social => ({
-  id: social.id,
-  title: social.attributes.title,
-  imageUrl: social.attributes.image?.data?.attributes?.url || '',
-})));
+const socialItems = computed(() =>
+  socials.value.map((social) => ({
+    id: social.id,
+    title: social.attributes.title,
+    imageUrl: social.attributes.img?.data?.attributes?.url || '',
+  }))
+);
 
-const albumItems = computed(() => albums.value.map(album => ({
-  id: album.id,
-  title: album.attributes.title,
-  imageUrl: album.attributes.cover?.data?.attributes?.url || '',
-})));
+const albumItems = computed(() =>
+  albums.value.map((album) => ({
+    id: album.id,
+    title: album.attributes.title,
+    imageUrl: album.attributes.cover?.data?.attributes?.url || '',
+  }))
+);
 
+const streamItems = computed(() =>
+  streams.value.map((stream) => ({
+    id: stream.id,
+    title: stream.attributes.title,
+    imageUrl: stream.attributes.image?.data?.attributes?.url || '',
+  }))
+);
 </script>
 
 <template>
-<div class="bg-[#000]" >
-  <div class="container bg-[#000] mx-auto p-4">
-    <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
+  <div class="bg-[#000]">
+    <div class="container bg-[#000] mx-auto p-4">
+      <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
 
-    <!-- QR Codes Section -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="qrItems.length" class="mb-6 border-2 border-white rounded-lg">
-      <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-8 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">QR Codes</h2>
-        <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
-        </NuxtLink>
+      <!-- QR Codes Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
       </div>
-      <ul class="px-6 py-6" >
-        <li v-for="qr in qrItems" :key="qr.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-            <img :src="qr.imageUrl" alt="" class="h-[150px] w-[150px] rounded mr-4">
-            <span class="text-white text-xl" >{{ qr.title }}</span>
-          </div>
-         <div class="flex items-center gap-4">
-          <button @click="viewQr(qr.imageUrl)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-          <button @click="editItem(qr.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         </div>
-        
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">QRS</h2>
-        <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
-        </NuxtLink>
+      <div v-else-if="qrItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- QR Codes List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">QR Codes</h2>
+          <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="qr in qrItems" :key="qr.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="qr.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ qr.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="viewQr(qr.imageUrl)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="editItem(qr.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(qr.id, 'qr')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div class="p-16">
-        <h2 class="text-center my-4 text-white text-xl">Create Your First QR</h2>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No QR Codes -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">QR Codes</h2>
+          <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First QR Code</h2>
+        </div>
       </div>
-    </div>
 
-    <!-- Bands Section -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="bandItems.length" class="mb-6   border-2 rounded-md">
-      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Bands</h2>
-        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
-        </NuxtLink>
-      </div>
-      <ul class="px-6 py-6" >
-        <li v-for="band in bandItems" :key="band.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-            <img :src="band.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span class="text-white text-xl">{{ band.title }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-            <button @click="router.push(`/editband/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         
-         
-         </div>
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Bands</h2>
-        <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
-        </NuxtLink>
-      </div>
-      <div>
-        <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Band</h2>
-      </div>
-    </div>
+      <!-- Repeat the same pattern for Bands, Events, Tours, Albums, Streams, Social Links -->
 
+      <!-- Bands Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="bandItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Bands List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
+          <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="band in bandItems" :key="band.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="band.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ band.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editband/${band.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(band.id, 'band')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Bands -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
+          <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Band</h2>
+        </div>
+      </div>
 
-    <!-- social section  -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="qrItems.length" class="mb-6 border-2 border-white rounded-lg">
-      <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-8 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">QR Codes</h2>
-        <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
-        </NuxtLink>
+      <!-- Social Links Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
       </div>
-      <ul class="px-6 py-6" >
-        <li v-for="socialpage in socialItems" :key="socialpage.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-            <img :src="socialpage.imageUrl" alt="" class="h-[150px] w-[150px] rounded mr-4">
-            <span class="text-white text-xl" >{{ socialpage.title }}</span>
-          </div>
-         <div class="flex items-center gap-4">
-          <button @click="viewQr(socialpage.imageUrl)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-          <button @click="editItem(socialpage.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         </div>
-        
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Social Page</h2>
-        <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Social  
-        </NuxtLink>
+      <div v-else-if="socialItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Social Links List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Social Links</h2>
+          <NuxtLink to="/socialpage" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Social Links
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="social in socialItems" :key="social.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="social.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ social.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/social/${social.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editsocial/${social.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(social.id, 'socialpage')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div class="p-16">
-        <h2 class="text-center my-4 text-white text-xl">Create Your First Social Page</h2>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Social Links -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Social Links</h2>
+          <NuxtLink to="/socialpage" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Social Links
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Social Link</h2>
+        </div>
       </div>
-    </div>
 
-    <!-- stream section -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="streams.length" class="mb-6   border-2 rounded-md">
-      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Streams</h2>
-        <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream Page
-        </NuxtLink>
-      </div>
-      <ul class="px-6 py-6" >
-        <li v-for="stream in streams" :key="stream.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-           <span v-if="stream.attributes.img" > <img :src="stream.attributes.img.data.attributes.url" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4"></span>
-            <span class="text-white text-xl">something here</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <button @click="router.push(`/stream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-            <button @click="router.push(`/editstream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         
-         
-         </div>
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#00} p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Streaming</h2>
-        <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream 
-        </NuxtLink>
-      </div>
-      <div class="p-16">
-        <h2 class="text-center my-4 text-white text-xl">Create Your First Stream Page</h2>
-      </div>
-    </div>
+      <!-- Repeat the same for Events, Tours, Albums, Streams -->
 
+      <!-- Events Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="eventItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Events List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
+          <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="event in eventItems" :key="event.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="event.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ event.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/event/${event.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editevent/${event.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(event.id, 'event')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Events -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
+          <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Event</h2>
+        </div>
+      </div>
 
-    <!-- Events Section -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="eventItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Events</h2>
-        <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
-        </NuxtLink>
+      <!-- Tours Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
       </div>
-      <ul class="p-6" >
-        <li v-for="event in eventItems" :key="event.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-            <img :src="event.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span class="text-white text-xl" >{{ event.title }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-          <button @click="router.push(`/event/${event.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-          <button @click="editItem(event.id, 'editevent')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         </div>
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Events</h2>
-        <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event 
-        </NuxtLink>
+      <div v-else-if="tourItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Tours List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Tours</h2>
+          <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="tour in tourItems" :key="tour.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="tour.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ tour.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/tour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/edittour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(tour.id, 'tour')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div class="p-16" >
-        <h2 class="text-center my-4 text-white text-xl">Create Your First Event</h2>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Tours -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Tours</h2>
+          <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Tour</h2>
+        </div>
       </div>
-    </div>
 
-    <!-- Tours Section -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="tourItems.length" class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col border-b-2 p-6 bg-gradient-to-r from-pink-500 to-violet-500 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Tours</h2>
-        <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
-        </NuxtLink>
+      <!-- Albums Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
       </div>
-      <ul class="p-6" >
-        <li v-for="tour in tourItems" :key="tour.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-            <img :src="tour.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span class="text-white text-xl">{{ tour.title }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-          <button @click="router.push(`/tour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-          <button @click="editItem(tour.id, 'edittour')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         </div>
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 p-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-white font-semibold md:text-left">Tours</h2>
-        <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Tour
-        </NuxtLink>
+      <div v-else-if="albumItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Albums List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Albums</h2>
+          <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Album
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="album in albumItems" :key="album.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="album.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ album.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/album/${album.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editalbum/${album.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(album.id, 'album')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div class="p-16">
-        <h2 class="text-center text-white text-xl my-4">Create Your First Tour</h2>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Albums -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Albums</h2>
+          <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Album
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Album</h2>
+        </div>
       </div>
-    </div>
 
-    <!-- Albums Section -->
-    <div v-if="loading">
-      <SkeletonLoader />
-    </div>
-    <div v-else-if="albumItems.length" class="mb-6  border-2 rounded-md">
-      <div class="flex flex-col border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  p-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-2xl text-center grow w-full text-white font-extrabold md:text-left">Albums</h2>
-        <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Album
-        </NuxtLink>
+      <!-- Streams Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
       </div>
-      <ul class="p-6">
-        <li v-for="album in albumItems" :key="album.id" class="flex justify-between items-center mb-4 p-2">
-          <div class="flex items-center">
-            <img :src="album.imageUrl" alt="" class="h-[150px] w-[150px] object-cover rounded mr-4">
-            <span class="text-white text-xl" >{{ album.title }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-          <button @click="router.push(`/album/${album.id}`)" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-          <button @click="editItem(album.id, 'editalbum')" class="text-blue-600 hover:text-blue-900">
-            <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-          </button>
-         </div>
-        </li>
-      </ul>
-    </div>
-    <div v-else class="mb-6 border-2 rounded-md">
-      <div class="flex flex-col border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 p-6 gap-2 items-center md:flex-row md:gap-0">
-        <h2 class="text-xl text-center grow w-full text-white font-semibold md:text-left">Ablums</h2>
-        <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
-          <img class="pr-2 h-6" src="@/assets/create-icon.svg" alt="">Create Album
-        </NuxtLink>
+      <div v-else-if="streamItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Streams List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Streams</h2>
+          <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="stream in streamItems" :key="stream.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="stream.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ stream.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/stream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editstream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(stream.id, 'stream')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div class="p-16">
-        <h2 class="text-center text-white text-xl my-4">Create Your First Album</h2>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Streams -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Streams</h2>
+          <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Stream</h2>
+        </div>
+      </div>
+
+      <!-- VIEW QR Popup -->
+      <div
+        v-if="qrView"
+        class="h-screen w-screen bg-black z-50 fixed overflow-hidden top-0 right-0 flex justify-center items-center"
+      >
+        <div class="flex flex-col gap-4">
+          <img :src="imageURL" class="max-h-[67vh]" alt="" />
+          <button @click="downloadImage" class="px-4 py-2 bg-blue-500 text-white rounded">
+            Download Image
+          </button>
+        </div>
+        <div class="absolute bottom-10 right-10">
+          <h2 @click="viewQr" class="text-white cursor-pointer">Close</h2>
+        </div>
       </div>
     </div>
   </div>
-  <!-- VIEW QR popup -->
-  <div v-if="qrView" class="h-screen w-screen bg-black z-50 fixed overflow-hidden top-0 right-0 flex justify-center items-center" style="z-index: 99990999999999" >
-    
-   <div class="flex flex-col gap-4">
-    <img :src="imageURL" class="max-h-[67vh]" alt="">
-    <button @click="downloadImage" class="px-4 py-2 bg-blue-500 text-white rounded">Download Image</button>
-   </div>
-
-     <div class="absolute bottom-10 right-10" >
-      <h2 @click="viewQr" class="text-white cursor-pointer">Close</h2>
-     </div>
-  </div>
-</div>
 </template>
 
-<style scoped>
+<style scoped lang="css">
 .mdc-button {
   border: 1px solid white;
-  background: transparent
-};
+  background: transparent;
+}
 
+img {
+  object-fit: cover;
+}
 </style>
-
-

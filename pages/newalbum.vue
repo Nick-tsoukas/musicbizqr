@@ -1,6 +1,9 @@
 <template>
-  <div class="container mx-auto ">
-    <h1 class="text-white text-2xl font-bold p-6">Create New Album</h1>
+  <div class="container mx-auto  px-6">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+    <h1 class="text-white text-2xl font-bold py-6">Create New Album</h1>
     <form @submit.prevent="submitNewAlbum">
       <div class="form-group">
         <div class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
@@ -63,6 +66,8 @@
 </template>
 
 <script setup>
+import { FaceSmileIcon } from '@heroicons/vue/24/outline';
+
 
 
 const router = useRouter();
@@ -70,7 +75,7 @@ const client = useStrapiClient();
 const user = useStrapiUser();
 const route = useRoute();
 const {update } = useStrapi()
-
+const loading = ref(false)
 const newAlbum = ref({
   title: '',
   releaseDate: '',
@@ -99,6 +104,7 @@ const addSong = () => {
 
 const submitNewAlbum = async () => {
   try {
+    loading.value = true
     const albumForm = new FormData();
     const albumData = {
       title: newAlbum.value.title,
@@ -133,6 +139,7 @@ const submitNewAlbum = async () => {
 
     router.push('/dashboard'); // Redirect to albums page after successful creation
   } catch (error) {
+    loading.value = false
     console.error('Error creating new album:', error);
   }
 };

@@ -25,7 +25,7 @@
      
         <div class=" mx-auto  w-[90vw]  px-6 py-10 2xl:flex   2xl:gap-x-10 2xl:px-8 ">
           <div class="mx-auto w-full 2xl:w-[45%]   lg:mx-0 text-white lg:flex-auto ">
-            <h1 class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center   text-white font-extrabold tracking-tight text-7xl  md:text-8xl lg:text-left ">Get your sound out</h1>
+            <h1 class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center text-white  font-extrabold tracking-tight text-7xl  md:text-8xl lg:text-left ">Music Biz Qr</h1>
             <div class="flex justify-center mb-12 2xl:hidden" >
               <img src="@/assets/qrcode.png" alt="" class="h-[350px]" >
             </div>

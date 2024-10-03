@@ -1,7 +1,12 @@
 <template>
-  <div class="bg-[#000] w-[90vw] mx-auto">
+  <div class="bg-[#000] w-[90vw] mx-auto z-0">
+
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+
     <div class="container-mdc bg-black max-w-5xl ">
-    <h1 class="title text-black">Create Band Profile</h1>
+    <h1 class="title text-white ">Create Band Profile</h1>
  
     <form class="form-group"  @submit.prevent="submitForm">
       <!-- Band Details Section -->
@@ -150,6 +155,7 @@ const client = useStrapiClient();
 const { update } = useStrapi();
 const user = useStrapiUser();
 
+const loading = ref(false)
 const bandName = ref('');
 const genre = ref('');
 const bio = ref('');
@@ -185,6 +191,7 @@ const removeMember = (index) => {
 
 const submitForm = async () => {
   try {
+    loading.value = true
     console.log('Submitting form with values:');
     console.log('Band Name:', bandName.value);
     console.log('Genre:', genre.value);
@@ -253,12 +260,13 @@ const submitForm = async () => {
     console.log('Band profile created successfully:', bandData);
     router.push('/dashboard'); // Redirect to dashboard
   } catch (error) {
+    loading.value = false
     console.error('Error creating band profile:', error);
   }
 };
 </script>
 
-<style scoped>
+<style >
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

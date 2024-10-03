@@ -30,7 +30,7 @@ const qrcode = ref(null)
 const link = ref(null)
 const color = ref('#ffffff')
 const name = ref('name')
-
+const loading = ref(false)
 const options = reactive({
   width: 300,
   height: 300,
@@ -113,6 +113,7 @@ onMounted(() => {
 })
 const saveQrCode = async () => {
   try {
+    loading.value = true
   
 
     const form = {
@@ -159,10 +160,12 @@ const saveQrCode = async () => {
         router.push('/dashboard');
       }
     } else {
+      loading.value= false
       console.error('QR code was not saved, no ID found.');
     }
 
   } catch (error) {
+    loading.value = false;
     console.error('Error during QR code save:', error.response ? error.response.data : error);
   }
 };
@@ -174,6 +177,9 @@ watch(() => options, updateQrCode, { deep: true })
 
 <template  class="container mx-auto " >
   <div class="flex flex-col items-center p-4  max-w-5xl  mx-auto ">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
     <div class="mt-4 flex flex-col space-y-4 w-full  ">
    <div class="bg-white rounded-md " >

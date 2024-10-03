@@ -11,6 +11,41 @@ html {
   background: black;
 }
 
+/* Neon green spinner */
+.spinner {
+  border: 8px solid rgba(0, 255, 0, 0.2); /* Light neon green border */
+  border-top: 8px solid #00ff00; /* Neon green border at the top */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+
+}
+
+/* Keyframes for the spin animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading container to center the spinner */
+.loading-container {
+  position: fixed; /* Fixes the container to the viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex; /* To center the spinner */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  background-color: rgba(0, 0, 0, 0.5); /* Optional background */
+  z-index: 99999999999999; /* Make sure it's on top of other content */
+}
+
 /* phone  */
 .phone-mockup {
   width: 300px;
@@ -138,21 +173,6 @@ html {
   .mdc-text-field__input:focus ~ .mdc-line-ripple {
     transform: scaleX(1);
   }
-
-  /*  spinner */
-  .spinner {
-    border: 4px solid rgba(0, 255, 0, 0.3); /* Light green border */
-    border-top: 4px solid #39ff14; /* Neon green top */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
   
   /* Button Styling */
   .mdc-button {
@@ -175,7 +195,7 @@ html {
   }
 
   .form-group {
-    padding: 1.5rem;
+   
     margin-bottom: 2rem;
     border: 1px solid black;
     border-radius: 8px;

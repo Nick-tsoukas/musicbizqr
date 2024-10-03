@@ -1,5 +1,8 @@
 <template>
   <div class="bg-[#000] w-[90vw] mx-auto">
+    <div v-if="loading" class="loading-container">
+  <div class="spinner"></div>
+</div>
     <div class="container-mdc bg-black max-w-5xl">
       <h1 class="title text-white">Create Streaming Links</h1>
 
@@ -86,6 +89,7 @@ const soundcloud = ref('');
 const youtubeMusic = ref('');
 const img = ref(null);
 const imgUrl = ref(null);
+const loading = ref(false)
 
 // Function to handle image upload
 const handleImageUpload = (event) => {
@@ -97,6 +101,7 @@ const handleImageUpload = (event) => {
 // Function to handle form submission
 const submitForm = async () => {
   try {
+    loading.value = true
     console.log('creating stream')
     // Create the form object with streaming link values
     const form = {
@@ -133,12 +138,13 @@ const submitForm = async () => {
     console.log('Streaming links created successfully:');
     router.push('/dashboard'); // Redirect to dashboard or another page
   } catch (error) {
+    loading.value = false;
     console.error('Error creating streaming links:', error);
   }
 };
 </script>
 
-<style scoped>
+<style >
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

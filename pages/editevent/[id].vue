@@ -119,6 +119,7 @@ const route = useRoute();
 const router = useRouter();
 const client = useStrapiClient();
 const user = useStrapiUser();
+const loading = ref(false)
 
 const event = ref({
   title: '',
@@ -162,6 +163,7 @@ const handleEventImageUpload = (e) => {
 const submitEditEvent = async () => {
   const eventId = route.params.id;
   try {
+    loading.value = true;
     const eventForm = new FormData();
     const eventData = {
       title: event.value.title ?? undefined,
@@ -193,6 +195,7 @@ const submitEditEvent = async () => {
 
     router.push('/dashboard');
   } catch (error) {
+    loading.value = false
     console.error('Error updating event:', error);
   }
 };

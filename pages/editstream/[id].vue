@@ -1,6 +1,8 @@
 <template>
   <div class="container mx-auto max-w-5xl px-6 mb-10">
-  
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <h1 class="text-white text-3xl font-bold mb-10 text-center pt-6 md:text-left">Edit Stream</h1>
     <form @submit.prevent="submitEditStream">
       <!-- Stream Details Section -->
@@ -71,7 +73,7 @@
 const route = useRoute();
 const router = useRouter();
 const client = useStrapiClient();
-
+const loading = ref(false)
 const stream = ref({
   title: '',
   description: '',
@@ -117,6 +119,7 @@ const handleStreamImageUpload = (e) => {
 const submitEditStream = async () => {
   const streamId = route.params.id;
   try {
+    loading.value = true;
     const streamForm = new FormData();
     const streamData = {
       title: stream.value.title ?? undefined,
@@ -139,6 +142,7 @@ const submitEditStream = async () => {
 
     router.push('/dashboard');
   } catch (error) {
+    loading.value = false;
     console.error('Error updating stream:', error);
   }
 };

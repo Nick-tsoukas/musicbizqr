@@ -1,52 +1,84 @@
 <script setup >
-const { register, login } = useStrapiAuth()
-const router = useRouter()
-const route = useRoute()
+const { register } = useStrapiAuth();
+const router = useRouter();
+const route = useRoute();
 
 const { values, defineField } = useForm();
-const [email, emailAttrs] = defineField('email')
-const [password, passwordAttrs] = defineField('password')
+const [email, emailAttrs] = defineField('email');
+const [password, passwordAttrs] = defineField('password');
 
 const signUp = async () => {
   try {
-    console.log(values.email, values.password)
-    await register({ username: values.email, email: values.email, password: values.password })
-    router.push('/dashboard')
+    console.log(values.email, values.password);
+    await register({ username: values.email, email: values.email, password: values.password });
+    router.push('/dashboard');
   } catch (e) {
-    console.error('Registration error:', e.response ? e.response.data : e)
+    console.error('Registration error:', e.response ? e.response.data : e);
   }
-}
-
-
+};
 </script>
 
 <template>
-  
-   <div class="flex justify-center items-center w-screen h-screen" >
-    <div class="flex flex-col w-[80vw]  rounded shadow-md p-8 border border-neon-purpule">
-      <div>
+  <div class="flex justify-center items-center w-screen custom_height">
+    <div class="container-mdc">
+      <div class="bg-white p-8 rounded-sm">
         <div>
-          <h2 class="text-xl mb-6">Sign up</h2>
+          <h2 class="text-xl mb-6 text-black font-semibold">Sign Up</h2>
         </div>
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+        <div class="mdc-text-field mdc-text-field--filled mb-4">
           <input id="email" v-model="email" v-bind="emailAttrs" type="text" class="mdc-text-field__input" placeholder="Enter your email" />
+          <label for="email" class="mdc-floating-label">Email</label>
+          <span class="mdc-line-ripple"></span>
+          <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearForm" />
         </div>
-        <div class="mb-8">
-          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+        <div class="mdc-text-field mdc-text-field--filled mb-8">
           <input id="password" v-model="password" v-bind="passwordAttrs" type="text" class="mdc-text-field__input" placeholder="Create a password" />
+          <label for="password" class="mdc-floating-label">Password</label>
+          <span class="mdc-line-ripple"></span>
+          <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearForm" />
         </div>
-        <div >
-          <button @click="signUp" class="btn w-full mb-4">
-            Sign up
+        <div>
+          <button @click="signUp" class="mdc-button mdc-button--raised w-full mb-4">
+            Sign Up
           </button>
-          <p class="text-right">Already have an account? <NuxtLink to="login" class="text-underline text-blue-800 ">LOGIN</NuxtLink></p>
+          <p class="text-right">Already have an account? <NuxtLink to="/login" class="text-underline text-blue-800">LOGIN</NuxtLink></p>
         </div>
       </div>
     </div>
-      
-    
-   </div>
-  
-  
+  </div>
 </template>
+
+<style scoped>
+.custom_height {
+  height: calc(100vh - 89px);
+}
+
+
+
+.mdc-text-field__input {
+  padding: 0.75rem;
+  border: 1px solid #000;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.mdc-button {
+  background-color: #6200ee;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+}
+
+.mdc-button:hover {
+  background-color: #3700b3;
+}
+
+.cancel-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+</style>

@@ -1,5 +1,8 @@
 <template>
   <div class="bg-[#000] w-[90vw] mx-auto">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
     <div class="container-mdc bg-black max-w-5xl">
       <h1 class="title text-black">Edit Band</h1>
       <form @submit.prevent="submitEditBand" class=" rounded-md p-4">
@@ -104,6 +107,7 @@ const router = useRouter();
 const { findOne } = useStrapi();
 const user = useStrapiUser();
 const client = useStrapiClient();
+const loading = ref(false)
 
 const band = ref({
   name: '',
@@ -156,6 +160,7 @@ const handleBandImageUpload = (e) => {
 const submitEditBand = async () => {
   const bandId = route.params.id;
   try {
+    loading.value = true;
     const bandForm = new FormData();
     const bandData = {
       name: band.value.name,
@@ -183,6 +188,7 @@ const submitEditBand = async () => {
 
     router.push('/dashboard');
   } catch (error) {
+    loading.value = false
     console.error('Error updating band:', error);
   }
 };
