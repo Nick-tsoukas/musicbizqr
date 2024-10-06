@@ -14,6 +14,7 @@ const tours = ref([]);
 const albums = ref([]);
 const streams = ref([]);
 const socials = ref([]);
+const videos = ref([])
 
 const fetchData = async () => {
   if (user.value) {
@@ -26,6 +27,7 @@ const fetchData = async () => {
         fetchAlbums(),
         fetchStreams(),
         fetchSocials(),
+        fetchVideos()
       ]);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -143,6 +145,39 @@ const fetchStreams = async () => {
   }
 };
 
+const fetchVideos = async () => {
+  try {
+    // const response = await find('videos', {
+   
+    //   filters: {
+    //     users_permissions_user: {
+    //       id: {
+    //         $eq: user.value.id,  // Ensure this filters based on the authenticated user ID
+    //       },
+    //     },
+    //   },
+    //   populate: {
+    //     oembed: true,           // Populate oembed field
+    //     users_permissions_user: true, // Populate user relation
+    //   },
+    // });
+    const response = await find('videos', {
+  filters: {
+    users_permissions_user: {
+      id: {
+        $eq: user.value.id,
+      },
+    },
+  },
+});
+
+    videos.value = response.data;  // Store fetched video data in `videos`
+    console.log(response.data, 'Fetched videos data');
+  } catch (error) {
+    console.error('Error fetching videos:', error);
+  }
+};
+
 const fetchAlbums = async () => {
   try {
     const response = await find('albums', {
@@ -218,6 +253,13 @@ const qrItems = computed(() =>
   }))
 );
 
+const videoItems = computed(() =>
+  videos.value.map((qr) => ({
+    id: video.id,
+    title: video.attributes.title,
+  }))
+);
+
 const bandItems = computed(() =>
   bands.value.map((band) => ({
     id: band.id,
@@ -261,9 +303,10 @@ const albumItems = computed(() =>
 const streamItems = computed(() =>
   streams.value.map((stream) => ({
     id: stream.id,
-    title: stream.attributes.title,
-    imageUrl: stream.attributes.image?.data?.attributes?.url || '',
+    title: stream.attributes.bandTitle,
+    imageUrl: stream.attributes.img?.data?.attributes?.url || '',
   }))
+  
 );
 </script>
 
@@ -588,6 +631,51 @@ const streamItems = computed(() =>
         </div>
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Stream</h2>
+        </div>
+      </div>
+
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="videoItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Streams List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Video page</h2>
+          <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video
+          </NuxtLink>
+        </div>
+
+        <ul class="px-6 py-6">
+          <li v-for="video in videoItems" :key="video.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <!-- <img :src="stream.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"> -->
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ video.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/video/${video.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editvideo/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(video.id, 'video')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Streams -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos Pages</h2>
+          <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video Grid
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Video Page</h2>
         </div>
       </div>
 

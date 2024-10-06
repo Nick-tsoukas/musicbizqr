@@ -1,6 +1,6 @@
 <template>
   <div v-if="tour" class="container mx-auto px-4 py-8">
-    <div class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-6">
+    <div  class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-6">
       <img
         :src="tourImage"
         alt="Tour Hero Image"
@@ -12,13 +12,19 @@
     </div>
 
     <section v-if="tour" class="mt-8">
-          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Description</h2>
+      <h2 class="text-2xl md:text-4xl text-white font-semibold my-4">Bands</h2>
+      <p v-if="tour.attributes.description" class="text-lg md:text-2xl text-white">{{ tour.attributes.bands.data[0].attributes.name }}</p>
+          <h2 class="text-2xl md:text-4xl text-white font-semibold my-4">Description</h2>
           <p v-if="tour.attributes.description" class="text-lg md:text-2xl text-white">{{ tour.attributes.description }}</p>
-        
-        </section>
+
+          <h2 class="text-2xl md:text-4xl text-white font-semibold my-4">Tour Date</h2>
+          <p v-if="tour.attributes.description" class="text-lg md:text-2xl text-white">From {{ tour.attributes.startDate }} - {{ tour.attributes.endDate }}</p>
+          
+
+    </section>
 
     <h2 class="text-3xl font-bold text-center mb-8">Upcoming Tour Events</h2>
-    <div class="space-y-8">
+    <div v-if="events" class="space-y-8 ">
       <div
         v-for="(event, index) in events"
         :key="index"
@@ -67,16 +73,32 @@ onMounted(async () => {
   try {
     const response = await findOne('tours', route.params.id, {
       populate: {
-      
+        bands: true,
+        image: true,
         events: {
           populate: 'image'
         }
       }
     });
+    // Set the tour data
     tour.value = response.data;
+    console.log(response.data)
+    // Set the tour title
     tourTitle.value = tour.value.attributes.title;
-    tourImage.value = tour.value.attributes.events.data[0]?.attributes.image.data.attributes.url;
+
+    // Check if the tour has a main image and set it
+    if (tour.value.attributes.image?.data) {
+      tourImage.value = tour.value.attributes.image.data.attributes.url;
+    }
+
+    // // Check if there are events with images and set the first event's image (optional)
+    // if (tour.value.attributes.events?.data[0]?.attributes.image?.data) {
+    //   firstEventImage.value = tour.value.attributes.events.data[0].attributes.image.data.attributes.url;
+    // }
+
+    // Set the events array
     events.value = tour.value.attributes.events.data;
+    console.log(events.value, 'this is events ')
   } catch (error) {
     console.error(error);
   }
