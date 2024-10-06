@@ -656,7 +656,7 @@ const streamItems = computed(() =>
               <button @click="router.push(`/video/${video.id}`)" class="text-blue-600 hover:text-blue-900">
                 <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
-              <button @click="router.push(`/editvideo/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+              <button @click="router.push(`/editvideo/${video.id}`)" class="text-blue-600 hover:text-blue-900">
                 <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
               <button @click="deleteItem(video.id, 'video')" class="text-red-600 hover:text-red-800">
