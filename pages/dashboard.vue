@@ -145,38 +145,87 @@ const fetchStreams = async () => {
   }
 };
 
+// const fetchVideos = async () => {
+//   try {
+//     // const response = await find('videos', {
+   
+//     //   filters: {
+//     //     users_permissions_user: {
+//     //       id: {
+//     //         $eq: user.value.id,  // Ensure this filters based on the authenticated user ID
+//     //       },
+//     //     },
+//     //   },
+//     //   populate: {
+//     //     oembed: true,           // Populate oembed field
+//     //     users_permissions_user: true, // Populate user relation
+//     //   },
+//     // });
+//     const response = await find('videos', {
+//   filters: {
+//     users_permissions_user: {
+//       id: {
+//         $eq: user.value.id,
+//       },
+//     },
+//   },
+// });
+
+//     videos.value = response.data;  // Store fetched video data in `videos`
+//     console.log(response.data, 'Fetched videos data');
+//   } catch (error) {
+//     console.error('Error fetching videos:', error);
+//   }
+// };
+
+// const fetchVideos = async () => {
+//   try {
+//     const response = await find('videos', {
+//       filters: {
+//         users_permissions_user: {
+//           id: {
+//             $eq: user.value.id,
+//           },
+//         },
+//       },
+//       populate: {
+//         oembeds: {
+//           populate: '*', // Populate all fields within the oembeds component
+//         },
+//         bandimg: true, // Populate band image if needed
+//       },
+//     });
+
+//     videos.value = response.data;
+//     console.log(response.data, 'Fetched videos data');
+//   } catch (error) {
+//     console.error('Error fetching videos:', error);
+//   }
+// };
 const fetchVideos = async () => {
   try {
-    // const response = await find('videos', {
-   
-    //   filters: {
-    //     users_permissions_user: {
-    //       id: {
-    //         $eq: user.value.id,  // Ensure this filters based on the authenticated user ID
-    //       },
-    //     },
-    //   },
-    //   populate: {
-    //     oembed: true,           // Populate oembed field
-    //     users_permissions_user: true, // Populate user relation
-    //   },
-    // });
     const response = await find('videos', {
-  filters: {
-    users_permissions_user: {
-      id: {
-        $eq: user.value.id,
+      filters: {
+        users_permissions_user: {
+          id: {
+            $eq: user.value.id, // Filter by the logged-in user
+          },
+        },
       },
-    },
-  },
-});
+      populate: {
+        youtubevideos: true,  // Populate the repeatable youtubevideos component
+        bandimg: true,        // Populate the band image media field
+        users_permissions_user: true, // Optionally populate the user relation if needed
+      },
+    });
 
-    videos.value = response.data;  // Store fetched video data in `videos`
+    videos.value = response.data;
     console.log(response.data, 'Fetched videos data');
   } catch (error) {
     console.error('Error fetching videos:', error);
   }
 };
+
 
 const fetchAlbums = async () => {
   try {
@@ -253,12 +302,62 @@ const qrItems = computed(() =>
   }))
 );
 
+// const videoItems = computed(() =>
+//   videos.value.map((video) => ({
+//     id: video.id,
+//     title: video.attributes.title,
+//     oembedData: JSON.parse(video.attributes.oembed) 
+//   }))
+// );
+
+// const videoItems = computed(() =>
+//   videos.value.map((video) => ({
+//     id: video.id,
+//     title: video.attributes.bandname || 'No Band Name',
+//     bandlink: video.attributes.bandlink || '',
+//     bandimgUrl: video.attributes.bandimg?.data?.attributes?.url || '',
+//     oembeds: JSON.parse(video.attributes.oembed) || [],
+//   }))
+// );
+
+// const videoItems = computed(() =>
+//   videos.value.map((video) => ({
+//     id: video.id,
+//     title: video.attributes.bandname || 'No Band Name',
+//     bandlink: video.attributes.bandlink || '',
+//     bandimgUrl: video.attributes.bandimg?.data?.attributes?.formats?.medium?.url || 
+//                 video.attributes.bandimg?.data?.attributes?.url || '',
+//     oembeds: video.attributes.oembeds.map((embed) => ({
+//       ...JSON.parse(embed.oembed),
+//     })) || [],  // Parse each oembed JSON string in the oembeds array
+//   }))
+// );
+
 const videoItems = computed(() =>
-  videos.value.map((qr) => ({
+  videos.value.map((video) => ({
     id: video.id,
-    title: video.attributes.title,
+    title: video.attributes.bandname || 'No Band Name',
+    bandlink: video.attributes.bandlink || '',
+    bandimgUrl: video.attributes.bandimg?.data?.attributes?.formats?.medium?.url || 
+                video.attributes.bandimg?.data?.attributes?.url || '',
+    
+    // Fetch thumbnails for each YouTube video
+    youtubeThumbnails: video.attributes.youtubevideos?.map((youtubeVideo) => {
+      const videoId = extractYouTubeId(youtubeVideo.youtube);
+      return {
+        videoId,
+        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      };
+    }) || [],
   }))
 );
+
+// Helper function to extract YouTube Video ID from a YouTube URL or ID string
+function extractYouTubeId(url) {
+  const regExp = /^.*(youtu.be\/|v\/|\/u\/\w\/|embed\/|watch\?v=|\&v=|youtube\.com\/v\/|youtube\.com\/embed\/|youtube\.com\/watch\?v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
 
 const bandItems = computed(() =>
   bands.value.map((band) => ({
@@ -312,6 +411,9 @@ const streamItems = computed(() =>
 
 <template>
   <div class="bg-[#000]">
+    <div class="bg-white text-black" >
+      <pre>{{ videoItems }}</pre>
+    </div>
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
 
@@ -634,50 +736,69 @@ const streamItems = computed(() =>
         </div>
       </div>
 
-      <div v-if="loading">
-        <SkeletonLoader />
-      </div>
-      <div v-else-if="videoItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Streams List -->
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Video page</h2>
-          <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video
-          </NuxtLink>
-        </div>
+    <!-- Videos Section -->
+<div v-if="loading">
+  <SkeletonLoader />
+</div>
 
-        <ul class="px-6 py-6">
-          <li v-for="video in videoItems" :key="video.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
-            <!-- <img :src="stream.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"> -->
-            <div class="flex-grow">
-              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ video.title }}</span>
-            </div>
-            <div class="flex items-center gap-4">
-              <button @click="router.push(`/video/${video.id}`)" class="text-blue-600 hover:text-blue-900">
-                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
-              </button>
-              <button @click="router.push(`/editvideo/${video.id}`)" class="text-blue-600 hover:text-blue-900">
-                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
-              </button>
-              <button @click="deleteItem(video.id, 'video')" class="text-red-600 hover:text-red-800">
-                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
-              </button>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Streams -->
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos Pages</h2>
-          <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video Grid
-          </NuxtLink>
-        </div>
+<div v-else-if="videoItems.length" class="mb-6 border-2 border-white rounded-lg">
+  <!-- Videos List -->
+  <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+    <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos</h2>
+    <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
+      <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video Grid
+    </NuxtLink>
+  </div>
+
+  <ul class="px-6 py-6">
+    <li
+      v-for="video in videoItems"
+      :key="video.id"
+      class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
+    >
+      <!-- Band Info -->
+      <div class="flex items-center flex-col gap-4 md:flex-row md:gap-0">
+        <img
+          v-if="video.bandimgUrl"
+          :src="video.bandimgUrl"
+          alt="Band Image"
+         class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+        >
         <div>
-          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Video Page</h2>
+          <h3 class="text-white font-semibold">{{ video.title }}</h3>
         </div>
       </div>
+
+     
+
+      <!-- Actions -->
+      <div class="flex items-center gap-4">
+        <button @click="router.push(`/video/${video.id}`)" class="text-blue-600 hover:text-blue-900">
+          <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+        </button>
+        <button @click="router.push(`/editvideo/${video.id}`)" class="text-blue-600 hover:text-blue-900">
+          <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+        </button>
+        <button @click="deleteItem(video.id, 'video')" class="text-red-600 hover:text-red-800">
+          <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+        </button>
+      </div>
+    </li>
+  </ul>
+</div>
+<div v-else class="mb-6 border-2 border-white rounded-lg">
+  <!-- No Videos -->
+  <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+    <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos Pages</h2>
+    <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
+      <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video Grid
+    </NuxtLink>
+  </div>
+  <div>
+    <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Video Page</h2>
+  </div>
+</div>
+
 
       <!-- VIEW QR Popup -->
       <div
