@@ -1,6 +1,7 @@
 <template>
-  <div v-if="band" class="bg-[#000] w-screen  mx-auto">
+  <div v-if="band && band.data " class="bg-[#000] w-screen  mx-auto">
     <!-- hero content  -->
+ 
     <div v-if="band" class="band-image-container relative w-screen max-h-[600px] p-5 flex flex-col md:flex-row ">
       <img
         class="w-[90vw] object-contain md:w-auto h-full rounded-lg lg:object-contain "  :src="band.data.attributes.bandImg.data.attributes.url"
@@ -8,7 +9,7 @@
       />
       <div class="w-full mx-auto flex-grow md:pl-6 md:mt-0">
         <h1 class=" text-white pl-0 mt-4  text-xl md:text-8xl font-bold ">{{ band.data.attributes.name }}</h1>
-        <p class="text-white pt-4 max-w-[80%]">{{ band.data.attributes.bio }}</p>
+        
         <div class="items-center absolute bottom-[1.5rem] justify-center md:justify-start bg-[#000] ">
         <!-- social grid -->
       <div class="flex justify-start gap-x-5 ">
@@ -150,7 +151,7 @@
           <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Tours</h1>
 
           <!-- Tours Slider -->
-          <div ref="toursSlider" class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
+          <div  class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
             <div v-for="tour in tours" :key="tour.id" class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white">
               <img
                 v-if="tour.attributes.image"
@@ -160,7 +161,7 @@
               />
               <div class="pt-5">
                 <!-- <p class="text-black mb-4">{{ tour.attributes.description ?? 'No description available' }}</p> -->
-                <p class="text-white text-sm">{{ new Date(tour.attributes.startDate ?? new Date()).toLocaleDateString() }} - {{ new Date(tour.attributes.endDate ?? new Date()).toLocaleDateString() }}</p>
+                <!-- <p class="text-white text-sm">{{ new Date(tour.attributes.startDate ?? new Date()).toLocaleDateString() }} - {{ new Date(tour.attributes.endDate ?? new Date()).toLocaleDateString() }}</p> -->
                 <button 
                 @click="router.push(`/tour/${tour.id}`)" 
                 class="mdc-button-green mt-2 w-full"
@@ -218,16 +219,27 @@
 
 
 
+
 <script setup>
-import { ref, onMounted } from 'vue';
-import { routerKey, useRoute } from 'vue-router';
+// import { ref, onMounted } from 'vue';
+// import { routerKey, useRoute } from 'vue-router';
 const { find, findOne } = useStrapi();
 const config = useRuntimeConfig(); // Access runtime configuration
 const apiUrl = config.public.strapiUrl; // Get the API base URL
 
+// const bandData = findOne('bands', route.params.id)
+// console.log(bandData, ' this is band data ')
+
+// const bandResponse = await fetch(
+//     `${apiUrl}/api/bands/${route.params.id}?populate[events][populate]=image&populate[tours][populate]=*&populate[albums][populate]=cover,songs.file&populate=bandImg`
+//   );
+//   const bandData = await bandResponse.json();
+//   band.value = bandData;
+
+
 const route = useRoute();
 const router = useRouter();
-const band = ref([null]);
+const band = ref([]);
 const albums = ref([]);
 const events = ref([]);
 const tours = ref([]);
@@ -243,11 +255,11 @@ const setAlbum = (id) => {
   }
 };
 
-const scrollSliderIntoView = (sliderRef) => {
-  if (window.innerWidth <= 640) {
-    sliderRef.value.scrollIntoView({ behavior: 'smooth' });
-  }
-};
+// const scrollSliderIntoView = (sliderRef) => {
+//   if (window.innerWidth <= 640) {
+//     sliderRef.value.scrollIntoView({ behavior: 'smooth' });
+//   }
+// };
 
 onMounted(async () => {
   document.body.classList.add('custom-page-body')
@@ -257,6 +269,8 @@ onMounted(async () => {
   );
   const bandData = await bandResponse.json();
   band.value = bandData;
+
+  console.log(bandData)
 
   // Fetching albums data
   if (band.value?.data?.attributes?.albums?.data?.length) {
@@ -279,10 +293,10 @@ onMounted(async () => {
   }
 
   // Start scrolling the sliders into view on mobile
-  const eventsSlider = ref('eventsSlider');
-  const toursSlider = ref('toursSlider');
-  scrollSliderIntoView(eventsSlider);
-  scrollSliderIntoView(toursSlider);
+  // const eventsSlider = ref('eventsSlider');
+  // const toursSlider = ref('toursSlider');
+  // scrollSliderIntoView(eventsSlider);
+  // scrollSliderIntoView(toursSlider);
 });
 onBeforeUnmount(() => {
   document.body.classList.remove('custom-page-body')

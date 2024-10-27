@@ -1,10 +1,9 @@
 # task list 
 
-- [] update button for upload on album page 
-- [] Add option to create new band on add album page 
-- [] change all images to nuxt img for preformance 
-- [] add more space between form containers 
-- [] add the right images for the homescreen phone  
+- [] fix loading icon on the create all my social links
+- [] loading icon on the create event page 
+- [] fix margins and padding layout on the create album page ... add more space 
+- [] give user indication of the song file ie list name of file and hide the button 
 
 
 

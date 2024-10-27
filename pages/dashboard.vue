@@ -412,7 +412,7 @@ const streamItems = computed(() =>
 <template>
   <div class="bg-[#000]">
     <div class="bg-white text-black" >
-      <pre>{{ videoItems }}</pre>
+      <!-- <pre>{{ videoItems }}</pre> -->
     </div>
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
@@ -482,6 +482,7 @@ const streamItems = computed(() =>
             <div class="flex-grow">
               <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ band.title }}</span>
             </div>
+        
             <div class="flex items-center gap-4">
               <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
                 <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
