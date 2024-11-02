@@ -9,7 +9,6 @@
       />
       <div class="w-full mx-auto flex-grow md:pl-6 md:mt-0">
         <h1 class=" text-white pl-0 mt-4  text-xl md:text-8xl font-bold ">{{ band.data.attributes.name }}</h1>
-        
         <div class="items-center absolute bottom-[1.5rem] justify-center md:justify-start bg-[#000] ">
         <!-- social grid -->
       <div class="flex justify-start gap-x-5 ">
