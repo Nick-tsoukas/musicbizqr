@@ -1,144 +1,526 @@
 <template>
-  <div class="list-container w-full mb-10">
-    <!-- Album img and band title -->
-    <div class="min-h-36 bg-black w-full flex p-6 gap-5" @click="playFirstSong">
-      <div class="h-24 w-24 rounded-lg bg-black">
-        <img :src="album.attributes.cover.data.attributes.url" alt="Album Cover" class="h-full w-full rounded-lg object-cover" />
-      </div>
-      <div>
-        <p class="text-white font-semibold text-xl">{{ album.attributes.title }}</p>
-        <p class="text-white text-lg">By Band Name</p> <!-- Adjust if band name is available -->
+  <div class="player-container">
+    <!-- Now Playing Section -->
+    <div class="now-playing">
+      <img
+        :src="albumCoverUrl"
+        alt="Album Cover"
+        class="album-cover"
+      />
+      <div class="song-info">
+        <h3 class="song-title">{{ currentSongTitle }}</h3>
+        <p class="artist-name">{{ artistName }}</p>
       </div>
     </div>
-    <!-- Play bar -->
-    <div class="flex bg-black items-center justify-end w-full min-h-10 px-6 gap-5 pb-4">
-      <img src="@/assets/back-icon.svg" alt="Previous" @click="previousSong">
-      <img src="@/assets/skip-icon.svg" alt="Next" @click="nextSong">
-      <img v-if="!playing" @click="togglePlay" src="@/assets/play-icon.svg" alt="Play">
-      <img v-if="playing" @click="togglePlay" src="@/assets/pause-icon.svg" alt="Pause">
+
+  
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <span class="current-time">{{ formatTime(currentTime) }}</span>
+      <input
+        type="range"
+        min="0"
+        :max="duration"
+        step="0.1"
+        v-model="currentTime"
+        @input="seekAudio"
+        class="progress-bar"
+      />
+      <span class="total-time">{{ formatTime(duration) }}</span>
     </div>
-    <!-- List of songs -->
-    <ul class="list w-full mb-10">
-      <li v-for="song in album.attributes.songs" :key="song.id" class="flex w-full text-white py-6 px-6 gap-2">
-        <div>
-          <img v-if="!playingSong(song)" @click="playSong(song)" src="@/assets/play-icon.svg" alt="Play">
-          <img v-if="playingSong(song)" @click="pauseSong" src="@/assets/pause-icon.svg" alt="Pause">
+
+      <!-- Playback Controls -->
+      <div class="controls">
+      <!-- Shuffle Button -->
+      <!-- <button @click="toggleShuffle" class="control-button">
+        <img
+          :src="shuffle ? shuffleActiveIcon : shuffleIcon"
+          alt="Shuffle"
+        />
+      </button> -->
+
+      <!-- Previous Button -->
+      <button @click="previousSong" class="control-button">
+        <img src="@/assets/previous-icon.svg" alt="Previous" />
+      </button>
+
+      <!-- Play/Pause Button -->
+      <button @click="togglePlay" class="control-button play-pause">
+        <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
+        <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
+      </button>
+
+      <!-- Next Button -->
+      <button @click="nextSong" class="control-button">
+        <img src="@/assets/next-icon.svg" alt="Next" />
+      </button>
+
+      <!-- Repeat Button -->
+      <!-- <button @click="toggleRepeat" class="control-button">
+        <img
+          :src="repeat ? repeatActiveIcon : repeatIcon"
+          alt="Repeat"
+        />
+      </button> -->
+    </div>
+
+    <!-- Volume Control -->
+    <!-- <div class="volume-control">
+      <button @click="toggleMute" class="volume-button">
+        <img :src="volumeIcon" alt="Volume" />
+      </button>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        v-model="volume"
+        @input="changeVolume"
+        class="volume-slider"
+      />
+    </div> -->
+
+    <!-- Song List -->
+    <ul class="song-list">
+      <li
+        v-for="(song, index) in album.attributes.songs"
+        :key="song.id"
+        :class="{ 'active-song': isCurrentSong(song) }"
+        @click="playSong(song)"
+      >
+        <div class="song-index">{{ index + 1 }}</div>
+        <div class="song-details">
+          <p class="song-title">{{ song.title }}</p>
+          <p class="artist-name">{{ artistName }}</p>
         </div>
-        <div class="grow flex items-center "><span class="text-white" >{{ song.title }}</span> </div>
-        <div class="text-white" >5:00</div> <!-- Adjust if duration is available -->
+        <div class="song-duration">{{ formatTime(song.duration) }}</div>
       </li>
     </ul>
-    <!-- Audio element -->
-    <audio ref="audioPlayer" @ended="nextSong" @loadeddata="onAudioLoaded" controls  class="w-full bg-black text-green-500 rounded-none"></audio>
+
+    <!-- Hidden Audio Element -->
+    <audio
+      ref="audioPlayer"
+      @timeupdate="updateTime"
+      @loadedmetadata="onAudioLoaded"
+      @ended="onSongEnded"
+    ></audio>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue'
 
-// Define props
+<script setup>
+
+
 const props = defineProps({
   album: {
     type: Object,
-    required: true
+    required: true,
+  },
+  placeholderImage: {
+    type: String,
+    default: '@/assets/placeholder-image.svg', // Provide a default placeholder image
+  },
+});
+
+const playing = ref(false);
+const currentSong = ref(null);
+const audioPlayer = ref(null);
+const currentTime = ref(0);
+const duration = ref(0);
+const volume = ref(1);
+const isMuted = ref(false);
+const shuffle = ref(false);
+const repeat = ref(false);
+
+// Computed property for album cover URL
+const albumCoverUrl = computed(() => {
+  try {
+    if (
+      currentSong.value &&
+      currentSong.value.cover &&
+      currentSong.value.cover.data &&
+      currentSong.value.cover.data.attributes &&
+      currentSong.value.cover.data.attributes.url
+    ) {
+      // If the current song has a cover image, use it
+      return currentSong.value.cover.data.attributes.url;
+    } else if (
+      props.album.attributes.cover &&
+      props.album.attributes.cover.data &&
+      props.album.attributes.cover.data.attributes &&
+      props.album.attributes.cover.data.attributes.url
+    ) {
+      // Otherwise, use the album cover
+      return props.album.attributes.cover.data.attributes.url;
+    } else {
+      // Fallback to the placeholder image
+      return props.placeholderImage;
+    }
+  } catch (error) {
+    // In case of any errors, use the placeholder image
+    return props.placeholderImage;
   }
-})
+});
 
-const playing = ref(false)
-const currentSong = ref(null)
-const audioPlayer = ref(null)
+// Computed property for current song title
+const currentSongTitle = computed(() => {
+  return currentSong.value && currentSong.value.title
+    ? currentSong.value.title
+    : 'Select a song';
+});
 
-// Initialize the audio player on mount
+// Computed property for artist name
+const artistName = computed(() => {
+  return props.album.attributes.artist || 'Unknown Artist';
+});
+
+// Method to check if a song is the current song
+const isCurrentSong = (song) => {
+  return currentSong.value && currentSong.value.id === song.id;
+};
+
+// Icons for volume control
+const volumeIcon = computed(() => {
+  if (isMuted.value || volume.value === 0) {
+    return '@/assets/volume-mute-icon.svg';
+  } else if (volume.value < 0.5) {
+    return '@/assets/volume-low-icon.svg';
+  } else {
+    return '@/assets/volume-high-icon.svg';
+  }
+});
+
+// Icons for shuffle and repeat
+const shuffleIcon = '@/assets/shuffle-icon.svg';
+const shuffleActiveIcon = '@/assets/shuffle-active-icon.svg';
+const repeatIcon = '@/assets/repeat-icon.svg';
+const repeatActiveIcon = '@/assets/repeat-active-icon.svg';
+
+// Initialize the audio player
 onMounted(() => {
   if (audioPlayer.value) {
-    audioPlayer.value.addEventListener('play', () => {
-      console.log('Audio playing')
-      playing.value = true
-    })
-    audioPlayer.value.addEventListener('pause', () => {
-      console.log('Audio paused')
-      playing.value = false
-    })
-    audioPlayer.value.addEventListener('ended', () => {
-      console.log('Audio ended')
-      nextSong()
-    })
+    audioPlayer.value.volume = volume.value;
   }
-})
+});
 
-// Handle the loadeddata event
-const onAudioLoaded = () => {
-  console.log('Audio loaded')
-  if (playing.value) {
-    audioPlayer.value.play()
-  }
-}
-
-// Play or pause the current song
-const togglePlay = () => {
-  if (playing.value) {
-    audioPlayer.value.pause()
-  } else {
-    audioPlayer.value.play()
-  }
-}
-
-const playSong = (song) => {
-  if (currentSong.value && currentSong.value.id === song.id) {
-    togglePlay()
-  } else {
-    currentSong.value = song
-    audioPlayer.value.src = song.file.data.attributes.url
-    playing.value = true
-  }
-}
-
-const pauseSong = () => {
-  audioPlayer.value.pause()
-}
-
-const playingSong = (song) => {
-  return currentSong.value && currentSong.value.id === song.id && playing.value
-}
-
-const nextSong = () => {
-  const currentIndex = album.attributes.songs.findIndex(s => s.id === currentSong.value.id)
-  const nextIndex = (currentIndex + 1) % album.attributes.songs.length
-  playSong(album.attributes.songs[nextIndex])
-}
-
-const previousSong = () => {
-  const currentIndex = album.attributes.songs.findIndex(s => s.id === currentSong.value.id)
-  const prevIndex = (currentIndex - 1 + album.attributes.songs.length) % album.attributes.songs.length
-  playSong(album.attributes.songs[prevIndex])
-}
-
-// Watch for changes in currentSong and update the audio player source
+// Watchers
 watch(currentSong, (newSong) => {
   if (newSong) {
-    audioPlayer.value.src = newSong.file.data.attributes.url
-    if (playing.value) {
-      audioPlayer.value.play()
+    audioPlayer.value.src = newSong.file.data.attributes.url;
+    audioPlayer.value.play();
+    playing.value = true;
+  }
+});
+
+watch(volume, (newVolume) => {
+  audioPlayer.value.volume = newVolume;
+  isMuted.value = newVolume === 0;
+});
+
+watch(isMuted, (muted) => {
+  audioPlayer.value.muted = muted;
+});
+
+// Methods
+const playSong = (song) => {
+  if (currentSong.value && currentSong.value.id === song.id) {
+    togglePlay();
+  } else {
+    currentSong.value = song;
+  }
+};
+
+const pauseSong = () => {
+  audioPlayer.value.pause();
+  playing.value = false;
+};
+
+const togglePlay = () => {
+  if (playing.value) {
+    pauseSong();
+  } else {
+    if (currentSong.value) {
+      audioPlayer.value.play();
+      playing.value = true;
+    } else {
+      // Play the first song if none is selected
+      playSong(props.album.attributes.songs[0]);
     }
   }
-})
+};
 
-// Play the first song of the album when the album is clicked
-const playFirstSong = () => {
-  if (album.attributes.songs.length > 0) {
-    playSong(album.attributes.songs[0])
+const nextSong = () => {
+  if (shuffle.value) {
+    playRandomSong();
+  } else {
+    const currentIndex = props.album.attributes.songs.findIndex(
+      (s) => s.id === currentSong.value.id
+    );
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= props.album.attributes.songs.length) {
+      nextIndex = 0; // Loop back to the first song
+    }
+    playSong(props.album.attributes.songs[nextIndex]);
   }
-}
+};
+
+const previousSong = () => {
+  const currentIndex = props.album.attributes.songs.findIndex(
+    (s) => s.id === currentSong.value.id
+  );
+  let prevIndex = currentIndex - 1;
+  if (prevIndex < 0) {
+    prevIndex = props.album.attributes.songs.length - 1; // Loop back to the last song
+  }
+  playSong(props.album.attributes.songs[prevIndex]);
+};
+
+const playRandomSong = () => {
+  const randomIndex = Math.floor(
+    Math.random() * props.album.attributes.songs.length
+  );
+  playSong(props.album.attributes.songs[randomIndex]);
+};
+
+const toggleShuffle = () => {
+  shuffle.value = !shuffle.value;
+};
+
+const toggleRepeat = () => {
+  repeat.value = !repeat.value;
+};
+
+const onSongEnded = () => {
+  if (repeat.value) {
+    audioPlayer.value.currentTime = 0;
+    audioPlayer.value.play();
+  } else {
+    nextSong();
+  }
+};
+
+const onAudioLoaded = () => {
+  duration.value = audioPlayer.value.duration;
+};
+
+const updateTime = () => {
+  currentTime.value = audioPlayer.value.currentTime;
+};
+
+const seekAudio = () => {
+  audioPlayer.value.currentTime = currentTime.value;
+};
+
+const changeVolume = () => {
+  isMuted.value = volume.value === 0;
+};
+
+const toggleMute = () => {
+  isMuted.value = !isMuted.value;
+  if (isMuted.value) {
+    volume.value = 0;
+  } else {
+    volume.value = audioPlayer.value.volume || 1;
+  }
+};
+
+// Format time in mm:ss
+const formatTime = (time) => {
+  if (!time && time !== 0) return '0:00';
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, '0');
+  return `${minutes}:${seconds}`;
+};
 </script>
 
 <style scoped>
-.list-container {
-  @apply  bg-[#000] shadow-md rounded-lg;
+.player-container {
+  display: flex;
+  flex-direction: column;
+  background-color: black;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  max-width: auto;
+  margin: auto;
 }
 
+/* Now Playing Section */
+.now-playing {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 
+.album-cover {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  margin-right: 1rem;
+}
 
-/* .list {
-  @apply divide-y divide-gray-200;
-} */
+.song-info {
+  flex-grow: 1;
+}
+
+.song-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.artist-name {
+  font-size: 1rem;
+  color: #b3b3b3;
+  margin: 0;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+}
+
+.control-button {
+  background: none;
+  border: none;
+  margin: 0 0.5rem;
+  cursor: pointer;
+}
+
+.control-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.play-pause img {
+  width: 32px;
+  height: 32px;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.current-time,
+.total-time {
+  width: 40px;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  margin: 0 0.5rem;
+  appearance: none;
+  height: 4px;
+  background: #404040;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #1db954;
+  border-radius: 50%;
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #1db954;
+  border-radius: 50%;
+}
+
+/* Volume Control */
+.volume-control {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.volume-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.volume-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.volume-slider {
+  width: 100px;
+  margin-left: 0.5rem;
+  appearance: none;
+  height: 4px;
+  background: #404040;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #1db954;
+  border-radius: 50%;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #1db954;
+  border-radius: 50%;
+}
+
+/* Song List */
+.song-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.song-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.song-list li:hover,
+.song-list li.active-song {
+  background-color: #282828;
+}
+
+.song-index {
+  width: 24px;
+  text-align: center;
+}
+
+.song-details {
+  flex-grow: 1;
+  padding-left: 0.5rem;
+}
+
+.song-duration {
+  width: 50px;
+  text-align: right;
+  font-size: 0.75rem;
+  color: #b3b3b3;
+}
 </style>
+
+
