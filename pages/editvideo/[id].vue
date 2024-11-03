@@ -101,8 +101,6 @@
 </template>
 
 <script setup>
-
-
 const route = useRoute();
 const router = useRouter();
 const client = useStrapiClient();
@@ -118,16 +116,27 @@ const existingImgUrl = ref(null);
 // Load the existing video data for editing
 const loadVideoData = async () => {
   try {
-    const { data } = await client(`/videos/${route.params.id}`, { method: 'GET', populate: '*' });
+    const { data } = await client(`/videos/${route.params.id}`, { method: 'GET', params: { populate: '*' } });
 
     videoTitle.value = data.attributes.title;
     bandname.value = data.attributes.bandname;
     bandlink.value = data.attributes.bandlink;
-    youtubevideos.value = data.attributes.youtube.map((video) => ({ youtube: video.video }));
+
+    // Update attribute names to match the new schema
+    if (data.attributes.mediayoutube) {
+      youtubevideos.value = data.attributes.mediayoutube.map((video) => ({ youtube: video.videoid }));
+    } else {
+      youtubevideos.value = [];
+    }
     console.log("Loaded youtube videos:", youtubevideos.value); // Debug log
 
+    // Adjust how you access bandImg.data
     if (data.attributes.bandImg?.data) {
-      existingImgUrl.value = data.attributes.bandImg.data[0]?.attributes.url;
+      if (Array.isArray(data.attributes.bandImg.data)) {
+        existingImgUrl.value = data.attributes.bandImg.data[0]?.attributes.url;
+      } else {
+        existingImgUrl.value = data.attributes.bandImg.data.attributes.url;
+      }
     }
   } catch (error) {
     console.error('Error loading video data:', error);
@@ -141,7 +150,7 @@ const submitForm = async () => {
       title: videoTitle.value,
       bandname: bandname.value,
       bandlink: bandlink.value,
-      youtube: youtubevideos.value.map(video => ({ video: video.youtube.trim() })),
+      mediayoutube: youtubevideos.value.map(video => ({ videoid: video.youtube.trim() })),
     };
 
     const formData = new FormData();

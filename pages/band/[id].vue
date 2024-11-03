@@ -19,7 +19,8 @@
 </div>
 
     <!-- album page content -->
-    <main class="pt-0 px-5 sm:p-5 ">
+ <div class="w-full px-6 md:max-w-[80vw]  md:mx-auto" >
+  <div class="pt-0 sm:p-5 ">
       <div>
         <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">Albums</h1>
         <section class="flex gap-4  overflow-x-scroll no-scrollbar">
@@ -62,7 +63,7 @@
           </div>
         </section>
 
-        <section v-if="albumPlay" class="w-full flex flex-col md:flex-row gap-4 my-20">
+        <section v-if="albumPlay" class="w-full flex flex-col xl:flex-row gap-4 my-20">
           <AudioPlayer :album="albumPlay" class="w-full md:w-[75%]  mx-0" />
           <div class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[25%] " >
             <h2 class="text-xl font-bold text-white" >   Streaming</h2>
@@ -135,7 +136,7 @@
           </div>
         </div>
       </div>
-    </main>
+    </div>
     <div class="h-52 flex items-center justify-center bg-[#000]">
       <div class="flex items-center justify-center gap-x-5">
         <a href="" aria-label="Find us on LinkedIn" target="_blank" rel="noopener">
@@ -174,7 +175,8 @@
 
         </a>
     </div>
-</div>
+    </div>
+ </div>
   </div>
 </template>
 

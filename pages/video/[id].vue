@@ -74,7 +74,6 @@
 
 import YouTube from 'vue3-youtube';
 
-
 const route = useRoute();
 const { findOne } = useStrapi();
 
@@ -92,7 +91,7 @@ const playerOptions = {
 
 // Function to extract YouTube video ID and create a thumbnail URL
 const getYouTubeThumbnail = (youtubeVideo) => {
-  const url = youtubeVideo.video;
+  const url = youtubeVideo.videoid; // Updated attribute name
   const videoIdMatch = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : '';
   return {
@@ -106,19 +105,19 @@ const fetchVideos = async () => {
   try {
     const response = await findOne('videos', route.params.id, {
       populate: {
-        youtube: true,
+        mediayoutube: true, // Updated attribute name
         bandImg: true,
       },
     });
 
     // Map video data for displaying
-    const thumbnails = response.data.attributes.youtube.map((youtubeVideo) => getYouTubeThumbnail(youtubeVideo));
+    const thumbnails = response.data.attributes.mediayoutube.map((youtubeVideo) => getYouTubeThumbnail(youtubeVideo));
     videoItems.value = [
       {
         id: response.id,
         title: response.data.attributes.bandname || 'No Band Name',
         bandlink: response.data.attributes.bandlink || '',
-        bandimgUrl: response.data.attributes.bandImg?.data?.[0]?.attributes?.url || '',
+        bandimgUrl: response.data.attributes.bandImg?.data?.attributes?.url || '',
         youtubeThumbnails: thumbnails,
       },
     ];

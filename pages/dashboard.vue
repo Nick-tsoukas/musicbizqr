@@ -203,20 +203,44 @@ const fetchStreams = async () => {
 //     console.error('Error fetching videos:', error);
 //   }
 // };
+// const fetchVideos = async () => {
+//   try {
+//     const response = await find('videos', {
+//       filters: {
+//         users_permissions_user: {
+//           id: {
+//             $eq: user.value.id, // Filter by the logged-in user
+//           },
+//         },
+//       },
+//       populate: {
+//         youtube: true,              // Populate the correct repeatable component field (youtube)
+//         bandImg: true,              // Populate the correct band image field (bandImg)
+//         users_permissions_user: true, // Populate the user relation if needed
+//       },
+//     });
+
+//     videos.value = response.data;
+//     console.log(response.data, 'Fetched videos data');
+//   } catch (error) {
+//     console.error('Error fetching videos:', error);
+//   }
+// };
+
 const fetchVideos = async () => {
   try {
     const response = await find('videos', {
       filters: {
-        users_permissions_user: {
+        users_permissions_users: {
           id: {
-            $eq: user.value.id, // Filter by the logged-in user
+            $eq: user.value.id,
           },
         },
       },
       populate: {
-        youtube: true,              // Populate the correct repeatable component field (youtube)
-        bandImg: true,              // Populate the correct band image field (bandImg)
-        users_permissions_user: true, // Populate the user relation if needed
+        mediayoutube: true,
+        bandImg: true,
+        users_permissions_users: true,
       },
     });
 
@@ -226,6 +250,8 @@ const fetchVideos = async () => {
     console.error('Error fetching videos:', error);
   }
 };
+
+// videoItems Computed Property
 
 
 
@@ -311,26 +337,50 @@ const qrItems = computed(() =>
 // }
 
 
+// const videoItems = computed(() =>
+//   videos.value.map((video) => ({
+//     id: video.id,
+//     title: video.attributes.bandname || 'No Band Name',
+//     bandlink: video.attributes.bandlink || '',
+    
+//     // Access the band image URL from the correct path
+//     bandimgUrl: video.attributes.bandImg?.data?.[0]?.attributes?.formats?.medium?.url || 
+//                 video.attributes.bandImg?.data?.[0]?.attributes?.url || '',
+
+//     // Fetch thumbnails for each YouTube video
+//     youtubeThumbnails: video.attributes.youtube?.map((youtubeVideo) => {
+//       const videoId = extractYouTubeId(youtubeVideo.video);
+//       return {
+//         videoId,
+//         thumbnailUrl: videoId
+//           ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+//           : '', // Fallback if videoId extraction fails
+//       };
+//     }) || [],
+//   }))
+// );
+
 const videoItems = computed(() =>
   videos.value.map((video) => ({
     id: video.id,
     title: video.attributes.bandname || 'No Band Name',
     bandlink: video.attributes.bandlink || '',
-    
-    // Access the band image URL from the correct path
-    bandimgUrl: video.attributes.bandImg?.data?.[0]?.attributes?.formats?.medium?.url || 
-                video.attributes.bandImg?.data?.[0]?.attributes?.url || '',
 
-    // Fetch thumbnails for each YouTube video
-    youtubeThumbnails: video.attributes.youtube?.map((youtubeVideo) => {
-      const videoId = extractYouTubeId(youtubeVideo.video);
-      return {
-        videoId,
-        thumbnailUrl: videoId
-          ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-          : '', // Fallback if videoId extraction fails
-      };
-    }) || [],
+    bandimgUrl:
+      video.attributes.bandImg?.data?.attributes?.formats?.medium?.url ||
+      video.attributes.bandImg?.data?.attributes?.url ||
+      '',
+
+    youtubeThumbnails:
+      video.attributes.mediayoutube?.map((youtubeVideo) => {
+        const videoId = extractYouTubeId(youtubeVideo.videoid);
+        return {
+          videoId,
+          thumbnailUrl: videoId
+            ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+            : '',
+        };
+      }) || [],
   }))
 );
 
@@ -750,7 +800,7 @@ const streamItems = computed(() =>
          class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
         >
         <div>
-          <h3 class="text-white font-semibold">{{ video.title }}</h3>
+          <h3 class="text-white font-semibold">{{ video.title }} </h3>
         </div>
       </div>
 

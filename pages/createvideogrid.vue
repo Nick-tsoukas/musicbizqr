@@ -152,12 +152,12 @@ const submitForm = async () => {
       title: videoTitle.value || null,
       bandname: bandname.value || null,
       bandlink: bandlink.value || null,
-      youtube: youtubevideos.value
+      mediayoutube: youtubevideos.value
         .filter(video => video.youtube.trim() !== '')
         .map(video => ({
-          video: video.youtube.trim() // Directly use the full URL
+          videoid: video.youtube.trim()
         })),
-      users_permissions_user: user.value.id,
+      users_permissions_users: user.value.id,
     };
 
     // Initialize FormData for files (band image)
@@ -181,5 +181,6 @@ const submitForm = async () => {
     console.error('Error creating video:', error);
   }
 };
+
 
 </script>
