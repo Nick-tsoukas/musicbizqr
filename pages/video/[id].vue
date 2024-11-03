@@ -1,10 +1,7 @@
 <template>
   <div class="max-w-full mx-auto p-4">
     <!-- Hero Section -->
-    <div
-      v-if="videoItems.length"
-      class="relative bg-black text-white rounded-lg overflow-hidden mb-8"
-    >
+    <div v-if="videoItems.length" class="relative bg-black text-white rounded-lg overflow-hidden mb-8">
       <img
         v-if="videoItems[0].bandimgUrl"
         :src="videoItems[0].bandimgUrl"
@@ -28,62 +25,45 @@
         :key="video.id"
         class="bg-black p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
       >
-        <!-- Responsive Video Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-6">
           <div
             v-for="(thumbnail, index) in video.youtubeThumbnails"
             :key="index"
             class="relative mb-4 rounded-lg overflow-hidden"
           >
-            <div v-if="playingVideos[thumbnail.videoId]">
-              <!-- Show YouTube iframe -->
-              <div class="relative aspect-video">
-                <YouTube
-                  :src="`https://www.youtube.com/watch?v=${thumbnail.videoId}`"
-                  :opts="playerOptions"
-                   width="100%"
-                   height="100%"
-                  class="absolute top-0 left-0 w-full h-full rounded-md"
-                />
-              </div>
+            <!-- Display YouTube player when video is playing -->
+            <div v-if="playingVideos[thumbnail.videoId]" class="relative aspect-video">
+              <YouTube
+                :src="thumbnail.videoId"
+                :width="640"
+                :height="360"
+                :vars="playerOptions"
+                @ready="onPlayerReady"
+                class="absolute top-0 left-0 w-full h-full rounded-md"
+              />
             </div>
-            <div v-else>
-              <!-- Show thumbnail image -->
-              <div
-                class="relative aspect-video cursor-pointer"
-                @click="playVideo(thumbnail.videoId)"
-              >
-                <img
-                  :src="thumbnail.thumbnailUrl"
-                  alt="Video Thumbnail"
-                  class="absolute top-0 left-0 w-full h-full object-cover rounded-md"
-                />
-                <!-- Play button overlay -->
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <svg
-                    class="w-16 h-16 text-white opacity-75"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 84 84"
-                  >
-                    <circle
-                      cx="42"
-                      cy="42"
-                      r="42"
-                      fill="rgba(0, 0, 0, 0.6)"
-                    />
-                    <polygon points="33,24 33,60 60,42" fill="white" />
-                  </svg>
-                </div>
+
+            <!-- Display thumbnail and play button when video is not playing -->
+            <div v-else class="relative aspect-video cursor-pointer" @click="playVideo(thumbnail.videoId)">
+              <img
+                :src="thumbnail.thumbnailUrl"
+                alt="Video Thumbnail"
+                class="absolute top-0 left-0 w-full h-full object-cover rounded-md"
+              />
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-16 h-16 text-white opacity-75" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 84 84">
+                  <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+                  <polygon points="33,24 33,60 60,42" fill="white" />
+                </svg>
               </div>
-              <h4 class="text-white font-semibold mt-4"> {{ videoMetadata[thumbnail.videoId] || 'Loading...' }}</h4>
+              <h4 class="text-white font-semibold mt-4">{{ videoMetadata[thumbnail.videoId] || 'Loading...' }}</h4>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Loading -->
+    <!-- No videos found message -->
     <div v-else class="text-white text-center">
       <p>No videos found. Please check back later.</p>
     </div>
@@ -94,85 +74,51 @@
 
 import YouTube from 'vue3-youtube';
 
-const loading = ref(true);
+
+const route = useRoute();
+const { findOne } = useStrapi();
+
 const videoItems = ref([]);
 const playingVideos = ref({});
-const videoMetadata = ref({}); // Store metadata for videos
-const { findOne } = useStrapi();
-const route = useRoute();
+const videoMetadata = ref({});
+const loading = ref(true);
 
 const playerOptions = {
-  playerVars: {
-    autoplay: 1,
-    rel: 0,
-    modestbranding: 1,
-    // Add other player variables as needed
-  },
+  autoplay: 1,
+  mute: 1,
+  rel: 0,
+  modestbranding: 1,
 };
 
+// Function to extract YouTube video ID and create a thumbnail URL
 const getYouTubeThumbnail = (youtubeVideo) => {
-  const url = youtubeVideo.youtube;
-  let videoId = '';
-
+  const url = youtubeVideo.video;
   const videoIdMatch = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
-  if (videoIdMatch && videoIdMatch[1]) {
-    videoId = videoIdMatch[1];
-  } else {
-    videoId = url.split('/').pop();
-  }
-
+  const videoId = videoIdMatch ? videoIdMatch[1] : '';
   return {
     videoId,
     thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-    title: youtubeVideo.title || 'No Title',
   };
 };
 
-const fetchVideoMetadata = async (videoId) => {
-  try {
-    const response = await $fetch(`/api/get-video-metadata?id=${videoId}`);
-    if (response.title) {
-      videoMetadata.value[videoId] = response.title;
-    } else {
-      console.error(`Error fetching metadata for video ID ${videoId}:`, response.error);
-      videoMetadata.value[videoId] = 'Unknown Title';
-    }
-  } catch (error) {
-    console.error(`Error fetching metadata for video ID ${videoId}:`, error);
-    videoMetadata.value[videoId] = 'Unknown Title';
-  }
-};
-
+// Fetch video data from Strapi
 const fetchVideos = async () => {
   try {
     const response = await findOne('videos', route.params.id, {
       populate: {
-        youtubevideos: true,
-        bandimg: true,
+        youtube: true,
+        bandImg: true,
       },
     });
 
-    const thumbnails =
-      response.data.attributes.youtubevideos?.map((youtubeVideo) => {
-        return getYouTubeThumbnail(youtubeVideo);
-      }) || [];
-
-    // Fetch metadata for each video
-    await Promise.all(
-      thumbnails.map(async (thumbnail) => {
-        await fetchVideoMetadata(thumbnail.videoId);
-      })
-    );
-
+    // Map video data for displaying
+    const thumbnails = response.data.attributes.youtube.map((youtubeVideo) => getYouTubeThumbnail(youtubeVideo));
     videoItems.value = [
       {
         id: response.id,
         title: response.data.attributes.bandname || 'No Band Name',
         bandlink: response.data.attributes.bandlink || '',
-        bandimgUrl:
-          response.data.attributes.bandimg?.data?.attributes?.formats?.large?.url ||
-          response.data.attributes.bandimg?.data?.attributes?.url ||
-          '',
+        bandimgUrl: response.data.attributes.bandImg?.data?.[0]?.attributes?.url || '',
         youtubeThumbnails: thumbnails,
       },
     ];
@@ -183,17 +129,26 @@ const fetchVideos = async () => {
   }
 };
 
+// Function to play video by setting its state in `playingVideos`
 const playVideo = (videoId) => {
   playingVideos.value[videoId] = true;
 };
 
-onMounted(async () => {
-  await fetchVideos();
+// // Enter full-screen mode when player is ready
+// const onPlayerReady = (event) => {
+//   const iframe = event.target.getIframe();
+//   if (iframe.requestFullscreen) {
+//     iframe.requestFullscreen();
+//   } else if (iframe.mozRequestFullScreen) { // Firefox
+//     iframe.mozRequestFullScreen();
+//   } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+//     iframe.webkitRequestFullscreen();
+//   } else if (iframe.msRequestFullscreen) { // IE/Edge
+//     iframe.msRequestFullscreen();
+//   }
+// };
+
+onMounted(() => {
+  fetchVideos();
 });
 </script>
-
-
-<style scoped>
-/* No additional styles needed */
-</style>
-

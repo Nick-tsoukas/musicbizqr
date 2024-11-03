@@ -39,6 +39,7 @@ const fetchData = async () => {
 
 const fetchBands = async () => {
   try {
+    console.log(user.value)
     const response = await find('bands', {
       filters: {
         users_permissions_user: {
@@ -213,9 +214,9 @@ const fetchVideos = async () => {
         },
       },
       populate: {
-        youtubevideos: true,  // Populate the repeatable youtubevideos component
-        bandimg: true,        // Populate the band image media field
-        users_permissions_user: true, // Optionally populate the user relation if needed
+        youtube: true,              // Populate the correct repeatable component field (youtube)
+        bandImg: true,              // Populate the correct band image field (bandImg)
+        users_permissions_user: true, // Populate the user relation if needed
       },
     });
 
@@ -225,6 +226,7 @@ const fetchVideos = async () => {
     console.error('Error fetching videos:', error);
   }
 };
+
 
 
 const fetchAlbums = async () => {
@@ -302,55 +304,37 @@ const qrItems = computed(() =>
   }))
 );
 
-// const videoItems = computed(() =>
-//   videos.value.map((video) => ({
-//     id: video.id,
-//     title: video.attributes.title,
-//     oembedData: JSON.parse(video.attributes.oembed) 
-//   }))
-// );
+// function extractYouTubeId(url) {
+//   const regExp = /^.*(youtu.be\/|v\/|\/u\/\w\/|embed\/|watch\?v=|youtube\.com\/v\/|youtube\.com\/embed\/|youtube\.com\/watch\?v=)([^#&?]*).*/;
+//   const match = url.match(regExp);
+//   return match && match[2].length === 11 ? match[2] : null;
+// }
 
-// const videoItems = computed(() =>
-//   videos.value.map((video) => ({
-//     id: video.id,
-//     title: video.attributes.bandname || 'No Band Name',
-//     bandlink: video.attributes.bandlink || '',
-//     bandimgUrl: video.attributes.bandimg?.data?.attributes?.url || '',
-//     oembeds: JSON.parse(video.attributes.oembed) || [],
-//   }))
-// );
-
-// const videoItems = computed(() =>
-//   videos.value.map((video) => ({
-//     id: video.id,
-//     title: video.attributes.bandname || 'No Band Name',
-//     bandlink: video.attributes.bandlink || '',
-//     bandimgUrl: video.attributes.bandimg?.data?.attributes?.formats?.medium?.url || 
-//                 video.attributes.bandimg?.data?.attributes?.url || '',
-//     oembeds: video.attributes.oembeds.map((embed) => ({
-//       ...JSON.parse(embed.oembed),
-//     })) || [],  // Parse each oembed JSON string in the oembeds array
-//   }))
-// );
 
 const videoItems = computed(() =>
   videos.value.map((video) => ({
     id: video.id,
     title: video.attributes.bandname || 'No Band Name',
     bandlink: video.attributes.bandlink || '',
-    bandimgUrl: video.attributes.bandimg?.data?.attributes?.formats?.medium?.url || 
-                video.attributes.bandimg?.data?.attributes?.url || '',
     
+    // Access the band image URL from the correct path
+    bandimgUrl: video.attributes.bandImg?.data?.[0]?.attributes?.formats?.medium?.url || 
+                video.attributes.bandImg?.data?.[0]?.attributes?.url || '',
+
     // Fetch thumbnails for each YouTube video
-    youtubeThumbnails: video.attributes.youtubevideos?.map((youtubeVideo) => {
-      const videoId = extractYouTubeId(youtubeVideo.youtube);
+    youtubeThumbnails: video.attributes.youtube?.map((youtubeVideo) => {
+      const videoId = extractYouTubeId(youtubeVideo.video);
       return {
         videoId,
-        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        thumbnailUrl: videoId
+          ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+          : '', // Fallback if videoId extraction fails
       };
     }) || [],
   }))
 );
+
+
 
 // Helper function to extract YouTube Video ID from a YouTube URL or ID string
 function extractYouTubeId(url) {

@@ -152,9 +152,11 @@ const submitForm = async () => {
       title: videoTitle.value || null,
       bandname: bandname.value || null,
       bandlink: bandlink.value || null,
-      youtubevideos: youtubevideos.value.filter(video => video.youtube.trim() !== '').map(video => ({
-        youtube: video.youtube
-      })),
+      youtube: youtubevideos.value
+        .filter(video => video.youtube.trim() !== '')
+        .map(video => ({
+          video: video.youtube.trim() // Directly use the full URL
+        })),
       users_permissions_user: user.value.id,
     };
 
@@ -163,7 +165,7 @@ const submitForm = async () => {
     formData.append('data', JSON.stringify(form));
 
     if (img.value) {
-      formData.append('files.bandimg', img.value);
+      formData.append('files.bandImg', img.value); // Use the correct field name for the image
     }
 
     // Submit the form
@@ -179,4 +181,5 @@ const submitForm = async () => {
     console.error('Error creating video:', error);
   }
 };
+
 </script>
