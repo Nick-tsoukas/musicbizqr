@@ -3,55 +3,81 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-    <div class=" bg-black ">
+    <div class="bg-black">
       <h1 class="title text-white">Create New Event</h1>
-      
+
       <form class="form-group" @submit.prevent="submitNewEvent">
-        
+
         <!-- Event Details Section -->
         <div class="bg-white rounded-md">
           <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
             <h2 class="font-semibold text-white text-2xl">Event Details</h2>
           </div>
           <div class="p-6">
+            <!-- Title -->
             <div class="mdc-text-field mb-4">
               <input type="text" id="new-event-title" class="mdc-text-field__input" v-model="newEvent.title" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-title">Event Title</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Description -->
             <div class="mdc-text-field mb-4">
               <textarea id="new-event-description" class="mdc-text-field__input" v-model="newEvent.description" placeholder=" "></textarea>
               <label class="mdc-floating-label" for="new-event-description">Event Description</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Date -->
             <div class="mdc-text-field mb-4">
               <input type="date" id="new-event-date" class="mdc-text-field__input" v-model="newEvent.date" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-date">Event Date</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Time -->
             <div class="mdc-text-field mb-4">
               <input type="time" id="new-event-time" class="mdc-text-field__input" v-model="newEvent.time" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-time">Event Time</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Venue -->
             <div class="mdc-text-field mb-4">
               <input type="text" id="new-event-venue" class="mdc-text-field__input" v-model="newEvent.venue" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-venue">Venue</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- City -->
             <div class="mdc-text-field mb-4">
               <input type="text" id="new-event-city" class="mdc-text-field__input" v-model="newEvent.city" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-city">City</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- State -->
             <div class="mdc-text-field mb-4">
               <input type="text" id="new-event-state" class="mdc-text-field__input" v-model="newEvent.state" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-state">State</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Address -->
             <div class="mdc-text-field mb-4">
               <input type="text" id="new-event-address" class="mdc-text-field__input" v-model="newEvent.address" placeholder=" " />
               <label class="mdc-floating-label" for="new-event-address">Street Address</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- Contact Email -->
+            <div class="mdc-text-field mb-4">
+              <input type="email" id="new-event-contact-email" class="mdc-text-field__input" v-model="newEvent.contactEmail" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-contact-email">Contact Email</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- Contact Phone -->
+            <div class="mdc-text-field mb-4">
+              <input type="tel" id="new-event-contact-phone" class="mdc-text-field__input" v-model="newEvent.contactPhone" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-contact-phone">Contact Phone</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- Age Restriction -->
+            <div class="mdc-text-field mb-4">
+              <input type="text" id="new-event-age-restriction" class="mdc-text-field__input" v-model="newEvent.ageRestriction" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-age-restriction">Age Restriction</label>
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
@@ -83,6 +109,51 @@
           </div>
         </div>
 
+        <!-- Social Media Links Section -->
+        <div class="bg-white rounded-md">
+          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Social Media Links</h2>
+          </div>
+          <div class="p-6">
+            <!-- Facebook -->
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="new-event-facebook" class="mdc-text-field__input" v-model="newEvent.facebook" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-facebook">Facebook URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- Twitter -->
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="new-event-twitter" class="mdc-text-field__input" v-model="newEvent.twitter" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-twitter">Twitter URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- Instagram -->
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="new-event-instagram" class="mdc-text-field__input" v-model="newEvent.instagram" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-instagram">Instagram URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- YouTube -->
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="new-event-youtube" class="mdc-text-field__input" v-model="newEvent.youtube" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-youtube">YouTube URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- TikTok -->
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="new-event-tiktok" class="mdc-text-field__input" v-model="newEvent.tiktok" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-tiktok">TikTok URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- Website -->
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="new-event-website" class="mdc-text-field__input" v-model="newEvent.website" placeholder=" " />
+              <label class="mdc-floating-label" for="new-event-website">Website URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Band Selection Section (Optional) -->
         <div class="bg-white rounded-md">
           <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
@@ -100,11 +171,13 @@
           </div>
         </div>
 
+        <!-- Submit Button -->
         <button type="submit" class="mdc-button w-full mt-10">Create Event</button>
       </form>
     </div>
   </div>
 </template>
+
 
 <script setup>
 
@@ -114,7 +187,8 @@ const route = useRoute();
 const client = useStrapiClient();
 const user = useStrapiUser();
 const { update } = useStrapi();
-const loading = ref(false)
+const loading = ref(false);
+
 const newEvent = ref({
   title: '',
   description: '',
@@ -128,11 +202,21 @@ const newEvent = ref({
   image: null,
   imageUrl: null,
   band: null,  // Optional association with band
+  contactEmail: '',
+  contactPhone: '',
+  ageRestriction: '',
+  facebook: '',
+  twitter: '',
+  instagram: '',
+  youtube: '',
+  tiktok: '',
+  website: '',
 });
 
 const bands = ref([]);
 
 const formatTime = (time) => {
+  if (!time) return '';
   const [hours, minutes] = time.split(':');
   return `${hours}:${minutes}:00.000`;
 };
@@ -158,6 +242,15 @@ const submitNewEvent = async () => {
       time: formatTime(newEvent.value.time),
       link: newEvent.value.link,
       users_permissions_user: user.value.id,
+      contactEmail: newEvent.value.contactEmail,
+      contactPhone: newEvent.value.contactPhone,
+      ageRestriction: newEvent.value.ageRestriction,
+      facebook: newEvent.value.facebook,
+      twitter: newEvent.value.twitter,
+      instagram: newEvent.value.instagram,
+      youtube: newEvent.value.youtube,
+      tiktok: newEvent.value.tiktok,
+      website: newEvent.value.website,
     };
 
     if (newEvent.value.band) {
@@ -183,8 +276,9 @@ const submitNewEvent = async () => {
 
     router.push('/dashboard');
   } catch (error) {
-    loading.value = false
     console.error('Error creating new event:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -205,6 +299,7 @@ onMounted(async () => {
   }
 });
 </script>
+
 
 <style scoped>
 @tailwind base;

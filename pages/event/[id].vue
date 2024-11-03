@@ -1,47 +1,121 @@
 <template>
-  <div>
-    <div v-if="eventData" class="container mx-auto my-10">
-      <div v-if="eventData.image" class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8">
-        <img
-          :src="eventData.image.data.attributes.url"
-          alt="Event Hero Image"
-          class="w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end p-4 rounded-b-lg">
-          <h1 class="text-4xl md:text-6xl text-white font-bold">{{ eventData.title }}</h1>
-        </div>
+  <div class="container mx-auto my-10 px-4">
+    <!-- Event Hero Section -->
+    <div v-if="eventData" class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8 shadow-lg">
+      <img
+        v-if="eventData.image && eventData.image.data"
+        :src="eventData.image.data.attributes.url"
+        alt="Event Hero Image"
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end p-4">
+        <h1 class="text-4xl md:text-6xl text-white font-bold">{{ eventData.title }}</h1>
       </div>
     </div>
 
-    <div class="container mx-auto px-4 md:px-0">
-      <div class="bg-white shadow-lg rounded-lg p-6 md:p-10 mb-10">
-        <section v-if="eventData.date" >
-          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Date & Time</h2>
-          <p class="text-lg md:text-2xl">{{ formatDate(eventData.date) }}</p>
-          <p class="text-lg md:text-2xl">{{ formatTime(eventData.time) }}</p>
+    <!-- Event Details Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Left Column -->
+      <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6">
+        <!-- Date & Time -->
+        <section v-if="eventData.date || eventData.time" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="far fa-calendar-alt gradient-icon mr-2"></i> Date & Time
+          </h2>
+          <p v-if="eventData.date" class="text-lg">{{ formatDate(eventData.date) }}</p>
+          <p v-if="eventData.time" class="text-lg">{{ formatTime(eventData.time) }}</p>
         </section>
 
-        <section class="mt-8">
-          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Description</h2>
-          <p class="text-lg md:text-2xl">{{ eventData.description }}</p>
+        <!-- Description -->
+        <section v-if="eventData.description" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
+          </h2>
+          <p class="text-lg">{{ eventData.description }}</p>
         </section>
 
-        <section class="mt-8">
-          <h2 class="text-2xl md:text-4xl font-semibold mb-2">Location</h2>
-          <p class="text-lg md:text-2xl">{{ eventData.venue }}</p>
-          <p class="text-lg md:text-2xl">{{ eventData.address }}</p>
-          <p class="text-lg md:text-2xl">{{ eventData.city }}, {{ eventData.state }}</p>
+        <!-- Location -->
+        <section v-if="eventData.venue || eventData.address || eventData.city || eventData.state" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-map-marker-alt gradient-icon mr-2"></i> Location
+          </h2>
+          <p v-if="eventData.venue" class="text-lg">{{ eventData.venue }}</p>
+          <p v-if="eventData.address" class="text-lg">{{ eventData.address }}</p>
+          <p v-if="eventData.city || eventData.state" class="text-lg">
+            {{ eventData.city }}<span v-if="eventData.city && eventData.state">, </span>{{ eventData.state }}
+          </p>
         </section>
 
-        <div class="mt-8">
-          <a :href="eventData.link" target="_blank" class="mdc-button ">
-            Ticket Link
+        <!-- Ticket Link -->
+        <div v-if="eventData.link" class="mt-8">
+          <a :href="eventData.link" target="_blank" class="mdc-button inline-flex items-center">
+            <i class="fas fa-ticket-alt gradient-icon mr-2"></i> Buy Tickets
           </a>
         </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <!-- Contact Information -->
+        <section v-if="eventData.contactEmail || eventData.contactPhone" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-address-book gradient-icon mr-2"></i> Contact
+          </h2>
+          <p v-if="eventData.contactEmail" class="text-lg flex items-center">
+            <i class="fas fa-envelope gradient-icon mr-2"></i> <a :href="`mailto:${eventData.contactEmail}`">{{ eventData.contactEmail }}</a>
+          </p>
+          <p v-if="eventData.contactPhone" class="text-lg flex items-center">
+            <i class="fas fa-phone mr-2 gradient-icon"></i> <a :href="`tel:${eventData.contactPhone}`">{{ eventData.contactPhone }}</a>
+          </p>
+        </section>
+
+        <!-- Age Restriction -->
+        <section v-if="eventData.ageRestriction" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-user-lock gradient-icon mr-2"></i> Age Restriction
+          </h2>
+          <p class="text-lg">{{ eventData.ageRestriction }}</p>
+        </section>
+
+        <!-- Social Media Links -->
+        <section v-if="hasSocialLinks" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-share-alt gradient-icon mr-2"></i> Follow Us
+          </h2>
+          <div class="flex space-x-4">
+            <a v-if="eventData.facebook" :href="eventData.facebook" target="_blank">
+              <i class="fab fa-facebook-square  text-2xl"></i>
+            </a>
+            <a v-if="eventData.twitter" :href="eventData.twitter" target="_blank">
+              <i class="fab fa-twitter-square  text-2xl"></i>
+            </a>
+            <a v-if="eventData.instagram" :href="eventData.instagram" target="_blank">
+              <i class="fab fa-instagram-square  text-2xl"></i>
+            </a>
+            <a v-if="eventData.youtube" :href="eventData.youtube" target="_blank">
+              <i class="fab fa-youtube-square  text-2xl"></i>
+            </a>
+            <a v-if="eventData.tiktok" :href="eventData.tiktok" target="_blank">
+              <i class="fab fa-tiktok  text-2xl"></i>
+            </a>
+            <a v-if="eventData.website" :href="eventData.website" target="_blank">
+              <i class="fas fa-globe  text-2xl"></i>
+            </a>
+          </div>
+        </section>
+
+        <!-- Band Information -->
+        <section v-if="eventData.band && eventData.band.data" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-music gradient-icon mr-2"></i> Band
+          </h2>
+          <p class="text-lg">{{ eventData.band.data.attributes.name }}</p>
+        </section>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 
@@ -54,39 +128,80 @@ const eventData = ref({});
 
 onMounted(async () => {
   try {
-    const { data: event } = await findOne('events', route.params.id, {
-      populate: {
-        image: true
-      }
+    const { data } = await findOne('events', route.params.id, {
+      populate: ['image', 'band'],
     });
-    eventData.value = event.attributes;
+    eventData.value = data.attributes;
+    // Include the band relation with attributes
+    if (data.attributes.band && data.attributes.band.data) {
+      eventData.value.band = data.attributes.band;
+    }
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching event data:', error);
   }
 });
 
 const formatDate = (dateStr) => {
-  console.log('Time String:', dateStr);
-
-  return format(parseISO(dateStr), 'MMMM d, yyyy');
+  if (!dateStr) {
+    return '';
+  }
+  try {
+    return format(parseISO(dateStr), 'MMMM d, yyyy');
+  } catch (error) {
+    console.error('Error parsing date:', error);
+    return dateStr;
+  }
 };
 
 const formatTime = (timeStr) => {
-  console.log('Time String:', timeStr);
-
-  const parsedTime = parse(timeStr, 'HH:mm:ss', new Date());
-  return format(parsedTime, 'hh:mm a');
+  if (!timeStr) {
+    return '';
+  }
+  try {
+    const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
+    return format(parsedTime, 'hh:mm a');
+  } catch (error) {
+    console.error('Error parsing time:', error);
+    return timeStr;
+  }
 };
 
+const hasSocialLinks = computed(() => {
+  return (
+    eventData.value.facebook ||
+    eventData.value.twitter ||
+    eventData.value.instagram ||
+    eventData.value.youtube ||
+    eventData.value.tiktok ||
+    eventData.value.website
+  );
+});
 </script>
 
+
+
 <style scoped>
-.mdc-button {
+.container {
+  max-width: 1200px;
+}
+
+.gradient-icon {
+  /* Set the icon size */
+  font-size: 1rem;
+  
+  /* Gradient background */
+  background: linear-gradient(to right, #ec4899, #8b5cf6);
+
+  -webkit-background-clip: text;
+  color: transparent;
   display: inline-block;
+}
+.mdc-button {
+  display: inline-flex;
+  align-items: center;
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
-  text-align: center;
   color: #fff;
   background-color: #6200ee;
   border: none;
@@ -99,6 +214,21 @@ const formatTime = (timeStr) => {
 }
 
 .shadow-lg {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-left: 1rem;
+}
+
+/* Additional styling for icons and layout */
 </style>
+

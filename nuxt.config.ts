@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css'],
+  css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css', '@fortawesome/fontawesome-free/css/all.css'],
   runtimeConfig: {
     public: {
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
@@ -46,6 +46,7 @@ export default defineNuxtConfig({
     cookieName: 'strapi_jwt'
   },
   plugins: [
-    '~/plugins/chart.js'
+    '~/plugins/chart.js',
+    '~/plugins/fontawesome.js'
   ]
 })
