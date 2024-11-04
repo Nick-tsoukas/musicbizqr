@@ -8,18 +8,50 @@ const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 
 const signUp = async () => {
-  try {
-    console.log(values.email, values.password);
-    await register({ username: values.email, email: values.email, password: values.password });
-    router.push('/dashboard');
-  } catch (e) {
-    console.error('Registration error:', e.response ? e.response.data : e);
-  }
+  // try {
+  //   console.log(values.email, values.password);
+  //   await register({ username: values.email, email: values.email, password: values.password });
+  //   router.push('/dashboard');
+  // } catch (e) {
+  //   console.error('Registration error:', e.response ? e.response.data : e);
+  // }
 };
 </script>
 
 <template>
-  <div class="flex justify-center items-center w-screen custom_height">
+  <div
+    class="w-full h-screen bg-black flex flex-col justify-center items-center text-white">
+    <h1 class="text-5xl">We are <b>Almost</b> there!</h1>
+   
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mt-10 lg:mt-20">
+
+        <div class="bg-transparent border text-center">
+            <p class="text-5xl px-10 py-5">20</p>
+            <hr>
+            <p class="px-10 py-5">days</p>
+        </div>
+
+        <div class="bg-transparent border text-center">
+            <p class="text-5xl px-10 py-5">03</p>
+            <hr>
+            <p class="px-10 py-5">hours</p>
+        </div>
+
+        <div class="bg-transparent border text-center">
+            <p class="text-5xl px-10 py-5">35</p>
+            <hr>
+            <p class="px-10 py-5">mins</p>
+        </div>
+        <div class="bg-transparent border text-center">
+            <p class="text-5xl px-10 py-5">01</p>
+            <hr>
+            <p class="px-10 py-5">secs</p>
+        </div>
+    </div>
+    
+</div>
+  <!-- <div class="flex justify-center items-center w-screen custom_height">
     <div class="container-mdc">
       <div class="bg-white p-8 rounded-sm">
         <div>
@@ -45,7 +77,7 @@ const signUp = async () => {
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style scoped>
