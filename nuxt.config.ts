@@ -31,6 +31,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "nuxt-particles",
   ],
+
   particles: {
     mode: 'full',
     lazy: true
@@ -47,6 +48,7 @@ export default defineNuxtConfig({
   },
   plugins: [
     '~/plugins/chart.js',
-    '~/plugins/fontawesome.js'
+    '~/plugins/fontawesome.js',
+   
   ]
 })

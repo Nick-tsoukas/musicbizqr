@@ -1,15 +1,5 @@
 <template>
   <div class="bg-[#000]">
-    <!-- Main content with particle animation and SVG -->
-    <!-- <div class="relative w-screen flex justify-center mt-8">
-      <div class="flex justify-center relative w-[300px]">
-        <NuxtParticles
-          class="mt-20"
-          id="tsparticles"
-          :options="options"
-        />
-      </div>
-    </div> -->
 
     <!-- Main content -->
     <main>
@@ -81,6 +71,43 @@
 
          </div>
       </section>
+
+      <!-- image gallery  -->
+
+      <div class="flex justify-center py-32 image_gradient my-16 ">
+    <div class="max-w-5xl  mx-auto">
+      <!-- Thumbnail Swiper -->
+      <!-- <Swiper
+        :modules="[Thumbs]"
+        :onSwiper="setThumbsSwiper"
+        :slides-per-view="4"
+        space-between="10"
+        class="thumbs-gallery"
+      >
+        <SwiperSlide v-for="(slide, index) in slides" :key="index">
+          <img :src="slide.thumbnail" alt="Thumbnail" class="w-full h-auto object-cover" />
+        </SwiperSlide>
+      </Swiper> -->
+     
+      <!-- Main Swiper with Effect -->
+      <Swiper
+        :modules="[Thumbs, EffectCards]" 
+        :thumbs="{ swiper: thumbsSwiper }"
+        effect="cards"
+        class="main-gallery  mt-4"
+      >
+        <SwiperSlide v-for="(slide, index) in slides" :key="index">
+          <img :src="slide.image" alt="Main Image" class="w-full h-auto object-cover" />
+        </SwiperSlide>
+      </Swiper>
+    </div>
+  </div>
+
+  <!-- main band image  -->
+   <div class="w-screen mx-auto" >
+    <img class="mx-auto" :src="bandDeskPage" alt="">
+   </div>
+  <!-- end of image galler   -->
       <!-- Chart  -->
       <section class="w-[70vw] mx-auto mt-10 2xl:mt-28 ">
         <h2 class=" text-4xl  md:text-4xl lg:text-6xl mb-14 text-center font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Advanced Analytics</h2>
@@ -152,6 +179,37 @@
 </template>
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Thumbs } from 'swiper/modules';
+import { EffectCards } from 'swiper/modules';
+import type { Swiper as SwiperInstance } from 'swiper/types';
+
+import streamLinksPage from '@/assets/socialpagedesktopnew.png';
+import albumDeskPage from'@/assets/newalbumpagedesktop.png'; // Replace with your actual image file
+import socialDeskPage from '@/assets/socialpagedesktopnew.png'; // Thumbnail images
+import bandDeskPage from '@/assets/newbandpageimage.png';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/thumbs';
+import 'swiper/css/effect-cards';
+
+// Define your slides data
+const slides = [
+  { image: streamLinksPage, thumbnail: streamLinksPage },
+  { image: albumDeskPage, thumbnail: streamLinksPage },
+  { image: socialDeskPage, thumbnail: streamLinksPage },
+  { image: socialDeskPage, thumbnail: streamLinksPage },
+  // Add more slides as needed
+];
+
+// Define your reactive variables with types
+const thumbsSwiper = ref<SwiperInstance | null>(null);
+
+// Define your functions with typed parameters
+const setThumbsSwiper = (swiper: SwiperInstance) => {
+  thumbsSwiper.value = swiper;
+};
 
 import musicSvg from '@/assets/music.svg';
 import microphoneSvg from '@/assets/microphone.svg';
@@ -493,7 +551,12 @@ const testimonials = [
     gap: 15px;
     align-items: flex-end;
 }
+/* image background grad */
 
+.image_gradient {
+  background: linear-gradient(to right, #ec4899, #8b5cf6);
+
+}
 /* Individual bar styling */
 .bar {
     width: 40px;
