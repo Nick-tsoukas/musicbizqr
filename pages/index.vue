@@ -81,7 +81,7 @@
       :modules="[EffectCards]"
       effect="cards"
       grabCursor="true"
-      class="main-gallery py-10  mt-4 h-80 md:h-[32rem]"
+      class="main-gallery pt-10  mt-4 h-auto "
     >
       <SwiperSlide
         v-for="(slide, index) in slides"
@@ -97,6 +97,15 @@
         />
       </SwiperSlide>
     </Swiper>
+    <!-- smart link section  -->
+     <div class=" mt-10">
+   
+      <h2 class="text-3xl  text-center md:text-5xl font-bold mb-4">Amplify Your Reach with Smart Links</h2>
+  
+     </div>
+     <!-- Smart Links and Shares Section -->
+
+
       <!-- Thumbnail Swiper -->
       <!-- <Swiper
         :modules="[Thumbs]"
@@ -136,8 +145,11 @@
     </div>
   </div>
 
+  <!-- heading of band image  -->
+ 
   <!-- main band image  -->
    <div class="w-screen mx-auto" >
+ 
     <img class="mx-auto" :src="bandDeskPage" alt="">
    </div>
   <!-- end of image galler   -->
