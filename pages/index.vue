@@ -74,8 +74,29 @@
 
       <!-- image gallery  -->
 
-      <div class="flex justify-center py-32 image_gradient my-16 ">
-    <div class="max-w-5xl  mx-auto">
+      <div class="flex justify-center py-10  md:py-32 image_gradient my-8 md:my-16">
+        <div class="w-full max-w-md md:max-w-5xl mx-auto">
+          <!-- swiper with cards  -->
+          <Swiper
+      :modules="[EffectCards]"
+      effect="cards"
+      grabCursor="true"
+      class="main-gallery py-10  mt-4 h-80 md:h-[32rem]"
+    >
+      <SwiperSlide
+        v-for="(slide, index) in slides"
+        :key="index"
+        class="flex items-center justify-center"
+      >
+        <img
+          :src="slide.image"
+          :srcset="slide.srcset"
+          alt="Main Image"
+          class="w-[90vw] md:w-full h-auto object-cover rounded-lg shadow-lg"
+
+        />
+      </SwiperSlide>
+    </Swiper>
       <!-- Thumbnail Swiper -->
       <!-- <Swiper
         :modules="[Thumbs]"
@@ -90,16 +111,28 @@
       </Swiper> -->
      
       <!-- Main Swiper with Effect -->
-      <Swiper
-        :modules="[Thumbs, EffectCards]" 
+      <!-- <Swiper
+        :modules="[Thumbs, EffectCards]"
         :thumbs="{ swiper: thumbsSwiper }"
-        effect="cards"
-        class="main-gallery  mt-4"
-      >
-        <SwiperSlide v-for="(slide, index) in slides" :key="index">
-          <img :src="slide.image" alt="Main Image" class="w-full h-auto object-cover" />
-        </SwiperSlide>
-      </Swiper>
+        :effect="swiperEffect"
+        class="main-gallery mt-4 h-80 md:h-96"
+          :breakpoints="{
+         768: { // For screens >= 768px
+          slidesPerView: 1,
+         spaceBetween: 30,
+          effect: 'slide',
+        },
+        0: { // For screens < 768px
+         slidesPerView: 1,
+      spaceBetween: 10,
+         effect: 'cards',
+         },
+        }"
+>
+  <SwiperSlide v-for="(slide, index) in slides" :key="index">
+    <img :src="slide.image" alt="Main Image" class="w-full h-full object-cover" />
+  </SwiperSlide>
+</Swiper> -->
     </div>
   </div>
 
@@ -359,7 +392,19 @@ const options = {
     number: {
       value: 100
     }
-  }
+  },
+  responsive: [
+    {
+      breakpoint: 768, // Mobile breakpoint (width ≤ 768px)
+      options: {
+        particles: {
+          number: {
+            value: 30 // Reduced number of particles on mobile
+          },
+        }
+      }
+    }
+  ]
 }
 
 function selectPage(i, page) {
