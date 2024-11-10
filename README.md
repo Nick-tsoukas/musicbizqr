@@ -2,11 +2,16 @@
 
 ## Saturday list
 
+## home page 
+- [] 
+
 ### band page 
 - [] add video grid to band page 
 - [] add proper space to streaming buttons 
   - [] add add the streaming platforms as buttons 
 - [] make a descion on the hero image sizing constraints 
+- [] use differnet images for all fake data types 
+
 
 ### Create Band Page 
 

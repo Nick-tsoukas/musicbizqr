@@ -137,6 +137,21 @@
           <label class="mdc-floating-label" for="soundcloud">SoundCloud</label>
           <div class="mdc-line-ripple"></div>
         </div>
+        <div class="mdc-text-field mb-4">
+          <input type="url" id="youtube" class="mdc-text-field__input" v-model="youtube" placeholder=" " />
+          <label class="mdc-floating-label" for="dezzer">Youtube Music</label>
+          <div class="mdc-line-ripple"></div>
+        </div>
+        <div class="mdc-text-field mb-4">
+          <input type="url" id="dezzer" class="mdc-text-field__input" v-model="dezzer" placeholder=" " />
+          <label class="mdc-floating-label" for="dezzer">Dezzer</label>
+          <div class="mdc-line-ripple"></div>
+        </div>
+        <div class="mdc-text-field mb-4">
+          <input type="url" id="bandcamp" class="mdc-text-field__input" v-model="bandcamp" placeholder=" " />
+          <label class="mdc-floating-label" for="dezzer">Bandcamp</label>
+          <div class="mdc-line-ripple"></div>
+        </div>
        </div>
       </div>
 
@@ -168,6 +183,12 @@ const twitch = ref('');
 const appleMusic = ref('');
 const spotify = ref('');
 const soundcloud = ref('');
+const dezzer = ref('');
+const bandcamp = ref('');
+const youtube = ref('');
+
+
+
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -208,6 +229,9 @@ const submitForm = async () => {
       appleMusic: appleMusic.value || null,
       spotify: spotify.value || null,
       soundcloud: soundcloud.value || null,
+      dezzer: dezzer.value || null,
+      youtube: youtube.value || null,
+      bandcamp: bandcamp.value || null,
       users_permissions_user: user.value.id, // Add the current user's ID
       members: members.value.map((member) => ({
         name: member.name || null,

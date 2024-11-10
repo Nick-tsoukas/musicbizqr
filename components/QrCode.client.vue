@@ -61,14 +61,52 @@ const options = reactive({
   }
 })
 
+
+
+const optionsGradient= reactive({
+  width: 300,
+  height: 300,
+  qrOptions: {
+    errorCorrectionLevel: "L",
+    version: 2,
+  },
+  data: `https://localhost:3000/directqr?id=${uuid}`,
+  dotsOptions: {
+    // Setting up the gradient correctly
+    gradient: {
+      type: "linear", // Type of gradient (linear)
+      rotation: 0, // Rotation of the gradient in degrees (0 for horizontal, 90 for vertical)
+      colorStops: [
+        { offset: 0, color: "#e6289d" }, // Starting color
+        { offset: 1, color: "#40353c" }, // Ending color
+      ],
+    },
+    type: "rounded", // Shape of the QR code dots
+  },
+  backgroundOptions: {
+    color: "#FFFFFF",
+  },
+  cornersSquareOptions: {
+    color: "#1E90FF",
+    type: "square",
+  },
+  cornersDotOptions: {
+    color: "#87CEFA",
+  },
+});
+
+
+
+
+
 console.log({...options})
 
 const gradient = {
   type: 'linear',
   rotation: 0,
   colorStops: [
-    { offset: 0, color: '#000000' },
-    { offset: 1, color: '#ffffff' }
+    { offset: 0, color: '#b44141' },
+    { offset: 1, color: '#17734b' }
   ]
 }
 
@@ -84,7 +122,9 @@ const initializeQrCode = async () => {
     console.log(error)
   }
 }
-
+const setGradient = () => {
+  console.log(options.dotsOptions = gradient, options)
+}
 const updateQrCode = () => {
   if (qrCodeStyling) {
     qrCodeStyling.update(options)
@@ -194,6 +234,7 @@ watch(() => options, updateQrCode, { deep: true })
         <span class="mb-1 text-white text-xl font-semibold">Name</span>
       </div>
    <div class="p-4">
+    <h2 @click="setGradient" >Test Gradient Button </h2>
     <label class="mdc-text-field mb-4">
     
     <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
@@ -287,7 +328,7 @@ watch(() => options, updateQrCode, { deep: true })
            <input v-model="options.backgroundOptions.color" type="color" class="color-input" />
 
         </div>
-</label>
+      </label>
      </div>
     </div>
     <div class="bg-white rounded-md " >
@@ -295,6 +336,7 @@ watch(() => options, updateQrCode, { deep: true })
       <h2 class="font-semibold text-white text-xl">Dot Options</h2>
       </div>
     <div class="p-4" >
+     <!-- solid color  -->
     <label class="color-picker-label mb-4">
         <span class="mb-1   text-gray-700  ">Dot Color:</span>
         <div class="color-picker">
@@ -302,6 +344,9 @@ watch(() => options, updateQrCode, { deep: true })
           <input type="color" id="color" v-model="options.dotsOptions.color" class="color-input" />
         </div>
       </label>
+
+      <!-- gradient  -->
+       
       
      
       <label class="mdc-text-field mb-4 mt-4">
