@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-5xl px-6">
+  <div class="container mx-auto max-w-5xl px-6 mb-10">
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
@@ -86,7 +86,7 @@
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" class="mdc-button w-full mt-10">Create Social Page Links</button>
+      <button type="submit" class="mdc-button w-full font-semibold text-xl mt-10 bg-gradient-to-r from-pink-500 to-violet-500">Create Social Page Links</button>
     </form>
   </div>
 </template>
