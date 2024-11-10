@@ -196,7 +196,7 @@
     </div>
 
     <!-- social media links -->
-     <!-- <pre class="text-white" >{{ band.data }}</pre> -->
+     <pre class="text-white" >{{ band.data }}</pre>
     <div class="h-52 flex items-center justify-center bg-[#000]">
       <div class="flex items-center justify-center gap-x-5">
         <a v-if="band.data.attributes.instagram" :href="band.data.attributes.instagram" aria-label="Find us on LinkedIn" target="_blank" rel="noopener">
@@ -231,7 +231,7 @@
 
 
 <script setup>
-import { data } from 'autoprefixer';
+import { data } from 'autoprefixer'
 
 
 const { find, findOne } = useStrapi();

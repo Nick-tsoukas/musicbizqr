@@ -2,6 +2,7 @@
 
 ## Saturday list
 
+- [] problems with edit album the image 
 ## home page 
 - [] 
 
