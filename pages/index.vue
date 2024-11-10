@@ -64,7 +64,7 @@
             </svg>
           </div>
           <!-- grid of screens  -->
-          <div class="flex flex-row overflow-scroll lg:justify-center  2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2  ">
+          <div class="flex element_scroll flex-row overflow-scroll lg:justify-center  2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2  ">
            <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-52 2xl:h-20 2xl:w-[30%]  p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl">{{ page }}</span>  </div>
               
         </div>
@@ -76,6 +76,10 @@
 
       <div class="flex justify-center py-10  md:py-32 image_gradient my-8 md:my-16">
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
+          <!-- heading  -->
+          <div class="mb-10">
+            <h2 class="text-3xl  text-center md:text-5xl text-white font-bold mb-4">Amplify Your Reach with Smart Links</h2>
+          </div>
           <!-- swiper with cards  -->
           <Swiper
       :modules="[EffectCards]"
@@ -98,11 +102,7 @@
       </SwiperSlide>
     </Swiper>
     <!-- smart link section  -->
-     <div class=" mt-10">
-   
-      <h2 class="text-3xl  text-center md:text-5xl font-bold mb-4">Amplify Your Reach with Smart Links</h2>
-  
-     </div>
+     
      <!-- Smart Links and Shares Section -->
 
 
@@ -149,7 +149,9 @@
  
   <!-- main band image  -->
    <div class="w-screen mx-auto" >
- 
+    <h2 class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center font-extrabold tracking-tight text-7xl md:text-8xl lg:text-center">
+  Build Your Band Page
+    </h2> 
     <img class="mx-auto" :src="bandDeskPage" alt="">
    </div>
   <!-- end of image galler   -->
@@ -593,6 +595,15 @@ const testimonials = [
   @apply bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:bg-purple-700;
 }
 
+
+.element_scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.element_scroll::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
 .animated-path {
   transition: fill 1s ease;
 }

@@ -24,7 +24,7 @@ const route = useRoute()
 const client = useStrapiClient()
 const uuid = uuidv4();
 
-const url = `${apiUrl}/directqr?id=${uuid}`;
+const url = `http://localhost:3000/directqr?id=${uuid}`;
 
 const qrcode = ref(null)
 const link = ref(null)
@@ -34,18 +34,24 @@ const loading = ref(false)
 const options = reactive({
   width: 300,
   height: 300,
-  data: `${apiUrl}/directqr?id=${uuid}`,
+  qrOptions: {
+    errorCorrectionLevel: "L", // Use "L" (Low) or "M" (Medium) for fewer dots
+    version: 2 // Lower version number means fewer dots (try values from 1 to 4)
+  },
+  data: `https://localhost:300/directqr?id=${uuid}`,
   dotsOptions: {
     color: '#000000',
     type: 'rounded',
   },
   backgroundOptions: {
-        color: "white", // Setting the background to transparent
+        color: "#fff", // Setting the background to transparent
     },
   imageOptions: {
     crossOrigin: 'anonymous',
-    margin: 20,
+    margin: 0,
+    imageSize: 1
   },
+
   cornersSquareOptions: {
     color: '#000000',
     type: 'square',
@@ -141,6 +147,7 @@ const saveQrCode = async () => {
 
     // Only proceed with routing if the QR code is saved and data.id exists
     if (data && data.id) {
+      console.log(data, data.id, 'this is data and data id ')
       if (props.type === 'externalURL') {
         router.push('/dashboard');
       } else if (route.query.type === 'bandProfile') {

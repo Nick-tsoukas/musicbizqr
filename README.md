@@ -1,5 +1,24 @@
 # task list 
 
+## Saturday list
+
+### band page 
+- [] add video grid to band page 
+- [] add proper space to streaming buttons 
+  - [] add add the streaming platforms as buttons 
+- [] make a descion on the hero image sizing constraints 
+
+### Create Band Page 
+
+- [] form for uploading image 
+  - [] make preview image smaller and center 
+  - [] move the button below the image 
+
+### Home page 
+
+- [] add all the screen shots for the mobile spalash pages 
+- [] add a grid of branded qrs
+
 - [] fix loading icon on the create all my social links
 - [] loading icon on the create event page 
 - [] fix margins and padding layout on the create album page ... add more space 
