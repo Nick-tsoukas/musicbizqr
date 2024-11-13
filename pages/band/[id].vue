@@ -2,7 +2,7 @@
   <div v-if="band && band.data " class="bg-[#000] w-screen  mx-auto">
     <!-- hero content  -->
  
-    <div v-if="band" class="relative w-full h-[calc(100vh-400px)]">
+    <div v-if="band" class="relative  w-full h-[calc(100vh-400px)]">
   <!-- Full-screen Image -->
   <img
     class="w-full h-full object-cover object-center"
@@ -17,7 +17,7 @@
     </h1>
   </div>
 </div>
-<!-- <pre class="text-white">{{ band }}</pre> -->
+<!-- <pre class="text-white">{{ band.data.attributes.albums}} fsdfsd</pre> -->
 <!-- streaming links if no albums  -->
 
     <!-- album page content -->
@@ -67,9 +67,10 @@
         </section>
 
         <section v-if="albumPlay" class="w-full flex flex-col xl:flex-row gap-4 my-20">
-          <AudioPlayer :album="albumPlay" class="w-full md:w-[75%]  mx-0" />
-          <div class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[25%] " >
-            <h2 class="text-xl font-bold text-white" >   Streaming</h2>
+         
+          <AudioPlayer :album="albumPlay" class="w-full md:w-[70%]  mx-0" />
+          <div class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[30%] " >
+            <h2 class="text-xl font-bold text-white" >Streaming Links</h2>
            <span v-if="band.data.attributes.spotify">
             <a :href="band.data.attributes.spotify">
             <button class="w-full custom-border bg-[#fff] flex justify-center text-black font-semibold px-2 py-3 items-center relative shadow-lg rounded-md" > <img src="@/assets/spotify.svg" class="h-8 absolute left-2" alt=""> Spotify</button>
@@ -163,8 +164,8 @@
         </div>
 
         <!-- streaming if no albums  -->
-        <div class="flex flex-col gap-6 justify-start  md:px-4 w-full md:w-[80%] md:mx-auto " >
-            <h2 class="text-2xl font-bold text-white" >   Streaming</h2>
+        <div class="flex flex-col gap-6 justify-start  md:px-4 w-full md:w-[100%] md:mx-auto " >
+            <h2 class="text-4xl my-10 font-bold text-white" >   Streaming Links</h2>
            <span v-if="band.data.attributes.spotify">
             <a :href="band.data.attributes.spotify">
             <button class="w-full custom-border bg-[#fff] flex justify-center text-black font-semibold px-2 py-3 items-center relative shadow-lg rounded-md" > <img src="@/assets/spotify.svg" class="h-8 absolute left-2" alt=""> Spotify</button>
@@ -196,7 +197,7 @@
     </div>
 
     <!-- social media links -->
-     <pre class="text-white" >{{ band.data }}</pre>
+    
     <div class="h-52 flex items-center justify-center bg-[#000]">
       <div class="flex items-center justify-center gap-x-5">
         <a v-if="band.data.attributes.instagram" :href="band.data.attributes.instagram" aria-label="Find us on LinkedIn" target="_blank" rel="noopener">
@@ -231,7 +232,7 @@
 
 
 <script setup>
-import { data } from 'autoprefixer'
+
 
 
 const { find, findOne } = useStrapi();
