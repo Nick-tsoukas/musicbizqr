@@ -1,177 +1,142 @@
-
-
-
-
 <script setup>
-// https://codepen.io/JamieCurnow/pen/KKPjraK
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import QRCodeStyling from 'qr-code-styling';
+import QrcodeVue from 'qrcode.vue';
 
 const config = useRuntimeConfig(); // Access runtime configuration
 const apiUrl = config.public.strapiUrl; // Get the API base URL
 
-
-
 const props = defineProps({
   type: String,
-})
-
-const { create, findOne, update } = useStrapi()
-const user = useStrapiUser()
-const router = useRouter()
-const route = useRoute()
-const client = useStrapiClient()
-const uuid = uuidv4();
-
-const url = `http://localhost:3000/directqr?id=${uuid}`;
-
-const qrcode = ref(null)
-const link = ref(null)
-const color = ref('#ffffff')
-const name = ref('name')
-const loading = ref(false)
-const options = reactive({
-  width: 300,
-  height: 300,
-  qrOptions: {
-    errorCorrectionLevel: "L", // Use "L" (Low) or "M" (Medium) for fewer dots
-    version: 2 // Lower version number means fewer dots (try values from 1 to 4)
-  },
-  data: `https://localhost:300/directqr?id=${uuid}`,
-  dotsOptions: {
-    color: '#000000',
-    type: 'rounded',
-  },
-  backgroundOptions: {
-        color: "#fff", // Setting the background to transparent
-    },
-  imageOptions: {
-    crossOrigin: 'anonymous',
-    margin: 0,
-    imageSize: 1
-  },
-
-  cornersSquareOptions: {
-    color: '#000000',
-    type: 'square',
-  },
-  cornersDotOptions: {
-    color: '#000000',
-  }
-})
-
-
-
-const optionsGradient= reactive({
-  width: 300,
-  height: 300,
-  qrOptions: {
-    errorCorrectionLevel: "L",
-    version: 2,
-  },
-  data: `https://localhost:3000/directqr?id=${uuid}`,
-  dotsOptions: {
-    // Setting up the gradient correctly
-    gradient: {
-      type: "linear", // Type of gradient (linear)
-      rotation: 0, // Rotation of the gradient in degrees (0 for horizontal, 90 for vertical)
-      colorStops: [
-        { offset: 0, color: "#e6289d" }, // Starting color
-        { offset: 1, color: "#40353c" }, // Ending color
-      ],
-    },
-    type: "rounded", // Shape of the QR code dots
-  },
-  backgroundOptions: {
-    color: "#FFFFFF",
-  },
-  cornersSquareOptions: {
-    color: "#1E90FF",
-    type: "square",
-  },
-  cornersDotOptions: {
-    color: "#87CEFA",
-  },
 });
 
+const { create, findOne, update } = useStrapi();
+const user = useStrapiUser();
+const router = useRouter();
+const route = useRoute();
+const client = useStrapiClient();
+const uuid = uuidv4();
 
+const qrValue = ref(`https://musicbizqr.com/?id=${uuid}`);
+const qrSize = ref(300);
+const qrLevel = ref('L');
 
+const bgColor = ref('#FFFFFF');
+const fgColor = ref('#000000');
 
+const gradient = ref(false); // Toggle for enabling gradient
+const gradientType = ref('linear'); // 'linear' or 'radial'
+const gradientRotation = ref(0); // For linear gradient rotation
+const gradientStartColor = ref('#e6289d');
+const gradientEndColor = ref('#40353c');
 
-console.log({...options})
+const name = ref('name');
+const link = ref(null);
+const loading = ref(false);
 
-const gradient = {
-  type: 'linear',
-  rotation: 0,
-  colorStops: [
-    { offset: 0, color: '#b44141' },
-    { offset: 1, color: '#17734b' }
-  ]
-}
+const imageSettings = reactive({
+  src: '', // Will be set when image is uploaded
+  height: 60,
+  width: 60,
+  excavate: true,
+});
 
-let qrCodeStyling
+const qrcodeRef = ref(null);
 
-const initializeQrCode = async () => {
-  try {
-    qrCodeStyling = await new QRCodeStyling({ ...options })
-    if (qrcode.value) {
-      qrCodeStyling.append(qrcode.value)
+// Reactive QR code properties
+const qrProps = reactive({
+  value: qrValue.value,
+  size: qrSize.value,
+  level: qrLevel.value,
+  background: bgColor.value,
+  foreground: fgColor.value,
+  imageSettings: { ...imageSettings },
+});
+
+// Watch for changes and update qrProps accordingly
+watch(
+  [
+    qrValue,
+    qrSize,
+    qrLevel,
+    bgColor,
+    fgColor,
+    gradient,
+    gradientType,
+    gradientRotation,
+    gradientStartColor,
+    gradientEndColor,
+    () => imageSettings.src,
+  ],
+  () => {
+    qrProps.value = qrValue.value;
+    qrProps.size = qrSize.value;
+    qrProps.level = qrLevel.value;
+    qrProps.background = bgColor.value;
+    qrProps.imageSettings = { ...imageSettings };
+
+    if (gradient.value) {
+      qrProps.gradient = true;
+      qrProps.gradientType = gradientType.value;
+      qrProps.gradientRotation = gradientRotation.value;
+      qrProps.gradientStartColor = gradientStartColor.value;
+      qrProps.gradientEndColor = gradientEndColor.value;
+      qrProps.foreground = null; // Reset foreground color when using gradient
+    } else {
+      qrProps.gradient = false;
+      qrProps.foreground = fgColor.value;
     }
-  } catch (error) {
-    console.log(error)
-  }
-}
-const setGradient = () => {
-  console.log(options.dotsOptions = gradient, options)
-}
-const updateQrCode = () => {
-  if (qrCodeStyling) {
-    qrCodeStyling.update(options)
-  }
-}
-
-const selectType = (selected) => {
-  router.push({
-    query: {
-      ...route.query, // Preserve other query params if any
-      type: selected
-    }
-  });
-}
+  },
+  { deep: true }
+);
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      options.image = e.target.result;
-      updateQrCode();
+      imageSettings.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 };
 
-onMounted(() => {
-  initializeQrCode()
-  console.log(user, 'this is the user ')
- 
-})
+const selectType = (selected) => {
+  router.push({
+    query: {
+      ...route.query, // Preserve other query params if any
+      type: selected,
+    },
+  });
+};
+
 const saveQrCode = async () => {
   try {
-    loading.value = true
-  
+    loading.value = true;
 
     const form = {
-      url: options.data,
+      url: qrValue.value,
       users_permissions_user: { id: user.value.id },
       q_type: route.query.type,
       link: link.value,
       name: name.value,
-      options: { ...options }
+      options: {
+        size: qrSize.value,
+        level: qrLevel.value,
+        background: bgColor.value,
+        foreground: fgColor.value,
+        gradient: gradient.value,
+        gradientType: gradientType.value,
+        gradientRotation: gradientRotation.value,
+        gradientStartColor: gradientStartColor.value,
+        gradientEndColor: gradientEndColor.value,
+        imageSettings: { ...imageSettings },
+      },
     };
 
-    const blob = await qrCodeStyling.getRawData('image/png');
+    const canvas = qrcodeRef.value.$el.querySelector('canvas');
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+
     const file = new File([blob], 'qrcode.png');
     const formData = new FormData();
     formData.append('files.q_image', file, 'qrcode.png');
@@ -180,15 +145,14 @@ const saveQrCode = async () => {
     // Saving the QR code
     const { data } = await client(`/qrs`, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
 
     console.log('QR code saved successfully:', data);
 
-    // Only proceed with routing if the QR code is saved and data.id exists
+    // Redirect based on QR type
     if (data && data.id) {
-      console.log(data, data.id, 'this is data and data id ')
-      if (props.type === 'externalURL') {
+      if (route.query.type === 'externalURL') {
         router.push('/dashboard');
       } else if (route.query.type === 'bandProfile') {
         router.push({ name: 'createband', query: { qrId: data.id } });
@@ -202,235 +166,244 @@ const saveQrCode = async () => {
         router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
       } else if (route.query.type === 'social') {
         router.push({ name: 'socialpage', query: { qrId: data.id } });
-  
       } else {
         router.push('/dashboard');
       }
     } else {
-      loading.value= false
+      loading.value = false;
       console.error('QR code was not saved, no ID found.');
     }
-
   } catch (error) {
     loading.value = false;
     console.error('Error during QR code save:', error.response ? error.response.data : error);
   }
 };
-
-
-watch(() => options, updateQrCode, { deep: true })
 </script>
 
-
-<template  class="container mx-auto " >
-  <div class="flex flex-col items-center p-4  max-w-5xl  mx-auto ">
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-    </div>
-    <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
-    <div class="mt-4 flex flex-col space-y-4 w-full  ">
-   <div class="bg-white rounded-md " >
-    <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-        <span class="mb-1 text-white text-xl font-semibold">Name</span>
+<template>
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center p-4 max-w-5xl mx-auto">
+      <div v-if="loading" class="loading-container">
+        <div class="spinner"></div>
       </div>
-   <div class="p-4">
-    <h2 @click="setGradient" >Test Gradient Button </h2>
-    <label class="mdc-text-field mb-4">
-    
-    <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
-    <span class="mdc-line-ripple"></span>
-  </label>
-   </div>
-    </div>
-    <!-- chhose type  -->
-    <div class="bg-white rounded-md " >
-    <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-        <span class="mb-1 text-white text-xl font-semibold">Choose Qr Type</span>
-      </div>
-   <div class="p-4">
-    <div class="flex gap-4">
-      <div 
-    @click="selectType('bandProfile')"  
-    :class="{ 'border-green': route.query.type == 'bandProfile', 'border-black': route.query.type !== 'bandProfile' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Band</span>
-  </div>
-
-  <div 
-    @click="selectType('events')" 
-    :class="{ 'border-green': route.query.type == 'events', 'border-black': route.query.type !== 'events' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Event</span>
-  </div>
-
-  <div 
-    @click="selectType('tours')" 
-    :class="{ 'border-green': route.query.type == 'tours', 'border-black': route.query.type !== 'tours' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Tour</span>
-  </div>
-
-  <div 
-    @click="selectType('albums')" 
-    :class="{ 'border-green': route.query.type == 'albums', 'border-black': route.query.type !== 'albums' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Album</span>
-  </div>
-
-  <div 
-    @click="selectType('social')" 
-    :class="{ 'border-green': route.query.type == 'social', 'border-black': route.query.type !== 'social' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Social Links</span>
-  </div>
-
-  <div 
-    @click="selectType('stream')" 
-    :class="{ 'border-green': route.query.type == 'stream', 'border-black': route.query.type !== 'stream' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Stream</span>
-  </div>
-
-  <div 
-    @click="selectType('externalURL')" 
-    :class="{ 'border-green': route.query.type == 'externalURL', 'border-black': route.query.type !== 'externalURL' }" 
-    class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-  >
-    <span>Link URL</span>
-  </div>
-
-    </div>
-   </div>
-    </div>
-
-    <div v-if="type === 'link'" class="bg-white rounded-md p-4">
-      <label  class="mdc-text-field mb-4">
-        <span class="mb-1 text-gray-700">External Link:</span>
-        <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
-        <span class="mdc-line-ripple"></span>
-      </label>
-    </div>
-    <div class="bg-white rounded-md" >
-      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-      <h2 class="font-semibold text-white text-xl">Background Options</h2>
-      </div>
-     <div class="p-4" >
-      <label class="color-picker-label mb-4">
-        <span class="mb-1 text-white">Background Color:</span>
-        <div class="color-picker">
-           <input v-model="options.backgroundOptions.color" type="text" class="color-text-input" />
-           <input v-model="options.backgroundOptions.color" type="color" class="color-input" />
-
+      <qrcode-vue
+        ref="qrcodeRef"
+        v-bind="qrProps"
+        class="p-4 border border-gray-300 rounded-lg shadow-md"
+      />
+      <div class="mt-4 flex flex-col space-y-4 w-full">
+        <!-- Name Input -->
+        <div class="bg-white rounded-md">
+          <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <span class="mb-1 text-white text-xl font-semibold">Name</span>
+          </div>
+          <div class="p-4">
+            <label class="mdc-text-field mb-4">
+              <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter Name" />
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
         </div>
-      </label>
-     </div>
-    </div>
-    <div class="bg-white rounded-md " >
-      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-      <h2 class="font-semibold text-white text-xl">Dot Options</h2>
-      </div>
-    <div class="p-4" >
-     <!-- solid color  -->
-    <label class="color-picker-label mb-4">
-        <span class="mb-1   text-gray-700  ">Dot Color:</span>
-        <div class="color-picker">
-          <input v-model="options.dotsOptions.color" type="text" class="color-text-input" />
-          <input type="color" id="color" v-model="options.dotsOptions.color" class="color-input" />
+        <!-- Choose QR Type -->
+        <div class="bg-white rounded-md">
+          <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <span class="mb-1 text-white text-xl font-semibold">Choose QR Type</span>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-4">
+              <!-- Band -->
+              <div
+                @click="selectType('bandProfile')"
+                :class="{ 'border-green': route.query.type == 'bandProfile', 'border-black': route.query.type !== 'bandProfile' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Band</span>
+              </div>
+              <!-- Event -->
+              <div
+                @click="selectType('events')"
+                :class="{ 'border-green': route.query.type == 'events', 'border-black': route.query.type !== 'events' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Event</span>
+              </div>
+              <!-- Tour -->
+              <div
+                @click="selectType('tours')"
+                :class="{ 'border-green': route.query.type == 'tours', 'border-black': route.query.type !== 'tours' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Tour</span>
+              </div>
+              <!-- Album -->
+              <div
+                @click="selectType('albums')"
+                :class="{ 'border-green': route.query.type == 'albums', 'border-black': route.query.type !== 'albums' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Album</span>
+              </div>
+              <!-- Social Links -->
+              <div
+                @click="selectType('social')"
+                :class="{ 'border-green': route.query.type == 'social', 'border-black': route.query.type !== 'social' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Social Links</span>
+              </div>
+              <!-- Stream -->
+              <div
+                @click="selectType('stream')"
+                :class="{ 'border-green': route.query.type == 'stream', 'border-black': route.query.type !== 'stream' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Stream</span>
+              </div>
+              <!-- External URL -->
+              <div
+                @click="selectType('externalURL')"
+                :class="{ 'border-green': route.query.type == 'externalURL', 'border-black': route.query.type !== 'externalURL' }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Link URL</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </label>
-
-      <!-- gradient  -->
-       
-      
-     
-      <label class="mdc-text-field mb-4 mt-4">
-        <span class="mb-1 text-gray-700">Dot Type:</span>
-        <select v-model="options.dotsOptions.type" class="mdc-text-field__input">
-          <option value="rounded">Rounded</option>
-          <option value="dots">Dots</option>
-          <option value="classy">Classy</option>
-          <option value="classy-rounded">Classy Rounded</option>
-          <option value="square">Square</option>
-          <option value="extra-rounded">Extra Rounded</option>
-        </select>
-        <span class="mdc-line-ripple"></span>
-      </label>
-    </div> 
-    </div>
-    <div class="bg-white rounded-md" >
-      <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-      <h2 class="text-white font-semibold text-xl">Corner Options</h2>
-      </div>
-      <div class="p-4" >
-        <label class="color-picker-label mb-4">
-        <span class="mb-1 text-gray-700">Corner Square Color:</span>
-        <div class="color-picker">
-          <input v-model="options.cornersSquareOptions.color" type="text" class="color-text-input" />
-          <input v-model="options.cornersSquareOptions.color" type="color" class="color-input" />
+        <!-- External Link Input (if applicable) -->
+        <div v-if="route.query.type === 'externalURL'" class="bg-white rounded-md p-4">
+          <label class="mdc-text-field mb-4">
+            <span class="mb-1 text-gray-700">External Link:</span>
+            <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
+            <span class="mdc-line-ripple"></span>
+          </label>
         </div>
-      </label>
-   
-      <label class="mdc-text-field mb-4 mt-4">
-        <span class="mb-1 text-gray-700">Corner Square Type:</span>
-        <select v-model="options.cornersSquareOptions.type" class="mdc-text-field__input">
-          <option value="dot">Dot</option>
-          <option value="square">Square</option>
-          <option value="extra-rounded">Extra Rounded</option>
-        </select>
-        <span class="mdc-line-ripple"></span>
-      </label>
-      <label class="color-picker-label mb-4">
-        <span class="mb-1 text-gray-700">Corner Dot Color:</span>
-        <div class="color-picker">
-          <input v-model="options.cornersDotOptions.color" type="text" class="color-text-input" />
-          <input v-model="options.cornersDotOptions.color" type="color" class="color-input" />
+        <!-- Background Options -->
+        <div class="bg-white rounded-md">
+          <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-xl">Background Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Background Color:</span>
+              <div class="color-picker">
+                <input v-model="bgColor" type="text" class="color-text-input" />
+                <input v-model="bgColor" type="color" class="color-input" />
+              </div>
+            </label>
+          </div>
         </div>
-      </label>
-    </div>
+        <!-- Foreground Options -->
+        <div v-if="!gradient" class="bg-white rounded-md">
+          <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-xl">Foreground Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Foreground Color:</span>
+              <div class="color-picker">
+                <input v-model="fgColor" type="text" class="color-text-input" />
+                <input v-model="fgColor" type="color" class="color-input" />
+              </div>
+            </label>
+          </div>
+        </div>
+        <!-- Gradient Options -->
+        <div class="bg-white rounded-md">
+          <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-xl">Gradient Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="mb-4 flex items-center">
+              <input type="checkbox" v-model="gradient" class="mr-2" />
+              <span class="text-gray-700">Enable Gradient</span>
+            </label>
+            <div v-if="gradient">
+              <label class="mdc-text-field mb-4">
+                <span class="mb-1 text-gray-700">Gradient Type:</span>
+                <select v-model="gradientType" class="mdc-text-field__input">
+                  <option value="linear">Linear</option>
+                  <option value="radial">Radial</option>
+                </select>
+                <span class="mdc-line-ripple"></span>
+              </label>
+              <label class="mdc-text-field mb-4">
+                <span class="mb-1 text-gray-700">Gradient Rotation (degrees):</span>
+                <input v-model.number="gradientRotation" type="number" class="mdc-text-field__input" min="0" max="360" />
+                <span class="mdc-line-ripple"></span>
+              </label>
+              <label class="color-picker-label mb-4">
+                <span class="mb-1 text-gray-700">Gradient Start Color:</span>
+                <div class="color-picker">
+                  <input v-model="gradientStartColor" type="text" class="color-text-input" />
+                  <input v-model="gradientStartColor" type="color" class="color-input" />
+                </div>
+              </label>
+              <label class="color-picker-label mb-4">
+                <span class="mb-1 text-gray-700">Gradient End Color:</span>
+                <div class="color-picker">
+                  <input v-model="gradientEndColor" type="text" class="color-text-input" />
+                  <input v-model="gradientEndColor" type="color" class="color-input" />
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        <!-- Image Options -->
+        <div class="bg-white rounded-md">
+          <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-xl">Image Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Upload Logo:</span>
+              <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+        </div>
+        <!-- Save Button -->
+        <button @click="saveQrCode" class="mdc-button w-full mt-4">
+          Save QR Code
+        </button>
       </div>
-      <div class="bg-white rounded-md " >
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
-      <h2 class=" font-semibold text-white text-xl">Image Options</h2>
-      </div>
-     <div class="p-4" >
-      <label class="mdc-text-field mb-4">
-        <span class="mb-1 text-gray-700">Upload Logo:</span>
-        <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
-        <span class="mdc-line-ripple"></span>
-      </label>
-     </div>
-      </div>
-      <button @click="saveQrCode" class="mdc-button w-full mt-4">
-        Save QR Code
-      </button>
     </div>
   </div>
 </template>
 
-
-
 <style scoped>
-/* Basic Container Styling */
-.container-mdc {
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Container Styling */
+.container {
+  margin-top: 2rem;
 }
 
-/* Title Styling */
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #333;
+/* Spinner Styling */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #555;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Material Design Text Field Styling */
@@ -450,27 +423,6 @@ watch(() => options, updateQrCode, { deep: true })
   outline: none;
   width: 100%;
   box-sizing: border-box;
-}
-
-.mdc-floating-label {
-  position: absolute;
-  z-index: 99999;
-  top: 0.75rem;
-  left: 0.5rem;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  font-size: 1rem;
-  background: white;
-  line-height: 1;
-  color: #aaa;
-  pointer-events: none;
-  transition: transform 0.2s, color 0.2s;
-}
-
-.mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
-  transform: translateY(-1.5rem);
-  color: #6200ee;
 }
 
 .mdc-line-ripple {
@@ -529,7 +481,7 @@ watch(() => options, updateQrCode, { deep: true })
   height: 36px;
   padding: 0;
   cursor: pointer;
-  border-radius: 50%; /* Makes the input rounded */
+  border-radius: 50%;
 }
 
 .color-text-input {
@@ -542,10 +494,19 @@ watch(() => options, updateQrCode, { deep: true })
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  padding-right: 36px; /* Adjust padding to accommodate the color input */
+  padding-right: 36px;
 }
 
 .font-bold {
   font-weight: 700;
+}
+
+/* Custom Classes */
+.border-green {
+  border-color: green;
+}
+
+.border-black {
+  border-color: black;
 }
 </style>

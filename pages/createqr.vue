@@ -1,5 +1,6 @@
 
 <script  setup>
+
 const route = useRoute()
 const type = route.query.type
 </script>
