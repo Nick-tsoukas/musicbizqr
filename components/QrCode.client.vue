@@ -19,7 +19,7 @@ const route = useRoute();
 const client = useStrapiClient();
 const uuid = uuidv4();
 
-const qrValue = ref(`https://musicbizqr.com/?id=${uuid}`);
+const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`);
 const qrSize = ref(300);
 const qrLevel = ref('L');
 

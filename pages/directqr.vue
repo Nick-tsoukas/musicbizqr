@@ -20,7 +20,7 @@ onMounted(async () => {
       method: 'GET',
       params: {
         filters: {
-          url: uuid, // Assuming 'url' is where you store the UUID
+          url: route.params.id, // Assuming 'url' is where you store the UUID
         },
         populate: '*', // To fetch related data like band, event, tour, etc.
       },
