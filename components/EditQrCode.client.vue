@@ -1,23 +1,19 @@
 <template>
   <div class="flex flex-col items-center p-4 w-full">
-    <div ref="qrcode" class="p-4 border border-gray-300 rounded-lg shadow-md"></div>
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
 
-    <div class="mt-4 flex flex-col space-y-4 w-full ">
-      <div class="text-left w-full my-4">
-        <h2 class="font-bold mb-2">QR Type</h2>
-        <p v-if="data.attributes.q_type">{{ data.attributes.q_type }}</p>
+    <qrcode-vue
+      ref="qrcodeRef"
+      v-bind="qrProps"
+      class="p-4 border border-gray-300 rounded-lg shadow-md"
+    />
 
-        <div>
-          <p v-if="data.attributes.q_type === 'band'">{{ data.attributes.band.data.attributes.name }}</p>
-          <p v-if="data.attributes.q_type === 'event'">{{ data.attributes.event.data.attributes.title }}</p>
-          <p v-if="data.attributes.q_type === 'tour'">{{ data.attributes.tour.data.attributes.title }}</p>
-          <p v-if="data.attributes.q_type === 'album'">{{ data.attributes.album.data.attributes.title }}</p>
-        </div>
-      </div>
-
+    <div class="mt-4 flex flex-col space-y-4 w-full">
       <!-- QR Name -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <span class="mb-1 text-white text-xl font-semibold">Name of QR</span>
         </div>
         <div class="p-4">
@@ -28,85 +24,203 @@
         </div>
       </div>
 
+      <!-- Choose QR Type -->
+      <div class="bg-white rounded-md">
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <span class="mb-1 text-white text-xl font-semibold">Edit QR Type</span>
+        </div>
+        <div class="p-4">
+          <div class="flex flex-wrap gap-4">
+            <!-- Band -->
+            <div
+              @click="handleSelection('band')"
+              :class="{ 'border-green': q_type == 'band', 'border-black': q_type !== 'band' }"
+              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+            >
+              <span>Band</span>
+            </div>
+            <!-- Event -->
+            <div
+              @click="handleSelection('event')"
+              :class="{ 'border-green': q_type == 'event', 'border-black': q_type !== 'event' }"
+              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+            >
+              <span>Event</span>
+            </div>
+            <!-- Tour -->
+            <div
+              @click="handleSelection('tour')"
+              :class="{ 'border-green': q_type == 'tour', 'border-black': q_type !== 'tour' }"
+              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+            >
+              <span>Tour</span>
+            </div>
+            <!-- Album -->
+            <div
+              @click="handleSelection('album')"
+              :class="{ 'border-green': q_type == 'album', 'border-black': q_type !== 'album' }"
+              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+            >
+              <span>Album</span>
+            </div>
+            <!-- External Link -->
+            <div
+              @click="handleSelection('link')"
+              :class="{ 'border-green': q_type == 'link', 'border-black': q_type !== 'link' }"
+              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+            >
+              <span>Link URL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- External Link Input (if applicable) -->
+      <div v-if="q_type === 'link'" class="bg-white rounded-md p-4">
+        <label class="mdc-text-field mb-4">
+          <span class="mb-1 text-gray-700">External Link:</span>
+          <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
+          <span class="mdc-line-ripple"></span>
+        </label>
+      </div>
+
+      <!-- QR Type Selection -->
+      <div class="bg-white rounded-md">
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="font-semibold text-white text-xl">Select Associated Content</h2>
+        </div>
+        <div class="p-4">
+          <!-- Band Selection -->
+          <div v-if="q_type === 'band'">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Select Band:</span>
+              <select v-model="selectedBand" class="mdc-text-field__input">
+                <option value="">Select a band</option>
+                <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
+                <option value="createNew">Create New Band</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+
+          <!-- Album Selection -->
+          <div v-if="q_type === 'album'">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Select Album:</span>
+              <select v-model="selectedAlbum" class="mdc-text-field__input">
+                <option value="">Select an album</option>
+                <option v-for="album in albums" :key="album.id" :value="album.id">{{ album.attributes.title }}</option>
+                <option value="createNew">Create New Album</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+
+          <!-- Tour Selection -->
+          <div v-if="q_type === 'tour'">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Select Tour:</span>
+              <select v-model="selectedTour" class="mdc-text-field__input">
+                <option value="">Select a tour</option>
+                <option v-for="tour in tours" :key="tour.id" :value="tour.id">{{ tour.attributes.title }}</option>
+                <option value="createNew">Create New Tour</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+
+          <!-- Event Selection -->
+          <div v-if="q_type === 'event'">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Select Event:</span>
+              <select v-model="selectedEvent" class="mdc-text-field__input">
+                <option value="">Select an event</option>
+                <option v-for="event in events" :key="event.id" :value="event.id">{{ event.attributes.title }}</option>
+                <option value="createNew">Create New Event</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
       <!-- Background Options -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-xl">Background Options</h2>
         </div>
         <div class="p-4">
           <label class="color-picker-label mb-4">
-            <span class="mb-1 text-white">Background Color:</span>
+            <span class="mb-1 text-gray-700">Background Color:</span>
             <div class="color-picker">
-              <input v-model="options.backgroundOptions.color" type="text" class="color-text-input" />
-              <input v-model="options.backgroundOptions.color" type="color" class="color-input" />
+              <input v-model="bgColor" type="text" class="color-text-input" />
+              <input v-model="bgColor" type="color" class="color-input" />
             </div>
           </label>
         </div>
       </div>
 
-      <!-- Dot Options -->
-      <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="font-semibold text-white text-xl">Dot Options</h2>
+      <!-- Foreground Options -->
+      <div v-if="!gradient" class="bg-white rounded-md">
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="font-semibold text-white text-xl">Foreground Options</h2>
         </div>
         <div class="p-4">
           <label class="color-picker-label mb-4">
-            <span class="mb-1 text-white">Dot Color:</span>
+            <span class="mb-1 text-gray-700">Foreground Color:</span>
             <div class="color-picker">
-              <input v-model="options.dotsOptions.color" type="text" class="color-text-input" />
-              <input type="color" id="color" v-model="options.dotsOptions.color" class="color-input" />
+              <input v-model="fgColor" type="text" class="color-text-input" />
+              <input v-model="fgColor" type="color" class="color-input" />
             </div>
-          </label>
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Dot Type:</span>
-            <select v-model="options.dotsOptions.type" class="mdc-text-field__input">
-              <option value="rounded">Rounded</option>
-              <option value="dots">Dots</option>
-              <option value="classy">Classy</option>
-              <option value="classy-rounded">Classy Rounded</option>
-              <option value="square">Square</option>
-              <option value="extra-rounded">Extra Rounded</option>
-            </select>
-            <span class="mdc-line-ripple"></span>
           </label>
         </div>
       </div>
 
-      <!-- Corner Options -->
+      <!-- Gradient Options -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="font-semibold text-white text-xl">Corner Options</h2>
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="font-semibold text-white text-xl">Gradient Options</h2>
         </div>
         <div class="p-4">
-          <label class="color-picker-label mb-4">
-            <span class="mb-1 text-gray-700">Corner Square Color:</span>
-            <div class="color-picker">
-              <input v-model="options.cornersSquareOptions.color" type="text" class="color-text-input" />
-              <input v-model="options.cornersSquareOptions.color" type="color" class="color-input" />
-            </div>
+          <label class="mb-4 flex items-center">
+            <input type="checkbox" v-model="gradient" class="mr-2" />
+            <span class="text-gray-700">Enable Gradient</span>
           </label>
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Corner Square Type:</span>
-            <select v-model="options.cornersSquareOptions.type" class="mdc-text-field__input">
-              <option value="dot">Dot</option>
-              <option value="square">Square</option>
-              <option value="extra-rounded">Extra Rounded</option>
-            </select>
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <label class="color-picker-label mb-4">
-            <span class="mb-1 text-gray-700">Corner Dot Color:</span>
-            <div class="color-picker">
-              <input v-model="options.cornersDotOptions.color" type="text" class="color-text-input" />
-              <input v-model="options.cornersDotOptions.color" type="color" class="color-input" />
-            </div>
-          </label>
+          <div v-if="gradient">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Gradient Type:</span>
+              <select v-model="gradientType" class="mdc-text-field__input">
+                <option value="linear">Linear</option>
+                <option value="radial">Radial</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Gradient Rotation (degrees):</span>
+              <input v-model.number="gradientRotation" type="number" class="mdc-text-field__input" min="0" max="360" />
+              <span class="mdc-line-ripple"></span>
+            </label>
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Gradient Start Color:</span>
+              <div class="color-picker">
+                <input v-model="gradientStartColor" type="text" class="color-text-input" />
+                <input v-model="gradientStartColor" type="color" class="color-input" />
+              </div>
+            </label>
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Gradient End Color:</span>
+              <div class="color-picker">
+                <input v-model="gradientEndColor" type="text" class="color-text-input" />
+                <input v-model="gradientEndColor" type="color" class="color-input" />
+              </div>
+            </label>
+          </div>
         </div>
       </div>
 
       <!-- Image Options -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="font-semibold text-white text-xl">Image Options</h2>
         </div>
         <div class="p-4">
@@ -118,87 +232,253 @@
         </div>
       </div>
 
-      <!-- QR Type Selection -->
-      <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="font-semibold text-white text-xl">Edit QR Type</h2>
-        </div>
-        <div class="p-4">
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">External Link:</span>
-            <input v-model="link" @change="handleSelection('link')" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
-            <span class="mdc-line-ripple"></span>
-          </label>
-
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Select Band:</span>
-            <select v-model="selectedBand" @change="handleSelection('band')" class="mdc-text-field__input">
-              <option value="">Select a band</option>
-              <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
-              <option value="createNew">Create New Band</option>
-            </select>
-            <span class="mdc-line-ripple"></span>
-          </label>
-
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Select Album:</span>
-            <select v-model="selectedAlbum" @change="handleSelection('album')" class="mdc-text-field__input">
-              <option value="">Select an album</option>
-              <option v-for="album in albums" :key="album.id" :value="album.id">{{ album.attributes.title }}</option>
-              <option value="createNew">Create New Album</option>
-            </select>
-            <span class="mdc-line-ripple"></span>
-          </label>
-
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Select Tour:</span>
-            <select v-model="selectedTour" @change="handleSelection('tour')" class="mdc-text-field__input">
-              <option value="">Select a tour</option>
-              <option v-for="tour in tours" :key="tour.id" :value="tour.id">{{ tour.attributes.title }}</option>
-              <option value="createNew">Create New Tour</option>
-            </select>
-            <span class="mdc-line-ripple"></span>
-          </label>
-
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Select Event:</span>
-            <select v-model="selectedEvent" @change="handleSelection('event')" class="mdc-text-field__input">
-              <option value="">Select an event</option>
-              <option v-for="event in events" :key="event.id" :value="event.id">{{ event.attributes.title }}</option>
-              <option value="createNew">Create New Event</option>
-            </select>
-            <span class="mdc-line-ripple"></span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Save Button -->
+      <!-- Update Button -->
       <button @click="updateQrCodeSubmit" class="mdc-button w-full mt-10">
-        Update QR
+        Update QR Code
       </button>
     </div>
   </div>
 </template>
 
+<script setup>
+import { ref, reactive, watch } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
+import QrcodeVue from 'qrcode.vue';
 
+const props = defineProps({
+  type: String,
+});
+
+const { findOne, find } = useStrapi();
+const user = useStrapiUser();
+const router = useRouter();
+const route = useRoute();
+const client = useStrapiClient();
+
+const loading = ref(false);
+
+const { data } = await findOne('qrs', route.params.id, {
+  populate: {
+    event: { populate: '*' },
+    tour: { populate: '*' },
+    album: { populate: '*' },
+    band: { populate: '*' },
+  },
+});
+
+const qrcodeRef = ref(null);
+const q_type = ref(data.attributes.q_type || null);
+const link = ref(data.attributes.link || null);
+const name = ref(data.attributes.name || 'add name');
+
+const qrValue = ref(data.attributes.url || '');
+const qrSize = ref(data.attributes.options?.size || 300);
+const qrLevel = ref(data.attributes.options?.level || 'L');
+const bgColor = ref(data.attributes.options?.background || '#FFFFFF');
+const fgColor = ref(data.attributes.options?.foreground || '#000000');
+
+const gradient = ref(data.attributes.options?.gradient || false);
+const gradientType = ref(data.attributes.options?.gradientType || 'linear');
+const gradientRotation = ref(data.attributes.options?.gradientRotation || 0);
+const gradientStartColor = ref(data.attributes.options?.gradientStartColor || '#e6289d');
+const gradientEndColor = ref(data.attributes.options?.gradientEndColor || '#40353c');
+
+const imageSettings = reactive({
+  src: data.attributes.options?.imageSettings?.src || '',
+  height: data.attributes.options?.imageSettings?.height || 60,
+  width: data.attributes.options?.imageSettings?.width || 60,
+  excavate: data.attributes.options?.imageSettings?.excavate || true,
+});
+
+const qrProps = reactive({
+  value: qrValue.value,
+  size: qrSize.value,
+  level: qrLevel.value,
+  background: bgColor.value,
+  foreground: fgColor.value,
+  imageSettings: { ...imageSettings },
+});
+
+watch(
+  [
+    qrValue,
+    qrSize,
+    qrLevel,
+    bgColor,
+    fgColor,
+    gradient,
+    gradientType,
+    gradientRotation,
+    gradientStartColor,
+    gradientEndColor,
+    () => imageSettings.src,
+  ],
+  () => {
+    qrProps.value = qrValue.value;
+    qrProps.size = qrSize.value;
+    qrProps.level = qrLevel.value;
+    qrProps.background = bgColor.value;
+    qrProps.imageSettings = { ...imageSettings };
+
+    if (gradient.value) {
+      qrProps.gradient = true;
+      qrProps.gradientType = gradientType.value;
+      qrProps.gradientRotation = gradientRotation.value;
+      qrProps.gradientStartColor = gradientStartColor.value;
+      qrProps.gradientEndColor = gradientEndColor.value;
+      qrProps.foreground = null;
+    } else {
+      qrProps.gradient = false;
+      qrProps.foreground = fgColor.value;
+    }
+  },
+  { deep: true }
+);
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageSettings.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const bands = ref([]);
+const events = ref([]);
+const tours = ref([]);
+const albums = ref([]);
+
+const selectedEvent = ref(data.attributes.event?.data?.id ?? null);
+const selectedTour = ref(data.attributes.tour?.data?.id ?? null);
+const selectedAlbum = ref(data.attributes.album?.data?.id ?? null);
+const selectedBand = ref(data.attributes.band?.data?.id ?? null);
+
+const fetchUserRelatedData = async () => {
+  try {
+    const bandsResponse = await find('bands', { filters: { users_permissions_user: { id: user.value.id } } });
+    bands.value = bandsResponse.data;
+
+    const eventsResponse = await find('events', { filters: { users_permissions_user: { id: user.value.id } } });
+    events.value = eventsResponse.data;
+
+    const toursResponse = await find('tours', { filters: { users_permissions_user: { id: user.value.id } } });
+    tours.value = toursResponse.data;
+
+    const albumsResponse = await find('albums', { filters: { users_permissions_user: { id: user.value.id } } });
+    albums.value = albumsResponse.data;
+  } catch (error) {
+    console.error('Error fetching user-related data:', error);
+  }
+};
+
+fetchUserRelatedData();
+
+const handleSelection = (type) => {
+  q_type.value = type;
+  link.value = null;
+  selectedBand.value = null;
+  selectedAlbum.value = null;
+  selectedTour.value = null;
+  selectedEvent.value = null;
+
+  if (type === 'link') {
+    qrValue.value = link.value || '';
+  }
+};
+
+const updateQrCodeSubmit = async () => {
+  const qrId = route.params.id;
+  try {
+    loading.value = true;
+    const formData = new FormData();
+    const form = {
+      url: qrValue.value,
+      users_permissions_user: { id: user.value.id },
+      q_type: q_type.value,
+      link: link.value,
+      name: name.value,
+      options: {
+        size: qrSize.value,
+        level: qrLevel.value,
+        background: bgColor.value,
+        foreground: fgColor.value,
+        gradient: gradient.value,
+        gradientType: gradientType.value,
+        gradientRotation: gradientRotation.value,
+        gradientStartColor: gradientStartColor.value,
+        gradientEndColor: gradientEndColor.value,
+        imageSettings: { ...imageSettings },
+      },
+      band: selectedBand.value !== 'createNew' ? selectedBand.value : null,
+      album: selectedAlbum.value !== 'createNew' ? selectedAlbum.value : null,
+      event: selectedEvent.value !== 'createNew' ? selectedEvent.value : null,
+      tour: selectedTour.value !== 'createNew' ? selectedTour.value : null,
+    };
+
+    const canvas = qrcodeRef.value.$el.querySelector('canvas');
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    const file = new File([blob], 'qrcode.png');
+
+    formData.append('files.q_image', file, 'qrcode.png');
+    formData.append('data', JSON.stringify(form));
+
+    await client(`/qrs/${qrId}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    // Routing after successful update based on selected values
+    if (selectedBand.value === 'createNew') {
+      router.push({ path: '/createband', query: { createnew: 'createNew', qrId: qrId } });
+    } else if (selectedAlbum.value === 'createNew') {
+      router.push({ path: '/newalbum', query: { createnew: 'createNew', qrId: qrId } });
+    } else if (selectedTour.value === 'createNew') {
+      router.push({ path: '/newtour', query: { createnew: 'createNew', qrId: qrId } });
+    } else if (selectedEvent.value === 'createNew') {
+      router.push({ path: '/newevent', query: { createnew: 'createNew', qrId: qrId } });
+    } else {
+      router.push('/dashboard');
+    }
+  } catch (error) {
+    loading.value = false;
+    console.error('Error updating QR code:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
 
 <style scoped>
-/* Basic Container Styling */
-.container-mdc {
-  max-width: 500px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Spinner Styling */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Title Styling */
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #333;
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #555;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Material Design Text Field Styling */
@@ -218,27 +498,6 @@
   outline: none;
   width: 100%;
   box-sizing: border-box;
-}
-
-.mdc-floating-label {
-  position: absolute;
-  z-index: 99999;
-  top: 0.75rem;
-  left: 0.5rem;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  font-size: 1rem;
-  background: white;
-  line-height: 1;
-  color: #aaa;
-  pointer-events: none;
-  transition: transform 0.2s, color 0.2s;
-}
-
-.mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
-  transform: translateY(-1.5rem);
-  color: #6200ee;
 }
 
 .mdc-line-ripple {
@@ -297,7 +556,7 @@
   height: 36px;
   padding: 0;
   cursor: pointer;
-  border-radius: 50%; /* Makes the input rounded */
+  border-radius: 50%;
 }
 
 .color-text-input {
@@ -310,219 +569,19 @@
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  padding-right: 36px; /* Adjust padding to accommodate the color input */
+  padding-right: 36px;
 }
 
 .font-bold {
   font-weight: 700;
 }
+
+/* Custom Classes */
+.border-green {
+  border-color: green;
+}
+
+.border-black {
+  border-color: black;
+}
 </style>
-
-
-<script setup>
-// https://codepen.io/JamieCurnow/pen/KKPjraK
-import { v4 as uuidv4 } from 'uuid';
-import QRCodeStyling from 'qr-code-styling'
-
-const props = defineProps({
-  type: String,
-})
-
-const { findOne, find } = useStrapi()
-const user = useStrapiUser()
-const router = useRouter()
-const route = useRoute()
-const client = useStrapiClient()
-const uuid = uuidv4()
-
-const url = `https://localhost:3000/directqr?id=${uuid}`
-
-const { data } = await findOne('qrs', route.params.id, {
-  populate: {
-    event: {
-      populate : "*"
-    },
-    tour: {
-      populate : "*"
-    },
-    album: {
-      populate : "*"
-    },
-    band: {
-      populate : "*"
-    }
-  }
-})
-
-const qrcode = ref(null)
-const q_type = ref(data.attributes.q_type || null)
-const link = ref(data.attributes.link || null)
-const color = ref('#ffffff')
-const name = ref(data.attributes.name || 'add name')
-const options = reactive(data.attributes.options)
-
-const bands = ref([])
-const events = ref([])
-const tours = ref([])
-const albums = ref([])
-
-
-const selectedEvent = ref(data.attributes.event?.data?.id ?? null)
-const selectedTour = ref(data.attributes.tour.data?.id ?? null)
-const selectedAlbum = ref( data.attributes.album?.data?.id ?? null)
-const selectedBand = ref( data.attributes.band?.data?.id ?? null)
-
-
-const fetchUserRelatedData = async () => {
-  try {
-    const bandsResponse = await find('bands', { filters: { users_permissions_user: { id: user.value.id } } })
-    bands.value = bandsResponse.data
-
-    const eventsResponse = await find('events', { filters: { users_permissions_user: { id: user.value.id } } })
-    events.value = eventsResponse.data
-
-    const toursResponse = await find('tours', { filters: { users_permissions_user: { id: user.value.id } } })
-    tours.value = toursResponse.data
-
-    const albumsResponse = await find('albums', { filters: { users_permissions_user: { id: user.value.id } } })
-    albums.value = albumsResponse.data
-  } catch (error) {
-    console.error('Error fetching user-related data:', error)
-  }
-}
-
-fetchUserRelatedData()
-
-const gradient = {
-  type: 'linear',
-  rotation: 0,
-  colorStops: [
-    { offset: 0, color: '#000000' },
-    { offset: 1, color: '#ffffff' }
-  ]
-}
-
-let qrCodeStyling
-
-const initializeQrCode = async () => {
-  try {
-    qrCodeStyling = await new QRCodeStyling({ ...options })
-    if (qrcode.value) {
-      qrCodeStyling.append(qrcode.value)
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const updateQrCode = () => {
-  if (qrCodeStyling) {
-    qrCodeStyling.update(options)
-  }
-}
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      options.image = e.target.result
-      updateQrCode()
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const handleSelection = (type) => {
-  if (type === 'link') {
-    selectedBand.value = null
-    selectedAlbum.value = null
-    selectedTour.value = null
-    selectedEvent.value = null
-    q_type.value = 'link'
-  } else {
-    link.value = null
-    if (type === 'band') {
-      selectedAlbum.value = null
-      selectedTour.value = null
-      selectedEvent.value = null
-      q_type.value = 'band'
-    } else if (type === 'album') {
-      selectedBand.value = null
-      selectedTour.value = null
-      selectedEvent.value = null
-      q_type.value = 'album'
-        } else if (type === 'tour') {
-      selectedBand.value = null
-      selectedAlbum.value = null
-      selectedEvent.value = null
-      q_type.value = 'tour'
-     
-    } else if (type === 'event') {
-      selectedBand.value = null
-      selectedAlbum.value = null
-      selectedTour.value = null
-      q_type.value = 'event'
-    
-    }
-  }
-}
-
-onMounted(() => {
-  initializeQrCode()
-})
-
-const updateQrCodeSubmit = async () => {
-  const qrId = route.params.id
-  try {
-    const formData = new FormData()
-    const form = {
-      url: options.data,
-      users_permissions_user: { id: user.value.id },
-      q_type: q_type.value,
-      link: link.value,
-      name: name.value,
-      options: options,
-      band: selectedBand.value !== 'createNew' ? selectedBand.value : null,
-      album: selectedAlbum.value !== 'createNew' ? selectedAlbum.value : null,
-      event: selectedEvent.value !== 'createNew' ? selectedEvent.value : null,
-      tour: selectedTour.value !== 'createNew' ? selectedTour.value : null
-    }
-
-    const blob = await qrCodeStyling.getRawData('image/png')
-    const file = new File([blob], 'qrcode.png')
-
-    formData.append('files.q_image', file, 'qrcode.png')
-    formData.append('data', JSON.stringify(form))
-
-    await client(`/qrs/${qrId}`, {
-      method: 'PUT',
-      body: formData,
-    })
-
-    // Routing after successful update based on selected values
-    if (selectedBand.value === 'createNew') {
-      q_type.value = 'band'
-      router.push({ path: '/createband', query: { createnew: 'createNew', qrId: qrId } })
-    } else if (selectedAlbum.value === 'createNew') {
-      q_type.value = 'album'
-      router.push({ path: '/newalbum', query: { createnew: 'createNew', qrId: qrId } })
-    } else if (selectedTour.value === 'createNew') {
-      q_type.value = 'tour'
-      router.push({ path: '/newtour', query: { createnew: 'createNew', qrId: qrId } })
-    } else if (selectedEvent.value === 'createNew') {
-      q_type.value = 'event'
-      router.push({ path: '/newevent', query: { createnew: 'createNew', qrId: qrId } })
-    } else {
-      router.push('/dashboard')
-    }
-  } catch (error) {
-    console.error('Error updating QR code:', error)
-  }
-}
-
-
-watch(() => options, updateQrCode, { deep: true })
-</script>
-
-

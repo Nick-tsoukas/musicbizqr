@@ -32,9 +32,9 @@
             :key="album.id"
             class="bg-black shadow-lg rounded p-3 "
           >
-            <div class="group relative transform transition-transform duration-300 hover:scale-105 in-w-[100%] h-[300px] md:w-[450px] md:h-[450px]">
+            <div class=" transform transition-transform duration-300 hover:scale-105 w-[100px] h-[100px] md:w-[450px] md:h-[450px]">
               <img
-                class="w-full block rounded mx-auto"
+                class="w-full h-full block rounded mx-auto"
                 :src="album.attributes.cover.data.attributes.url"
                 alt=""
               />
