@@ -46,7 +46,7 @@
       <h3 class=" font-semibold text-white text-2xl">Upload Image</h3>
 </div>
 <div class="mb-4 py-10 bg-white p-4">
-  <input type="file" id="band-img" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
+  <input type="file" required id="band-img" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
   <label for="band-img" class="styled-file-label w-full text-center">Choose Band Image</label>
   <div v-if="bandImgUrl" class="mb-4">
   <img :src="bandImgUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md" />

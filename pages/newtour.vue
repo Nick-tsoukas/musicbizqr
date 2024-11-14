@@ -56,7 +56,7 @@
             <h2 class="font-semibold text-white text-2xl">Event Image </h2>
           </div>
         <div class="mb-4 p-6">
-          <input type="file" id="new-tour-image" class="styled-file-input" @change="handleNewTourImageUpload" accept="image/*" />
+          <input type="file" required id="new-tour-image" class="styled-file-input" @change="handleNewTourImageUpload" accept="image/*" />
           <label for="new-tour-image" class="styled-file-label w-full text-center ">Choose Tour Image</label>
         </div>
         <div v-if="newTour.imageUrl" class="mb-4">

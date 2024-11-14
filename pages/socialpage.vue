@@ -77,7 +77,7 @@
           <h2 class="font-semibold text-white text-2xl">Upload Image</h2>
         </div>
         <div class="bg-white p-6">
-          <input type="file" id="img" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
+          <input type="file" required id="img" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
           <label for="img" class="styled-file-label w-full text-center">Choose Image</label>
           <div v-if="socialpage.imgUrl" class="mt-4">
             <img :src="socialpage.imgUrl" alt="Social Page Image" class="w-full h-auto rounded-lg shadow-md" />

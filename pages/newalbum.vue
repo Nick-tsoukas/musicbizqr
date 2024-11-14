@@ -22,7 +22,7 @@
           <div class="mdc-line-ripple"></div>
         </div>
         <div class="mb-4">
-          <input type="file" id="new-album-cover" class="styled-file-input" @change="handleCoverUpload" accept="image/*" />
+          <input type="file" required id="new-album-cover" class="styled-file-input" @change="handleCoverUpload" accept="image/*" />
           <label for="new-album-cover" class="styled-file-label">Choose Album Cover</label>
         </div>
         <div v-if="newAlbum.coverUrl" class="mb-4">
@@ -51,7 +51,7 @@
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mb-2">
-              <input type="file" :id="'song-file-' + index" class="styled-file-input" @change="handleSongFileUpload($event, index)" accept="audio/*" />
+              <input type="file" required :id="'song-file-' + index" class="styled-file-input" @change="handleSongFileUpload($event, index)" accept="audio/*" />
               <label :for="'song-file-' + index" class="styled-file-label">Choose Song File</label>
             </div>
           </div>

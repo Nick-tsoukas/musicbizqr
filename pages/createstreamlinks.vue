@@ -60,7 +60,7 @@
             <h2 class="font-semibold text-2xl text-white">Upload Image</h2>
           </div>
           <div class="p-4">
-            <input type="file" id="streamImg" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
+            <input type="file" required id="streamImg" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
             <label for="streamImg" class="styled-file-label w-full text-center">Choose Image</label>
             <div v-if="imgUrl" class="mt-4">
               <img :src="imgUrl" alt="Stream Image" class="w-full h-auto rounded-lg shadow-md" />

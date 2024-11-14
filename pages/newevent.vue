@@ -88,7 +88,7 @@
           <h3 class="font-semibold text-white text-2xl">Upload Event Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-6">
-          <input type="file" id="new-event-image" class="styled-file-input" @change="handleNewEventImageUpload" accept="image/*" />
+          <input type="file" required id="new-event-image" class="styled-file-input" @change="handleNewEventImageUpload" accept="image/*" />
           <label for="new-event-image" class="styled-file-label w-full text-center">Choose Event Image</label>
           <div v-if="newEvent.imageUrl" class="mb-4">
             <img :src="newEvent.imageUrl" alt="Event Image" class="w-full h-auto rounded-lg shadow-md" />
