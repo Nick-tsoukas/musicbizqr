@@ -32,14 +32,14 @@
             :key="album.id"
             class="bg-black shadow-lg rounded p-3 "
           >
-            <div class="group relative min-w-[100%] h-[300px] md:w-[450px] md:h-[450px]">
+            <div class="group relative transform transition-transform duration-300 hover:scale-105 in-w-[100%] h-[300px] md:w-[450px] md:h-[450px]">
               <img
                 class="w-full block rounded mx-auto"
                 :src="album.attributes.cover.data.attributes.url"
                 alt=""
               />
-              <div
-                class="absolute bg-black rounded bg-opacity-0 group-hover:bg-opacity-60 w-full h-full top-0 flex items-center group-hover:opacity-100 transition justify-evenly"
+              <!-- <div
+                class="hidden md:absolute bg-black rounded bg-opacity-0 group-hover:bg-opacity-60 w-full h-full top-0 md:flex items-center group-hover:opacity-100 transition justify-evenly"
               >
                 <button
                   @click="setAlbum(album.id)"
@@ -58,7 +58,7 @@
                     />
                   </svg>
                 </button>
-              </div>
+              </div> -->
             </div>
             <div class="pt-5">
               <h3 class="text-white font-semibold text-xl">{{ album.attributes.title }}</h3>
