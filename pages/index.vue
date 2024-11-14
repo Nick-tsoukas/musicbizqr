@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000]">
+  <div class="bg-[#000] verflow-x-hidden">
 
     <!-- Main content -->
     <main>
