@@ -5,61 +5,85 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
-import { onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router';
+import { onMounted } from 'vue';
 
 const router = useRouter();
 const route = useRoute();
-const uuid = route.query.id; // Get the UUID from query params
-const client = useStrapiClient(); // Assuming Strapi is set up
+const client = useStrapiClient(); // Assuming Strapi client is set up
 
 onMounted(async () => {
   try {
-    // Fetch the QR data using the UUID
-    const { data: qrData } = await client(`/qrs`, {
+    // Get the full URL including the query parameters
+    const fullUrl = window.location.href;
+
+    console.log('Full URL:', fullUrl); // For debugging
+
+    // Fetch the QR data using the full URL
+    const response = await client('/qrs', {
       method: 'GET',
       params: {
         filters: {
-          url: route.params.id, // Assuming 'url' is where you store the UUID
+          url: fullUrl, // Use the full URL for filtering
         },
         populate: '*', // To fetch related data like band, event, tour, etc.
       },
     });
+    console.log(response)
+    const qrData = response.data; // Adjusted to match Strapi's response format
+
+    console.log('QR Data:', qrData); // For debugging
 
     if (qrData && qrData.length > 0) {
-      const qr = qrData[0]; // Assuming you get one QR code per UUID
-console.log(qrData , 'this is qr data')
+      const qr = qrData[0]; // Assuming you get one QR code per URL
+      console.log('QR Object:', qr);
+
+      // Accessing attributes and relationships from the QR code
+      const qType = qr.attributes.q_type;
+      const link = qr.attributes.link;
+
       // Check the QR type and perform the appropriate redirection
-      if (qr.q_type === 'bandProfile' && qr.band) {
+      if (qType === 'bandProfile' && qr.attributes.band.data) {
         // Redirect to the band profile page
-        // router.push({ name: 'band', params: { id: qr.band.id } });
-      } else if (qr.q_type === 'events' && qr.event) {
+        const bandId = qr.attributes.band.data.id;
+        console.log('Redirecting to band:', bandId);
+        router.push({ path: `/band/${bandId}` });
+      } else if (qType === 'events' && qr.attributes.event.data) {
         // Redirect to the event page
-        // router.push({ name: 'event', params: { id: qr.event.id } });
-      } else if (qr.q_type === 'tours' && qr.tour) {
+        const eventId = qr.attributes.event.data.id;
+        console.log('Redirecting to event:', eventId);
+        router.push({ path: `/event/${eventId}` });
+      } else if (qType === 'tours' && qr.attributes.tour.data) {
         // Redirect to the tour page
-        // router.push({ name: 'tour', params: { id: qr.tour.id } });
-      } else if (qr.q_type === 'albums' && qr.album) {
+        const tourId = qr.attributes.tour.data.id;
+        console.log('Redirecting to tour:', tourId);
+        router.push({ path: `/tour/${tourId}` });
+      } else if (qType === 'albums' && qr.attributes.album.data) {
         // Redirect to the album page
-        // router.push({ name: 'album', params: { id: qr.album.id } });
-      } else if (qr.q_type === 'stream' && qr.link) {
+        const albumId = qr.attributes.album.data.id;
+        console.log('Redirecting to album:', albumId);
+        router.push({ path: `/album/${albumId}` });
+      } else if (qType === 'stream' && link) {
         // Redirect to an external streaming link
-        // window.location.href = qr.link;
-      } else if (qr.q_type === 'externalURL' && qr.link) {
-        console.log('link')
+        const streamId = qr.attributes.stream.data.id
+        console.log('Redirecting to stream link:', streamId);
+        router.push({ path: `/stream/${streamId}` });
+      } else if (qType === 'externalURL' && link) {
         // Redirect to an external URL
-        // window.location.href = qr.link;
+        console.log('Redirecting to external URL:', link);
+        window.location.href = link;
       } else {
         // Default fallback, redirect to dashboard or error page
+        console.log('No matching QR type found. Redirecting to dashboard.');
         // router.push('/dashboard');
       }
     } else {
-      console.error('QR code not found for UUID:', uuid);
-      router.push('/error'); // Handle error page
+      console.error('QR code not found for URL:', fullUrl);
+      // router.push('/error'); // Handle error page
     }
   } catch (error) {
     console.error('Error fetching QR code data:', error);
-    router.push('/error'); // Redirect to an error page if something goes wrong
+    // router.push('/error'); // Redirect to an error page if something goes wrong
   }
 });
 </script>
