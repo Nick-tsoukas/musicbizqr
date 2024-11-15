@@ -3,12 +3,12 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-
+    <div ref="qrcodeWrapper">
     <qrcode-vue
-      ref="qrcodeRef"
       v-bind="qrProps"
       class="p-4 border border-gray-300 rounded-lg shadow-md"
     />
+    </div>
 
     <div class="mt-4 flex flex-col space-y-4 w-full">
       <!-- QR Name -->
@@ -245,6 +245,9 @@ import { ref, reactive, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import QrcodeVue from 'qrcode.vue';
 
+
+const qrcodeWrapper = ref(null);
+
 const props = defineProps({
   type: String,
 });
@@ -418,7 +421,9 @@ const updateQrCodeSubmit = async () => {
       tour: selectedTour.value !== 'createNew' ? selectedTour.value : null,
     };
 
-    const canvas = qrcodeRef.value.$el.querySelector('canvas');
+    // const canvas = qrcodeRef.value.$el.querySelector('canvas');
+    const canvas = qrcodeWrapper.value.querySelector('canvas');
+
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     const file = new File([blob], 'qrcode.png');
 
