@@ -380,6 +380,7 @@ function getQRCodeOptions() {
     },
     backgroundOptions: {
       color: bgColor.value,
+      transparent: false, // Explicitly set to false
     },
     imageOptions: {
       crossOrigin: imageSettings.crossOrigin,
@@ -477,7 +478,10 @@ const saveQrCode = async () => {
   try {
     loading.value = true;
 
-   
+    // // Update qrValue based on the selected type
+    // if (route.query.type === 'externalURL' && link.value) {
+    //   qrValue.value = link.value;
+    // }
 
     const form = {
       url: qrValue.value,
