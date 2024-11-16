@@ -343,7 +343,7 @@ const loading = ref(false);
 
 const imageSettings = reactive({
   src: '', // Will be set when image is uploaded
-  imageSize: 0.9,
+  imageSize: 0.4,
   margin: 0,
   crossOrigin: 'anonymous',
 });
