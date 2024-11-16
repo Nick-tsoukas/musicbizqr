@@ -347,7 +347,8 @@ const imageSettings = reactive({
   margin: 0,
   crossOrigin: 'anonymous',
 });
-
+// rgb(14, 72, 222) converts to #0E48DE
+// rgb(3, 22, 65) converts to #031641
 // New reactive variables for dotsOptions, cornersSquareOptions, cornersDotOptions
 const dotsColor = ref('#000000');
 const dotsType = ref('square');
@@ -476,10 +477,7 @@ const saveQrCode = async () => {
   try {
     loading.value = true;
 
-    // Update qrValue based on the selected type
-    if (route.query.type === 'externalURL' && link.value) {
-      qrValue.value = link.value;
-    }
+   
 
     const form = {
       url: qrValue.value,
