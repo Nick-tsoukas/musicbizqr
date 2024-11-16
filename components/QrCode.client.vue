@@ -233,9 +233,9 @@
                 <option value="rounded">Rounded</option>
                 <option value="dots">Dots</option>
                 <option value="classy">Classy</option>
-                <option value="classyRounded">Classy Rounded</option>
+                <option value="classy-rounded">Classy Rounded</option>
                 <option value="square">Square</option>
-                <option value="extraRounded">Extra Rounded</option>
+                <option value="extra-rounded">Extra Rounded</option>
               </select>
               <span class="mdc-line-ripple"></span>
             </label>
