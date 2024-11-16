@@ -241,7 +241,7 @@
             </label>
           </div>
         </div>
-        <!-- Corners Square Options -->
+        <!-- Corners Square Options e6289d 40353c -->
         <div class="bg-white rounded-md">
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
@@ -343,7 +343,7 @@ const loading = ref(false);
 
 const imageSettings = reactive({
   src: '', // Will be set when image is uploaded
-  imageSize: 0.4,
+  imageSize: 0.9,
   margin: 0,
   crossOrigin: 'anonymous',
 });
@@ -365,6 +365,7 @@ function getQRCodeOptions() {
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value,
+    errorCorrectionLevel: 'H',
     dotsOptions: {
       type: dotsType.value,
     },
