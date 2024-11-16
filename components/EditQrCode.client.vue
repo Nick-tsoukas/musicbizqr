@@ -1,260 +1,313 @@
 <template>
-  <div class="flex flex-col items-center p-4 w-full">
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-    </div>
-    <!-- QR Code Wrapper -->
-    <div ref="qrcodeWrapper" class="p-4 border border-gray-300 rounded-lg shadow-md">
-      <!-- QR code will be rendered here by qr-code-styling -->
-    </div>
-
-    <div class="mt-4 flex flex-col space-y-4 w-full">
-      <!-- QR Name -->
-      <div class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <span class="mb-1 text-white text-xl font-semibold">Name of QR</span>
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center p-4 max-w-5xl mx-auto">
+      <div v-if="loading" class="loading-container">
+        <div class="spinner"></div>
+      </div>
+      <!-- QR Code Wrapper -->
+      <div ref="qrcodeWrapper" class="p-4 border border-gray-300 rounded-lg shadow-md">
+        <!-- QR code will be rendered here by qr-code-styling -->
+      </div>
+      <div class="mt-4 flex flex-col space-y-4 w-full">
+        <!-- Name Input -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <span class="mb-1 text-white text-xl font-semibold">Name</span>
+          </div>
+          <div class="p-4">
+            <label class="mdc-text-field mb-4">
+              <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter Name" />
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
         </div>
-        <div class="p-4">
+        <!-- Choose QR Type -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <span class="mb-1 text-white text-xl font-semibold">Choose QR Type</span>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-4">
+              <!-- Band -->
+              <div
+                @click="selectType('bandProfile')"
+                :class="{
+                  'border-green': q_type == 'bandProfile',
+                  'border-black': q_type !== 'bandProfile'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Band</span>
+              </div>
+              <!-- Event -->
+              <div
+                @click="selectType('events')"
+                :class="{
+                  'border-green': q_type == 'events',
+                  'border-black': q_type !== 'events'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Event</span>
+              </div>
+              <!-- Tour -->
+              <div
+                @click="selectType('tours')"
+                :class="{
+                  'border-green': q_type == 'tours',
+                  'border-black': q_type !== 'tours'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Tour</span>
+              </div>
+              <!-- Album -->
+              <div
+                @click="selectType('albums')"
+                :class="{
+                  'border-green': q_type == 'albums',
+                  'border-black': q_type !== 'albums'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Album</span>
+              </div>
+              <!-- Social Links -->
+              <div
+                @click="selectType('social')"
+                :class="{
+                  'border-green': q_type == 'social',
+                  'border-black': q_type !== 'social'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Social Links</span>
+              </div>
+              <!-- Stream -->
+              <div
+                @click="selectType('stream')"
+                :class="{
+                  'border-green': q_type == 'stream',
+                  'border-black': q_type !== 'stream'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Stream</span>
+              </div>
+              <!-- External URL -->
+              <div
+                @click="selectType('externalURL')"
+                :class="{
+                  'border-green': q_type == 'externalURL',
+                  'border-black': q_type !== 'externalURL'
+                }"
+                class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
+              >
+                <span>Link URL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- External Link Input (if applicable) -->
+        <div v-if="q_type === 'externalURL'" class="bg-white rounded-md p-4">
           <label class="mdc-text-field mb-4">
-            <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter QR Name" />
+            <span class="mb-1 text-gray-700">External Link:</span>
+            <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
             <span class="mdc-line-ripple"></span>
           </label>
         </div>
-      </div>
-
-      <!-- Choose QR Type -->
-      <div class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <span class="mb-1 text-white text-xl font-semibold">Edit QR Type</span>
-        </div>
-        <div class="p-4">
-          <div class="flex flex-wrap gap-4">
-            <!-- Band -->
-            <div
-              @click="handleSelection('band')"
-              :class="{ 'border-green': q_type == 'band', 'border-black': q_type !== 'band' }"
-              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-            >
-              <span>Band</span>
-            </div>
-            <!-- Event -->
-            <div
-              @click="handleSelection('event')"
-              :class="{ 'border-green': q_type == 'event', 'border-black': q_type !== 'event' }"
-              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-            >
-              <span>Event</span>
-            </div>
-            <!-- Tour -->
-            <div
-              @click="handleSelection('tour')"
-              :class="{ 'border-green': q_type == 'tour', 'border-black': q_type !== 'tour' }"
-              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-            >
-              <span>Tour</span>
-            </div>
-            <!-- Album -->
-            <div
-              @click="handleSelection('album')"
-              :class="{ 'border-green': q_type == 'album', 'border-black': q_type !== 'album' }"
-              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-            >
-              <span>Album</span>
-            </div>
-            <!-- External Link -->
-            <div
-              @click="handleSelection('link')"
-              :class="{ 'border-green': q_type == 'link', 'border-black': q_type !== 'link' }"
-              class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
-            >
-              <span>Link URL</span>
-            </div>
+        <!-- Background Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Background Options</h2>
           </div>
-        </div>
-      </div>
-
-      <!-- External Link Input (if applicable) -->
-      <div v-if="q_type === 'link'" class="bg-white rounded-md p-4">
-        <label class="mdc-text-field mb-4">
-          <span class="mb-1 text-gray-700">External Link:</span>
-          <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
-          <span class="mdc-line-ripple"></span>
-        </label>
-      </div>
-
-      <!-- QR Type Selection -->
-      <div class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-xl">Select Associated Content</h2>
-        </div>
-        <div class="p-4">
-          <!-- Band Selection -->
-          <div v-if="q_type === 'band'">
-            <label class="mdc-text-field mb-4">
-              <span class="mb-1 text-gray-700">Select Band:</span>
-              <select v-model="selectedBand" class="mdc-text-field__input">
-                <option value="">Select a band</option>
-                <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
-                <option value="createNew">Create New Band</option>
-              </select>
-              <span class="mdc-line-ripple"></span>
-            </label>
-          </div>
-
-          <!-- Album Selection -->
-          <div v-if="q_type === 'album'">
-            <label class="mdc-text-field mb-4">
-              <span class="mb-1 text-gray-700">Select Album:</span>
-              <select v-model="selectedAlbum" class="mdc-text-field__input">
-                <option value="">Select an album</option>
-                <option v-for="album in albums" :key="album.id" :value="album.id">{{ album.attributes.title }}</option>
-                <option value="createNew">Create New Album</option>
-              </select>
-              <span class="mdc-line-ripple"></span>
-            </label>
-          </div>
-
-          <!-- Tour Selection -->
-          <div v-if="q_type === 'tour'">
-            <label class="mdc-text-field mb-4">
-              <span class="mb-1 text-gray-700">Select Tour:</span>
-              <select v-model="selectedTour" class="mdc-text-field__input">
-                <option value="">Select a tour</option>
-                <option v-for="tour in tours" :key="tour.id" :value="tour.id">{{ tour.attributes.title }}</option>
-                <option value="createNew">Create New Tour</option>
-              </select>
-              <span class="mdc-line-ripple"></span>
-            </label>
-          </div>
-
-          <!-- Event Selection -->
-          <div v-if="q_type === 'event'">
-            <label class="mdc-text-field mb-4">
-              <span class="mb-1 text-gray-700">Select Event:</span>
-              <select v-model="selectedEvent" class="mdc-text-field__input">
-                <option value="">Select an event</option>
-                <option v-for="event in events" :key="event.id" :value="event.id">{{ event.attributes.title }}</option>
-                <option value="createNew">Create New Event</option>
-              </select>
-              <span class="mdc-line-ripple"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Background Options -->
-      <div class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-xl">Background Options</h2>
-        </div>
-        <div class="p-4">
-          <label class="color-picker-label mb-4">
-            <span class="mb-1 text-gray-700">Background Color:</span>
-            <div class="color-picker">
-              <input v-model="bgColor" type="text" class="color-text-input" />
-              <input v-model="bgColor" type="color" class="color-input" />
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <!-- Foreground Options -->
-      <div v-if="!gradient" class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-xl">Foreground Options</h2>
-        </div>
-        <div class="p-4">
-          <label class="color-picker-label mb-4">
-            <span class="mb-1 text-gray-700">Foreground Color:</span>
-            <div class="color-picker">
-              <input v-model="dotsColor" type="text" class="color-text-input" />
-              <input v-model="dotsColor" type="color" class="color-input" />
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <!-- Gradient Options -->
-      <div class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-xl">Gradient Options</h2>
-        </div>
-        <div class="p-4">
-          <label class="mb-4 flex items-center">
-            <input type="checkbox" v-model="gradient" class="mr-2" />
-            <span class="text-gray-700">Enable Gradient</span>
-          </label>
-          <div v-if="gradient">
-            <label class="mdc-text-field mb-4">
-              <span class="mb-1 text-gray-700">Gradient Type:</span>
-              <select v-model="gradientType" class="mdc-text-field__input">
-                <option value="linear">Linear</option>
-                <option value="radial">Radial</option>
-              </select>
-              <span class="mdc-line-ripple"></span>
-            </label>
-            <label class="mdc-text-field mb-4">
-              <span class="mb-1 text-gray-700">Gradient Rotation (degrees):</span>
-              <input v-model.number="gradientRotation" type="number" class="mdc-text-field__input" min="0" max="360" />
-              <span class="mdc-line-ripple"></span>
-            </label>
+          <div class="p-4">
             <label class="color-picker-label mb-4">
-              <span class="mb-1 text-gray-700">Gradient Start Color:</span>
+              <span class="mb-1 text-gray-700">Background Color:</span>
               <div class="color-picker">
-                <input v-model="gradientStartColor" type="text" class="color-text-input" />
-                <input v-model="gradientStartColor" type="color" class="color-input" />
-              </div>
-            </label>
-            <label class="color-picker-label mb-4">
-              <span class="mb-1 text-gray-700">Gradient End Color:</span>
-              <div class="color-picker">
-                <input v-model="gradientEndColor" type="text" class="color-text-input" />
-                <input v-model="gradientEndColor" type="color" class="color-input" />
+                <input v-model="bgColor" type="text" class="color-text-input" />
+                <input v-model="bgColor" type="color" class="color-input" />
               </div>
             </label>
           </div>
         </div>
-      </div>
-
-      <!-- Image Options -->
-      <div class="bg-white rounded-md">
-        <div
-          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-xl">Image Options</h2>
+        <!-- Foreground Options -->
+        <div v-if="!gradient" class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Foreground Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Foreground Color:</span>
+              <div class="color-picker">
+                <input v-model="dotsColor" type="text" class="color-text-input" />
+                <input v-model="dotsColor" type="color" class="color-input" />
+              </div>
+            </label>
+          </div>
         </div>
-        <div class="p-4">
-          <label class="mdc-text-field mb-4">
-            <span class="mb-1 text-gray-700">Upload Logo:</span>
-            <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
-            <span class="mdc-line-ripple"></span>
-          </label>
+        <!-- Gradient Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Gradient Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="mb-4 flex items-center">
+              <input type="checkbox" v-model="gradient" class="mr-2" />
+              <span class="text-gray-700">Enable Gradient</span>
+            </label>
+            <div v-if="gradient">
+              <label class="mdc-text-field mb-4">
+                <span class="mb-1 text-gray-700">Gradient Type:</span>
+                <select v-model="gradientType" class="mdc-text-field__input">
+                  <option value="linear">Linear</option>
+                  <option value="radial">Radial</option>
+                </select>
+                <span class="mdc-line-ripple"></span>
+              </label>
+              <label class="mdc-text-field mb-4">
+                <span class="mb-1 text-gray-700">Gradient Rotation (degrees):</span>
+                <input
+                  v-model.number="gradientRotation"
+                  type="number"
+                  class="mdc-text-field__input"
+                  min="0"
+                  max="360"
+                />
+                <span class="mdc-line-ripple"></span>
+              </label>
+              <label class="color-picker-label mb-4">
+                <span class="mb-1 text-gray-700">Gradient Start Color:</span>
+                <div class="color-picker">
+                  <input v-model="gradientStartColor" type="text" class="color-text-input" />
+                  <input v-model="gradientStartColor" type="color" class="color-input" />
+                </div>
+              </label>
+              <label class="color-picker-label mb-4">
+                <span class="mb-1 text-gray-700">Gradient End Color:</span>
+                <div class="color-picker">
+                  <input v-model="gradientEndColor" type="text" class="color-text-input" />
+                  <input v-model="gradientEndColor" type="color" class="color-input" />
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
+        <!-- Image Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Image Options</h2>
+          </div>
+          <div class="p-4">
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Upload Logo:</span>
+              <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+        </div>
+        <!-- Dots Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Dots Options</h2>
+          </div>
+          <div class="p-4">
+            <!-- Dots Type -->
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Dots Type:</span>
+              <select v-model="dotsType" class="mdc-text-field__input">
+                <option value="rounded">Rounded</option>
+                <option value="dots">Dots</option>
+                <option value="classy">Classy</option>
+                <option value="classy-rounded">Classy Rounded</option>
+                <option value="square">Square</option>
+                <option value="extra-rounded">Extra Rounded</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+        </div>
+        <!-- Corners Square Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Corners Square Options</h2>
+          </div>
+          <div class="p-4">
+            <!-- Corners Square Color -->
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Corners Square Color:</span>
+              <div class="color-picker">
+                <input v-model="cornersSquareColor" type="text" class="color-text-input" />
+                <input v-model="cornersSquareColor" type="color" class="color-input" />
+              </div>
+            </label>
+            <!-- Corners Square Type -->
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Corners Square Type:</span>
+              <select v-model="cornersSquareType" class="mdc-text-field__input">
+                <option value="square">Square</option>
+                <option value="dot">Dot</option>
+                <option value="extra-rounded">Extra Rounded</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+        </div>
+        <!-- Corners Dot Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">Corners Dot Options</h2>
+          </div>
+          <div class="p-4">
+            <!-- Corners Dot Color -->
+            <label class="color-picker-label mb-4">
+              <span class="mb-1 text-gray-700">Corners Dot Color:</span>
+              <div class="color-picker">
+                <input v-model="cornersDotColor" type="text" class="color-text-input" />
+                <input v-model="cornersDotColor" type="color" class="color-input" />
+              </div>
+            </label>
+            <!-- Corners Dot Type -->
+            <label class="mdc-text-field mb-4">
+              <span class="mb-1 text-gray-700">Corners Dot Type:</span>
+              <select v-model="cornersDotType" class="mdc-text-field__input">
+                <option value="square">Square</option>
+                <option value="dot">Dot</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+            </label>
+          </div>
+        </div>
+        <!-- Update Button -->
+        <button @click="updateQrCodeSubmit" class="mdc-button w-full mt-4">
+          Update QR Code
+        </button>
       </div>
-
-      <!-- Update Button -->
-      <button @click="updateQrCodeSubmit" class="mdc-button w-full mt-10">
-        Update QR Code
-      </button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue';
-import QRCodeStyling from 'qr-code-styling';
+import { v4 as uuidv4 } from 'uuid';
 
 const qrcodeWrapper = ref(null);
 
@@ -270,57 +323,85 @@ const client = useStrapiClient();
 
 const loading = ref(false);
 
-const { data } = await findOne('qrs', route.params.id, {
-  populate: {
-    event: { populate: '*' },
-    tour: { populate: '*' },
-    album: { populate: '*' },
-    band: { populate: '*' },
-  },
-});
-
-const q_type = ref(data.attributes.q_type || null);
-const link = ref(data.attributes.link || null);
-const name = ref(data.attributes.name || 'add name');
-
-const qrValue = ref(data.attributes.url || '');
-const qrSize = ref(data.attributes.options?.size || 300);
-
-// Adjusted initialization of options to match qr-code-styling structure
-const bgColor = ref(data.attributes.options?.backgroundOptions?.color || '#FFFFFF');
-
-const gradient = ref(!!data.attributes.options?.dotsOptions?.gradient);
-const gradientType = ref(data.attributes.options?.dotsOptions?.gradient?.type || 'linear');
-const gradientRotation = ref(
-  data.attributes.options?.dotsOptions?.gradient?.rotation
-    ? (data.attributes.options.dotsOptions.gradient.rotation * 180) / Math.PI
-    : 0
-);
-const gradientStartColor = ref(
-  data.attributes.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || '#e6289d'
-);
-const gradientEndColor = ref(
-  data.attributes.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || '#40353c'
-);
-
-const imageSettings = reactive({
-  src: data.attributes.options?.imageSettings?.src || '',
-  imageSize: data.attributes.options?.imageSettings?.imageSize || 0.4,
-  margin: data.attributes.options?.imageSettings?.margin || 0,
-  crossOrigin: 'anonymous',
-});
-
-// New reactive variables for dotsOptions, cornersSquareOptions, cornersDotOptions
-const dotsColor = ref(data.attributes.options?.dotsOptions?.color || '#000000');
-const dotsType = ref(data.attributes.options?.dotsOptions?.type || 'square');
-
-const cornersSquareColor = ref(data.attributes.options?.cornersSquareOptions?.color || '#000000');
-const cornersSquareType = ref(data.attributes.options?.cornersSquareOptions?.type || 'square');
-
-const cornersDotColor = ref(data.attributes.options?.cornersDotOptions?.color || '#000000');
-const cornersDotType = ref(data.attributes.options?.cornersDotOptions?.type || 'square');
-
 const qrCode = ref(null);
+
+// Fetch QR code data from backend
+const qrData = ref(null);
+
+onMounted(async () => {
+  loading.value = true;
+  try {
+    const response = await findOne('qrs', route.params.id, {
+      populate: {
+        event: { populate: '*' },
+        tour: { populate: '*' },
+        album: { populate: '*' },
+        band: { populate: '*' },
+      },
+    });
+    qrData.value = response.data;
+
+    // Initialize reactive variables after data is fetched
+    initializeVariables();
+
+    if (process.client) {
+      const { default: QRCodeStyling } = await import('qr-code-styling');
+      qrCode.value = new QRCodeStyling(getQRCodeOptions());
+      qrCode.value.append(qrcodeWrapper.value);
+
+      // Initialize the watcher after qrCode.value is set
+      initializeWatcher();
+    }
+  } catch (error) {
+    console.error('Error fetching QR code data:', error);
+  } finally {
+    loading.value = false;
+  }
+});
+
+function initializeVariables() {
+  const data = qrData.value.attributes;
+
+  q_type.value = data.q_type || null;
+  link.value = data.link || null;
+  name.value = data.name || 'add name';
+  qrValue.value = data.url || '';
+  qrSize.value = data.options?.size || 300;
+
+  bgColor.value = data.options?.backgroundOptions?.color || '#FFFFFF';
+
+  gradient.value = !!data.options?.dotsOptions?.gradient;
+  gradientType.value = data.options?.dotsOptions?.gradient?.type || 'linear';
+  gradientRotation.value = data.options?.dotsOptions?.gradient?.rotation
+    ? (data.options.dotsOptions.gradient.rotation * 180) / Math.PI
+    : 0;
+  gradientStartColor.value =
+    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || '#e6289d';
+  gradientEndColor.value =
+    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || '#40353c';
+
+  imageSettings.src = data.options?.imageOptions?.src || '';
+  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.4;
+  imageSettings.margin = data.options?.imageOptions?.margin || 0;
+  imageSettings.crossOrigin = 'anonymous';
+
+  dotsColor.value = data.options?.dotsOptions?.color || '#000000';
+  dotsType.value = data.options?.dotsOptions?.type || 'square';
+
+  cornersSquareColor.value = data.options?.cornersSquareOptions?.color || '#000000';
+  cornersSquareType.value = data.options?.cornersSquareOptions?.type || 'square';
+
+  cornersDotColor.value = data.options?.cornersDotOptions?.color || '#000000';
+  cornersDotType.value = data.options?.cornersDotOptions?.type || 'square';
+
+  selectedEvent.value = data.event?.data?.id ?? null;
+  selectedTour.value = data.tour?.data?.id ?? null;
+  selectedAlbum.value = data.album?.data?.id ?? null;
+  selectedBand.value = data.band?.data?.id ?? null;
+
+  // Fetch user-related data
+  fetchUserRelatedData();
+}
 
 function getQRCodeOptions() {
   const options = {
@@ -374,36 +455,67 @@ function getQRCodeOptions() {
   return options;
 }
 
-onMounted(() => {
-  qrCode.value = new QRCodeStyling(getQRCodeOptions());
-  qrCode.value.append(qrcodeWrapper.value);
+function initializeWatcher() {
+  watch(
+    [
+      qrValue,
+      qrSize,
+      bgColor,
+      dotsColor,
+      dotsType,
+      cornersSquareColor,
+      cornersSquareType,
+      cornersDotColor,
+      cornersDotType,
+      gradient,
+      gradientType,
+      gradientRotation,
+      gradientStartColor,
+      gradientEndColor,
+      () => imageSettings.src,
+    ],
+    () => {
+      if (qrCode.value) {
+        qrCode.value.update(getQRCodeOptions());
+      }
+    },
+    { deep: true }
+  );
+}
+
+const qrValue = ref('');
+const qrSize = ref(300);
+
+const bgColor = ref('#FFFFFF');
+const fgColor = ref('#000000');
+
+const gradient = ref(false); // Toggle for enabling gradient
+const gradientType = ref('linear'); // 'linear' or 'radial'
+const gradientRotation = ref(0); // For linear gradient rotation in degrees
+const gradientStartColor = ref('#e6289d');
+const gradientEndColor = ref('#40353c');
+
+const name = ref('name');
+const link = ref(null);
+
+const imageSettings = reactive({
+  src: '', // Will be set when image is uploaded
+  imageSize: 0.4,
+  margin: 0,
+  crossOrigin: 'anonymous',
 });
 
-watch(
-  [
-    qrValue,
-    qrSize,
-    bgColor,
-    dotsColor,
-    dotsType,
-    cornersSquareColor,
-    cornersSquareType,
-    cornersDotColor,
-    cornersDotType,
-    gradient,
-    gradientType,
-    gradientRotation,
-    gradientStartColor,
-    gradientEndColor,
-    () => imageSettings.src,
-  ],
-  () => {
-    if (qrCode.value) {
-      qrCode.value.update(getQRCodeOptions());
-    }
-  },
-  { deep: true }
-);
+// New reactive variables for dotsOptions, cornersSquareOptions, cornersDotOptions
+const dotsColor = ref('#000000');
+const dotsType = ref('square');
+
+const cornersSquareColor = ref('#000000');
+const cornersSquareType = ref('square');
+
+const cornersDotColor = ref('#000000');
+const cornersDotType = ref('square');
+
+const q_type = ref(null);
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -421,10 +533,10 @@ const events = ref([]);
 const tours = ref([]);
 const albums = ref([]);
 
-const selectedEvent = ref(data.attributes.event?.data?.id ?? null);
-const selectedTour = ref(data.attributes.tour?.data?.id ?? null);
-const selectedAlbum = ref(data.attributes.album?.data?.id ?? null);
-const selectedBand = ref(data.attributes.band?.data?.id ?? null);
+const selectedEvent = ref(null);
+const selectedTour = ref(null);
+const selectedAlbum = ref(null);
+const selectedBand = ref(null);
 
 const fetchUserRelatedData = async () => {
   try {
@@ -444,9 +556,7 @@ const fetchUserRelatedData = async () => {
   }
 };
 
-fetchUserRelatedData();
-
-const handleSelection = (type) => {
+const selectType = (type) => {
   q_type.value = type;
   link.value = null;
   selectedBand.value = null;
@@ -454,7 +564,7 @@ const handleSelection = (type) => {
   selectedTour.value = null;
   selectedEvent.value = null;
 
-  if (type === 'link') {
+  if (type === 'externalURL') {
     qrValue.value = link.value || '';
   }
 };
@@ -466,7 +576,7 @@ const updateQrCodeSubmit = async () => {
     const formData = new FormData();
 
     // Update qrValue based on q_type
-    if (q_type.value === 'link' && link.value) {
+    if (q_type.value === 'externalURL' && link.value) {
       qrValue.value = link.value;
     }
 
@@ -483,8 +593,8 @@ const updateQrCodeSubmit = async () => {
         },
         imageOptions: { ...imageSettings },
         dotsOptions: {
-          color: dotsColor.value,
           type: dotsType.value,
+          color: !gradient.value ? dotsColor.value : undefined,
           gradient: gradient.value
             ? {
                 type: gradientType.value,
@@ -544,9 +654,12 @@ const updateQrCodeSubmit = async () => {
 };
 </script>
 
-
-
 <style scoped>
+/* Container Styling */
+.container {
+  margin-top: 2rem;
+}
+
 /* Spinner Styling */
 .loading-container {
   position: fixed;

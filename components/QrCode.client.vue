@@ -233,9 +233,9 @@
                 <option value="rounded">Rounded</option>
                 <option value="dots">Dots</option>
                 <option value="classy">Classy</option>
-                <option value="classy-rounded">Classy Rounded</option>
+                <option value="classyRounded">Classy Rounded</option>
                 <option value="square">Square</option>
-                <option value="extra-rounded">Extra Rounded</option>
+                <option value="extraRounded">Extra Rounded</option>
               </select>
               <span class="mdc-line-ripple"></span>
             </label>
@@ -263,7 +263,7 @@
               <select v-model="cornersSquareType" class="mdc-text-field__input">
                 <option value="square">Square</option>
                 <option value="dot">Dot</option>
-                <option value="extra-rounded">Extra Rounded</option>
+                <option value="extraRounded">Extra Rounded</option>
               </select>
               <span class="mdc-line-ripple"></span>
             </label>
@@ -308,7 +308,6 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import QRCodeStyling from 'qr-code-styling';
 
 const qrcodeWrapper = ref(null);
 
@@ -413,36 +412,44 @@ function getQRCodeOptions() {
   return options;
 }
 
-onMounted(() => {
-  qrCode.value = new QRCodeStyling(getQRCodeOptions());
-  qrCode.value.append(qrcodeWrapper.value);
+onMounted(async () => {
+  if (process.client) {
+    const { default: QRCodeStyling } = await import('qr-code-styling');
+    qrCode.value = new QRCodeStyling(getQRCodeOptions());
+    qrCode.value.append(qrcodeWrapper.value);
+
+    // Initialize the watcher after qrCode.value is set
+    initializeWatcher();
+  }
 });
 
-watch(
-  [
-    qrValue,
-    qrSize,
-    bgColor,
-    dotsColor,
-    dotsType,
-    cornersSquareColor,
-    cornersSquareType,
-    cornersDotColor,
-    cornersDotType,
-    gradient,
-    gradientType,
-    gradientRotation,
-    gradientStartColor,
-    gradientEndColor,
-    () => imageSettings.src,
-  ],
-  () => {
-    if (qrCode.value) {
-      qrCode.value.update(getQRCodeOptions());
-    }
-  },
-  { deep: true }
-);
+function initializeWatcher() {
+  watch(
+    [
+      qrValue,
+      qrSize,
+      bgColor,
+      dotsColor,
+      dotsType,
+      cornersSquareColor,
+      cornersSquareType,
+      cornersDotColor,
+      cornersDotType,
+      gradient,
+      gradientType,
+      gradientRotation,
+      gradientStartColor,
+      gradientEndColor,
+      () => imageSettings.src,
+    ],
+    () => {
+      if (qrCode.value) {
+        qrCode.value.update(getQRCodeOptions());
+      }
+    },
+    { deep: true }
+  );
+}
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -554,6 +561,7 @@ const saveQrCode = async () => {
   }
 };
 </script>
+
 
 <style scoped>
 /* Container Styling */
