@@ -3,17 +3,17 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-    <div ref="qrcodeWrapper">
-    <qrcode-vue
-      v-bind="qrProps"
-      class="p-4 border border-gray-300 rounded-lg shadow-md"
-    />
+    <!-- QR Code Wrapper -->
+    <div ref="qrcodeWrapper" class="p-4 border border-gray-300 rounded-lg shadow-md">
+      <!-- QR code will be rendered here by qr-code-styling -->
     </div>
 
     <div class="mt-4 flex flex-col space-y-4 w-full">
       <!-- QR Name -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <span class="mb-1 text-white text-xl font-semibold">Name of QR</span>
         </div>
         <div class="p-4">
@@ -26,7 +26,9 @@
 
       <!-- Choose QR Type -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <span class="mb-1 text-white text-xl font-semibold">Edit QR Type</span>
         </div>
         <div class="p-4">
@@ -86,7 +88,9 @@
 
       <!-- QR Type Selection -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h2 class="font-semibold text-white text-xl">Select Associated Content</h2>
         </div>
         <div class="p-4">
@@ -146,7 +150,9 @@
 
       <!-- Background Options -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h2 class="font-semibold text-white text-xl">Background Options</h2>
         </div>
         <div class="p-4">
@@ -162,15 +168,17 @@
 
       <!-- Foreground Options -->
       <div v-if="!gradient" class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h2 class="font-semibold text-white text-xl">Foreground Options</h2>
         </div>
         <div class="p-4">
           <label class="color-picker-label mb-4">
             <span class="mb-1 text-gray-700">Foreground Color:</span>
             <div class="color-picker">
-              <input v-model="fgColor" type="text" class="color-text-input" />
-              <input v-model="fgColor" type="color" class="color-input" />
+              <input v-model="dotsColor" type="text" class="color-text-input" />
+              <input v-model="dotsColor" type="color" class="color-input" />
             </div>
           </label>
         </div>
@@ -178,7 +186,9 @@
 
       <!-- Gradient Options -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h2 class="font-semibold text-white text-xl">Gradient Options</h2>
         </div>
         <div class="p-4">
@@ -220,7 +230,9 @@
 
       <!-- Image Options -->
       <div class="bg-white rounded-md">
-        <div class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h2 class="font-semibold text-white text-xl">Image Options</h2>
         </div>
         <div class="p-4">
@@ -241,10 +253,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import QrcodeVue from 'qrcode.vue';
-
+import { ref, reactive, watch, onMounted } from 'vue';
+import QRCodeStyling from 'qr-code-styling';
 
 const qrcodeWrapper = ref(null);
 
@@ -269,46 +279,117 @@ const { data } = await findOne('qrs', route.params.id, {
   },
 });
 
-const qrcodeRef = ref(null);
 const q_type = ref(data.attributes.q_type || null);
 const link = ref(data.attributes.link || null);
 const name = ref(data.attributes.name || 'add name');
 
 const qrValue = ref(data.attributes.url || '');
 const qrSize = ref(data.attributes.options?.size || 300);
-const qrLevel = ref(data.attributes.options?.level || 'L');
-const bgColor = ref(data.attributes.options?.background || '#FFFFFF');
-const fgColor = ref(data.attributes.options?.foreground || '#000000');
 
-const gradient = ref(data.attributes.options?.gradient || false);
-const gradientType = ref(data.attributes.options?.gradientType || 'linear');
-const gradientRotation = ref(data.attributes.options?.gradientRotation || 0);
-const gradientStartColor = ref(data.attributes.options?.gradientStartColor || '#e6289d');
-const gradientEndColor = ref(data.attributes.options?.gradientEndColor || '#40353c');
+// Adjusted initialization of options to match qr-code-styling structure
+const bgColor = ref(data.attributes.options?.backgroundOptions?.color || '#FFFFFF');
+
+const gradient = ref(!!data.attributes.options?.dotsOptions?.gradient);
+const gradientType = ref(data.attributes.options?.dotsOptions?.gradient?.type || 'linear');
+const gradientRotation = ref(
+  data.attributes.options?.dotsOptions?.gradient?.rotation
+    ? (data.attributes.options.dotsOptions.gradient.rotation * 180) / Math.PI
+    : 0
+);
+const gradientStartColor = ref(
+  data.attributes.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || '#e6289d'
+);
+const gradientEndColor = ref(
+  data.attributes.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || '#40353c'
+);
 
 const imageSettings = reactive({
   src: data.attributes.options?.imageSettings?.src || '',
-  height: data.attributes.options?.imageSettings?.height || 60,
-  width: data.attributes.options?.imageSettings?.width || 60,
-  excavate: data.attributes.options?.imageSettings?.excavate || true,
+  imageSize: data.attributes.options?.imageSettings?.imageSize || 0.4,
+  margin: data.attributes.options?.imageSettings?.margin || 0,
+  crossOrigin: 'anonymous',
 });
 
-const qrProps = reactive({
-  value: qrValue.value,
-  size: qrSize.value,
-  level: qrLevel.value,
-  background: bgColor.value,
-  foreground: fgColor.value,
-  imageSettings: { ...imageSettings },
+// New reactive variables for dotsOptions, cornersSquareOptions, cornersDotOptions
+const dotsColor = ref(data.attributes.options?.dotsOptions?.color || '#000000');
+const dotsType = ref(data.attributes.options?.dotsOptions?.type || 'square');
+
+const cornersSquareColor = ref(data.attributes.options?.cornersSquareOptions?.color || '#000000');
+const cornersSquareType = ref(data.attributes.options?.cornersSquareOptions?.type || 'square');
+
+const cornersDotColor = ref(data.attributes.options?.cornersDotOptions?.color || '#000000');
+const cornersDotType = ref(data.attributes.options?.cornersDotOptions?.type || 'square');
+
+const qrCode = ref(null);
+
+function getQRCodeOptions() {
+  const options = {
+    width: qrSize.value,
+    height: qrSize.value,
+    data: qrValue.value,
+    dotsOptions: {
+      type: dotsType.value,
+    },
+    cornersSquareOptions: {
+      color: cornersSquareColor.value,
+      type: cornersSquareType.value,
+    },
+    cornersDotOptions: {
+      color: cornersDotColor.value,
+      type: cornersDotType.value,
+    },
+    backgroundOptions: {
+      color: bgColor.value,
+    },
+    imageOptions: {
+      crossOrigin: imageSettings.crossOrigin,
+      margin: imageSettings.margin,
+      imageSize: imageSettings.imageSize,
+    },
+  };
+
+  // Set image if available
+  if (imageSettings.src) {
+    options.image = imageSettings.src;
+  }
+
+  // Handle gradient and color for dotsOptions
+  if (gradient.value) {
+    options.dotsOptions.gradient = {
+      type: gradientType.value,
+      rotation: (gradientRotation.value * Math.PI) / 180, // Convert degrees to radians
+      colorStops: [
+        { offset: 0, color: gradientStartColor.value },
+        { offset: 1, color: gradientEndColor.value },
+      ],
+    };
+    // Ensure color is not set when gradient is used
+    delete options.dotsOptions.color;
+  } else {
+    options.dotsOptions.color = dotsColor.value;
+    // Ensure gradient is not set when color is used
+    delete options.dotsOptions.gradient;
+  }
+
+  return options;
+}
+
+onMounted(() => {
+  qrCode.value = new QRCodeStyling(getQRCodeOptions());
+  qrCode.value.append(qrcodeWrapper.value);
 });
 
 watch(
   [
     qrValue,
     qrSize,
-    qrLevel,
     bgColor,
-    fgColor,
+    dotsColor,
+    dotsType,
+    cornersSquareColor,
+    cornersSquareType,
+    cornersDotColor,
+    cornersDotType,
     gradient,
     gradientType,
     gradientRotation,
@@ -317,22 +398,8 @@ watch(
     () => imageSettings.src,
   ],
   () => {
-    qrProps.value = qrValue.value;
-    qrProps.size = qrSize.value;
-    qrProps.level = qrLevel.value;
-    qrProps.background = bgColor.value;
-    qrProps.imageSettings = { ...imageSettings };
-
-    if (gradient.value) {
-      qrProps.gradient = true;
-      qrProps.gradientType = gradientType.value;
-      qrProps.gradientRotation = gradientRotation.value;
-      qrProps.gradientStartColor = gradientStartColor.value;
-      qrProps.gradientEndColor = gradientEndColor.value;
-      qrProps.foreground = null;
-    } else {
-      qrProps.gradient = false;
-      qrProps.foreground = fgColor.value;
+    if (qrCode.value) {
+      qrCode.value.update(getQRCodeOptions());
     }
   },
   { deep: true }
@@ -397,6 +464,12 @@ const updateQrCodeSubmit = async () => {
   try {
     loading.value = true;
     const formData = new FormData();
+
+    // Update qrValue based on q_type
+    if (q_type.value === 'link' && link.value) {
+      qrValue.value = link.value;
+    }
+
     const form = {
       url: qrValue.value,
       users_permissions_user: { id: user.value.id },
@@ -405,15 +478,32 @@ const updateQrCodeSubmit = async () => {
       name: name.value,
       options: {
         size: qrSize.value,
-        level: qrLevel.value,
-        background: bgColor.value,
-        foreground: fgColor.value,
-        gradient: gradient.value,
-        gradientType: gradientType.value,
-        gradientRotation: gradientRotation.value,
-        gradientStartColor: gradientStartColor.value,
-        gradientEndColor: gradientEndColor.value,
-        imageSettings: { ...imageSettings },
+        backgroundOptions: {
+          color: bgColor.value,
+        },
+        imageOptions: { ...imageSettings },
+        dotsOptions: {
+          color: dotsColor.value,
+          type: dotsType.value,
+          gradient: gradient.value
+            ? {
+                type: gradientType.value,
+                rotation: (gradientRotation.value * Math.PI) / 180,
+                colorStops: [
+                  { offset: 0, color: gradientStartColor.value },
+                  { offset: 1, color: gradientEndColor.value },
+                ],
+              }
+            : undefined,
+        },
+        cornersSquareOptions: {
+          color: cornersSquareColor.value,
+          type: cornersSquareType.value,
+        },
+        cornersDotOptions: {
+          color: cornersDotColor.value,
+          type: cornersDotType.value,
+        },
       },
       band: selectedBand.value !== 'createNew' ? selectedBand.value : null,
       album: selectedAlbum.value !== 'createNew' ? selectedAlbum.value : null,
@@ -421,10 +511,8 @@ const updateQrCodeSubmit = async () => {
       tour: selectedTour.value !== 'createNew' ? selectedTour.value : null,
     };
 
-    // const canvas = qrcodeRef.value.$el.querySelector('canvas');
-    const canvas = qrcodeWrapper.value.querySelector('canvas');
-
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    // Get the QR code as a blob
+    const blob = await qrCode.value.getRawData('png');
     const file = new File([blob], 'qrcode.png');
 
     formData.append('files.q_image', file, 'qrcode.png');
@@ -455,6 +543,8 @@ const updateQrCodeSubmit = async () => {
   }
 };
 </script>
+
+
 
 <style scoped>
 /* Spinner Styling */
