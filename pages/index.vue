@@ -25,11 +25,11 @@
             </div>
             <p class=" text-2xl text-center  leading-10 2xl:text-left ">Amplify your brand with custom QR codes, personalized splash pages, and seamless social media connections. </p>
             <ul class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6">
-              <li>Create branded QR codes</li>
-              <li>Generate personalized splash pages</li>
-              <li>Add custom audio players</li>
-              <li>Showcase band pages and tour dates</li>
-              <li>Connect social media links and streaming services</li>
+              <li>Create QR codes</li>
+              <li>Feature Music pages</li>
+              <li>Add audio players</li>
+              <li>Artist pages</li>
+              <li>Connnect social media links, streaming, websites</li>
             </ul>
             <div class="mt-16 justify-center  mb-10 flex flex-col md:flex-row xl:justify-start items-center  gap-x-6">
               <NuxtLink to="/signup" class="mdc-button mb-4 w-full md:mb-0 md:w-auto">Get started</NuxtLink>
@@ -46,7 +46,7 @@
 
       <!-- grid of main features and branded qrs -->
       <section class="text-center 2xl:text-left mb-2 mx-auto  px-2 w-full  lg:w-[90vw] lg:px-6 mt-0 lg:mb-20" >
-        <h2 class=" text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold  mt-0 "> <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Splash Pages</span> for your branded  <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 italic ">QRS</span></h2>
+        <h2 class=" text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold  mt-0 "> <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">Example Splash Pages</span>   <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 italic "></span></h2>
       </section>
       
       <section class="mx-auto px-1 pt-6 2xl:pt-0  w-[90vw] 2xl:px-6" >
@@ -80,8 +80,8 @@
       <div class="flex justify-center py-10  md:py-32 image_gradient my-8 md:my-16">
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
           <!-- heading  -->
-          <div class="mb-10">
-            <h2 class="text-3xl  text-center md:text-5xl text-white font-bold mb-4">Amplify Your Reach with Smart Links</h2>
+          <div class="mb-24">
+            <h2 class="text-3xl  text-center md:text-5xl text-white font-bold mb-4">Example Desktop Splash Pages</h2>
           </div>
           <!-- swiper with cards  -->
           <Swiper

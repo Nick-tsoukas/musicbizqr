@@ -1,4 +1,26 @@
-# task list 
+# notes on zoom 
+
+- [] rework text !important 
+  - home page 
+    - hero section 
+      - bullet point 
+      - add analytics to bullet points analytics tracking 
+        - branded qr or create qr codes (create qr codes )
+  - feature music pages feature your content product content links 
+  - connnect social media links, streaming, websites 
+  - create an account create account / member login 
+  - splash pages for heading 
+  - example splash page 
+  - change band page lingo ... artist music artist !!!
+  - music player 
+  - social to social media 
+
+  - make splash page buttons move user friendly hover effect 
+
+  - change text in splash page photos 
+  - your link use the word you in the context  text 
+  - desktop mobile  optimized 
+
 
 ## Saturday list
 
