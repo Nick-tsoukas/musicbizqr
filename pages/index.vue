@@ -32,8 +32,8 @@
               <li>Connnect social media links, streaming, websites</li>
             </ul>
             <div class="mt-16 justify-center  mb-10 flex flex-col md:flex-row xl:justify-start items-center  gap-x-6">
-              <NuxtLink to="/signup" class="mdc-button mb-4 w-full md:mb-0 md:w-auto">Get started</NuxtLink>
-              <NuxtLink to="/login" class="mdc-button w-full md:w-auto">Login </NuxtLink>
+              <NuxtLink to="/signup" class="mdc-button mb-4 w-full md:mb-0 md:w-auto">Create Account</NuxtLink>
+              <NuxtLink to="/login" class="mdc-button w-full md:w-auto">Member Login </NuxtLink>
             </div>
           </div>
           <div class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow ">
@@ -300,7 +300,7 @@ const imageToRender = ref(bandScreen)
 const show = ref(false)
 
 
-const splashPages = ref(['Band Page', 'Album Player', "Streaming Links", "Social links", "Website Url", "Video Grid"])
+const splashPages = ref(['Band Page', 'Music Player', "Streaming Links", "Social links", "Website Url", "Video Grid"])
 
 const splashImages = ref([
   musicSvg, recordSvg, streamingSvg, facebookSvg, websiteSvg, videoSvg,
@@ -434,8 +434,8 @@ function selectPage(i, page) {
    // somevaluie is set to bandmobilescreen.png
    imageToRender.value = bandScreen
  }
- if(page == 'Album Player'){
-  // change image to Album player screenshot and get url 
+ if(page == 'Music Player'){
+  // change image to Music Player screenshot and get url 
   imageToRender.value = albumScreen
 
  }
