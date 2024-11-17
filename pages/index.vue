@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000] verflow-x-hidden">
+  <div class="bg-[#000] overflow-x-hidden">
 
     <!-- Main content -->
     <main>
@@ -149,7 +149,7 @@
  
   <!-- main band image  -->
    <div class="w-screen mx-auto" >
-    <h2 class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center font-extrabold tracking-tight text-7xl md:text-8xl lg:text-center">
+    <h2 class="bg-clip-text text-transparent bg-gradient-to-r pb-10 from-pink-500 to-violet-500  text-center font-extrabold tracking-tight text-5xl md:text-8xl lg:text-center">
   Build Your Band Page
     </h2> 
     <img class="mx-auto" :src="bandDeskPage" alt="">
@@ -189,7 +189,7 @@
                   </radialGradient>
                 </defs>
               </svg> -->
-              <div class="" aria-hidden="true" />
+              <!-- <div class="" aria-hidden="true" /> -->
 
               <div v-for="tier in pricing.tiers" :key="tier.id" :class="[tier.featured ? 'z-10 bg-white shadow-xl ring-1 ring-gray-900/10' : 'bg-gray-800/80 ring-1 ring-white/10 lg:bg-transparent lg:pb-14 lg:ring-0', 'relative rounded-2xl']">
                 <div class="p-8 lg:pt-12 xl:p-10 xl:pt-14">
