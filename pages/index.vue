@@ -300,7 +300,7 @@ const imageToRender = ref(bandScreen)
 const show = ref(false)
 
 
-const splashPages = ref(['Band Page', 'Music Player', "Streaming Links", "Social links", "Website Url", "Video Grid"])
+const splashPages = ref(['Band Page', 'Music Player', "Streaming Links", "Social Media", "Website Url", "Video Grid"])
 
 const splashImages = ref([
   musicSvg, recordSvg, streamingSvg, facebookSvg, websiteSvg, videoSvg,
@@ -444,7 +444,7 @@ function selectPage(i, page) {
   imageToRender.value = streamScreen
 
  }
- if(page == 'Social Links'){
+ if(page == 'Social Media'){
   imageToRender.value = socialScreen
  }
  if(page == 'Website Url'){
