@@ -68,7 +68,7 @@
           </div>
           <!-- grid of screens  -->
           <div class="flex element_scroll flex-row overflow-scroll lg:justify-center  2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2  ">
-           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-52 2xl:h-20 2xl:w-[30%]  p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative"  > <img class="absolute top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl">{{ page }}</span>  </div>
+           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green border-4 transform scale-105 transition duration-300' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-52 2xl:h-20 2xl:w-[30%]  p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative cursor-pointer"  > <img class="absolute top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl">{{ page }}</span>  </div>
               
         </div>
 
@@ -153,7 +153,7 @@
   <!-- main band image  -->
    <div class="w-screen mx-auto" >
     <h2 class="bg-clip-text text-transparent bg-gradient-to-r pb-10 from-pink-500 to-violet-500  text-center font-extrabold tracking-tight text-5xl md:text-8xl lg:text-center">
-  Build Your Band Page
+  Build Your Artist Page
     </h2> 
     <img class="mx-auto" :src="bandDeskPage" alt="">
    </div>
@@ -300,7 +300,7 @@ const imageToRender = ref(bandScreen)
 const show = ref(false)
 
 
-const splashPages = ref(['Band Page', 'Music Player', "Streaming Links", "Social Media", "Website Url", "Video Grid"])
+const splashPages = ref(['Artist Page', 'Music Player', "Streaming Links", "Social Media", "Website Url", "Video Grid"])
 
 const splashImages = ref([
   musicSvg, recordSvg, streamingSvg, facebookSvg, websiteSvg, videoSvg,
@@ -430,7 +430,7 @@ const options = {
 }
 
 function selectPage(i, page) {
- if(page == 'Band Page'){
+ if(page == 'Artist Page'){
    // somevaluie is set to bandmobilescreen.png
    imageToRender.value = bandScreen
  }
