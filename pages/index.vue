@@ -1,13 +1,16 @@
 <template>
   <div class="bg-[#000] overflow-x-hidden">
-
-    <!-- Main content -->
-    <main>
-      <!-- Hero section -->
-      <NuxtParticles
+    <NuxtParticles
           id="tsparticles"
           :options="options"
         />
+    <!-- Main content -->
+    <main>
+      <!-- Hero section -->
+      <!-- <NuxtParticles
+          id="tsparticles"
+          :options="options"
+        /> -->
       <div class="relative isolate min-h-[50vh] ">
        
        <!-- mobile  -->
@@ -235,6 +238,8 @@ import streamLinksPage from '@/assets/socialpagedesktopnew.png';
 import albumDeskPage from'@/assets/newalbumpagedesktop.png'; // Replace with your actual image file
 import socialDeskPage from '@/assets/socialpagedesktopnew.png'; // Thumbnail images
 import bandDeskPage from '@/assets/newbandpageimage.png';
+import evnetsDesk from '@/assets/eventsdesk.png'; // Thumbnail images
+
 
 // Import Swiper styles
 import 'swiper/css';
@@ -243,9 +248,9 @@ import 'swiper/css/effect-cards';
 
 // Define your slides data
 const slides = [
+{ image: evnetsDesk, thumbnail: streamLinksPage },
   { image: streamLinksPage, thumbnail: streamLinksPage },
   { image: albumDeskPage, thumbnail: streamLinksPage },
-  { image: socialDeskPage, thumbnail: streamLinksPage },
   { image: socialDeskPage, thumbnail: streamLinksPage },
   // Add more slides as needed
 ];
@@ -266,9 +271,12 @@ import facebookSvg from '@/assets/facebook-icon-white.svg'
 import websiteSvg from '@/assets/website.svg'
 import videoSvg from '@/assets/video.svg'
 
-import bandScreen from '@/assets/bandmobilescreen.png'
-import albumScreen from '@/assets/albumpage.png'
-import streamScreen from '@/assets/strealinkpagenewone.png'
+import bandScreen from '@/assets/newbandhome.jpg'
+import albumScreen from '@/assets/albumnewpage.jpg'
+import streamScreen from '@/assets/socialnewpage.jpg'
+import socialScreen from '@/assets/socialnewpage.jpg'
+import externalScreen from '@/assets/newbandhome.jpg'
+
 
 
 
@@ -437,14 +445,14 @@ function selectPage(i, page) {
 
  }
  if(page == 'Social Links'){
-  imageToRender.value = '/assets/streamsplash.png'
+  imageToRender.value = socialScreen
  }
- if(page == 'Webiste Url'){
+ if(page == 'Website Url'){
    imageToRender.value = bandScreen
  }
-//  if(page == 'Video Grid'){
-//   // Video Grid 
-//  }
+ if(page == 'Video Grid'){
+  imageToRender.value = bandScreen
+ }
   selectedPage.value  = i
   
 }
