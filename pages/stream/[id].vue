@@ -18,13 +18,17 @@
          <p class="text-white " >Apple Music</p>
         <!-- <p class="text-white" >{{ stream.attributes.applemusic }}</p> -->
       </NuxtLink>
-      <NuxtLink v-if="stream.attributes.applemusic" class="flex gap-4 bg-gradient-to-r from-pink-500 to-violet-500 w-fullmx-auto p-4 rounded-md shadow-lg  mb-6"  >
+      <NuxtLink v-if="stream.attributes.spotify" class="flex gap-4 bg-gradient-to-r from-pink-500 to-violet-500 w-fullmx-auto p-4 rounded-md shadow-lg  mb-6"  >
         <img src="@/assets/spot.svg" class="h-6 w-6" alt="">
         <p class="text-white ">Spotify</p>
       </NuxtLink>
-      <NuxtLink v-if="stream.attributes.applemusic" class="flex gap-4 bg-gradient-to-r from-pink-500 to-violet-500 w-full mx-auto p-4 rounded-md shadow-lg mb-6"  >
+      <NuxtLink v-if="stream.attributes.youtubemusic" class="flex gap-4 bg-gradient-to-r from-pink-500 to-violet-500 w-full mx-auto p-4 rounded-md shadow-lg mb-6"  >
         <img src="@/assets/ymusic.svg" class="h-6 w-6" alt="">
-        <p class="text-white">Youtubemusic</p>
+        <p class="text-white">Youtube Music</p>
+      </NuxtLink>
+      <NuxtLink v-if="stream.attributes.soundcloud" class="flex gap-4 bg-gradient-to-r from-pink-500 to-violet-500 w-full mx-auto p-4 rounded-md shadow-lg mb-6"  >
+        <img src="@/assets/soundcloudlast.png" class="h-6 w-6" alt="">
+        <p class="text-white">Soundcloud</p>
       </NuxtLink>
     </div>
 

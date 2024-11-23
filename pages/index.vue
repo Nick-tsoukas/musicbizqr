@@ -234,11 +234,14 @@ import { Thumbs } from 'swiper/modules';
 import { EffectCards } from 'swiper/modules';
 import type { Swiper as SwiperInstance } from 'swiper/types';
 
+//  mockups 
+import videoMobilePage from '@/assets/vidgrid.jpg';
 import streamLinksPage from '@/assets/socialpagedesktopnew.png';
 import albumDeskPage from'@/assets/newalbumpagedesktop.png'; // Replace with your actual image file
 import socialDeskPage from '@/assets/socialpagedesktopnew.png'; // Thumbnail images
 import bandDeskPage from '@/assets/newbandpageimage.png';
 import evnetsDesk from '@/assets/eventsdesk.png'; // Thumbnail images
+import videoDesk from '@/assets/desktopvideogrid.png'
 
 
 // Import Swiper styles
@@ -246,12 +249,15 @@ import 'swiper/css';
 import 'swiper/css/thumbs';
 import 'swiper/css/effect-cards';
 
-// Define your slides data
+// Define your slides data for the swiper desktop splash page demo 
 const slides = [
+{ image: videoDesk, thumbnail: streamLinksPage },
 { image: evnetsDesk, thumbnail: streamLinksPage },
   { image: streamLinksPage, thumbnail: streamLinksPage },
   { image: albumDeskPage, thumbnail: streamLinksPage },
   { image: socialDeskPage, thumbnail: streamLinksPage },
+ 
+
   // Add more slides as needed
 ];
 
@@ -273,9 +279,11 @@ import videoSvg from '@/assets/video.svg'
 
 import bandScreen from '@/assets/newbandhome.jpg'
 import albumScreen from '@/assets/albumnewpage.jpg'
-import streamScreen from '@/assets/socialnewpage.jpg'
+import streamScreen from '@/assets/laststreampage.jpg'
 import socialScreen from '@/assets/socialnewpage.jpg'
 import externalScreen from '@/assets/newbandhome.jpg'
+import videoScreen from '@/assets/vidgrid.jpg'
+
 
 
 
@@ -451,7 +459,7 @@ function selectPage(i, page) {
    imageToRender.value = bandScreen
  }
  if(page == 'Video Grid'){
-  imageToRender.value = bandScreen
+  imageToRender.value = videoScreen
  }
   selectedPage.value  = i
   
