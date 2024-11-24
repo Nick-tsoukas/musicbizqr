@@ -75,7 +75,7 @@
       'transform scale-105 transition duration-300 border-transparent bg-gradient-to-r from-pink-500 to-violet-500': selectedPage === index,
       'border-gray-300': selectedPage !== index
     }"
-    class="min-w-[50vw] h-20 w-auto rounded-lg bg-white text-center 2xl:w-[30%] p-0 flex justify-center items-center border-2 text-xl font-semibold relative cursor-pointer"
+    class="min-w-[50vw] m-2 h-20 w-auto rounded-lg bg-white text-center 2xl:w-[30%]  p-0 flex justify-center items-center border-2 text-xl font-semibold relative cursor-pointer"
   >
     <img
       class="hidden top-4 left-4 h-6 lg:h-[50px]"
