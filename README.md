@@ -1,3 +1,7 @@
+# task list for today 
+
+- [] 
+
 # notes on zoom 
 
 - [] rework text !important 
@@ -25,6 +29,7 @@
 ## Saturday list
 
 - [] problems with edit album the image 
+
 ## home page 
 - [] 
 

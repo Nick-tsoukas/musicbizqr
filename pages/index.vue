@@ -21,7 +21,7 @@
             <h1 class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center font-extrabold tracking-tight text-7xl md:text-8xl lg:text-left">
   Music Biz Qr
 </h1>            <div class="flex justify-center mb-12 2xl:hidden" >
-              <img src="@/assets/qrcode.png" alt="" class="h-[275px] w-[275px]" >
+              <img src="@/assets/qrcode.png" alt="" class="h-[225px] w-[225px]" >
             </div>
             <p class=" text-2xl text-center  leading-10 2xl:text-left ">Amplify your brand with custom QR codes, personalized splash pages, and seamless social media connections. </p>
             <ul class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6">
@@ -37,7 +37,7 @@
             </div>
           </div>
           <div class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow ">
-            <img src="@/assets/qrcode.png" alt="" class=" md:h-[450px] md:w-[450px]" >
+            <img src="@/assets/qrcode.png" alt="" class=" md:h-[225px] md:w-[225px]" >
           </div>
           
         </div>
