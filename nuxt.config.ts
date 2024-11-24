@@ -30,7 +30,23 @@ export default defineNuxtConfig({
     '@vee-validate/nuxt',
     "@nuxt/image",
     "nuxt-particles",
+    "@unlok-co/nuxt-stripe"
   ],
+
+  stripe: {
+    server: {
+      key: process.env.STRIPE_SECRET_KEY,
+      options: {
+        // Optional: Additional Stripe configuration options
+      },
+    },
+    client: {
+      key: process.env.STRIPE_PUBLIC_KEY,
+      options: {
+        // Optional: Additional Stripe.js configuration options
+      },
+    },
+  },
 
   particles: {
     mode: 'full',
