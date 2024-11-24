@@ -37,7 +37,7 @@
             </div>
           </div>
           <div class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow ">
-            <img src="@/assets/qrcode.png" alt="" class=" md:h-[225px] md:w-[225px]" >
+            <img src="@/assets/qrcode.png" alt="" class=" md:h-[425px] md:w-[425px]" >
           </div>
           
         </div>
@@ -68,7 +68,9 @@
           </div>
           <!-- grid of screens  -->
           <div class="flex element_scroll flex-row overflow-scroll lg:justify-center  2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2  ">
-           <div v-for="(page, index) in splashPages" :key="index" :class="{'border-green border-4 transform scale-105 transition duration-300' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-52 2xl:h-20 2xl:w-[30%]  p-0 text-white flex justify-center items-center border-2 text-2xl font-semibold relative cursor-pointer"  > <img class="absolute top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl">{{ page }}</span>  </div>
+           <div v-for="(page, index) in splashPages" :key="index" :class="{' transform scale-105 transition duration-300' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-20 w-auto rounded-lg bg-gray-200 text-center 2xl:w-[30%]  p-0 text-black flex justify-center items-center border-2 text-xl font-semibold relative cursor-pointer"  > 
+            <img class="hidden top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl" :class="{'bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500' : selectedPage == index}">{{ page }}</span> 
+           </div>
               
         </div>
 
