@@ -66,13 +66,34 @@
               </foreignObject>
             </svg>
           </div>
-          <!-- grid of screens  -->
-          <div class="flex element_scroll flex-row overflow-scroll lg:justify-center  2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2  ">
-           <div v-for="(page, index) in splashPages" :key="index" :class="{' transform scale-105 transition duration-300' : selectedPage == index}" @click="selectPage(index, page)" class="min-w-[50vw] h-20 w-auto rounded-lg bg-white text-center 2xl:w-[30%]  p-0 text-black flex justify-center items-center border-2 text-xl font-semibold relative cursor-pointer"  > 
-            <img class="hidden top-4 left-4  h-6 lg:h-[50px]" :src="splashImages[index]" alt=""><span class="text-xl" :class="{'bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500' : selectedPage == index}">{{ page }}</span> 
-           </div>
-              
-        </div>
+          <div class="flex element_scroll flex-row overflow-scroll lg:justify-center 2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2">
+  <div
+    v-for="(page, index) in splashPages"
+    :key="index"
+    @click="selectPage(index, page)"
+    :class="{
+      'transform scale-105 transition duration-300 border-transparent bg-gradient-to-r from-pink-500 to-violet-500': selectedPage === index,
+      'border-gray-300': selectedPage !== index
+    }"
+    class="min-w-[50vw] h-20 w-auto rounded-lg bg-white text-center 2xl:w-[30%] p-0 flex justify-center items-center border-2 text-xl font-semibold relative cursor-pointer"
+  >
+    <img
+      class="hidden top-4 left-4 h-6 lg:h-[50px]"
+      :src="splashImages[index]"
+      alt=""
+    />
+    <span
+      class="text-xl"
+      :class="{
+        'bg-clip-text text-white': selectedPage === index,
+        'text-black': selectedPage !== index
+      }"
+    >
+      {{ page }}
+    </span>
+  </div>
+</div>
+
 
          </div>
       </section>
