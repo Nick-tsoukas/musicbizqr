@@ -41,7 +41,9 @@
       </a>
 
       <a v-if="socialPage.attributes.tictok" :href="socialPage.attributes.tictok" class="flex gap-4 items-center bg-gradient-to-r from-pink-500 to-violet-500 w-full mx-auto p-4 rounded-md shadow-lg mb-6">
-        <svg class="h-10 w-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/></svg>        <p class="text-white text-lg font-semibold">TikTok</p>
+        <img class="w-10 h-10" src="@/assets/tiktokfree.png" alt="">
+        <p class="text-white text-lg font-semibold">TikTok</p>
+        <!-- <svg class="h-10 w-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/></svg>        <p class="text-white text-lg font-semibold">TikTok</p> -->
       </a>
     </div>
   </div>

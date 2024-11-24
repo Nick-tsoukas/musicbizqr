@@ -9,6 +9,7 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router';
 import { onMounted } from 'vue';
+const { create } = useStrapi()
 
 const router = useRouter();
 const route = useRoute();
@@ -18,6 +19,7 @@ onMounted(async () => {
   try {
     // Get the full URL including the query parameters
     const fullUrl = window.location.href;
+    // const fullUrl = 'http://localhost:3000/directqr?id=a50db616-0c03-42c3-9f4a-46616fe87daa'
 
     console.log('Full URL:', fullUrl); // For debugging
 
@@ -36,6 +38,11 @@ onMounted(async () => {
 
     console.log('QR Data:', qrData); // For debugging
 
+     if (qrData && qrData.length > 0) {
+      const scan = await create('scans', {qrs: qrData.id })
+      console.log('scans ', scan )
+    }
+
     if (qrData && qrData.length > 0) {
       const qr = qrData[0]; // Assuming you get one QR code per URL
       console.log('QR Object:', qr);
@@ -46,36 +53,36 @@ onMounted(async () => {
 
       // Check the QR type and perform the appropriate redirection
       if (qType === 'bandProfile' && qr.attributes.band.data) {
-        // Redirect to the band profile page
+       
         const bandId = qr.attributes.band.data.id;
         console.log('Redirecting to band:', bandId);
         router.push({ path: `/band/${bandId}` });
       } else if (qType === 'events' && qr.attributes.event.data) {
-        // Redirect to the event page
+       
         const eventId = qr.attributes.event.data.id;
         console.log('Redirecting to event:', eventId);
         router.push({ path: `/event/${eventId}` });
       } else if (qType === 'tours' && qr.attributes.tour.data) {
-        // Redirect to the tour page
+       
         const tourId = qr.attributes.tour.data.id;
         console.log('Redirecting to tour:', tourId);
         router.push({ path: `/tour/${tourId}` });
       } else if (qType === 'albums' && qr.attributes.album.data) {
-        // Redirect to the album page
+       
         const albumId = qr.attributes.album.data.id;
         console.log('Redirecting to album:', albumId);
         router.push({ path: `/album/${albumId}` });
       } else if (qType === 'stream' && link) {
-        // Redirect to an external streaming link
+      
         const streamId = qr.attributes.stream.data.id
         console.log('Redirecting to stream link:', streamId);
         router.push({ path: `/stream/${streamId}` });
       } else if (qType === 'externalURL' && link) {
-        // Redirect to an external URL
+       
         console.log('Redirecting to external URL:', link);
         window.location.href = link;
       } else {
-        // Default fallback, redirect to dashboard or error page
+       
         console.log('No matching QR type found. Redirecting to dashboard.');
         // router.push('/dashboard');
       }
