@@ -1,6 +1,21 @@
 # task list for today 
 
-- [] 
+## right now 
+
+- [x] create data modle 
+- [] fefactor album page to allow for streaming 
+
+## music 
+- [] custom album or streaming embeded content both 
+  - [] add spotify 
+  - [] refactor form to allow for custom audio or streaming ebeded content 
+
+- [] add single for proper nomenclature for singles 
+
+
+
+## band page 
+- [] add photo gallery 
 
 # notes on zoom 
 
