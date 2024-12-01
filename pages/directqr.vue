@@ -49,9 +49,7 @@ onMounted(async () => {
       // Update the scan count in the QR code
       try {
         await update('qrs', qrId, {
-          data: {
-            scans: newScanCount,
-          },
+          scans: newScanCount,
         });
         console.log(`Scan count updated to ${newScanCount}`);
       } catch (updateError) {
@@ -61,8 +59,10 @@ onMounted(async () => {
       // Create a new scan entry in 'scans' collection
       try {
         await create('scans', {
-            date: new Date().toISOString(),
-            qr: qrId, // Use the correct field name for the relation
+          date: new Date().toISOString(),
+          qr: {
+            id: qrId,
+          },
         });
         console.log('Scan entry created');
       } catch (createError) {
