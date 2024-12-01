@@ -7,9 +7,9 @@
 </template>
 
 <script setup lang="ts">
-
 import { onMounted } from 'vue';
-
+import { useRouter, useRoute } from 'vue-router';
+import { useStrapi, useStrapiClient } from '@nuxtjs/strapi';
 
 const { create, update } = useStrapi();
 const router = useRouter();
@@ -18,23 +18,17 @@ const client = useStrapiClient();
 
 onMounted(async () => {
   try {
-    // Extract the 'id' parameter from the query string
-    const qrUuid = route.query.id;
+    // Get the full URL including the query parameters
+    const fullUrl = window.location.href;
 
-    if (!qrUuid) {
-      console.error('No QR code ID found in the URL.');
-      // Handle error
-      return;
-    }
+    console.log('Full URL:', fullUrl); // For debugging
 
-    console.log('QR UUID:', qrUuid); // For debugging
-
-    // Fetch the QR data using the 'url_contains' filter
+    // Fetch the QR data using the full URL
     const response = await client('/qrs', {
       method: 'GET',
       params: {
         filters: {
-          url_contains: qrUuid,
+          url: fullUrl, // Use the full URL for filtering
         },
         populate: '*', // To fetch related data like band, event, tour, etc.
       },
@@ -91,7 +85,7 @@ onMounted(async () => {
         const albumId = qr.attributes.album.data.id;
         console.log('Redirecting to album:', albumId);
         router.push({ path: `/album/${albumId}` });
-      } else if (qType === 'stream' && qr.attributes.stream.data) {
+      } else if (qType === 'stream' && qr.attributes.stream?.data) {
         const streamId = qr.attributes.stream.data.id;
         console.log('Redirecting to stream link:', streamId);
         router.push({ path: `/stream/${streamId}` });
@@ -103,14 +97,13 @@ onMounted(async () => {
         router.push('/dashboard');
       }
     } else {
-      console.error('QR code not found for UUID:', qrUuid);
-      // Redirect to an error page or show an error message
-      // router.push('/error');
+      console.error('QR code not found for URL:', fullUrl);
+
+      router.push('/error');
     }
   } catch (error) {
     console.error('Error fetching QR code data:', error);
-    // Redirect to an error page or show an error message
-    // router.push('/error');
+    router.push('/error');
   }
 });
 </script>
