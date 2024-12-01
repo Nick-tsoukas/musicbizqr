@@ -4,7 +4,16 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+      stripe: {
+        key: process.env.STRIPE_PUBLISHABLE_KEY,
+        options: {},
+      },
     },
+    stripe: {
+      key: process.env.STRIPE_SECRET_KEY,
+      options: {},
+    },
+
   },
   app: {
     head: {
@@ -42,6 +51,7 @@ export default defineNuxtConfig({
     },
     client: {
       key: process.env.STRIPE_PUBLIC_KEY,
+      manualClientLoad: true,
       options: {
         // Optional: Additional Stripe.js configuration options
       },

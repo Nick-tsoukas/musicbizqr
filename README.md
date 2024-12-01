@@ -1,6 +1,8 @@
 # task list for today 
 
-## right now 
+
+
+
 
 - [x] create data modle 
 - [] fefactor album page to allow for streaming 
