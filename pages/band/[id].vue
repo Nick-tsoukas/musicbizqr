@@ -25,7 +25,7 @@
               <div
                 v-for="album in albums"
                 :key="album.id"
-                class="bg-black shadow-lg rounded p-3"
+                class="bg-black shadow-lg rounded p-3 relative"
               >
                 <div
                   class="transform transition-transform duration-300 hover:scale-105 w-[100px] h-[100px] md:w-[450px] md:h-[450px]"
@@ -64,6 +64,7 @@
             <section v-if="albumPlay" class="w-full flex flex-col xl:flex-row gap-4 my-20">
               <!-- Conditional Rendering Based on Album Type -->
               <div v-if="albumPlay.attributes.type === 'custom'" class="w-full md:w-[70%] mx-0">
+                <!-- Custom Album Player Component -->
                 <AudioPlayer :album="albumPlay" />
               </div>
               <div v-else-if="albumPlay.attributes.type === 'streaming'" class="w-full md:w-[70%] mx-0">
@@ -142,6 +143,51 @@
             </div>
           </div>
 
+          <!-- Videos Section -->
+          <div v-if="videoItems.length" class="mt-10 mx-auto">
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Videos</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div
+                v-for="(video, videoIndex) in videoItems"
+                :key="videoIndex"
+                class="bg-black p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+              >
+                <div
+                  v-for="(thumbnail, index) in video.youtubeThumbnails"
+                  :key="index"
+                  class="relative mb-4 rounded-lg overflow-hidden"
+                >
+                  <!-- Display YouTube player when video is playing -->
+                  <div v-if="playingVideos[thumbnail.videoId]" class="relative aspect-video">
+                    <YouTube
+                      :video-id="thumbnail.videoId"
+                      :player-vars="playerOptions"
+                      @ready="onPlayerReady"
+                      class="absolute top-0 left-0 w-full h-full rounded-md"
+                    />
+                  </div>
+
+                  <!-- Display thumbnail and play button when video is not playing -->
+                  <div v-else class="relative aspect-video cursor-pointer" @click="playVideo(thumbnail.videoId)">
+                    <img
+                      :src="thumbnail.thumbnailUrl"
+                      alt="Video Thumbnail"
+                      class="absolute top-0 left-0 w-full h-full object-cover rounded-md"
+                    />
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <svg class="w-16 h-16 text-white opacity-75" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 84 84">
+                        <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+                        <polygon points="33,24 33,60 60,42" fill="white" />
+                      </svg>
+                    </div>
+                    <!-- Video Title (if available) -->
+                    <h4 class="text-white font-semibold mt-4">{{ video.title }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Streaming Links -->
           <div class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto">
             <h2 class="text-4xl my-10 font-bold text-white">Streaming Links</h2>
@@ -187,6 +233,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 
+import YouTube from 'vue3-youtube'; // Import YouTube component
 
 // Reactive variables
 const route = useRoute();
@@ -196,6 +243,11 @@ const albums = ref([]);
 const events = ref([]);
 const tours = ref([]);
 const albumPlay = ref(null);
+const videos = ref([]);
+const videoItems = ref([]);
+const playingVideos = ref({});
+const videoMetadata = ref({});
+const loadingVideos = ref(true);
 
 // Import social media icons
 import facebookIcon from '@/assets/facebookfree.png';
@@ -243,6 +295,39 @@ const setAlbum = (id) => {
   }
 };
 
+// Player options for YouTube
+const playerOptions = {
+  autoplay: 1,
+  mute: 0,
+  rel: 0,
+  modestbranding: 1,
+};
+
+// Function to play video
+const playVideo = (videoId) => {
+  playingVideos.value[videoId] = true;
+};
+
+// Function when player is ready
+const onPlayerReady = (event) => {
+  // Optionally, you can handle player events here
+};
+
+// Function to extract YouTube video ID and create a thumbnail URL
+const getYouTubeThumbnail = (youtubeVideo) => {
+  const url = youtubeVideo.videoid; // Assuming 'videoid' is the attribute name
+  const videoIdMatch =
+    url.match(/[?&]v=([^&]+)/) ||
+    url.match(/youtu\.be\/([^?]+)/) ||
+    url.match(/\/embed\/([^?]+)/) ||
+    url.match(/youtube\.com\/watch\?v=([^&]+)/);
+  const videoId = videoIdMatch ? videoIdMatch[1] : url; // Use the URL directly if no match
+  return {
+    videoId,
+    thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+  };
+};
+
 onMounted(async () => {
   document.body.classList.add('custom-page-body');
   const apiUrl = useRuntimeConfig().public.strapiUrl;
@@ -272,6 +357,29 @@ onMounted(async () => {
   // Set tours
   if (band.value?.data?.attributes?.tours?.data?.length) {
     tours.value = band.value.data.attributes.tours.data;
+  }
+
+  // Fetch videos associated with the band
+  const videoResponse = await fetch(
+    `${apiUrl}/api/videos?filters[bands][id][$eq]=${route.params.id}&populate=mediayoutube,bandImg`
+  );
+  const videoData = await videoResponse.json();
+  videos.value = videoData.data;
+
+  // Process videos into videoItems
+  if (videos.value.length) {
+    videoItems.value = videos.value.map((video) => {
+      const thumbnails = video.attributes.mediayoutube.map((youtubeVideo) =>
+        getYouTubeThumbnail(youtubeVideo)
+      );
+      return {
+        id: video.id,
+        title: video.attributes.bandname || 'No Band Name',
+        bandlink: video.attributes.bandlink || '',
+        bandimgUrl: video.attributes.bandImg?.data?.attributes?.url || '',
+        youtubeThumbnails: thumbnails,
+      };
+    });
   }
 });
 
@@ -305,5 +413,14 @@ onBeforeUnmount(() => {
 }
 .custom-border {
   border: 0.1px solid white;
+}
+.mdc-button-green {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+.mdc-button-green:hover {
+  background-color: #45a049;
 }
 </style>
