@@ -1,10 +1,13 @@
 <template>
   <div class="bg-[#000]">
+    <div class="bg-white text-black">
+      <!-- <pre>{{ videoItems }}</pre> -->
+    </div>
     <div class="container bg-[#000] mx-auto p-4">
-      <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
+      <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
 
       <!-- Scans Chart Section -->
-      <div v-if="!loading" class="mb-6 border-2 border-white rounded-lg">
+      <div v-if="!loading && scansPerMonth.labels.length" class="mb-6 border-2 border-white rounded-lg">
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8">
           <h2 class="text-2xl text-white font-extrabold">Scans Over Time</h2>
         </div>
@@ -32,7 +35,7 @@
               <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ qr.title }}</span>
             </div>
             <div class="flex items-center gap-4">
-              <p class="text-white">scans: {{ qr.scans ? qr.scans : 0 }}</p>
+              <p class="text-white">Scans: {{ qr.scans ? qr.scans : 0 }}</p>
               <button @click="viewQr(qr.imageUrl)" class="text-blue-600 hover:text-blue-900">
                 <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
@@ -59,9 +62,334 @@
         </div>
       </div>
 
-      <!-- Repeat the same pattern for Bands, Events, Tours, Albums, Streams, Social Links -->
+      <!-- Bands Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="bandItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Bands List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
+          <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="band in bandItems" :key="band.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="band.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ band.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editband/${band.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(band.id, 'band')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Bands -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
+          <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Band</h2>
+        </div>
+      </div>
 
-      <!-- Include other sections here... -->
+      <!-- Social Links Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="socialItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Social Links List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Social Links</h2>
+          <NuxtLink to="/socialpage" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Social Links
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="social in socialItems" :key="social.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="social.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ social.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/social/${social.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editsocial/${social.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(social.id, 'socialpage')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Social Links -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Social Links</h2>
+          <NuxtLink to="/socialpage" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Social Links
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Social Link</h2>
+        </div>
+      </div>
+
+      <!-- Events Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="eventItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Events List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-yellow-500 to-orange-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
+          <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="event in eventItems" :key="event.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="event.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ event.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/event/${event.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editevent/${event.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(event.id, 'event')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Events -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-yellow-500 to-orange-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
+          <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Event
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Event</h2>
+        </div>
+      </div>
+
+      <!-- Tours Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="tourItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Tours List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-purple-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Tours</h2>
+          <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="tour in tourItems" :key="tour.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="tour.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ tour.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/tour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/edittour/${tour.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(tour.id, 'tour')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Tours -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-purple-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Tours</h2>
+          <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Tour
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Tour</h2>
+        </div>
+      </div>
+
+      <!-- Albums Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="albumItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Albums List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-red-500 to-pink-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Albums</h2>
+          <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Album
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="album in albumItems" :key="album.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="album.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ album.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/album/${album.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editalbum/${album.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(album.id, 'album')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Albums -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-red-500 to-pink-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Albums</h2>
+          <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Album
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Album</h2>
+        </div>
+      </div>
+
+      <!-- Streams Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="streamItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Streams List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-teal-500 to-green-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Streams</h2>
+          <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li v-for="stream in streamItems" :key="stream.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
+            <img :src="stream.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+            <div class="flex-grow">
+              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ stream.title }}</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/stream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editstream/${stream.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(stream.id, 'stream')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Streams -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-teal-500 to-green-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Streams</h2>
+          <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Stream
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Stream</h2>
+        </div>
+      </div>
+
+      <!-- Videos Section -->
+      <div v-if="loading">
+        <SkeletonLoader />
+      </div>
+      <div v-else-if="videoItems.length" class="mb-6 border-2 border-white rounded-lg">
+        <!-- Videos List -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-indigo-500 to-purple-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos</h2>
+          <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video Grid
+          </NuxtLink>
+        </div>
+        <ul class="px-6 py-6">
+          <li
+            v-for="video in videoItems"
+            :key="video.id"
+            class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
+          >
+            <!-- Band Info -->
+            <div class="flex items-center flex-col gap-4 md:flex-row md:gap-0">
+              <img
+                v-if="video.bandimgUrl"
+                :src="video.bandimgUrl"
+                alt="Band Image"
+                class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+              >
+              <div>
+                <h3 class="text-white font-semibold">{{ video.title }} </h3>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-4">
+              <button @click="router.push(`/video/${video.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="router.push(`/editvideo/${video.id}`)" class="text-blue-600 hover:text-blue-900">
+                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+              <button @click="deleteItem(video.id, 'video')" class="text-red-600 hover:text-red-800">
+                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="mb-6 border-2 border-white rounded-lg">
+        <!-- No Videos -->
+        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-indigo-500 to-purple-500 py-8 gap-2 items-center md:flex-row md:gap-0">
+          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos Pages</h2>
+          <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Video Grid
+          </NuxtLink>
+        </div>
+        <div>
+          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Video Page</h2>
+        </div>
+      </div>
 
       <!-- VIEW QR Popup -->
       <div
@@ -85,7 +413,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 
-import ScansChart from '@/components/ScansChart.vue'; // Import the chart component
 
 const user = useStrapiUser();
 const router = useRouter();
@@ -103,17 +430,11 @@ const streams = ref([]);
 const socials = ref([]);
 const videos = ref([]);
 
-// Fetch data on mounted
-onMounted(() => {
-  fetchData();
-});
-
-// Fetch data functions
 const fetchData = async () => {
   if (user.value) {
     try {
       await fetchQrs(); // Fetch QR codes first
-      await fetchScans(); // Fetch scans after QR codes
+      await fetchScans(); // Then fetch scans
 
       // Fetch other data in parallel
       await Promise.all([
@@ -215,9 +536,11 @@ const scansPerMonth = computed(() => {
   return { labels, data };
 });
 
-// Other fetch functions (fetchBands, fetchEvents, etc.) remain unchanged
+// Fetch other data (Bands, Events, Tours, Albums, Streams, Social Links, Videos)
+// ... (The rest of your fetch functions remain unchanged)
 const fetchBands = async () => {
   try {
+    console.log(user.value)
     const response = await find('bands', {
       filters: {
         users_permissions_user: {
@@ -252,6 +575,24 @@ const fetchEvents = async () => {
   }
 };
 
+const fetchSocials = async () => {
+  try {
+    const response = await find('socialpages', {
+      filters: {
+        users_permissions_user: {
+          id: {
+            $eq: user.value.id,
+          },
+        },
+      },
+      populate: '*',
+    });
+    socials.value = response.data;
+  } catch (error) {
+    console.error('Error fetching social pages:', error);
+  }
+};
+
 const fetchTours = async () => {
   try {
     const response = await find('tours', {
@@ -267,24 +608,6 @@ const fetchTours = async () => {
     tours.value = response.data;
   } catch (error) {
     console.error('Error fetching tours:', error);
-  }
-};
-
-const fetchAlbums = async () => {
-  try {
-    const response = await find('albums', {
-      filters: {
-        users_permissions_user: {
-          id: {
-            $eq: user.value.id,
-          },
-        },
-      },
-      populate: '*',
-    });
-    albums.value = response.data;
-  } catch (error) {
-    console.error('Error fetching albums:', error);
   }
 };
 
@@ -305,25 +628,6 @@ const fetchStreams = async () => {
     console.error('Error fetching streams:', error);
   }
 };
-
-const fetchSocials = async () => {
-  try {
-    const response = await find('socialpages', {
-      filters: {
-        users_permissions_user: {
-          id: {
-            $eq: user.value.id,
-          },
-        },
-      },
-      populate: '*',
-    });
-    socials.value = response.data;
-  } catch (error) {
-    console.error('Error fetching social pages:', error);
-  }
-};
-
 const fetchVideos = async () => {
   try {
     const response = await find('videos', {
@@ -342,12 +646,34 @@ const fetchVideos = async () => {
     });
 
     videos.value = response.data;
+    console.log(response.data, 'Fetched videos data');
   } catch (error) {
     console.error('Error fetching videos:', error);
   }
 };
 
-// Other functions (deleteItem, viewQr, etc.) remain unchanged
+// videoItems Computed Property
+
+
+
+const fetchAlbums = async () => {
+  try {
+    const response = await find('albums', {
+      filters: {
+        users_permissions_user: {
+          id: {
+            $eq: user.value.id,
+          },
+        },
+      },
+      populate: '*',
+    });
+    albums.value = response.data;
+  } catch (error) {
+    console.error('Error fetching albums:', error);
+  }
+};
+// Delete Item Function
 const deleteItem = async (id, type) => {
   try {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) {
@@ -389,32 +715,138 @@ const downloadImage = () => {
   document.body.removeChild(link);
 };
 
+onMounted(() => {
+  fetchData();
+});
+
 const editItem = (id, page) => {
   router.push({ path: `/${page}/${id}` });
 };
 
-// Computed properties remain unchanged
+// Computed properties for items
 const qrItems = computed(() =>
   qrs.value.map((qr) => ({
     id: qr.id,
     title: qr.attributes.name,
     imageUrl: qr.attributes.q_image?.data?.attributes?.url || '',
-    type: qr.attributes.q_type,
-    scans: qr.attributes.scans,
+    scans: qr.attributes.scans || 0, // Assuming scans are stored here
   }))
 );
 
-// Other computed properties for bands, events, etc.
+// Helper function to extract YouTube Video ID from a YouTube URL or ID string
+function extractYouTubeId(url) {
+  const regExp = /^.*(youtu.be\/|v\/|\/u\/\w\/|embed\/|watch\?v=|\&v=|youtube\.com\/v\/|youtube\.com\/embed\/|youtube\.com\/watch\?v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
 
+const videoItems = computed(() =>
+  videos.value.map((video) => ({
+    id: video.id,
+    title: video.attributes.bandname || 'No Band Name',
+    bandlink: video.attributes.bandlink || '',
+
+    bandimgUrl:
+      video.attributes.bandImg?.data?.attributes?.formats?.medium?.url ||
+      video.attributes.bandImg?.data?.attributes?.url ||
+      '',
+
+    youtubeThumbnails:
+      video.attributes.mediayoutube?.map((youtubeVideo) => {
+        const videoId = extractYouTubeId(youtubeVideo.videoid);
+        return {
+          videoId,
+          thumbnailUrl: videoId
+            ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+            : '',
+        };
+      }) || [],
+  }))
+);
+
+const bandItems = computed(() =>
+  bands.value.map((band) => ({
+    id: band.id,
+    title: band.attributes.name,
+    imageUrl: band.attributes.bandImg?.data?.attributes?.url || '',
+  }))
+);
+
+const eventItems = computed(() =>
+  events.value.map((event) => ({
+    id: event.id,
+    title: event.attributes.title,
+    imageUrl: event.attributes.image?.data?.attributes?.url || '',
+  }))
+);
+
+const tourItems = computed(() =>
+  tours.value.map((tour) => ({
+    id: tour.id,
+    title: tour.attributes.title,
+    imageUrl: tour.attributes.image?.data?.attributes?.url || '',
+  }))
+);
+
+const socialItems = computed(() =>
+  socials.value.map((social) => ({
+    id: social.id,
+    title: social.attributes.title,
+    imageUrl: social.attributes.img?.data?.attributes?.url || '',
+  }))
+);
+
+const albumItems = computed(() =>
+  albums.value.map((album) => ({
+    id: album.id,
+    title: album.attributes.title,
+    imageUrl: album.attributes.cover?.data?.attributes?.url || '',
+  }))
+);
+
+const streamItems = computed(() =>
+  streams.value.map((stream) => ({
+    id: stream.id,
+    title: stream.attributes.bandTitle,
+    imageUrl: stream.attributes.img?.data?.attributes?.url || '',
+  }))
+);
 </script>
 
 <style scoped lang="css">
 .mdc-button {
   border: 1px solid white;
   background: transparent;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.mdc-button img {
+  height: 20px;
+}
+
+.mdc-button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 img {
   object-fit: cover;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.border-white {
+  border-color: #fff;
+}
+
+.bg-[#000] {
+  background-color: #000;
+}
+
+.container {
+  max-width: 1200px;
 }
 </style>
