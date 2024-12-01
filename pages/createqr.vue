@@ -9,7 +9,7 @@ const type = route.query.type
 
 <div>
   
-    <ClientOnly >
+    <ClientOnly  >
       <QrCode />
     </ClientOnly>
   </div>

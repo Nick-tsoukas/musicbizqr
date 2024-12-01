@@ -5,7 +5,7 @@
         <div class="spinner"></div>
       </div>
       <!-- QR Code Wrapper -->
-      <div ref="qrcodeWrapper" class="p-4  rounded-lg shadow-md">
+      <div ref="qrcodeWrapper" class="p-4 sticky top-0 z-50  rounded-lg shadow-md">
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
       <div class="mt-4 flex flex-col space-y-4 w-full">
