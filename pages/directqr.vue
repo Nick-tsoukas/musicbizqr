@@ -8,8 +8,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useStrapi, useStrapiClient } from '@nuxtjs/strapi';
+
 
 const { create, update } = useStrapi();
 const router = useRouter();
