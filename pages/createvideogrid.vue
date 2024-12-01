@@ -18,8 +18,28 @@
                 class="mdc-text-field__input"
                 v-model="videoTitle"
                 placeholder=" "
+                required
               />
               <label class="mdc-floating-label" for="videoTitle">Video Title</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Band Selection -->
+        <div class="bg-[#fff] rounded-md mt-4">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-2xl text-white">Select Band</h2>
+          </div>
+          <div class="p-4">
+            <div class="mdc-text-field mb-4">
+              <select v-model="selectedBand" class="mdc-text-field__input" required>
+                <option value="" disabled>Select Band</option>
+                <option v-for="band in bands" :key="band.id" :value="band.id">
+                  {{ band.attributes.name }}
+                </option>
+              </select>
+              <label class="mdc-floating-label" for="selectedBand">Band</label>
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
@@ -36,8 +56,8 @@
                 <input
                   type="url"
                   class="mdc-text-field__input"
-                  v-model="youtubeVideo.youtube" 
-                  placeholder="Paste YouTube Video URL"
+                  v-model="youtubeVideo.youtube"
+                  placeholder=" "
                   required
                 />
                 <label class="mdc-floating-label">YouTube Video URL</label>
@@ -61,6 +81,9 @@
 
         <!-- Band Image Section -->
         <div class="bg-[#fff] rounded-md mt-4">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-2xl text-white">Upload Band Image</h2>
+          </div>
           <div class="p-4">
             <input type="file" @change="handleImageUpload" class="styled-file-input" id="fileUpload" />
             <label for="fileUpload" class="styled-file-label">Upload Band Image</label>
@@ -72,6 +95,9 @@
 
         <!-- Band Information Section -->
         <div class="bg-[#fff] rounded-md mt-4">
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-2xl text-white">Band Information</h2>
+          </div>
           <div class="p-4">
             <div class="mdc-text-field mb-4">
               <input
@@ -80,6 +106,7 @@
                 class="mdc-text-field__input"
                 v-model="bandname"
                 placeholder=" "
+                required
               />
               <label class="mdc-floating-label" for="bandname">Band Name</label>
               <div class="mdc-line-ripple"></div>
@@ -105,6 +132,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+
+
 const router = useRouter();
 const client = useStrapiClient();
 const user = useStrapiUser();
@@ -117,6 +147,34 @@ const youtubevideos = ref([{ youtube: '' }]); // Initialize with one empty embed
 const img = ref(null);
 const imgUrl = ref(null);
 const loading = ref(false);
+
+// Bands data
+const bands = ref([]);
+const selectedBand = ref('');
+
+// Fetch bands associated with the user
+const fetchBands = async () => {
+  try {
+    const response = await client('/bands', {
+      params: {
+        filters: {
+          users_permissions_user: {
+            id: user.value.id,
+          },
+        },
+        populate: ['users_permissions_user'],
+      },
+    });
+    bands.value = response.data;
+  } catch (error) {
+    console.error('Error fetching bands associated with the user:', error);
+  }
+};
+
+// Fetch bands on component mount
+onMounted(() => {
+  fetchBands();
+});
 
 // Add a new YouTube video field
 const addYouTubeVideo = () => {
@@ -153,11 +211,12 @@ const submitForm = async () => {
       bandname: bandname.value || null,
       bandlink: bandlink.value || null,
       mediayoutube: youtubevideos.value
-        .filter(video => video.youtube.trim() !== '')
-        .map(video => ({
-          videoid: video.youtube.trim()
+        .filter((video) => video.youtube.trim() !== '')
+        .map((video) => ({
+          videoid: getYouTubeVideoId(video.youtube.trim()),
         })),
       users_permissions_users: user.value.id,
+      band: selectedBand.value || null,
     };
 
     // Initialize FormData for files (band image)
@@ -181,6 +240,158 @@ const submitForm = async () => {
     console.error('Error creating video:', error);
   }
 };
-
-
 </script>
+
+<style scoped>
+/* Spinner Styling */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #555;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Material Design Text Field Styling */
+.mdc-text-field {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  width: 100%;
+}
+
+.mdc-text-field__input::placeholder {
+  color: transparent;
+}
+
+.mdc-text-field__input:focus::placeholder {
+  color: #aaa;
+}
+
+.mdc-text-field__input {
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  width: 100%;
+}
+
+.mdc-floating-label {
+  position: absolute;
+  z-index: 1;
+  top: 0.75rem;
+  left: 0.5rem;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  font-size: 1rem;
+  background: white;
+  line-height: 1;
+  color: #aaa;
+  pointer-events: none;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.mdc-text-field__input:focus + .mdc-floating-label,
+.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
+  transform: translateY(-1.5rem);
+  color: #6200ee;
+}
+
+.mdc-line-ripple {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #6200ee;
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+
+.mdc-text-field__input:focus ~ .mdc-line-ripple {
+  transform: scaleX(1);
+}
+
+/* Button Styling */
+.mdc-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.0892857143em;
+  color: #fff;
+  background-color: #2C2C2C;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mdc-button:hover {
+  background-color: #3700b3;
+}
+
+.mdc-button:focus {
+  outline: none;
+}
+
+/* Styled File Input */
+.styled-file-input {
+  display: none;
+}
+
+.styled-file-label {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.0892857143em;
+  color: #fff;
+  background-color: #2C2C2C;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+  width: 100%;
+}
+
+.styled-file-label:hover {
+  background-color: #3700b3;
+}
+
+/* Additional Styles */
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.audio-player {
+  width: 100%;
+}
+</style>
