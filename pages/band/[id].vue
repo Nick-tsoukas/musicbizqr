@@ -215,20 +215,21 @@
       <h2 class="text-3xl text-center text-white mt-16 font-bold">Social</h2>
 
       <div class="h-52 flex items-center justify-center bg-[#000]">
-        <div class="flex items-center justify-center gap-x-5">
-          <!-- Social Media Platforms -->
-          <template v-for="platform in socialPlatforms" :key="platform.name">
-            <a
-              v-if="band.data.attributes[platform.name]"
-              :href="band.data.attributes[platform.name]"
-              :aria-label="`Find us on ${platform.label}`"
-              target="_blank"
-              rel="noopener"
-            >
-              <img :src="platform.img" :alt="platform.label" class="h-10 w-10" />
-            </a>
-          </template>
-        </div>
+        <div class="flex flex-wrap items-center justify-center gap-5">
+  <!-- Social Media Platforms -->
+  <template v-for="platform in socialPlatforms" :key="platform.name">
+    <a
+      v-if="band.data.attributes[platform.name]"
+      :href="band.data.attributes[platform.name]"
+      :aria-label="`Find us on ${platform.label}`"
+      target="_blank"
+      rel="noopener"
+    >
+      <img :src="platform.img" :alt="platform.label" class="h-10 w-10" />
+    </a>
+  </template>
+</div>
+
       </div>
     </div>
   </div>
