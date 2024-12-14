@@ -2,8 +2,7 @@
   <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
     <!-- Hero Content -->
     <div class="relative w-full h-[calc(100vh-400px)]">
-      <img
-        class="w-full h-full object-cover object-center"
+      <img class="w-full h-full object-cover object-center"
         :src="band.data.attributes.bandImg.data.attributes.url"
         alt="Band Image"
       />
@@ -20,7 +19,9 @@
         <div>
           <!-- Albums Section -->
           <div v-if="albums.length > 0">
-            <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">Albums</h1>
+            <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
+              Albums
+            </h1>
             <section class="flex gap-4 overflow-x-scroll no-scrollbar">
               <div
                 v-for="album in albums"
@@ -55,20 +56,31 @@
                   </div>
                 </div>
                 <div class="pt-5">
-                  <h3 class="text-white font-semibold text-xl">{{ album.attributes.title }}</h3>
+                  <h3 class="text-white font-semibold text-xl">
+                    {{ album.attributes.title }}
+                  </h3>
                 </div>
               </div>
             </section>
 
             <!-- Album Player Section -->
-            <section v-if="albumPlay" class="w-full flex flex-col xl:flex-row gap-4 my-20">
+            <section
+              v-if="albumPlay"
+              class="w-full flex flex-col xl:flex-row gap-4 my-20"
+            >
               <!-- Conditional Rendering Based on Album Type -->
-              <div v-if="albumPlay.attributes.type === 'custom'" class="w-full md:w-[70%] mx-0">
+              <div
+                v-if="albumPlay.attributes.type === 'custom'"
+                class="w-full md:w-[70%] mx-0"
+              >
                 <!-- Custom Album Player Component -->
                 <!-- Include your AudioPlayer component here -->
                 <AudioPlayer :album="albumPlay" />
               </div>
-              <div v-else-if="albumPlay.attributes.type === 'streaming'" class="w-full md:w-[70%] mx-0">
+              <div
+                v-else-if="albumPlay.attributes.type === 'streaming'"
+                class="w-full md:w-[70%] mx-0"
+              >
                 <div class="embed-container">
                   <iframe
                     :src="albumPlay.attributes.embedUrl"
@@ -88,7 +100,11 @@
 
           <!-- Events Section -->
           <div v-if="events.length" class="mt-10 mx-auto">
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Events</h1>
+            <h1
+              class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16"
+            >
+              Events
+            </h1>
             <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
               <div
                 v-for="event in events"
@@ -102,17 +118,26 @@
                   alt="Event Image"
                 />
                 <div class="pt-5">
-                  <h3 class="text-xl md:text-2xl text-white font-bold mb-2">{{ event.attributes.title }}</h3>
+                  <h3 class="text-xl md:text-2xl text-white font-bold mb-2">
+                    {{ event.attributes.title }}
+                  </h3>
                   <p class="text-white text-sm">
-                    {{ new Date(event.attributes.date ?? new Date()).toLocaleDateString() }}
+                    {{
+                      new Date(
+                        event.attributes.date ?? new Date()
+                      ).toLocaleDateString()
+                    }}
                   </p>
                   <p class="text-white text-sm">
-                    {{ event.attributes.venue ?? 'Venue not specified' }}
+                    {{ event.attributes.venue ?? "Venue not specified" }}
                   </p>
                   <p class="text-white text-sm">
-                    {{ event.attributes.city ?? 'City not specified' }}
+                    {{ event.attributes.city ?? "City not specified" }}
                   </p>
-                  <button @click="router.push(`/event/${event.id}`)" class="mdc-button-green mt-2 w-full">
+                  <button
+                    @click="router.push(`/event/${event.id}`)"
+                    class="mdc-button-green mt-2 w-full"
+                  >
                     View Event
                   </button>
                 </div>
@@ -122,7 +147,11 @@
 
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto">
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Tours</h1>
+            <h1
+              class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16"
+            >
+              Tours
+            </h1>
             <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
               <div
                 v-for="tour in tours"
@@ -136,7 +165,10 @@
                   alt="Tour Image"
                 />
                 <div class="pt-5">
-                  <button @click="router.push(`/tour/${tour.id}`)" class="mdc-button-green mt-2 w-full">
+                  <button
+                    @click="router.push(`/tour/${tour.id}`)"
+                    class="mdc-button-green mt-2 w-full"
+                  >
                     View Tour
                   </button>
                 </div>
@@ -146,8 +178,14 @@
 
           <!-- Videos Section -->
           <div v-if="videoItems.length" class="mt-10 mx-auto">
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16">Videos</h1>
-            <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h1
+              class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16"
+            >
+              Videos
+            </h1>
+            <div
+              class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               <div
                 v-for="(video, videoIndex) in videoItems"
                 :key="videoIndex"
@@ -160,7 +198,10 @@
                     class="relative mb-4 rounded-lg overflow-hidden"
                   >
                     <!-- Display YouTube player when video is playing -->
-                    <div v-if="playingVideos[thumbnail.videoId]" class="relative aspect-video">
+                    <div
+                      v-if="playingVideos[thumbnail.videoId]"
+                      class="relative aspect-video"
+                    >
                       <YouTube
                         :src="thumbnail.videoId"
                         :width="640"
@@ -171,15 +212,31 @@
                     </div>
 
                     <!-- Display thumbnail and play button when video is not playing -->
-                    <div v-else class="relative aspect-video cursor-pointer" @click="playVideo(thumbnail.videoId)">
+                    <div
+                      v-else
+                      class="relative aspect-video cursor-pointer"
+                      @click="playVideo(thumbnail.videoId)"
+                    >
                       <img
                         :src="thumbnail.thumbnailUrl"
                         alt="Video Thumbnail"
                         class="absolute top-0 left-0 w-full h-full object-cover rounded-md"
                       />
-                      <div class="absolute inset-0 flex items-center justify-center">
-                        <svg class="w-16 h-16 text-white opacity-75" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 84 84">
-                          <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+                      <div
+                        class="absolute inset-0 flex items-center justify-center"
+                      >
+                        <svg
+                          class="w-16 h-16 text-white opacity-75"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor"
+                          viewBox="0 0 84 84"
+                        >
+                          <circle
+                            cx="42"
+                            cy="42"
+                            r="42"
+                            fill="rgba(0, 0, 0, 0.6)"
+                          />
                           <polygon points="33,24 33,60 60,42" fill="white" />
                         </svg>
                       </div>
@@ -193,15 +250,28 @@
           </div>
 
           <!-- Streaming Links -->
-          <div class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16">
+          <div
+            class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16"
+          >
             <h2 class="text-4xl my-10 font-bold text-white">Streaming Links</h2>
-            <template v-for="platform in streamingPlatforms" :key="platform.name">
+            <template
+              v-for="platform in streamingPlatforms"
+              :key="platform.name"
+            >
               <span v-if="band.data.attributes[platform.name]">
-                <a :href="band.data.attributes[platform.name]" target="_blank" rel="noopener">
+                <a
+                  :href="band.data.attributes[platform.name]"
+                  target="_blank"
+                  rel="noopener"
+                >
                   <button
                     class="w-full custom-border bg-[#fff] flex justify-center text-black font-semibold px-2 py-3 items-center relative shadow-lg rounded-md"
                   >
-                    <img :src="platform.img" class="h-8 absolute left-2" :alt="platform.label" />
+                    <img
+                      :src="platform.img"
+                      class="h-8 absolute left-2"
+                      :alt="platform.label"
+                    />
                     {{ platform.label }}
                   </button>
                 </a>
@@ -216,30 +286,40 @@
 
       <div class="h-52 flex items-center justify-center bg-[#000]">
         <div class="flex flex-wrap items-center justify-center gap-5">
-  <!-- Social Media Platforms -->
-  <template v-for="platform in socialPlatforms" :key="platform.name">
-    <a
-      v-if="band.data.attributes[platform.name]"
-      :href="band.data.attributes[platform.name]"
-      :aria-label="`Find us on ${platform.label}`"
-      target="_blank"
-      rel="noopener"
-    >
-      <img :src="platform.img" :alt="platform.label" class="h-10 w-10" />
-    </a>
-  </template>
-</div>
-
+          <!-- Social Media Platforms -->
+          <template v-for="platform in socialPlatforms" :key="platform.name">
+            <a
+              v-if="band.data.attributes[platform.name]"
+              :href="band.data.attributes[platform.name]"
+              :aria-label="`Find us on ${platform.label}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                :src="platform.img"
+                :alt="platform.label"
+                class="h-10 w-10"
+              />
+            </a>
+          </template>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
-import YouTube from 'vue3-youtube';
+import YouTube from "vue3-youtube";
 
+import { Swiper, SwiperSlide } from "swiper/vue";
+import { Thumbs } from "swiper/modules";
+import { EffectCards } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/thumbs";
+import "swiper/css/effect-cards";
 
 const { find } = useStrapi();
 const route = useRoute();
@@ -271,7 +351,8 @@ const playVideo = (videoId) => {
 // Function to extract YouTube video ID and create a thumbnail URL
 const getYouTubeThumbnail = (youtubeVideo) => {
   const url = youtubeVideo.videoid; // Assuming 'videoid' is the attribute name
-  const videoIdMatch = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+  const videoIdMatch =
+    url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : url; // Use the URL directly if no match
   return {
     videoId,
@@ -282,7 +363,7 @@ const getYouTubeThumbnail = (youtubeVideo) => {
 // Fetch videos associated with the band
 const fetchVideos = async () => {
   try {
-    const response = await find('videos', {
+    const response = await find("videos", {
       filters: {
         bands: {
           id: {
@@ -298,22 +379,24 @@ const fetchVideos = async () => {
 
     // Map video data for displaying
     videoItems.value = response.data.map((videoData) => {
-      const thumbnails = videoData.attributes.mediayoutube.map((youtubeVideo) => {
-        const thumbnailData = getYouTubeThumbnail(youtubeVideo);
-        console.log('Extracted Video ID:', thumbnailData.videoId);
-        return thumbnailData;
-      });
+      const thumbnails = videoData.attributes.mediayoutube.map(
+        (youtubeVideo) => {
+          const thumbnailData = getYouTubeThumbnail(youtubeVideo);
+          console.log("Extracted Video ID:", thumbnailData.videoId);
+          return thumbnailData;
+        }
+      );
 
       return {
         id: videoData.id,
-        title: videoData.attributes.bandname || 'No Band Name',
-        bandlink: videoData.attributes.bandlink || '',
-        bandimgUrl: videoData.attributes.bandImg?.data?.attributes?.url || '',
+        title: videoData.attributes.bandname || "No Band Name",
+        bandlink: videoData.attributes.bandlink || "",
+        bandimgUrl: videoData.attributes.bandImg?.data?.attributes?.url || "",
         youtubeThumbnails: thumbnails,
       };
     });
   } catch (error) {
-    console.error('Error fetching videos:', error);
+    console.error("Error fetching videos:", error);
   }
 };
 
@@ -324,10 +407,10 @@ const fetchBandData = async () => {
   // Fetch band data
   const response = await fetch(
     `${apiUrl}/api/bands/${route.params.id}?` +
-      'populate[events][populate]=image&' +
-      'populate[tours][populate]=*&' +
-      'populate[albums][populate]=cover,songs.file&' +
-      'populate=bandImg'
+      "populate[events][populate]=image&" +
+      "populate[tours][populate]=*&" +
+      "populate[albums][populate]=cover,songs.file&" +
+      "populate=bandImg"
   );
   const data = await response.json();
   band.value = data;
@@ -358,53 +441,53 @@ const setAlbum = (id) => {
 };
 
 // Import social media icons
-import facebookIcon from '@/assets/facebookfree.png';
-import instagramIcon from '@/assets/instagramfree.png';
-import twitchIcon from '@/assets/twitchfree.png';
-import appleMusicIcon from '@/assets/apple.svg';
-import soundcloudIcon from '@/assets/soundcloudlast.png';
-import deezerIcon from '@/assets/dezzer.svg';
-import youtubeIcon from '@/assets/youtube-icon.svg';
-import bandcampIcon from '@/assets/bandcamp.svg';
-import twitterIcon from '@/assets/bandcamp.svg';
+import facebookIcon from "@/assets/facebookfree.png";
+import instagramIcon from "@/assets/instagramfree.png";
+import twitchIcon from "@/assets/twitchfree.png";
+import appleMusicIcon from "@/assets/apple.svg";
+import soundcloudIcon from "@/assets/soundcloudlast.png";
+import deezerIcon from "@/assets/dezzer.svg";
+import youtubeIcon from "@/assets/youtube-icon.svg";
+import bandcampIcon from "@/assets/bandcamp.svg";
+import twitterIcon from "@/assets/bandcamp.svg";
 
 // Import streaming platform icons
-import spotifyIcon from '@/assets/spotify.svg';
-import youtubeMusicIcon from '@/assets/youtube-icon.svg';
-import deezerIcon2 from '@/assets/dezzer.svg';
-import soundcloudIcon2 from '@/assets/soundcloudlast.png';
-import bandcampIcon2 from '@/assets/bandcamp.svg';
+import spotifyIcon from "@/assets/spotify.svg";
+import youtubeMusicIcon from "@/assets/youtube-icon.svg";
+import deezerIcon2 from "@/assets/dezzer.svg";
+import soundcloudIcon2 from "@/assets/soundcloudlast.png";
+import bandcampIcon2 from "@/assets/bandcamp.svg";
 
 // Define social media platforms
 const socialPlatforms = [
-  { name: 'facebook', img: facebookIcon, label: 'Facebook' },
-  { name: 'instagram', img: instagramIcon, label: 'Instagram' },
-  { name: 'twitch', img: twitchIcon, label: 'Twitch' },
-  { name: 'appleMusic', img: appleMusicIcon, label: 'Apple Music' },
-  { name: 'soundcloud', img: soundcloudIcon, label: 'SoundCloud' },
-  { name: 'deezer', img: deezerIcon, label: 'Deezer' },
-  { name: 'youtube', img: youtubeIcon, label: 'YouTube' },
-  { name: 'bandcamp', img: bandcampIcon, label: 'Bandcamp' },
-  { name: 'twitter', img: twitterIcon, label: 'Twitter' },
+  { name: "facebook", img: facebookIcon, label: "Facebook" },
+  { name: "instagram", img: instagramIcon, label: "Instagram" },
+  { name: "twitch", img: twitchIcon, label: "Twitch" },
+  { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
+  { name: "soundcloud", img: soundcloudIcon, label: "SoundCloud" },
+  { name: "deezer", img: deezerIcon, label: "Deezer" },
+  { name: "youtube", img: youtubeIcon, label: "YouTube" },
+  { name: "bandcamp", img: bandcampIcon, label: "Bandcamp" },
+  { name: "twitter", img: twitterIcon, label: "Twitter" },
 ];
 
 // Define streaming platforms
 const streamingPlatforms = [
-  { name: 'spotify', img: spotifyIcon, label: 'Spotify' },
-  { name: 'youtube', img: youtubeMusicIcon, label: 'YouTube Music' },
-  { name: 'deezer', img: deezerIcon2, label: 'Deezer' },
-  { name: 'soundcloud', img: soundcloudIcon2, label: 'SoundCloud' },
-  { name: 'bandcamp', img: bandcampIcon2, label: 'Bandcamp' },
+  { name: "spotify", img: spotifyIcon, label: "Spotify" },
+  { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
+  { name: "deezer", img: deezerIcon2, label: "Deezer" },
+  { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
+  { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
 ];
 
 onMounted(async () => {
-  document.body.classList.add('custom-page-body');
+  document.body.classList.add("custom-page-body");
   await fetchBandData();
   await fetchVideos();
 });
 
 onBeforeUnmount(() => {
-  document.body.classList.remove('custom-page-body');
+  document.body.classList.remove("custom-page-body");
 });
 </script>
 
