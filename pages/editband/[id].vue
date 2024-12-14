@@ -68,7 +68,30 @@
             <label class="mdc-floating-label" for="edit-band-twitch">Twitch</label>
             <div class="mdc-line-ripple"></div>
           </div>
+                <!-- Additional Social Media Links -->
+                <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-twitter" class="mdc-text-field__input" v-model="band.twitter" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-twitter">Twitter</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-whatsapp" class="mdc-text-field__input" v-model="band.whatsapp" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-whatsapp">WhatsApp</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-tiktok" class="mdc-text-field__input" v-model="band.tiktok" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-tiktok">TikTok</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-snapchat" class="mdc-text-field__input" v-model="band.snapchat" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-snapchat">Snapchat</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
        </div>
+
+    
 
           <!-- Streaming Links -->
           <div class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500  py-6 gap-2 items-center md:flex-row md:gap-0">
@@ -91,7 +114,54 @@
             <label class="mdc-floating-label" for="edit-band-soundcloud">SoundCloud</label>
             <div class="mdc-line-ripple"></div>
           </div>
+             <!-- Additional Streaming Links -->
+             <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-youtube" class="mdc-text-field__input" v-model="band.youtube" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-youtube">YouTube</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-deezer" class="mdc-text-field__input" v-model="band.deezer" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-deezer">Deezer</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <div class="mdc-text-field mb-4">
+            <input type="url" id="edit-band-bandcamp" class="mdc-text-field__input" v-model="band.bandcamp" placeholder=" " />
+            <label class="mdc-floating-label" for="edit-band-bandcamp">Bandcamp</label>
+            <div class="mdc-line-ripple"></div>
+          </div>
          </div>
+
+       
+
+          <!-- Single Song Section -->
+          <div class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6">
+            <h3 class="font-semibold text-white text-xl">Single Song</h3>
+          </div>
+          <div class="bg-white p-4">
+            <div class="mdc-text-field mb-4">
+              <input type="text" id="edit-singlesong-title" class="mdc-text-field__input" v-model="band.singlesong.title" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-singlesong-title">Song Title</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <input type="file" id="edit-singlesong-file" class="styled-file-input" @change="handleSingleSongUpload" accept="audio/*" />
+            <label for="edit-singlesong-file" class="styled-file-label w-full text-center">Choose Single Song File</label>
+            <div v-if="band.singlesong?.song" class="mt-4">
+              <p>Current Song: {{ band.singlesong.song.data?.attributes.name }}</p>
+            </div>
+          </div>
+
+          <!-- Single Video Section -->
+          <div class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6">
+            <h3 class="font-semibold text-white text-xl">Single Video</h3>
+          </div>
+          <div class="bg-white p-4">
+            <div class="mdc-text-field mb-4">
+              <input type="url" id="edit-singlevideo-youtube" class="mdc-text-field__input" v-model="band.singlevideo.youtubeid" placeholder=" " />
+              <label class="mdc-floating-label" for="edit-singlevideo-youtube">YouTube URL</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
 
           <!-- Save Button -->
           <button type="submit" class="mdc-button w-full mt-10">Save Changes</button>
@@ -118,16 +188,41 @@ const band = ref({
   facebook: '',
   instagram: '',
   twitch: '',
+  twitter: '',
+  whatsapp: '',
+  tiktok: '',
+  snapchat: '',
   appleMusic: '',
   spotify: '',
   soundcloud: '',
+  youtube: '',
+  deezer: '',
+  bandcamp: '',
+  singlesong: {
+    title: '',
+    song: null
+  },
+  singlevideo: {
+    youtubeid: ''
+  }
 });
+
+const handleBandImageUpload = (e) => {
+  const file = e.target.files[0];
+  band.value.bandImg = file;
+  band.value.imageUrl = URL.createObjectURL(file);
+};
+
+const handleSingleSongUpload = (e) => {
+  const file = e.target.files[0];
+  band.value.singlesong.song = file;
+};
 
 const fetchBand = async () => {
   const bandId = route.params.id;
   try {
     const response = await findOne('bands', bandId, {
-      populate: ['bandImg'],
+      populate: ['bandImg', 'singlesong.song', 'singlevideo'],
     });
 
     if (response.data) {
@@ -141,20 +236,28 @@ const fetchBand = async () => {
         facebook: attributes.facebook || '',
         instagram: attributes.instagram || '',
         twitch: attributes.twitch || '',
+        twitter: attributes.twitter || '',
+        whatsapp: attributes.whatsapp || '',
+        tiktok: attributes.tiktok || '',
+        snapchat: attributes.snapchat || '',
         appleMusic: attributes.appleMusic || '',
         spotify: attributes.spotify || '',
         soundcloud: attributes.soundcloud || '',
+        youtube: attributes.youtube || '',
+        deezer: attributes.deezer || '',
+        bandcamp: attributes.bandcamp || '',
+        singlesong: {
+          title: attributes.singlesong?.title || '',
+          song: attributes.singlesong?.song || null
+        },
+        singlevideo: {
+          youtubeid: attributes.singlevideo?.youtubeid || ''
+        }
       };
     }
   } catch (error) {
     console.error('Error fetching band:', error);
   }
-};
-
-const handleBandImageUpload = (e) => {
-  const file = e.target.files[0];
-  band.value.bandImg = file;
-  band.value.imageUrl = URL.createObjectURL(file);
 };
 
 const submitEditBand = async () => {
@@ -169,16 +272,33 @@ const submitEditBand = async () => {
       facebook: band.value.facebook,
       instagram: band.value.instagram,
       twitch: band.value.twitch,
+      twitter: band.value.twitter,
+      whatsapp: band.value.whatsapp,
+      tiktok: band.value.tiktok,
+      snapchat: band.value.snapchat,
       appleMusic: band.value.appleMusic,
       spotify: band.value.spotify,
       soundcloud: band.value.soundcloud,
+      youtube: band.value.youtube,
+      deezer: band.value.deezer,
+      bandcamp: band.value.bandcamp,
+      singlesong: {
+        title: band.value.singlesong.title
+      },
+      singlevideo: {
+        youtubeid: band.value.singlevideo.youtubeid
+      },
       users_permissions_user: user.value.id,
     };
 
     bandForm.append('data', JSON.stringify(bandData));
 
-    if (band.value.bandImg) {
+    if (band.value.bandImg && band.value.bandImg instanceof File) {
       bandForm.append('files.bandImg', band.value.bandImg);
+    }
+
+    if (band.value.singlesong.song instanceof File) {
+      bandForm.append('files.singlesong.song', band.value.singlesong.song);
     }
 
     await client(`/bands/${bandId}`, {
@@ -188,7 +308,7 @@ const submitEditBand = async () => {
 
     router.push('/dashboard');
   } catch (error) {
-    loading.value = false
+    loading.value = false;
     console.error('Error updating band:', error);
   }
 };
