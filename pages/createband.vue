@@ -1,13 +1,10 @@
 <template>
   <div class="bg-[#000] w-[90vw] mx-auto z-0">
-
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-
-    <div class="container-mdc bg-black max-w-5xl ">
+    <div class="container-mdc bg-black max-w-5xl">
       <h1 class="title text-white">Create Band Profile</h1>
-
       <form class="form-group" @submit.prevent="submitForm">
         <!-- Band Details Section -->
         <div class="bg-[#fff] rounded-md">
@@ -18,21 +15,41 @@
             <!-- Band Name -->
             <div class="p-4">
               <div class="mdc-text-field">
-                <input type="text" id="band-name" class="mdc-text-field__input" v-model="bandName" placeholder=" " />
+                <input
+                  type="text"
+                  id="band-name"
+                  class="mdc-text-field__input"
+                  v-model="bandName"
+                  placeholder=" "
+                  required
+                />
                 <label class="mdc-floating-label" for="band-name">Band Name</label>
                 <div class="mdc-line-ripple"></div>
               </div>
 
               <!-- Genre -->
               <div class="mdc-text-field">
-                <input type="text" id="genre" class="mdc-text-field__input" v-model="genre" placeholder=" " />
+                <input
+                  type="text"
+                  id="genre"
+                  class="mdc-text-field__input"
+                  v-model="genre"
+                  placeholder=" "
+                  required
+                />
                 <label class="mdc-floating-label" for="genre">Genre</label>
                 <div class="mdc-line-ripple"></div>
               </div>
 
               <!-- Bio -->
               <div class="mdc-text-field">
-                <textarea id="bio" class="mdc-text-field__input" v-model="bio" placeholder=" "></textarea>
+                <textarea
+                  id="bio"
+                  class="mdc-text-field__input"
+                  v-model="bio"
+                  placeholder=" "
+                  required
+                ></textarea>
                 <label class="mdc-floating-label" for="bio">Bio</label>
                 <div class="mdc-line-ripple"></div>
               </div>
@@ -45,7 +62,14 @@
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
-          <input type="file" required id="band-img" class="styled-file-input" @change="handleImageUpload" accept="image/*" />
+          <input
+            type="file"
+            required
+            id="band-img"
+            class="styled-file-input"
+            @change="handleImageUpload"
+            accept="image/*"
+          />
           <label for="band-img" class="styled-file-label w-full text-center">Choose Band Image</label>
           <div v-if="bandImgUrl" class="mb-4">
             <img :src="bandImgUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md" />
@@ -58,25 +82,51 @@
             <h2 class="font-semibold text-white text-2xl">Band Members</h2>
           </div>
           <div class="p-4">
-            <div v-for="(member, index) in members" :key="index" class="member-container">
+            <div
+              v-for="(member, index) in members"
+              :key="index"
+              class="member-container"
+            >
               <div class="mdc-text-field mb-4">
-                <input type="text" :id="'member-name-' + index" class="mdc-text-field__input" v-model="member.name" placeholder=" " />
+                <input
+                  type="text"
+                  :id="'member-name-' + index"
+                  class="mdc-text-field__input"
+                  v-model="member.name"
+                  placeholder=" "
+                />
                 <label class="mdc-floating-label" :for="'member-name-' + index">Member Name</label>
                 <div class="mdc-line-ripple"></div>
               </div>
               <div class="mdc-text-field mb-4">
-                <input type="text" :id="'instrument-' + index" class="mdc-text-field__input" v-model="member.instrument" placeholder=" " />
+                <input
+                  type="text"
+                  :id="'instrument-' + index"
+                  class="mdc-text-field__input"
+                  v-model="member.instrument"
+                  placeholder=" "
+                />
                 <label class="mdc-floating-label" :for="'instrument-' + index">Instrument</label>
                 <div class="mdc-line-ripple"></div>
               </div>
               <div class="mb-4">
-                <input type="file" :id="'member-img-' + index" class="styled-file-input" @change="(event) => handleMemberImageUpload(event, index)" accept="image/*" />
-                <label :for="'member-img-' + index" class="styled-file-label w-full text-center">Choose Member Image</label>
+                <input
+                  type="file"
+                  :id="'member-img-' + index"
+                  class="styled-file-input"
+                  @change="(event) => handleMemberImageUpload(event, index)"
+                  accept="image/*"
+                />
+                <label :for="'member-img-' + index" class="styled-file-label w-full text-center"
+                  >Choose Member Image</label
+                >
               </div>
               <div v-if="member.imageUrl" class="mb-4">
                 <img :src="member.imageUrl" alt="Member Image" class="w-full h-auto rounded-lg shadow-md" />
               </div>
-              <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(index)">Remove Member</button>
+              <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(index)">
+                Remove Member
+              </button>
             </div>
             <button type="button" class="mdc-button mb-8 w-full" @click="addMember">+ Add Member</button>
           </div>
@@ -118,7 +168,6 @@
               <label class="mdc-floating-label" for="tictok">TicTok</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <!-- Snapchat requested by user -->
             <div class="mdc-text-field mb-4">
               <input type="url" id="snapchat" class="mdc-text-field__input" v-model="snapchat" placeholder=" " />
               <label class="mdc-floating-label" for="snapchat">Snapchat</label>
@@ -140,7 +189,7 @@
             </div>
             <div class="mdc-text-field mb-4">
               <input type="url" id="spotify" class="mdc-text-field__input" v-model="spotify" placeholder=" " />
-              <label class="mdc-floating-label" for="spotify">Spotify (Not in schema, optional)</label>
+              <label class="mdc-floating-label" for="spotify">Spotify</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
@@ -173,14 +222,28 @@
           </div>
           <div class="p-4">
             <div class="mdc-text-field mb-4">
-              <input type="text" id="singlesong-title" class="mdc-text-field__input" v-model="singlesongTitle" placeholder=" " />
+              <input
+                type="text"
+                id="singlesong-title"
+                class="mdc-text-field__input"
+                v-model="singlesongTitle"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="singlesong-title">Song Title</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <input type="file" id="singlesong-file" class="styled-file-input" @change="handleSingleSongUpload" accept="audio/*" />
-            <label for="singlesong-file" class="styled-file-label w-full text-center">Choose Single Song File</label>
+            <input
+              type="file"
+              id="singlesong-file"
+              class="styled-file-input"
+              @change="handleSingleSongUpload"
+              accept="audio/*"
+            />
+            <label for="singlesong-file" class="styled-file-label w-full text-center">
+              Choose Single Song File
+            </label>
             <div v-if="singlesongFileName" class="mt-4 text-white">
-              <p>Selected Song: {{ singlesongFileName }}</p>
+              <p>Selected Song: {{ singlesongTitle || singlesongFileName }}</p>
             </div>
           </div>
         </div>
@@ -192,7 +255,13 @@
           </div>
           <div class="p-4">
             <div class="mdc-text-field mb-4">
-              <input type="url" id="singlevideo-youtube" class="mdc-text-field__input" v-model="singlevideoYoutubeUrl" placeholder=" " />
+              <input
+                type="url"
+                id="singlevideo-youtube"
+                class="mdc-text-field__input"
+                v-model="singlevideoYoutubeUrl"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="singlevideo-youtube">YouTube URL</label>
               <div class="mdc-line-ripple"></div>
             </div>
@@ -227,11 +296,11 @@ const twitch = ref('');
 const twitter = ref('');
 const whatsapp = ref('');
 const tictok = ref('');
-const snapchat = ref(''); // User requested, not in schema.
+const snapchat = ref('');
 
 // Streaming
 const appleMusic = ref('');
-const spotify = ref(''); // optional
+const spotify = ref('');
 const soundcloud = ref('');
 const dezzer = ref('');
 const youtube = ref('');
@@ -268,22 +337,24 @@ const removeMember = (index) => {
 const handleSingleSongUpload = (event) => {
   const file = event.target.files[0];
   singlesongFile.value = file;
-  singlesongFileName.value = file.name;
+  singlesongFileName.value = singlesongTitle.value || file.name;
 };
 
 const submitForm = async () => {
   try {
     loading.value = true;
-    console.log('Submitting form with values:');
-    console.log('Band Name:', bandName.value);
-    console.log('Genre:', genre.value);
-    console.log('Bio:', bio.value);
 
-    // Create a form object with the necessary fields
+    // Ensure required fields are not empty
+    if (!bandName.value || !genre.value || !bio.value) {
+      alert('Please fill in the required fields: name, genre, bio.');
+      loading.value = false;
+      return;
+    }
+
     const form = {
-      name: bandName.value || null,
-      genre: genre.value || null,
-      bio: bio.value || null,
+      name: bandName.value,
+      genre: genre.value,
+      bio: bio.value,
       facebook: facebook.value || null,
       instagram: instagram.value || null,
       twitch: twitch.value || null,
@@ -296,76 +367,54 @@ const submitForm = async () => {
       dezzer: dezzer.value || null,
       youtube: youtube.value || null,
       bandcamp: bandcamp.value || null,
-      spotify: spotify.value || null, // optional
+      spotify: spotify.value || null,
       users_permissions_user: user.value.id,
       members: members.value.map((member) => ({
-        name: member.name || null,
-        instrument: member.instrument || null,
+        name: member.name || '',
+        instrument: member.instrument || '',
       })),
-      // singlesong component
       singlesong: {
-        title: singlesongTitle.value || null,
+        title: singlesongTitle.value || '',
         song: null,
       },
-      // singlevideo component
       singlevideo: {
-        title: singlesongTitle.value || null,
-        youtubeid: singlevideoYoutubeUrl.value || null,
-      }
+        title: singlesongTitle.value || '',
+        youtubeid: singlevideoYoutubeUrl.value || '',
+      },
     };
 
-    // Remove null or empty values from the form object
-    for (const key in form) {
-      if (
-        form[key] === null ||
-        form[key] === '' ||
-        (Array.isArray(form[key]) && form[key].length === 0)
-      ) {
-        delete form[key];
-      }
-    }
-
-    // Initialize FormData
     const formData = new FormData();
     formData.append('data', JSON.stringify(form));
 
-    // Append band image file if it exists
     if (bandImg.value) {
-      formData.append('files.bandImg', bandImg.value);
+      formData.append('files[bandImg]', bandImg.value);
     }
 
-    // Append member images if they exist
     members.value.forEach((member, index) => {
       if (member.image) {
-        formData.append(`files.members[${index}].image`, member.image);
+        formData.append(`files[members][${index}][image]`, member.image);
       }
     });
 
-    // Append singlesong file if exists
     if (singlesongFile.value) {
-      formData.append(`files.singlesong.song`, singlesongFile.value);
+      formData.append('files[singlesong][song]', singlesongFile.value);
     }
 
-    // Video is just a URL, no file to append.
-
-    // Log the FormData entries
     console.log('FormData:', Array.from(formData.entries()));
 
-    // Use Strapi client to create the band
     const { data: bandData } = await client('/bands', {
       method: 'POST',
-      body: formData
+      body: formData,
     });
 
-    // Update the QR entry with the band ID if qrId provided
     if (route.query.qrId) {
       await update('qrs', route.query.qrId, {
-        band: bandData.id
+        band: bandData.id,
       });
     }
 
     console.log('Band profile created successfully:', bandData);
-    router.push('/dashboard'); // Redirect to dashboard
+    router.push('/dashboard');
   } catch (error) {
     loading.value = false;
     console.error('Error creating band profile:', error);
@@ -510,5 +559,27 @@ const submitForm = async () => {
 
 .mdc-text-field.mb-4 {
   margin-bottom: 1rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.spinner {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #6200ee; /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-top: 2rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
