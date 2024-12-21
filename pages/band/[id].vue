@@ -17,6 +17,26 @@
     <div class="w-full px-6 md:max-w-[80vw] md:mx-auto">
       <div class="pt-0 sm:p-5">
         <div>
+         
+          <!-- bio section -->
+          <div v-if="band.data.attributes.bio">
+            <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
+              Bio
+            </h1>
+            <p class="text-white">{{ band.data.attributes.bio }}</p>
+          </div>
+
+          <!-- singlesong section -->
+          <div v-if="band.data.attributes.singlesong">
+            <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
+              Singles
+            </h1>
+            <AudioPlayer 
+              :album="formatSingleSong(band.data.attributes.singlesong)" 
+              :placeholderImage="'/placeholder-image.svg'"
+            />
+          </div>
+
           <!-- Albums Section -->
           <div v-if="albums.length > 0">
             <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
@@ -62,7 +82,15 @@
                 </div>
               </div>
             </section>
-
+            <!-- bio section -->
+             
+            <div v-if="band.data.attributes.bio">
+              <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
+                Bio
+              </h1>
+              <p class="text-white">{{ band.data.attributes.bio }}</p>
+            </div>
+            
             <!-- Album Player Section -->
             <section
               v-if="albumPlay"
@@ -404,16 +432,22 @@ const fetchVideos = async () => {
 const fetchBandData = async () => {
   const apiUrl = useRuntimeConfig().public.strapiUrl;
 
-  // Fetch band data
   const response = await fetch(
     `${apiUrl}/api/bands/${route.params.id}?` +
-      "populate[events][populate]=image&" +
-      "populate[tours][populate]=*&" +
-      "populate[albums][populate]=cover,songs.file&" +
-      "populate=bandImg"
+    "populate[events][populate]=image&" +
+    "populate[tours][populate]=*&" +
+    "populate[albums][populate]=cover,songs.file&" +
+    "populate[singlesong][populate][song]=*&" +
+    "populate[singlesong][populate][cover]=*&" +
+    "populate=bandImg"
   );
+
   const data = await response.json();
+  console.log('Fetched band data:', data);
   band.value = data;
+
+  // Debug log
+  console.log('Single song data:', band.value?.data?.attributes?.singlesong);
 
   // Set albums
   if (band.value?.data?.attributes?.albums?.data?.length) {
@@ -479,6 +513,31 @@ const streamingPlatforms = [
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
   { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
 ];
+
+// Add this function to format single song data
+const formatSingleSong = (song) => {
+  console.log('Formatting song data:', song); // Debug log
+  
+  if (!song) return null;
+
+  return {
+    id: song.id,
+    attributes: {
+      title: song.title,
+      // The file is now under song.data.attributes
+      file: {
+        data: {
+          attributes: {
+            url: song.song?.data?.attributes?.url
+          }
+        }
+      },
+      duration: song.duration || 0,
+      cover: song.cover?.data || null,
+      artist: band.value?.data?.attributes?.name || 'Unknown Artist'
+    }
+  };
+};
 
 onMounted(async () => {
   document.body.classList.add("custom-page-body");

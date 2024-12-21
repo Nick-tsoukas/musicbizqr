@@ -3,6 +3,7 @@
     <!-- Now Playing Section -->
     <div class="now-playing">
       <img
+        v-if="albumCoverUrl !== props.placeholderImage"
         :src="albumCoverUrl"
         alt="Album Cover"
         class="album-cover"
@@ -82,10 +83,10 @@
     </div> -->
 
     <!-- Song List -->
-    <ul class="song-list">
+    <ul class="song-list" v-if="songs.length > 0">
       <li
-        v-for="(song, index) in album.attributes.songs"
-        :key="song.id"
+        v-for="(song, index) in songs"
+        :key="song.id || index"
         :class="{ 'active-song': isCurrentSong(song) }"
         @click="playSong(song)"
       >
@@ -137,28 +138,17 @@ const repeat = ref(false);
 const albumCoverUrl = computed(() => {
   try {
     if (
-      currentSong.value &&
-      currentSong.value.cover &&
-      currentSong.value.cover.data &&
-      currentSong.value.cover.data.attributes &&
-      currentSong.value.cover.data.attributes.url
+      currentSong.value?.cover?.data?.attributes?.url
     ) {
-      // If the current song has a cover image, use it
       return currentSong.value.cover.data.attributes.url;
     } else if (
-      props.album.attributes.cover &&
-      props.album.attributes.cover.data &&
-      props.album.attributes.cover.data.attributes &&
-      props.album.attributes.cover.data.attributes.url
+      props.album?.attributes?.cover?.data?.attributes?.url
     ) {
-      // Otherwise, use the album cover
       return props.album.attributes.cover.data.attributes.url;
-    } else {
-      // Fallback to the placeholder image
-      return props.placeholderImage;
     }
+    return props.placeholderImage;
   } catch (error) {
-    // In case of any errors, use the placeholder image
+    console.error('Error getting album cover:', error);
     return props.placeholderImage;
   }
 });
@@ -202,14 +192,39 @@ onMounted(() => {
   if (audioPlayer.value) {
     audioPlayer.value.volume = volume.value;
   }
+  
+  // Preselect the first song if available
+  if (songs.value.length > 0) {
+    currentSong.value = songs.value[0];
+  }
 });
 
 // Watchers
 watch(currentSong, (newSong) => {
   if (newSong) {
-    audioPlayer.value.src = newSong.file.data.attributes.url;
-    audioPlayer.value.play();
-    playing.value = true;
+    try {
+      let fileUrl = '';
+      if (newSong.file?.data?.attributes?.url) {
+        fileUrl = newSong.file.data.attributes.url;
+      } else if (newSong.song?.data?.attributes?.url) {
+        fileUrl = newSong.song.data.attributes.url;
+      } else if (typeof newSong.file === 'string') {
+        fileUrl = newSong.file;
+      }
+
+      console.log('File URL:', fileUrl);
+
+      if (!fileUrl) {
+        console.error('No valid file URL found:', newSong);
+        return;
+      }
+
+      audioPlayer.value.src = fileUrl;
+      // Remove the automatic play
+      playing.value = false;
+    } catch (error) {
+      console.error('Error setting up audio:', error);
+    }
   }
 });
 
@@ -241,11 +256,13 @@ const togglePlay = () => {
     pauseSong();
   } else {
     if (currentSong.value) {
-      audioPlayer.value.play();
+      audioPlayer.value.play().catch(error => {
+        console.error('Error playing audio:', error);
+        playing.value = false;
+      });
       playing.value = true;
-    } else {
-      // Play the first song if none is selected
-      playSong(props.album.attributes.songs[0]);
+    } else if (songs.value.length > 0) {
+      playSong(songs.value[0]);
     }
   }
 };
@@ -254,33 +271,33 @@ const nextSong = () => {
   if (shuffle.value) {
     playRandomSong();
   } else {
-    const currentIndex = props.album.attributes.songs.findIndex(
+    const currentIndex = songs.value.findIndex(
       (s) => s.id === currentSong.value.id
     );
     let nextIndex = currentIndex + 1;
-    if (nextIndex >= props.album.attributes.songs.length) {
+    if (nextIndex >= songs.value.length) {
       nextIndex = 0; // Loop back to the first song
     }
-    playSong(props.album.attributes.songs[nextIndex]);
+    playSong(songs.value[nextIndex]);
   }
 };
 
 const previousSong = () => {
-  const currentIndex = props.album.attributes.songs.findIndex(
+  const currentIndex = songs.value.findIndex(
     (s) => s.id === currentSong.value.id
   );
   let prevIndex = currentIndex - 1;
   if (prevIndex < 0) {
-    prevIndex = props.album.attributes.songs.length - 1; // Loop back to the last song
+    prevIndex = songs.value.length - 1; // Loop back to the last song
   }
-  playSong(props.album.attributes.songs[prevIndex]);
+  playSong(songs.value[prevIndex]);
 };
 
 const playRandomSong = () => {
   const randomIndex = Math.floor(
-    Math.random() * props.album.attributes.songs.length
+    Math.random() * songs.value.length
   );
-  playSong(props.album.attributes.songs[randomIndex]);
+  playSong(songs.value[randomIndex]);
 };
 
 const toggleShuffle = () => {
@@ -334,6 +351,37 @@ const formatTime = (time) => {
     .padStart(2, '0');
   return `${minutes}:${seconds}`;
 };
+
+// Update the computed property to handle different data structures
+const songs = computed(() => {
+  console.log('Album prop:', props.album); // Debug log
+  
+  try {
+    // Handle case where songs is directly in album.attributes
+    if (props.album?.attributes?.songs) {
+      const songsList = props.album.attributes.songs;
+      return Array.isArray(songsList) ? songsList : [songsList];
+    }
+    
+    // Handle case where the album itself is a single song
+    if (props.album?.attributes) {
+      return [{
+        id: props.album.id || Date.now(),
+        title: props.album.attributes.title || 'Unknown Title',
+        file: props.album.attributes.file,
+        song: props.album.attributes.song,
+        duration: props.album.attributes.duration || 0,
+        cover: props.album.attributes.cover
+      }];
+    }
+    
+    console.warn('No valid song data found in album:', props.album);
+    return [];
+  } catch (error) {
+    console.error('Error processing songs:', error);
+    return [];
+  }
+});
 </script>
 
 <style scoped>
@@ -353,6 +401,7 @@ const formatTime = (time) => {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 .album-cover {
