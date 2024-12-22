@@ -1,15 +1,28 @@
 <template>
   <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
     <!-- Hero Content -->
-    <div class="relative w-full h-[calc(100vh-400px)]">
-      <img class="w-full h-full object-cover object-center"
-        :src="band.data.attributes.bandImg.data.attributes.url"
-        alt="Band Image"
-      />
-      <div class="absolute bottom-0 left-0 w-full bg-black bg-opacity-70 py-4">
-        <h1 class="text-white text-xl md:text-7xl text-center font-bold px-4">
-          {{ band.data.attributes.name }}
-        </h1>
+    <div class="relative w-full flex items-center justify-center bg-gradient-to-b from-neutral-900 to-black">
+      <!-- Dynamic height container with fixed height -->
+      <div class="w-full h-[66vh] relative">
+        <!-- Slightly Lighter Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/60 opacity-90"></div>
+        
+        <!-- Background Image -->
+        <img 
+          class="h-[66vh] w-auto object-contain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          :src="band.data.attributes.bandImg.data.attributes.url"
+          alt="Band Image"
+        />
+
+        <!-- Content Container -->
+        <div class="absolute bottom-0 left-0 w-full">
+          <!-- Artist Name Container -->
+          <div class="bg-black/70 backdrop-blur-sm py-4 px-4 md:px-8">
+            <h1 class="text-white text-2xl sm:text-4xl md:text-7xl text-center font-bold tracking-tight">
+              {{ band.data.attributes.name }}
+            </h1>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -23,13 +36,15 @@
             <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
               Bio
             </h1>
-            <p class="text-white">{{ band.data.attributes.bio }}</p>
+            <p class="text-white text-lg whitespace-pre-wrap leading-relaxed">
+              {{ band.data.attributes.bio }}
+            </p>
           </div>
 
           <!-- singlesong section -->
           <div v-if="band.data.attributes.singlesong">
             <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
-              Singles
+              Single
             </h1>
             <AudioPlayer 
               :album="formatSingleSong(band.data.attributes.singlesong)" 
