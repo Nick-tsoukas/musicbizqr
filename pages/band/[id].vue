@@ -29,7 +29,7 @@
             </p>
             <button
               @click="toggleBio"
-              class="text-purple-400 mt-4 font-semibold"
+              class="text-purple-400 mt-4 font-semibold border-1 border-white"
             >
               {{ isExpanded ? "Read Less" : "Read More" }}
             </button>
