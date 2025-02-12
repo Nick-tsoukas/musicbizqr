@@ -304,11 +304,11 @@
                   rel="noopener"
                 >
                   <button
-                    class="w-full custom-border text-white flex justify-center font-semibold px-2 py-3 items-center relative shadow-lg rounded-md"
+                    class="w-full custom-border text-white text-xl flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md"
                   >
                     <img
                       :src="platform.img"
-                      class="h-8 absolute left-2"
+                      class="h-10 absolute left-2"
                       :alt="platform.label"
                     />
                     {{ platform.label }}
@@ -503,15 +503,15 @@ const setAlbum = (id) => {
 };
 
 // Import social media icons
-import facebookIcon from "@/assets/facebookfree.png";
-import instagramIcon from "@/assets/instagramfree.png";
-import twitchIcon from "@/assets/twitchfree.png";
+import facebookIcon from "@/assets/fbwhite.svg";
+import instagramIcon from "@/assets/whiteinstagram.svg";
+import twitchIcon from "@/assets/whitetwitch.svg";
 import appleMusicIcon from "@/assets/apple.svg";
-import soundcloudIcon from "@/assets/soundcloudlast.png";
-import deezerIcon from "@/assets/dezzer.svg";
-import youtubeIcon from "@/assets/youtube-icon.svg";
-import bandcampIcon from "@/assets/bandcamp.svg";
-import twitterIcon from "@/assets/bandcamp.svg";
+import soundcloudIcon from "@/assets/whitesoundcloud.svg";
+import deezerIcon from "@/assets/whitedeezer.svg";
+import youtubeIcon from "@/assets/whiteyoutube.svg";
+import bandcampIcon from "@/assets/whitebandcamp.svg";
+import twitterIcon from "@/assets/whitetwitter.svg";
 
 // Import streaming platform icons
 import spotifyIcon from "@/assets/spotify.svg";
@@ -525,11 +525,7 @@ const socialPlatforms = [
   { name: "facebook", img: facebookIcon, label: "Facebook" },
   { name: "instagram", img: instagramIcon, label: "Instagram" },
   { name: "twitch", img: twitchIcon, label: "Twitch" },
-  { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
-  { name: "soundcloud", img: soundcloudIcon, label: "SoundCloud" },
-  { name: "deezer", img: deezerIcon, label: "Deezer" },
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
-  { name: "bandcamp", img: bandcampIcon, label: "Bandcamp" },
   { name: "twitter", img: twitterIcon, label: "Twitter" },
 ];
 
@@ -538,6 +534,7 @@ const streamingPlatforms = [
   { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
   { name: "deezer", img: deezerIcon2, label: "Deezer" },
+  { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
   { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
 ];
