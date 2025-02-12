@@ -9,7 +9,7 @@
       />
       <div class="absolute inset-0 bg-black bg-opacity-50"></div>
       <div class="absolute bg-black bottom-0 p-6 left-0 w-full text-center">
-        <h1 class="text-white text-5xl md:text-7xl font-bold tracking-tight">
+        <h1 class="text-white text-5xl md:text-4xl font-bold tracking-tight">
           {{ band.data.attributes.name }}
         </h1>
       </div>
@@ -37,7 +37,7 @@
 
           <!-- singlesong section -->
           <div v-if="band.data.attributes.singlesong">
-            <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
+            <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
               Single
             </h1>
             <AudioPlayer
@@ -48,7 +48,7 @@
 
           <!-- Albums Section -->
           <div v-if="albums.length > 0">
-            <h1 class="text-lg my-4 md:text-7xl font-bold text-white md:my-16">
+            <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
               Albums
             </h1>
             <section class="flex gap-4 overflow-x-scroll no-scrollbar">
@@ -95,7 +95,7 @@
 
             <div v-if="band.data.attributes.bio">
               <h1
-                class="text-lg my-4 md:text-7xl font-bold text-white md:my-16"
+                class="text-lg my-4 md:text-4xl font-bold text-white md:my-16"
               >
                 Bio
               </h1>
@@ -140,7 +140,7 @@
           <!-- Events Section -->
           <div v-if="events.length" class="mt-10 mx-auto">
             <h1
-              class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16"
+              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
               Events
             </h1>
@@ -187,7 +187,7 @@
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto">
             <h1
-              class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16"
+              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
               Tours
             </h1>
@@ -218,7 +218,7 @@
           <!-- Videos Section -->
           <div v-if="videoItems.length" class="mt-10 mx-auto">
             <h1
-              class="text-4xl sm:text-5xl md:text-7xl font-bold text-white my-16"
+              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
               Videos
             </h1>
