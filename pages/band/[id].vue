@@ -9,7 +9,7 @@
       />
       <div class="absolute inset-0 bg-black bg-opacity-50"></div>
       <div class="absolute bg-black bottom-0 p-6 left-0 w-full text-center">
-        <h1 class="text-white text-5xl md:text-4xl font-bold tracking-tight">
+        <h1 class="text-white text-5xl md:text-5xl font-bold tracking-tight">
           {{ band.data.attributes.name }}
         </h1>
       </div>
@@ -21,7 +21,7 @@
         <div>
           <!-- Bio Section -->
           <div v-if="band.data.attributes.bio">
-            <h1 class="text-4xl my-4 md:text-5xl font-bold text-white md:my-16">
+            <h1 class="text-4xl my-4 md:text-4xl font-bold text-white md:mb-16 mt-8">
               Bio
             </h1>
             <p class="text-white text-lg whitespace-pre-wrap leading-relaxed">
