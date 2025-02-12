@@ -16,36 +16,21 @@
     </div>
 
     <!-- Band Page Content -->
+
     <div class="w-full px-6 md:max-w-[80vw] md:mx-auto">
       <div class="pt-0 sm:p-5">
+        <!-- singlesong section -->
+        <div v-if="band.data.attributes.singlesong">
+          <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
+            Featured Song
+          </h1>
+          <AudioPlayer
+            :album="formatSingleSong(band.data.attributes.singlesong)"
+            :placeholderImage="'/placeholder-image.svg'"
+          />
+        </div>
+
         <div>
-          <!-- Bio Section -->
-          <div v-if="band.data.attributes.bio">
-            <h1 class="text-4xl my-4 md:text-4xl font-bold text-white md:mb-16 mt-8">
-              Bio
-            </h1>
-            <p class="text-white text-lg whitespace-pre-wrap leading-relaxed">
-              {{ isExpanded ? band.data.attributes.bio : truncatedBio }}
-            </p>
-            <button
-              @click="toggleBio"
-              class="text-purple-400 mt-4 font-semibold border-1 border-white"
-            >
-              {{ isExpanded ? "Read Less" : "Read More" }}
-            </button>
-          </div>
-
-          <!-- singlesong section -->
-          <div v-if="band.data.attributes.singlesong">
-            <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
-              Single
-            </h1>
-            <AudioPlayer
-              :album="formatSingleSong(band.data.attributes.singlesong)"
-              :placeholderImage="'/placeholder-image.svg'"
-            />
-          </div>
-
           <!-- Albums Section -->
           <div v-if="albums.length > 0">
             <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
@@ -92,15 +77,15 @@
               </div>
             </section>
             <!-- bio section -->
-
+            <!-- 
             <div v-if="band.data.attributes.bio">
               <h1
                 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16"
               >
-                Bio
+                Biography
               </h1>
               <p class="text-white">{{ band.data.attributes.bio }}</p>
-            </div>
+            </div> -->
 
             <!-- Album Player Section -->
             <section
@@ -137,84 +122,7 @@
             </section>
           </div>
 
-          <!-- Events Section -->
-          <div v-if="events.length" class="mt-10 mx-auto">
-            <h1
-              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
-            >
-              Events
-            </h1>
-            <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
-              <div
-                v-for="event in events"
-                :key="event.id"
-                class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white"
-              >
-                <img
-                  v-if="event.attributes.image"
-                  class="w-full h-[200px] md:h-72 object-cover rounded-md"
-                  :src="event.attributes.image.data.attributes.url"
-                  alt="Event Image"
-                />
-                <div class="pt-5">
-                  <h3 class="text-xl md:text-2xl text-white font-bold mb-2">
-                    {{ event.attributes.title }}
-                  </h3>
-                  <p class="text-white text-sm">
-                    {{
-                      new Date(
-                        event.attributes.date ?? new Date()
-                      ).toLocaleDateString()
-                    }}
-                  </p>
-                  <p class="text-white text-sm">
-                    {{ event.attributes.venue ?? "Venue not specified" }}
-                  </p>
-                  <p class="text-white text-sm">
-                    {{ event.attributes.city ?? "City not specified" }}
-                  </p>
-                  <button
-                    @click="router.push(`/event/${event.id}`)"
-                    class="mdc-button-green mt-2 w-full"
-                  >
-                    View Event
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tours Section -->
-          <div v-if="tours.length" class="mt-10 mx-auto">
-            <h1
-              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
-            >
-              Tours
-            </h1>
-            <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
-              <div
-                v-for="tour in tours"
-                :key="tour.id"
-                class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white"
-              >
-                <img
-                  v-if="tour.attributes.image"
-                  class="w-full h-[200px] md:h-72 object-cover"
-                  :src="tour.attributes.image.data.attributes.url"
-                  alt="Tour Image"
-                />
-                <div class="pt-5">
-                  <button
-                    @click="router.push(`/tour/${tour.id}`)"
-                    class="mdc-button-green mt-2 w-full"
-                  >
-                    View Tour
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
+         
           <!-- Videos Section -->
           <div v-if="videoItems.length" class="mt-10 mx-auto">
             <h1
@@ -318,37 +226,139 @@
             </template>
           </div>
         </div>
-        
+
         <div
         class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16"
-      >
-      <h2 class="text-4xl my-6 font-bold text-white">Social</h2>
+        >
+          <h2 class="text-4xl my-6 font-bold text-white">Social Media</h2>
 
-        <div class=" flex items-center justify-between w-full bg-[#000] mb-10">
-          <div class="flex flex-wrap items-center justify-between gap-5">
-            <!-- Social Media Platforms -->
-            <template v-for="platform in socialPlatforms" :key="platform.name">
-              <a
-                v-if="band.data.attributes[platform.name]"
-                :href="band.data.attributes[platform.name]"
-                :aria-label="`Find us on ${platform.label}`"
-                target="_blank"
-                rel="noopener"
+     
+              <!-- Social Media Platforms -->
+              <template
+                v-for="platform in socialPlatforms"
+                :key="platform.name"
+              >
+              <span v-if="band.data.attributes[platform.name]">
+                <a
+                  :href="band.data.attributes[platform.name]"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <button
+                    class="w-full custom-border text-white text-xl flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md"
+                  >
+                    <img
+                      :src="platform.img"
+                      class="h-10 absolute left-2"
+                      :alt="platform.label"
+                    />
+                    {{ platform.label }}
+                  </button>
+                </a>
+              </span>
+              </template>
+
+
+               <!-- Events Section -->
+          <div v-if="events.length" class="mt-10 mx-auto">
+            <h1
+              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
+            >
+              Events
+            </h1>
+            <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
+              <div
+                v-for="event in events"
+                :key="event.id"
+                class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white"
               >
                 <img
-                  :src="platform.img"
-                  :alt="platform.label"
-                  class="h-10 w-10"
+                  v-if="event.attributes.image"
+                  class="w-full h-[200px] md:h-72 object-cover rounded-md"
+                  :src="event.attributes.image.data.attributes.url"
+                  alt="Event Image"
                 />
-              </a>
-            </template>
+                <div class="pt-5">
+                  <h3 class="text-xl md:text-2xl text-white font-bold mb-2">
+                    {{ event.attributes.title }}
+                  </h3>
+                  <p class="text-white text-sm">
+                    {{
+                      new Date(
+                        event.attributes.date ?? new Date()
+                      ).toLocaleDateString()
+                    }}
+                  </p>
+                  <p class="text-white text-sm">
+                    {{ event.attributes.venue ?? "Venue not specified" }}
+                  </p>
+                  <p class="text-white text-sm">
+                    {{ event.attributes.city ?? "City not specified" }}
+                  </p>
+                  <button
+                    @click="router.push(`/event/${event.id}`)"
+                    class="mdc-button-green mt-2 w-full"
+                  >
+                    View Event
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tours Section -->
+          <div v-if="tours.length" class="mt-10 mx-auto">
+            <h1
+              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
+            >
+              Tours
+            </h1>
+            <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
+              <div
+                v-for="tour in tours"
+                :key="tour.id"
+                class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white"
+              >
+                <img
+                  v-if="tour.attributes.image"
+                  class="w-full h-[200px] md:h-72 object-cover"
+                  :src="tour.attributes.image.data.attributes.url"
+                  alt="Tour Image"
+                />
+                <div class="pt-5">
+                  <button
+                    @click="router.push(`/tour/${tour.id}`)"
+                    class="mdc-button-green mt-2 w-full"
+                  >
+                    View Tour
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+         
+          <!-- Bio Section -->
+          <div v-if="band.data.attributes.bio" class="mb-10">
+            <h1
+              class="text-4xl my-4 md:text-4xl font-bold text-white md:mb-16 mt-8"
+            >
+              Biography
+            </h1>
+            <p class="text-white text-lg whitespace-pre-wrap leading-relaxed">
+              {{ isExpanded ? band.data.attributes.bio : truncatedBio }}
+            </p>
+            <button
+              @click="toggleBio"
+              class="text-purple-400 mt-4 font-semibold border-1 border-white"
+            >
+              {{ isExpanded ? "Read Less" : "Read More" }}
+            </button>
           </div>
         </div>
       </div>
-      </div>
 
       <!-- Social Media Links -->
-     
     </div>
   </div>
 </template>
