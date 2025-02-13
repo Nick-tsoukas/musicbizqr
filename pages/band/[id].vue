@@ -24,11 +24,11 @@
         {{ band.data.attributes.bio }}
      </h3>
       <div v-if="band.data.attributes.biotagline">
-        <p
-        class="text-[18px] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
+        <h3
+        class="text-[1rem] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
       >
         {{ band.data.attributes.biotagline }}
-      </p>
+      </h3>
       </div>
      </div>
     </div>
