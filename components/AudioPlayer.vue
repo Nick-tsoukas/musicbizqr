@@ -418,7 +418,7 @@ const songs = computed(() => {
 }
 
 .song-title {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: bold;
   margin: 0;
 }

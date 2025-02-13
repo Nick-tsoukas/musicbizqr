@@ -15,11 +15,22 @@
       </div> -->
     </div>
 
-    <div
-      v-if="band.data.attributes.bio"
-      class="text-[18px] w-[90vw] mx-auto my-10 text-center text-white md:max-w-[75vw] md:text-2xl break-words whitespace-pre-wrap"
-    >
-      {{ band.data.attributes.bio }}
+    <div class="flex justify-center">
+     <div class="flex flex-col">
+      <div
+        v-if="band.data.attributes.bio"
+        class="text-[18px] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line"
+      >
+        {{ band.data.attributes.bio }}
+      </div>
+      <div v-if="band.data.attributes.biotagline">
+        <p
+        class="text-[18px] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
+      >
+        {{ band.data.attributes.biotagline }}
+      </p>
+      </div>
+     </div>
     </div>
 
     <!-- Band Page Content -->
@@ -28,7 +39,7 @@
       <div class="pt-0 sm:p-5">
         <!-- singlesong section -->
         <div v-if="band.data.attributes.singlesong">
-          <h1 class="text-3xl my-4 md:text-4xl font-bold text-white md:my-16">
+          <h1 class="text-2xl mt-2 md:text-3xl font-bold text-white md:my-4">
             Featured Song
           </h1>
           <AudioPlayer
@@ -40,24 +51,23 @@
         <!-- website link  -->
         <div v-if="band.data.attributes.websitelink">
           <h1
-            class="text-3xl my-4 md:text-4xl font-bold text-white md:mt-16 mb-6"
+            class="text-2xl my-2 md:text-3xl font-bold text-white md:mt-16 mb-1"
           >
             Website Link
           </h1>
           <a
-            class="text-purple-500 text-lg"
+            class="text-purple-500 text-xl"
             :href="band.data.attributes.websitelink"
             ><span :vif="band.data.attributes.websitelinktext">{{
               band.data.attributes.websitelinktext
             }}</span>
-            </a
-          >
+          </a>
         </div>
 
         <div>
           <!-- Albums Section -->
           <div v-if="albums.length > 0">
-            <h1 class="text-3xl my-4 md:text-4xl font-bold text-white md:my-16">
+            <h1 class="text-2xl my-4 md:text-3xl font-bold text-white md:my-16">
               Albums
             </h1>
             <section class="flex gap-4 overflow-x-scroll no-scrollbar">
@@ -148,9 +158,7 @@
 
           <!-- Videos Section -->
           <div v-if="videoItems.length" class="mt-10 mx-auto">
-            <h1
-              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
-            >
+            <h1 class="text-2xl md:text-3xl font-bold text-white my-16">
               Videos
             </h1>
             <div
@@ -223,9 +231,11 @@
           <div
             class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-16"
           >
-            <h2 class="text-3xl my-10 font-bold text-white md:3xl">
+            <h1
+              class="text-2xl my-2 md:text-3xl font-bold text-white md:mt-16 mb-4"
+            >
               Streaming Links
-            </h2>
+            </h1>
             <template
               v-for="platform in streamingPlatforms"
               :key="platform.name"
@@ -237,7 +247,7 @@
                   rel="noopener"
                 >
                   <button
-                    class="w-full custom-border text-white text-xl flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md"
+                    class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
                   >
                     <img
                       :src="platform.img"
@@ -253,11 +263,11 @@
         </div>
 
         <div
-          class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-16"
+          class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-10"
         >
-          <h2 class="text-3xl my-6 font-bold text-white md:text-4xl">
+          <h1 class="text-2xl my-2 font-bold text-white md:text-3xl">
             Social Media
-          </h2>
+          </h1>
 
           <!-- Social Media Platforms -->
           <template v-for="platform in socialPlatforms" :key="platform.name">
@@ -268,7 +278,7 @@
                 rel="noopener"
               >
                 <button
-                  class="w-full custom-border text-white text-xl flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md"
+                  class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
                 >
                   <img
                     :src="platform.img"
@@ -329,58 +339,45 @@
           </div> -->
 
           <div v-if="events.length" class="w-full mt-10">
-            <h1
-              class="text-3xl sm:text-5xl md:text-4xl font-bold text-white my-16"
-            >
+            <h1 class="text-2xl md:text-3xl font-bold text-white my-2">
               Events and Tours
             </h1>
 
             <!-- Full Table View for >=SM screens -->
-            <div class="hidden sm:block">
+            <div
+              class="overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 relative"
+            >
               <table
-                class="min-w-full bg-black text-white rounded-md shadow-lg"
+                class="w-full table-auto bg-black text-white rounded-md shadow-lg"
               >
                 <thead>
-                  <tr class="border-b border-gray-700">
-                    <th class="p-4 text-left">Image</th>
-                    <th class="p-4 text-left">Title</th>
-                    <th class="p-4 text-left">Date</th>
-                    <th class="p-4 text-left">Venue</th>
-                    <th class="p-4 text-left">City</th>
-                    <th class="p-4 text-left">Action</th>
+                  <tr class="border-b border-purple-500">
+                    <th class="py-4 text-left">Date</th>
+                    <th class="py-4 text-left">City</th>
+                    <th class="py-4 text-left">Venue</th>
+                    <th class="py-4 text-left">Tickets</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="event in events"
                     :key="event.id"
-                    class="border-b border-gray-700"
+                    class="border-b border-purple-500"
                   >
-                    <td class="p-4">
-                      <img
-                        v-if="event.attributes.image"
-                        :src="event.attributes.image.data.attributes.url"
-                        alt="Event Image"
-                        class="w-24 h-24 object-cover rounded-md"
-                      />
-                    </td>
-                    <td class="p-4">
-                      {{ event.attributes.title }}
-                    </td>
-                    <td class="p-4">
+                    <td class="py-4 wyitespace-nowrap min-w-[150px]">
                       {{
                         new Date(
                           event.attributes.date ?? new Date()
                         ).toLocaleDateString()
                       }}
                     </td>
-                    <td class="p-4">
-                      {{ event.attributes.venue ?? "Venue not specified" }}
-                    </td>
-                    <td class="p-4">
+                    <td class="p-4 whitespace-nowrap min-w-[150px]">
                       {{ event.attributes.city ?? "City not specified" }}
                     </td>
-                    <td class="p-4">
+                    <td class="p-4 whitespace-nowrap min-w-[200px]">
+                      {{ event.attributes.venue ?? "Venue not specified" }}
+                    </td>
+                    <td class="p-4 whitespace-nowrap min-w-[120px]">
                       <button
                         @click="router.push(`/event/${event.id}`)"
                         class="text-purple-400"
@@ -392,59 +389,12 @@
                 </tbody>
               </table>
             </div>
-
-            <!-- Card/List Layout for <SM screens -->
-            <div class="block sm:hidden space-y-4">
-              <div
-                v-for="event in events"
-                :key="event.id"
-                class="bg-black text-white p-4 rounded shadow-md"
-              >
-                <!-- Image -->
-                <div class="mb-2">
-                  <img
-                    v-if="event.attributes.image"
-                    :src="event.attributes.image.data.attributes.url"
-                    alt="Event Image"
-                    class="w-full h-auto object-cover rounded-md"
-                  />
-                </div>
-                <!-- Title -->
-                <h3 class="text-xl font-bold mb-1">
-                  {{ event.attributes.title }}
-                </h3>
-                <!-- Date, Venue, City -->
-                <p class="text-sm mb-1">
-                  <strong>Date:</strong>
-                  {{
-                    new Date(
-                      event.attributes.date ?? new Date()
-                    ).toLocaleDateString()
-                  }}
-                </p>
-                <p class="text-sm mb-1">
-                  <strong>Venue:</strong>
-                  {{ event.attributes.venue ?? "Venue not specified" }}
-                </p>
-                <p class="text-sm mb-2">
-                  <strong>City:</strong>
-                  {{ event.attributes.city ?? "City not specified" }}
-                </p>
-                <!-- Action -->
-                <button
-                  @click="router.push(`/event/${event.id}`)"
-                  class="text-purple-400"
-                >
-                  View Event
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto mb-10">
             <h1
-              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
+              class="text-2xl sm:text-2xl md:text-3xl font-bold text-white my-16"
             >
               Tours
             </h1>
