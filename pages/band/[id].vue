@@ -1,7 +1,7 @@
 <template>
   <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
     <!-- Hero Section -->
-    <div class="relative w-full h-[35vh] md:h-[80vh]">
+    <div class="relative w-full h-[25vh] md:h-[80vh]">
       <img
         class="absolute inset-0 w-auto m-auto h-[35vh] object-cover md:h-2/3"
         :src="band.data.attributes.bandImg.data.attributes.url"
@@ -19,7 +19,7 @@
      <div class="flex flex-col">
       <h3
         v-if="band.data.attributes.bio"
-        class="text-[1rem] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line"
+        class="text-[16px] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line"
       >
         {{ band.data.attributes.bio }}
      </h3>
