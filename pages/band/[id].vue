@@ -7,12 +7,16 @@
         :src="band.data.attributes.bandImg.data.attributes.url"
         alt="Band Image"
       />
-      <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-      <div class="absolute bg-black bottom-0 p-6 left-0 w-full text-center">
+      <div class="absolute inset-0 bg-black bg-opacity-0"></div>
+      <!-- <div class="absolute bg-black bottom-0 p-6 left-0 w-full text-center">
         <h1 class="text-white text-5xl md:text-6xl font-bold tracking-tight">
           {{ band.data.attributes.name }}
         </h1>
-      </div>
+      </div> -->
+    </div>
+
+    <div v-if="band.data.attributes.bio" class="text-3xl w-[60vw] mx-auto text-center text-white">
+      <p > {{band.data.attributes.bio}}</p>
     </div>
 
     <!-- Band Page Content -->
@@ -28,6 +32,14 @@
             :album="formatSingleSong(band.data.attributes.singlesong)"
             :placeholderImage="'/placeholder-image.svg'"
           />
+        </div>
+
+        <!-- website link  -->
+        <div v-if="band.data.attributes.websitelink">
+          <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
+          {{band.data.attributes.websitelink}}
+          </h1>
+          <a class="text-white" > Website Link</a>
         </div>
 
         <div>
@@ -122,7 +134,6 @@
             </section>
           </div>
 
-         
           <!-- Videos Section -->
           <div v-if="videoItems.length" class="mt-10 mx-auto">
             <h1
@@ -228,38 +239,33 @@
         </div>
 
         <div
-        class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16"
+          class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16"
         >
           <h2 class="text-4xl my-6 font-bold text-white">Social Media</h2>
 
-     
-              <!-- Social Media Platforms -->
-              <template
-                v-for="platform in socialPlatforms"
-                :key="platform.name"
+          <!-- Social Media Platforms -->
+          <template v-for="platform in socialPlatforms" :key="platform.name">
+            <span v-if="band.data.attributes[platform.name]">
+              <a
+                :href="band.data.attributes[platform.name]"
+                target="_blank"
+                rel="noopener"
               >
-              <span v-if="band.data.attributes[platform.name]">
-                <a
-                  :href="band.data.attributes[platform.name]"
-                  target="_blank"
-                  rel="noopener"
+                <button
+                  class="w-full custom-border text-white text-xl flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md"
                 >
-                  <button
-                    class="w-full custom-border text-white text-xl flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md"
-                  >
-                    <img
-                      :src="platform.img"
-                      class="h-10 absolute left-2"
-                      :alt="platform.label"
-                    />
-                    {{ platform.label }}
-                  </button>
-                </a>
-              </span>
-              </template>
+                  <img
+                    :src="platform.img"
+                    class="h-10 absolute left-2"
+                    :alt="platform.label"
+                  />
+                  {{ platform.label }}
+                </button>
+              </a>
+            </span>
+          </template>
 
-
-               <!-- Events Section -->
+          <!-- Events Section -->
           <!-- <div v-if="events.length" class="mt-10 mx-auto">
             <h1
               class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
@@ -307,61 +313,67 @@
           </div> -->
 
           <div v-if="events.length" class="w-full mt-10">
-    <h1 class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16">
-      Events and Tours
-    </h1>
-    <table class="min-w-full bg-black text-white rounded-md shadow-lg">
-      <thead>
-        <tr class="border-b border-gray-700">
-          <th class="p-4 text-left">Image</th>
-          <th class="p-4 text-left">Title</th>
-          <th class="p-4 text-left">Date</th>
-          <th class="p-4 text-left">Venue</th>
-          <th class="p-4 text-left">City</th>
-          <th class="p-4 text-left">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="event in events"
-          :key="event.id"
-          class="border-b border-gray-700"
-        >
-          <td class="p-4">
-            <img
-              v-if="event.attributes.image"
-              :src="event.attributes.image.data.attributes.url"
-              alt="Event Image"
-              class="w-24 h-24 object-cover rounded-md"
-            />
-          </td>
-          <td class="p-4">
-            {{ event.attributes.title }}
-          </td>
-          <td class="p-4">
-            {{ new Date(event.attributes.date ?? new Date()).toLocaleDateString() }}
-          </td>
-          <td class="p-4">
-            {{ event.attributes.venue ?? 'Venue not specified' }}
-          </td>
-          <td class="p-4">
-            {{ event.attributes.city ?? 'City not specified' }}
-          </td>
-          <td class="p-4">
-            <button
-              @click="router.push(`/event/${event.id}`)"
-              class="text-purple-400"
+            <h1
+              class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
-              View Event
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+              Events and Tours
+            </h1>
+            <table class="min-w-full bg-black text-white rounded-md shadow-lg">
+              <thead>
+                <tr class="border-b border-gray-700">
+                  <th class="p-4 text-left">Image</th>
+                  <th class="p-4 text-left">Title</th>
+                  <th class="p-4 text-left">Date</th>
+                  <th class="p-4 text-left">Venue</th>
+                  <th class="p-4 text-left">City</th>
+                  <th class="p-4 text-left">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="event in events"
+                  :key="event.id"
+                  class="border-b border-gray-700"
+                >
+                  <td class="p-4">
+                    <img
+                      v-if="event.attributes.image"
+                      :src="event.attributes.image.data.attributes.url"
+                      alt="Event Image"
+                      class="w-24 h-24 object-cover rounded-md"
+                    />
+                  </td>
+                  <td class="p-4">
+                    {{ event.attributes.title }}
+                  </td>
+                  <td class="p-4">
+                    {{
+                      new Date(
+                        event.attributes.date ?? new Date()
+                      ).toLocaleDateString()
+                    }}
+                  </td>
+                  <td class="p-4">
+                    {{ event.attributes.venue ?? "Venue not specified" }}
+                  </td>
+                  <td class="p-4">
+                    {{ event.attributes.city ?? "City not specified" }}
+                  </td>
+                  <td class="p-4">
+                    <button
+                      @click="router.push(`/event/${event.id}`)"
+                      class="text-purple-400"
+                    >
+                      View Event
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <!-- Tours Section -->
-          <div v-if="tours.length" class="mt-10 mx-auto">
+          <div v-if="tours.length" class="mt-10 mx-auto mb-10">
             <h1
               class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
@@ -391,7 +403,6 @@
             </div>
           </div>
 
-         
           <!-- Bio Section -->
           <!-- <div v-if="band.data.attributes.bio" class="mb-10">
             <h1
@@ -414,6 +425,7 @@
 
       <!-- Social Media Links -->
     </div>
+    <Footer/>
   </div>
 </template>
 
