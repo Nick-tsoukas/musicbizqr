@@ -260,7 +260,7 @@
 
 
                <!-- Events Section -->
-          <div v-if="events.length" class="mt-10 mx-auto">
+          <!-- <div v-if="events.length" class="mt-10 mx-auto">
             <h1
               class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
@@ -304,7 +304,61 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
+
+          <div v-if="events.length" class="w-full mt-10">
+    <h1 class="text-4xl sm:text-5xl md:text-4xl font-bold text-white my-16">
+      Events and Tours
+    </h1>
+    <table class="min-w-full bg-black text-white rounded-md shadow-lg">
+      <thead>
+        <tr class="border-b border-gray-700">
+          <th class="p-4 text-left">Image</th>
+          <th class="p-4 text-left">Title</th>
+          <th class="p-4 text-left">Date</th>
+          <th class="p-4 text-left">Venue</th>
+          <th class="p-4 text-left">City</th>
+          <th class="p-4 text-left">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="event in events"
+          :key="event.id"
+          class="border-b border-gray-700"
+        >
+          <td class="p-4">
+            <img
+              v-if="event.attributes.image"
+              :src="event.attributes.image.data.attributes.url"
+              alt="Event Image"
+              class="w-24 h-24 object-cover rounded-md"
+            />
+          </td>
+          <td class="p-4">
+            {{ event.attributes.title }}
+          </td>
+          <td class="p-4">
+            {{ new Date(event.attributes.date ?? new Date()).toLocaleDateString() }}
+          </td>
+          <td class="p-4">
+            {{ event.attributes.venue ?? 'Venue not specified' }}
+          </td>
+          <td class="p-4">
+            {{ event.attributes.city ?? 'City not specified' }}
+          </td>
+          <td class="p-4">
+            <button
+              @click="router.push(`/event/${event.id}`)"
+              class="text-purple-400"
+            >
+              View Event
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto">
