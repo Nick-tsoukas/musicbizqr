@@ -17,7 +17,7 @@
 
     <div
       v-if="band.data.attributes.bio"
-      class="text-[18px] w-[90vw] mx-auto my-10 text-center text-white md:w-[75vw] md:text-2xl whitespace-pre-wrap"
+      class="text-[18px] w-[90vw] mx-auto my-10 text-center text-white md:max-w-[75vw] md:text-2xl break-words whitespace-pre-wrap"
     >
       {{ band.data.attributes.bio }}
     </div>
