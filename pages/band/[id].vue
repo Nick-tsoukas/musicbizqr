@@ -513,15 +513,25 @@ const setAlbum = (id) => {
 };
 
 // Import social media icons
-import facebookIcon from "@/assets/fbwhite.svg";
-import instagramIcon from "@/assets/whiteinstagram.svg";
-import twitchIcon from "@/assets/whitetwitch.svg";
+// import facebookIcon from "@/assets/fbwhite.svg";
+// import instagramIcon from "@/assets/whiteinstagram.svg";
+// import twitchIcon from "@/assets/whitetwitch.svg";
+// import appleMusicIcon from "@/assets/apple.svg";
+// import soundcloudIcon from "@/assets/whitesoundcloud.svg";
+// import deezerIcon from "@/assets/whitedeezer.svg";
+// import youtubeIcon from "@/assets/whiteyoutube.svg";
+// import bandcampIcon from "@/assets/whitebandcamp.svg";
+// import twitterIcon from "@/assets/whitetwitter.svg";
+
+import facebookIcon from "@/assets/facebookfree.png";
+import instagramIcon from "@/assets/instagramfree.png";
+import twitchIcon from "@/assets/twitchfree.png";
 import appleMusicIcon from "@/assets/apple.svg";
-import soundcloudIcon from "@/assets/whitesoundcloud.svg";
-import deezerIcon from "@/assets/whitedeezer.svg";
-import youtubeIcon from "@/assets/whiteyoutube.svg";
-import bandcampIcon from "@/assets/whitebandcamp.svg";
-import twitterIcon from "@/assets/whitetwitter.svg";
+import soundcloudIcon from "@/assets/soundcloudlast.png";
+import deezerIcon from "@/assets/dezzer.svg";
+import youtubeIcon from "@/assets/youtube-icon.svg";
+import bandcampIcon from "@/assets/bandcamp.svg";
+import twitterIcon from "@/assets/bandcamp.svg";
 
 // Import streaming platform icons
 import spotifyIcon from "@/assets/spotify.svg";
