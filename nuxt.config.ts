@@ -4,6 +4,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+      // strapiUrl: 'https://pink-papayas-brush.loca.lt',
+    
       stripe: {
         key: process.env.STRIPE_PUBLISHABLE_KEY,
         options: {},
