@@ -64,7 +64,12 @@ const router = useRouter();
 const isMenuOpen = ref(false);
 
 const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
+  if (!isMenuOpen.value) {
+  document.body.style.overflow = 'hidden'; // disable body scroll
+} else {
+  document.body.style.overflow = '';
+}
+isMenuOpen.value = !isMenuOpen.value;
 };
 
 const logoutUser = () => {
