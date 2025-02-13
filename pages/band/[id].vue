@@ -393,7 +393,7 @@
 
          
           <!-- Bio Section -->
-          <div v-if="band.data.attributes.bio" class="mb-10">
+          <!-- <div v-if="band.data.attributes.bio" class="mb-10">
             <h1
               class="text-4xl my-4 md:text-4xl font-bold text-white md:mb-16 mt-8"
             >
@@ -408,7 +408,7 @@
             >
               {{ isExpanded ? "Read Less" : "Read More" }}
             </button>
-          </div>
+          </div> -->
         </div>
       </div>
 
