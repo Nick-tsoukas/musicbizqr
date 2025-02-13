@@ -9,7 +9,9 @@
         <!-- Band Details Section -->
         <div class="bg-[#fff] rounded-md">
           <div>
-            <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <div
+              class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+            >
               <h2 class="font-semibold text-white text-2xl">Band Details</h2>
             </div>
             <!-- Band Name -->
@@ -23,7 +25,9 @@
                   placeholder=" "
                   required
                 />
-                <label class="mdc-floating-label" for="band-name">Band Name</label>
+                <label class="mdc-floating-label" for="band-name"
+                  >Band Name</label
+                >
                 <div class="mdc-line-ripple"></div>
               </div>
 
@@ -57,8 +61,52 @@
           </div>
         </div>
 
+        <!-- website link and text   -->
+        <div class="bg-[#fff] rounded-md my-10">
+          <div>
+            <div
+              class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+            >
+              <h2 class="font-semibold text-white text-2xl">Website Link and Text</h2>
+            </div>
+            <!-- websitelink  -->
+            <div class="p-4">
+              <div class="mdc-text-field">
+                <input
+                  type="text"
+                  id="websitelink"
+                  class="mdc-text-field__input"
+                  v-model="websitelink"
+                  placeholder="https://yourbandsite.com "
+                />
+                <label class="mdc-floating-label" for="websitelink"
+                  >Website Link</label
+                >
+                <div class="mdc-line-ripple"></div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="mdc-text-field">
+                <input
+                  type="text"
+                  id="websitelinktext"
+                  class="mdc-text-field__input"
+                  v-model="websitelink"
+                  placeholder="YourBandSiteLinkText.com "
+                />
+                <label class="mdc-floating-label" for="websitelinktext"
+                  >Website Link Text To Show</label
+                >
+                <div class="mdc-line-ripple"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Band Image -->
-        <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
@@ -70,15 +118,23 @@
             @change="handleImageUpload"
             accept="image/*"
           />
-          <label for="band-img" class="styled-file-label w-full text-center">Choose Band Image</label>
+          <label for="band-img" class="styled-file-label w-full text-center"
+            >Choose Band Image</label
+          >
           <div v-if="bandImgUrl" class="mb-4">
-            <img :src="bandImgUrl" alt="Band Image" class="w-full h-auto rounded-lg shadow-md" />
+            <img
+              :src="bandImgUrl"
+              alt="Band Image"
+              class="w-full h-auto rounded-lg shadow-md"
+            />
           </div>
         </div>
 
         <!-- Band Members Section -->
         <div class="bg-white rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-white text-2xl">Band Members</h2>
           </div>
           <div class="p-4">
@@ -95,7 +151,9 @@
                   v-model="member.name"
                   placeholder=" "
                 />
-                <label class="mdc-floating-label" :for="'member-name-' + index">Member Name</label>
+                <label class="mdc-floating-label" :for="'member-name-' + index"
+                  >Member Name</label
+                >
                 <div class="mdc-line-ripple"></div>
               </div>
               <div class="mdc-text-field mb-4">
@@ -106,7 +164,9 @@
                   v-model="member.instrument"
                   placeholder=" "
                 />
-                <label class="mdc-floating-label" :for="'instrument-' + index">Instrument</label>
+                <label class="mdc-floating-label" :for="'instrument-' + index"
+                  >Instrument</label
+                >
                 <div class="mdc-line-ripple"></div>
               </div>
               <div class="mb-4">
@@ -117,59 +177,123 @@
                   @change="(event) => handleMemberImageUpload(event, index)"
                   accept="image/*"
                 />
-                <label :for="'member-img-' + index" class="styled-file-label w-full text-center"
+                <label
+                  :for="'member-img-' + index"
+                  class="styled-file-label w-full text-center"
                   >Choose Member Image</label
                 >
               </div>
               <div v-if="member.imageUrl" class="mb-4">
-                <img :src="member.imageUrl" alt="Member Image" class="w-full h-auto rounded-lg shadow-md" />
+                <img
+                  :src="member.imageUrl"
+                  alt="Member Image"
+                  class="w-full h-auto rounded-lg shadow-md"
+                />
               </div>
-              <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(index)">
+              <button
+                type="button"
+                class="mdc-button mb-4 w-full"
+                @click="removeMember(index)"
+              >
                 Remove Member
               </button>
             </div>
-            <button type="button" class="mdc-button mb-8 w-full" @click="addMember">+ Add Member</button>
+            <button
+              type="button"
+              class="mdc-button mb-8 w-full"
+              @click="addMember"
+            >
+              + Add Member
+            </button>
           </div>
         </div>
 
         <!-- Social Media Links Section -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-            <h2 class="font-semibold text-white text-2xl">Social Media Links</h2>
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">
+              Social Media Links
+            </h2>
           </div>
           <div class="p-4">
             <div class="mdc-text-field mb-4">
-              <input type="url" id="facebook" class="mdc-text-field__input" v-model="facebook" placeholder=" " />
+              <input
+                type="url"
+                id="facebook"
+                class="mdc-text-field__input"
+                v-model="facebook"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="facebook">Facebook</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="instagram" class="mdc-text-field__input" v-model="instagram" placeholder=" " />
-              <label class="mdc-floating-label" for="instagram">Instagram</label>
+              <input
+                type="url"
+                id="instagram"
+                class="mdc-text-field__input"
+                v-model="instagram"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="instagram"
+                >Instagram</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="twitch" class="mdc-text-field__input" v-model="twitch" placeholder=" " />
+              <input
+                type="url"
+                id="twitch"
+                class="mdc-text-field__input"
+                v-model="twitch"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="twitch">Twitch</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="twitter" class="mdc-text-field__input" v-model="twitter" placeholder=" " />
+              <input
+                type="url"
+                id="twitter"
+                class="mdc-text-field__input"
+                v-model="twitter"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="twitter">Twitter</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="whatsapp" class="mdc-text-field__input" v-model="whatsapp" placeholder=" " />
+              <input
+                type="url"
+                id="whatsapp"
+                class="mdc-text-field__input"
+                v-model="whatsapp"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="whatsapp">WhatsApp</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="tictok" class="mdc-text-field__input" v-model="tictok" placeholder=" " />
+              <input
+                type="url"
+                id="tictok"
+                class="mdc-text-field__input"
+                v-model="tictok"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="tictok">TicTok</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="snapchat" class="mdc-text-field__input" v-model="snapchat" placeholder=" " />
+              <input
+                type="url"
+                id="snapchat"
+                class="mdc-text-field__input"
+                v-model="snapchat"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="snapchat">Snapchat</label>
               <div class="mdc-line-ripple"></div>
             </div>
@@ -178,37 +302,79 @@
 
         <!-- Streaming Links Section -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-            <h2 class=" font-semibold text-2xl text-white">Streaming Links</h2>
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-2xl text-white">Streaming Links</h2>
           </div>
           <div class="p-4">
             <div class="mdc-text-field mb-4">
-              <input type="url" id="appleMusic" class="mdc-text-field__input" v-model="appleMusic" placeholder=" " />
-              <label class="mdc-floating-label" for="appleMusic">Apple Music</label>
+              <input
+                type="url"
+                id="appleMusic"
+                class="mdc-text-field__input"
+                v-model="appleMusic"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="appleMusic"
+                >Apple Music</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="spotify" class="mdc-text-field__input" v-model="spotify" placeholder=" " />
+              <input
+                type="url"
+                id="spotify"
+                class="mdc-text-field__input"
+                v-model="spotify"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="spotify">Spotify</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="soundcloud" class="mdc-text-field__input" v-model="soundcloud" placeholder=" " />
-              <label class="mdc-floating-label" for="soundcloud">SoundCloud</label>
+              <input
+                type="url"
+                id="soundcloud"
+                class="mdc-text-field__input"
+                v-model="soundcloud"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="soundcloud"
+                >SoundCloud</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="youtube" class="mdc-text-field__input" v-model="youtube" placeholder=" " />
+              <input
+                type="url"
+                id="youtube"
+                class="mdc-text-field__input"
+                v-model="youtube"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="youtube">YouTube</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="dezzer" class="mdc-text-field__input" v-model="dezzer" placeholder=" " />
+              <input
+                type="url"
+                id="dezzer"
+                class="mdc-text-field__input"
+                v-model="dezzer"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="dezzer">Dezzer</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <div class="mdc-text-field mb-4">
-              <input type="url" id="bandcamp" class="mdc-text-field__input" v-model="bandcamp" placeholder=" " />
+              <input
+                type="url"
+                id="bandcamp"
+                class="mdc-text-field__input"
+                v-model="bandcamp"
+                placeholder=" "
+              />
               <label class="mdc-floating-label" for="bandcamp">Bandcamp</label>
               <div class="mdc-line-ripple"></div>
             </div>
@@ -217,7 +383,9 @@
 
         <!-- Single Song Section (Media File + Title) -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-white text-2xl">Single Song</h2>
           </div>
           <div class="p-4">
@@ -229,7 +397,9 @@
                 v-model="singlesongTitle"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="singlesong-title">Song Title</label>
+              <label class="mdc-floating-label" for="singlesong-title"
+                >Song Title</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <input
@@ -239,7 +409,10 @@
               @change="handleSingleSongUpload"
               accept="audio/*"
             />
-            <label for="singlesong-file" class="styled-file-label w-full text-center">
+            <label
+              for="singlesong-file"
+              class="styled-file-label w-full text-center"
+            >
               Choose Single Song File
             </label>
             <div v-if="singlesongFileName" class="mt-4 text-white">
@@ -250,7 +423,9 @@
 
         <!-- Single Video Section (Youtube URL) -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-white text-2xl">Single Video</h2>
           </div>
           <div class="p-4">
@@ -262,13 +437,17 @@
                 v-model="singlevideoYoutubeUrl"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="singlevideo-youtube">YouTube URL</label>
+              <label class="mdc-floating-label" for="singlevideo-youtube"
+                >YouTube URL</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="mdc-button w-full mt-10">Create Profile</button>
+        <button type="submit" class="mdc-button w-full mt-10">
+          Create Profile
+        </button>
       </form>
     </div>
   </div>
@@ -282,38 +461,43 @@ const { update } = useStrapi();
 const user = useStrapiUser();
 
 const loading = ref(false);
-const bandName = ref('');
-const genre = ref('');
-const bio = ref('');
+const bandName = ref("");
+const genre = ref("");
+const bio = ref("");
 const bandImg = ref(null);
 const bandImgUrl = ref(null);
-const members = ref([{ name: '', instrument: '', image: null, imageUrl: null }]);
+const websitelink = ref(null);
+const websitelinktext = ref(null)
+
+const members = ref([
+  { name: "", instrument: "", image: null, imageUrl: null },
+]);
 
 // new push to github
 // Social media
-const facebook = ref('');
-const instagram = ref('');
-const twitch = ref('');
-const twitter = ref('');
-const whatsapp = ref('');
-const tictok = ref('');
-const snapchat = ref('');
+const facebook = ref("");
+const instagram = ref("");
+const twitch = ref("");
+const twitter = ref("");
+const whatsapp = ref("");
+const tictok = ref("");
+const snapchat = ref("");
 
 // Streaming
-const appleMusic = ref('');
-const spotify = ref('');
-const soundcloud = ref('');
-const dezzer = ref('');
-const youtube = ref('');
-const bandcamp = ref('');
+const appleMusic = ref("");
+const spotify = ref("");
+const soundcloud = ref("");
+const dezzer = ref("");
+const youtube = ref("");
+const bandcamp = ref("");
 
 // Single song (media + title)
-const singlesongTitle = ref('');
+const singlesongTitle = ref("");
 const singlesongFile = ref(null);
-const singlesongFileName = ref('');
+const singlesongFileName = ref("");
 
 // Single video (just Youtube URL)
-const singlevideoYoutubeUrl = ref('');
+const singlevideoYoutubeUrl = ref("");
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -328,7 +512,7 @@ const handleMemberImageUpload = (event, index) => {
 };
 
 const addMember = () => {
-  members.value.push({ name: '', instrument: '', image: null, imageUrl: null });
+  members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
 };
 
 const removeMember = (index) => {
@@ -347,7 +531,7 @@ const submitForm = async () => {
 
     // Ensure required fields are not empty
     if (!bandName.value || !genre.value || !bio.value) {
-      alert('Please fill in the required fields: name, genre, bio.');
+      alert("Please fill in the required fields: name, genre, bio.");
       loading.value = false;
       return;
     }
@@ -369,26 +553,28 @@ const submitForm = async () => {
       youtube: youtube.value || null,
       bandcamp: bandcamp.value || null,
       spotify: spotify.value || null,
+      websitelink : websitelink.value || null,
+      websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
       members: members.value.map((member) => ({
-        name: member.name || '',
-        instrument: member.instrument || '',
+        name: member.name || "",
+        instrument: member.instrument || "",
       })),
       singlesong: {
-        title: singlesongTitle.value || '',
+        title: singlesongTitle.value || "",
         song: null,
       },
       singlevideo: {
-        title: singlesongTitle.value || '',
-        youtubeid: singlevideoYoutubeUrl.value || '',
+        title: singlesongTitle.value || "",
+        youtubeid: singlevideoYoutubeUrl.value || "",
       },
     };
 
     const formData = new FormData();
-    formData.append('data', JSON.stringify(form));
+    formData.append("data", JSON.stringify(form));
 
     if (bandImg.value) {
-      formData.append('files[bandImg]', bandImg.value);
+      formData.append("files[bandImg]", bandImg.value);
     }
 
     members.value.forEach((member, index) => {
@@ -398,27 +584,27 @@ const submitForm = async () => {
     });
 
     if (singlesongFile.value) {
-      formData.append('files[singlesong][song]', singlesongFile.value);
+      formData.append("files[singlesong][song]", singlesongFile.value);
     }
 
-    console.log('FormData:', Array.from(formData.entries()));
+    console.log("FormData:", Array.from(formData.entries()));
 
-    const { data: bandData } = await client('/bands', {
-      method: 'POST',
+    const { data: bandData } = await client("/bands", {
+      method: "POST",
       body: formData,
     });
 
     if (route.query.qrId) {
-      await update('qrs', route.query.qrId, {
+      await update("qrs", route.query.qrId, {
         band: bandData.id,
       });
     }
 
-    console.log('Band profile created successfully:', bandData);
-    router.push('/dashboard');
+    console.log("Band profile created successfully:", bandData);
+    router.push("/dashboard");
   } catch (error) {
     loading.value = false;
-    console.error('Error creating band profile:', error);
+    console.error("Error creating band profile:", error);
   }
 };
 </script>
@@ -475,8 +661,8 @@ const submitForm = async () => {
   z-index: 99999;
   top: 0.75rem;
   left: 0.5rem;
-  padding-left: .2em;
-  padding-right: .2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
   font-size: 1rem;
   background: white;
   line-height: 1;
@@ -516,7 +702,7 @@ const submitForm = async () => {
   text-transform: uppercase;
   letter-spacing: 0.0892857143em;
   color: #fff;
-  background-color: #2C2C2C;
+  background-color: #2c2c2c;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -543,7 +729,7 @@ const submitForm = async () => {
   text-transform: uppercase;
   letter-spacing: 0.0892857143em;
   color: #fff;
-  background-color: #2C2C2C;
+  background-color: #2c2c2c;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -580,7 +766,11 @@ const submitForm = async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
