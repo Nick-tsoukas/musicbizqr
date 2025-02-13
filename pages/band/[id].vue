@@ -25,7 +25,7 @@
      </h3>
       <div v-if="band.data.attributes.biotagline">
         <h3
-        class="text-[1rem] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
+        class="text-[16px] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
       >
         {{ band.data.attributes.biotagline }}
       </h3>
