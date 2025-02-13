@@ -345,7 +345,7 @@
 
             <!-- Full Table View for >=SM screens -->
             <div
-              class="overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 relative"
+              class="overflow-x-scroll relative"
             >
               <table
                 class="w-full table-auto bg-black text-white rounded-md shadow-lg"
