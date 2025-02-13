@@ -2,11 +2,8 @@
   <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
     <!-- Hero Section -->
     <div class="relative w-full h-[35vh] md:h-[80vh]">
-      <img
-        class="absolute inset-0 w-auto m-auto h-[35vh] object-cover md:h-2/3"
-        :src="band.data.attributes.bandImg.data.attributes.url"
-        alt="Band Image"
-      />
+      <img class="absolute inset-0 w-auto m-auto h-[35vh] object-cover md:h-2/3"
+        :src="band.data.attributes.bandImg.data.attributes.url" alt="Band Image" />
       <div class="absolute inset-0 bg-black bg-opacity-0"></div>
       <!-- <div class="absolute bg-black bottom-0 p-6 left-0 w-full text-center">
         <h1 class="text-white text-5xl md:text-6xl font-bold tracking-tight">
@@ -16,52 +13,43 @@
     </div>
 
     <div class="flex justify-center">
-     <div class="flex flex-col">
-      <h3
-        v-if="band.data.attributes.bio"
-        class="text-[16px] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line"
-      >
-        {{ band.data.attributes.bio }}
-     </h3>
-      <div v-if="band.data.attributes.biotagline">
-        <!-- change text  -->
-        <h3
-        class="text-[16px] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
-      >
-        {{ band.data.attributes.biotagline }}
-      </h3>
+      <div class="flex flex-col">
+        <h3 v-if="band.data.attributes.bio"
+          class="text-[16px] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line">
+          {{ band.data.attributes.bio }}
+        </h3>
+        <div v-if="band.data.attributes.biotagline">
+          <!-- change text  -->
+          <h3
+            class="text-[16px] mx-auto  max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0">
+            {{ band.data.attributes.biotagline }}
+          </h3>
+        </div>
       </div>
-     </div>
     </div>
 
     <!-- Band Page Content -->
 
-    <div class="w-full px-6 md:max-w-[80vw] md:mx-auto">
+    <div class="w-full px-6 mt-10 md:max-w-[80vw] md:mx-auto">
       <div class="pt-0 sm:p-5">
         <!-- singlesong section -->
         <div v-if="band.data.attributes.singlesong">
-          <h1 class="text-2xl mt-6 mb-1 md:text-3xl font-bold text-white md:my-4">
+          <h1 class="text-2xl  mb-1 md:text-3xl font-bold text-white md:my-4">
             Featured Song
           </h1>
-          <AudioPlayer
-            :album="formatSingleSong(band.data.attributes.singlesong)"
-            :placeholderImage="'/placeholder-image.svg'"
-          />
+          <AudioPlayer :album="formatSingleSong(band.data.attributes.singlesong)"
+            :placeholderImage="'/placeholder-image.svg'" />
         </div>
 
         <!-- website link  -->
-        <div v-if="band.data.attributes.websitelink" class="mt-6">
-          <h1
-            class="text-2xl mb-1  md:text-3xl font-bold text-white md:mt-16"
-          >
+        <div v-if="band.data.attributes.websitelink" class="mt-10">
+          <h1 class="text-2xl mb-1  md:text-3xl font-bold text-white md:mt-16">
             Website Link
           </h1>
-          <a
-            class="text-purple-500 text-xl"
-            :href="band.data.attributes.websitelink"
-            ><span :vif="band.data.attributes.websitelinktext">{{
-              band.data.attributes.websitelinktext
-            }}</span>
+          <a class="text-purple-500 text-xl" :href="band.data.attributes.websitelink"><span
+              :vif="band.data.attributes.websitelinktext">{{
+                band.data.attributes.websitelinktext
+              }}</span>
           </a>
         </div>
 
@@ -72,35 +60,19 @@
               Albums
             </h1>
             <section class="flex gap-4 overflow-x-scroll no-scrollbar">
-              <div
-                v-for="album in albums"
-                :key="album.id"
-                class="bg-black shadow-lg rounded p-3 relative"
-              >
+              <div v-for="album in albums" :key="album.id" class="bg-black shadow-lg rounded p-3 relative">
                 <div
-                  class="transform transition-transform duration-300 hover:scale-105 w-[100px] h-[100px] md:w-[450px] md:h-[450px]"
-                >
-                  <img
-                    class="w-full h-full block rounded mx-auto"
-                    :src="album.attributes.cover.data.attributes.url"
-                    alt="Album Cover"
-                  />
+                  class="transform transition-transform duration-300 hover:scale-105 w-[100px] h-[100px] md:w-[450px] md:h-[450px]">
+                  <img class="w-full h-full block rounded mx-auto" :src="album.attributes.cover.data.attributes.url"
+                    alt="Album Cover" />
                   <!-- Play Button Overlay -->
                   <div
                     class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300"
-                    @click="setAlbum(album.id)"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="60"
-                      height="60"
-                      fill="currentColor"
-                      class="text-white"
-                      viewBox="0 0 16 16"
-                    >
+                    @click="setAlbum(album.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor"
+                      class="text-white" viewBox="0 0 16 16">
                       <path
-                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"
-                      />
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
                     </svg>
                   </div>
                 </div>
@@ -123,32 +95,17 @@
             </div> -->
 
             <!-- Album Player Section -->
-            <section
-              v-if="albumPlay"
-              class="w-full flex flex-col xl:flex-row gap-4 my-20"
-            >
+            <section v-if="albumPlay" class="w-full flex flex-col xl:flex-row gap-4 my-20">
               <!-- Conditional Rendering Based on Album Type -->
-              <div
-                v-if="albumPlay.attributes.type === 'custom'"
-                class="w-full md:w-[70%] mx-0"
-              >
+              <div v-if="albumPlay.attributes.type === 'custom'" class="w-full md:w-[70%] mx-0">
                 <!-- Custom Album Player Component -->
                 <!-- Include your AudioPlayer component here -->
                 <AudioPlayer :album="albumPlay" />
               </div>
-              <div
-                v-else-if="albumPlay.attributes.type === 'streaming'"
-                class="w-full md:w-[70%] mx-0"
-              >
+              <div v-else-if="albumPlay.attributes.type === 'streaming'" class="w-full md:w-[70%] mx-0">
                 <div class="embed-container">
-                  <iframe
-                    :src="albumPlay.attributes.embedUrl"
-                    width="100%"
-                    height="380"
-                    frameborder="0"
-                    allowtransparency="true"
-                    allow="encrypted-media"
-                  ></iframe>
+                  <iframe :src="albumPlay.attributes.embedUrl" width="100%" height="380" frameborder="0"
+                    allowtransparency="true" allow="encrypted-media"></iframe>
                 </div>
               </div>
               <div v-else>
@@ -162,60 +119,26 @@
             <h1 class="text-2xl md:text-3xl font-bold text-white my-16">
               Videos
             </h1>
-            <div
-              class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              <div
-                v-for="(video, videoIndex) in videoItems"
-                :key="videoIndex"
-                class="bg-black p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
+            <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div v-for="(video, videoIndex) in videoItems" :key="videoIndex"
+                class="bg-black p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div class="grid grid-cols-1 gap-6">
-                  <div
-                    v-for="(thumbnail, index) in video.youtubeThumbnails"
-                    :key="index"
-                    class="relative mb-4 rounded-lg overflow-hidden"
-                  >
+                  <div v-for="(thumbnail, index) in video.youtubeThumbnails" :key="index"
+                    class="relative mb-4 rounded-lg overflow-hidden">
                     <!-- Display YouTube player when video is playing -->
-                    <div
-                      v-if="playingVideos[thumbnail.videoId]"
-                      class="relative aspect-video"
-                    >
-                      <YouTube
-                        :src="thumbnail.videoId"
-                        :width="640"
-                        :height="360"
-                        :vars="playerOptions"
-                        class="absolute top-0 left-0 w-full h-full rounded-md"
-                      />
+                    <div v-if="playingVideos[thumbnail.videoId]" class="relative aspect-video">
+                      <YouTube :src="thumbnail.videoId" :width="640" :height="360" :vars="playerOptions"
+                        class="absolute top-0 left-0 w-full h-full rounded-md" />
                     </div>
 
                     <!-- Display thumbnail and play button when video is not playing -->
-                    <div
-                      v-else
-                      class="relative aspect-video cursor-pointer"
-                      @click="playVideo(thumbnail.videoId)"
-                    >
-                      <img
-                        :src="thumbnail.thumbnailUrl"
-                        alt="Video Thumbnail"
-                        class="absolute top-0 left-0 w-full h-full object-cover rounded-md"
-                      />
-                      <div
-                        class="absolute inset-0 flex items-center justify-center"
-                      >
-                        <svg
-                          class="w-16 h-16 text-white opacity-75"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 84 84"
-                        >
-                          <circle
-                            cx="42"
-                            cy="42"
-                            r="42"
-                            fill="rgba(0, 0, 0, 0.6)"
-                          />
+                    <div v-else class="relative aspect-video cursor-pointer" @click="playVideo(thumbnail.videoId)">
+                      <img :src="thumbnail.thumbnailUrl" alt="Video Thumbnail"
+                        class="absolute top-0 left-0 w-full h-full object-cover rounded-md" />
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white opacity-75" xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor" viewBox="0 0 84 84">
+                          <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
                           <polygon points="33,24 33,60 60,42" fill="white" />
                         </svg>
                       </div>
@@ -229,32 +152,16 @@
           </div>
 
           <!-- Streaming Links -->
-          <div
-            class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-6"
-          >
-            <h1
-              class="text-2xl mb-1 md:text-3xl font-bold text-white "
-            >
+          <div class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-10">
+            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white ">
               Streaming Links
             </h1>
-            <template
-              v-for="platform in streamingPlatforms"
-              :key="platform.name"
-            >
+            <template v-for="platform in streamingPlatforms" :key="platform.name">
               <span v-if="band.data.attributes[platform.name]">
-                <a
-                  :href="band.data.attributes[platform.name]"
-                  target="_blank"
-                  rel="noopener"
-                >
+                <a :href="band.data.attributes[platform.name]" target="_blank" rel="noopener">
                   <button
-                    class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
-                  >
-                    <img
-                      :src="platform.img"
-                      class="h-10 absolute left-2"
-                      :alt="platform.label"
-                    />
+                    class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl">
+                    <img :src="platform.img" class="h-10 absolute left-2" :alt="platform.label" />
                     {{ platform.label }}
                   </button>
                 </a>
@@ -263,9 +170,7 @@
           </div>
         </div>
 
-        <div
-          class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-6"
-        >
+        <div class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-10">
           <h1 class="text-2xl mb-1 font-bold text-white md:text-3xl">
             Social Media
           </h1>
@@ -273,19 +178,10 @@
           <!-- Social Media Platforms -->
           <template v-for="platform in socialPlatforms" :key="platform.name">
             <span v-if="band.data.attributes[platform.name]">
-              <a
-                :href="band.data.attributes[platform.name]"
-                target="_blank"
-                rel="noopener"
-              >
+              <a :href="band.data.attributes[platform.name]" target="_blank" rel="noopener">
                 <button
-                  class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
-                >
-                  <img
-                    :src="platform.img"
-                    class="h-10 absolute left-2"
-                    :alt="platform.label"
-                  />
+                  class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl">
+                  <img :src="platform.img" class="h-10 absolute left-2" :alt="platform.label" />
                   {{ platform.label }}
                 </button>
               </a>
@@ -339,50 +235,37 @@
             </div>
           </div> -->
 
-          <div v-if="events.length" class="w-full mt-6">
+          <div v-if="events.length" class="w-full mt-10">
             <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">
               Events and Tours
             </h1>
 
-            <!-- Full Table View for >=SM screens -->
-            <div
-              class="overflow-x-scroll relative"
-            >
-              <table
-                class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-              >
+            <div class="overflow-x-scroll relative">
+              <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
                 <thead>
                   <tr class="border-b border-purple-500">
-                    <th class="py-4 text-left">Date</th>
-                    <th class="py-4 text-left">City</th>
-                    <th class="py-4 text-left">Venue</th>
-                    <th class="py-4 text-left">Tickets</th>
+                    <th class="px-2 py-1 text-left">Date</th>
+                    <th class="px-2 py-1 text-left">City</th>
+                    <th class="px-2 py-1 text-left">Venue</th>
+                    <th class="px-2 py-1 text-left">Tickets</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="event in events"
-                    :key="event.id"
-                    class="border-b border-purple-500"
-                  >
-                    <td class="py-4 wyitespace-nowrap min-w-[150px]">
+                  <tr v-for="event in events" :key="event.id" class="border-b border-purple-500">
+                    <!-- Removed any `min-w-[150px]` from here -->
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{
-                        new Date(
-                          event.attributes.date ?? new Date()
-                        ).toLocaleDateString()
+                        new Date(event.attributes.date ?? new Date()).toLocaleDateString()
                       }}
                     </td>
-                    <td class="p-4 whitespace-nowrap min-w-[150px]">
-                      {{ event.attributes.city ?? "City not specified" }}
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
+                      {{ event.attributes.city ?? "City not specified" }}, {{ event.attributes.state }}
                     </td>
-                    <td class="p-4 whitespace-nowrap min-w-[200px]">
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{ event.attributes.venue ?? "Venue not specified" }}
                     </td>
-                    <td class="p-4 whitespace-nowrap min-w-[120px]">
-                      <button
-                        @click="router.push(`/event/${event.id}`)"
-                        class="text-purple-400"
-                      >
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
+                      <button @click="router.push(`/event/${event.id}`)" class="text-purple-400">
                         View Event
                       </button>
                     </td>
@@ -392,30 +275,20 @@
             </div>
           </div>
 
+
+
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto mb-10">
-            <h1
-              class="text-2xl sm:text-2xl md:text-3xl font-bold text-white my-16"
-            >
+            <h1 class="text-2xl sm:text-2xl md:text-3xl font-bold text-white my-16">
               Tours
             </h1>
             <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
-              <div
-                v-for="tour in tours"
-                :key="tour.id"
-                class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white"
-              >
-                <img
-                  v-if="tour.attributes.image"
-                  class="w-full h-[200px] md:h-72 object-cover"
-                  :src="tour.attributes.image.data.attributes.url"
-                  alt="Tour Image"
-                />
+              <div v-for="tour in tours" :key="tour.id"
+                class="shadow-lg rounded-lg p-[15px] flex-none w-[285px] sm:w-[60vw] md:w-[500px] bg-black text-white">
+                <img v-if="tour.attributes.image" class="w-full h-[200px] md:h-72 object-cover"
+                  :src="tour.attributes.image.data.attributes.url" alt="Tour Image" />
                 <div class="pt-5">
-                  <button
-                    @click="router.push(`/tour/${tour.id}`)"
-                    class="mdc-button-green mt-2 w-full"
-                  >
+                  <button @click="router.push(`/tour/${tour.id}`)" class="mdc-button-green mt-2 w-full">
                     View Tour
                   </button>
                 </div>
@@ -426,7 +299,7 @@
           <!-- Bio Section -->
           <!-- <div v-if="band.data.attributes.bio" class="mb-10">
             <h1
-              class="text-4xl my-4 md:text-4xl font-bold text-white md:mb-16 mt-8"
+              class="text-4xl my-4 md:text-4xl font-bold text-white md:mb-16 mt-10"
             >
               Biography
             </h1>
@@ -443,7 +316,7 @@
         </div>
       </div>
 
-      <!-- Social Media Links -->
+
     </div>
     <!-- <Footer /> -->
     <div class="h-40 flex justify-center items-center">
@@ -567,12 +440,12 @@ const fetchBandData = async () => {
 
   const response = await fetch(
     `${apiUrl}/api/bands/${route.params.id}?` +
-      "populate[events][populate]=image&" +
-      "populate[tours][populate]=*&" +
-      "populate[albums][populate]=cover,songs.file&" +
-      "populate[singlesong][populate][song]=*&" +
-      "populate[singlesong][populate][cover]=*&" +
-      "populate=bandImg"
+    "populate[events][populate]=image&" +
+    "populate[tours][populate]=*&" +
+    "populate[albums][populate]=cover,songs.file&" +
+    "populate[singlesong][populate][song]=*&" +
+    "populate[singlesong][populate][cover]=*&" +
+    "populate=bandImg"
   );
 
   const data = await response.json();
@@ -640,13 +513,13 @@ const socialPlatforms = [
   { name: "facebook", img: facebookIcon, label: "Facebook" },
   { name: "instagram", img: instagramIcon, label: "Instagram" },
   { name: "twitch", img: twitchIcon, label: "Twitch" },
-  { name: "youtube", img: youtubeIcon, label: "YouTube" },
   { name: "twitter", img: twitterIcon, label: "Twitter" },
 ];
 
 // Define streaming platforms
 const streamingPlatforms = [
   { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
+  { name: "youtube", img: youtubeIcon, label: "YouTube" },
   { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
@@ -694,15 +567,19 @@ onBeforeUnmount(() => {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .embed-container {
   position: relative;
   overflow: hidden;
-  padding-top: 56.25%; /* Aspect ratio for 16:9 */
+  padding-top: 56.25%;
+  /* Aspect ratio for 16:9 */
 }
+
 .embed-container iframe {
   position: absolute;
   top: 0;
@@ -710,18 +587,22 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
 }
+
 .custom-page-body {
   background-color: #000;
 }
+
 .custom-border {
   border: 0.1px solid white;
 }
+
 .mdc-button-green {
   background-color: #4caf50;
   color: white;
   padding: 8px 16px;
   border-radius: 4px;
 }
+
 .mdc-button-green:hover {
   background-color: #45a049;
 }
