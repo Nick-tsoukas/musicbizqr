@@ -15,7 +15,7 @@
       </div> -->
     </div>
 
-    <div v-if="band.data.attributes.bio" class="text-3xl w-[60vw] mx-auto text-center text-white">
+    <div v-if="band.data.attributes.bio" class="text-[24px] w-[60vw] mx-auto text-center text-white">
       <p > {{band.data.attributes.bio}}</p>
     </div>
 
