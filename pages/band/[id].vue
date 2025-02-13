@@ -258,13 +258,13 @@
                         new Date(event.attributes.date ?? new Date()).toLocaleDateString()
                       }}
                     </td>
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
+                    <td class="px-2 py-2 whitespace-nowrap text-left">
                       {{ event.attributes.city ?? "City not specified" }}, {{ event.attributes.state }}
                     </td>
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
+                    <td class="px-2 py-2 whitespace-nowrap text-left">
                       {{ event.attributes.venue ?? "Venue not specified" }}
                     </td>
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
+                    <td class="px-2 py-2 whitespace-nowrap text-left">
                       <button @click="router.push(`/event/${event.id}`)" class="text-purple-400">
                         View Event
                       </button>
