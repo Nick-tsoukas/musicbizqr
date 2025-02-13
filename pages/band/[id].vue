@@ -36,10 +36,10 @@
 
         <!-- website link  -->
         <div v-if="band.data.attributes.websitelink">
-          <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:my-16">
-          {{band.data.attributes.websitelink}}
+          <h1 class="text-lg my-4 md:text-4xl font-bold text-white md:mt-16 mb-6">
+          Website Link
           </h1>
-          <a class="text-white" > Website Link</a>
+          <a class="text-purple-500 text-lg" :href="band.data.attributes.websitelink" >The Danny Nova Band</a>
         </div>
 
         <div>
@@ -209,7 +209,7 @@
 
           <!-- Streaming Links -->
           <div
-            class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16"
+            class="flex flex-col gap-6 justify-start  w-full md:w-[100%] md:mx-auto mt-16"
           >
             <h2 class="text-4xl my-10 font-bold text-white">Streaming Links</h2>
             <template
@@ -239,7 +239,7 @@
         </div>
 
         <div
-          class="flex flex-col gap-6 justify-start md:px-4 w-full md:w-[100%] md:mx-auto mt-16"
+          class="flex flex-col gap-6 justify-start  w-full md:w-[100%] md:mx-auto mt-16"
         >
           <h2 class="text-4xl my-6 font-bold text-white">Social Media</h2>
 
