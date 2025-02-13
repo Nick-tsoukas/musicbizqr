@@ -617,12 +617,12 @@ const socialPlatforms = [
 
 // Define streaming platforms
 const streamingPlatforms = [
-  { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
-  { name: "deezer", img: deezerIcon2, label: "Deezer" },
+  { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
   { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
+  { name: "deezer", img: deezerIcon2, label: "Deezer" },
 ];
 
 // Add this function to format single song data
