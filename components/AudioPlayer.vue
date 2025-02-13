@@ -390,8 +390,7 @@ const songs = computed(() => {
   flex-direction: column;
   background-color: black;
   color: #fff;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+ 
   border-radius: 0.5rem;
   max-width: auto;
   margin: auto;

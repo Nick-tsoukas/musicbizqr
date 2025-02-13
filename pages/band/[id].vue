@@ -24,6 +24,7 @@
         {{ band.data.attributes.bio }}
      </h3>
       <div v-if="band.data.attributes.biotagline">
+        <!-- change text  -->
         <h3
         class="text-[16px] mx-auto my-2 max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
       >
@@ -39,7 +40,7 @@
       <div class="pt-0 sm:p-5">
         <!-- singlesong section -->
         <div v-if="band.data.attributes.singlesong">
-          <h1 class="text-2xl mt-2 md:text-3xl font-bold text-white md:my-4">
+          <h1 class="text-2xl mt-6 mb-1 md:text-3xl font-bold text-white md:my-4">
             Featured Song
           </h1>
           <AudioPlayer
@@ -49,9 +50,9 @@
         </div>
 
         <!-- website link  -->
-        <div v-if="band.data.attributes.websitelink">
+        <div v-if="band.data.attributes.websitelink" class="mt-6">
           <h1
-            class="text-2xl my-2 md:text-3xl font-bold text-white md:mt-16 mb-1"
+            class="text-2xl mb-1  md:text-3xl font-bold text-white md:mt-16"
           >
             Website Link
           </h1>
@@ -229,10 +230,10 @@
 
           <!-- Streaming Links -->
           <div
-            class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-16"
+            class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-6"
           >
             <h1
-              class="text-2xl my-2 md:text-3xl font-bold text-white md:mt-16 mb-4"
+              class="text-2xl mb-1 md:text-3xl font-bold text-white "
             >
               Streaming Links
             </h1>
@@ -263,9 +264,9 @@
         </div>
 
         <div
-          class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-10"
+          class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-6"
         >
-          <h1 class="text-2xl my-2 font-bold text-white md:text-3xl">
+          <h1 class="text-2xl mb-1 font-bold text-white md:text-3xl">
             Social Media
           </h1>
 
@@ -338,8 +339,8 @@
             </div>
           </div> -->
 
-          <div v-if="events.length" class="w-full mt-10">
-            <h1 class="text-2xl md:text-3xl font-bold text-white my-2">
+          <div v-if="events.length" class="w-full mt-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">
               Events and Tours
             </h1>
 
