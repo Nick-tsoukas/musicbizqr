@@ -19,8 +19,7 @@
       v-if="band.data.attributes.bio"
       class="text-[24px] w-[90vw] mx-auto my-10 text-center text-white md:w-[75vw] md:text-2xl whitespace-pre-wrap"
     >
-    {{ band.data.attributes.bio }}
-
+      {{ band.data.attributes.bio }}
     </div>
 
     <!-- Band Page Content -->
@@ -48,7 +47,10 @@
           <a
             class="text-purple-500 text-lg"
             :href="band.data.attributes.websitelink"
-            >The Danny Nova Band</a
+            ><span :vif="band.data.attributes.websitelinktext">{{
+              band.data.attributes.websitelinktext
+            }}</span>
+            </a
           >
         </div>
 
@@ -221,7 +223,9 @@
           <div
             class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-16"
           >
-            <h2 class="text-3xl my-10 font-bold text-white md:3xl">Streaming Links</h2>
+            <h2 class="text-3xl my-10 font-bold text-white md:3xl">
+              Streaming Links
+            </h2>
             <template
               v-for="platform in streamingPlatforms"
               :key="platform.name"
@@ -251,7 +255,9 @@
         <div
           class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-16"
         >
-          <h2 class="text-3xl my-6 font-bold text-white md:text-4xl">Social Media</h2>
+          <h2 class="text-3xl my-6 font-bold text-white md:text-4xl">
+            Social Media
+          </h2>
 
           <!-- Social Media Platforms -->
           <template v-for="platform in socialPlatforms" :key="platform.name">
@@ -323,114 +329,117 @@
           </div> -->
 
           <div v-if="events.length" class="w-full mt-10">
-  <h1 class="text-3xl sm:text-5xl md:text-4xl font-bold text-white my-16">
-    Events and Tours
-  </h1>
-
-  <!-- Full Table View for >=SM screens -->
-  <div class="hidden sm:block">
-    <table class="min-w-full bg-black text-white rounded-md shadow-lg">
-      <thead>
-        <tr class="border-b border-gray-700">
-          <th class="p-4 text-left">Image</th>
-          <th class="p-4 text-left">Title</th>
-          <th class="p-4 text-left">Date</th>
-          <th class="p-4 text-left">Venue</th>
-          <th class="p-4 text-left">City</th>
-          <th class="p-4 text-left">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="event in events"
-          :key="event.id"
-          class="border-b border-gray-700"
-        >
-          <td class="p-4">
-            <img
-              v-if="event.attributes.image"
-              :src="event.attributes.image.data.attributes.url"
-              alt="Event Image"
-              class="w-24 h-24 object-cover rounded-md"
-            />
-          </td>
-          <td class="p-4">
-            {{ event.attributes.title }}
-          </td>
-          <td class="p-4">
-            {{
-              new Date(
-                event.attributes.date ?? new Date()
-              ).toLocaleDateString()
-            }}
-          </td>
-          <td class="p-4">
-            {{ event.attributes.venue ?? "Venue not specified" }}
-          </td>
-          <td class="p-4">
-            {{ event.attributes.city ?? "City not specified" }}
-          </td>
-          <td class="p-4">
-            <button
-              @click="router.push(`/event/${event.id}`)"
-              class="text-purple-400"
+            <h1
+              class="text-3xl sm:text-5xl md:text-4xl font-bold text-white my-16"
             >
-              View Event
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+              Events and Tours
+            </h1>
 
-  <!-- Card/List Layout for <SM screens -->
-  <div class="block sm:hidden space-y-4">
-    <div
-      v-for="event in events"
-      :key="event.id"
-      class="bg-black text-white p-4 rounded shadow-md"
-    >
-      <!-- Image -->
-      <div class="mb-2">
-        <img
-          v-if="event.attributes.image"
-          :src="event.attributes.image.data.attributes.url"
-          alt="Event Image"
-          class="w-full h-auto object-cover rounded-md"
-        />
-      </div>
-      <!-- Title -->
-      <h3 class="text-xl font-bold mb-1">
-        {{ event.attributes.title }}
-      </h3>
-      <!-- Date, Venue, City -->
-      <p class="text-sm mb-1">
-        <strong>Date:</strong>
-        {{
-          new Date(
-            event.attributes.date ?? new Date()
-          ).toLocaleDateString()
-        }}
-      </p>
-      <p class="text-sm mb-1">
-        <strong>Venue:</strong>
-        {{ event.attributes.venue ?? "Venue not specified" }}
-      </p>
-      <p class="text-sm mb-2">
-        <strong>City:</strong>
-        {{ event.attributes.city ?? "City not specified" }}
-      </p>
-      <!-- Action -->
-      <button
-        @click="router.push(`/event/${event.id}`)"
-        class="text-purple-400"
-      >
-        View Event
-      </button>
-    </div>
-  </div>
-</div>
+            <!-- Full Table View for >=SM screens -->
+            <div class="hidden sm:block">
+              <table
+                class="min-w-full bg-black text-white rounded-md shadow-lg"
+              >
+                <thead>
+                  <tr class="border-b border-gray-700">
+                    <th class="p-4 text-left">Image</th>
+                    <th class="p-4 text-left">Title</th>
+                    <th class="p-4 text-left">Date</th>
+                    <th class="p-4 text-left">Venue</th>
+                    <th class="p-4 text-left">City</th>
+                    <th class="p-4 text-left">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="event in events"
+                    :key="event.id"
+                    class="border-b border-gray-700"
+                  >
+                    <td class="p-4">
+                      <img
+                        v-if="event.attributes.image"
+                        :src="event.attributes.image.data.attributes.url"
+                        alt="Event Image"
+                        class="w-24 h-24 object-cover rounded-md"
+                      />
+                    </td>
+                    <td class="p-4">
+                      {{ event.attributes.title }}
+                    </td>
+                    <td class="p-4">
+                      {{
+                        new Date(
+                          event.attributes.date ?? new Date()
+                        ).toLocaleDateString()
+                      }}
+                    </td>
+                    <td class="p-4">
+                      {{ event.attributes.venue ?? "Venue not specified" }}
+                    </td>
+                    <td class="p-4">
+                      {{ event.attributes.city ?? "City not specified" }}
+                    </td>
+                    <td class="p-4">
+                      <button
+                        @click="router.push(`/event/${event.id}`)"
+                        class="text-purple-400"
+                      >
+                        View Event
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
+            <!-- Card/List Layout for <SM screens -->
+            <div class="block sm:hidden space-y-4">
+              <div
+                v-for="event in events"
+                :key="event.id"
+                class="bg-black text-white p-4 rounded shadow-md"
+              >
+                <!-- Image -->
+                <div class="mb-2">
+                  <img
+                    v-if="event.attributes.image"
+                    :src="event.attributes.image.data.attributes.url"
+                    alt="Event Image"
+                    class="w-full h-auto object-cover rounded-md"
+                  />
+                </div>
+                <!-- Title -->
+                <h3 class="text-xl font-bold mb-1">
+                  {{ event.attributes.title }}
+                </h3>
+                <!-- Date, Venue, City -->
+                <p class="text-sm mb-1">
+                  <strong>Date:</strong>
+                  {{
+                    new Date(
+                      event.attributes.date ?? new Date()
+                    ).toLocaleDateString()
+                  }}
+                </p>
+                <p class="text-sm mb-1">
+                  <strong>Venue:</strong>
+                  {{ event.attributes.venue ?? "Venue not specified" }}
+                </p>
+                <p class="text-sm mb-2">
+                  <strong>City:</strong>
+                  {{ event.attributes.city ?? "City not specified" }}
+                </p>
+                <!-- Action -->
+                <button
+                  @click="router.push(`/event/${event.id}`)"
+                  class="text-purple-400"
+                >
+                  View Event
+                </button>
+              </div>
+            </div>
+          </div>
 
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto mb-10">
@@ -486,9 +495,9 @@
       <!-- Social Media Links -->
     </div>
     <!-- <Footer /> -->
-     <div class="h-40 flex justify-center items-center" >
+    <div class="h-40 flex justify-center items-center">
       <img src="@/assets/musicbizlogo.png" class="h-20" />
-     </div>
+    </div>
   </div>
 </template>
 
