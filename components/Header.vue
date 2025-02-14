@@ -1,7 +1,7 @@
 <template>
   <header class="bg-[#000] text-white shadow-lg">
     <div class=" p-5 mx-auto flex items-center justify-between px-4 py-4">
-      <img src="@/assets/musicbizlogo.png" class="h-6" />
+      <img src="@/assets/musicbizlogo.png" class="h-8" />
       <!-- <div class="text-xl font-bold">MusicBizQR</div> -->
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
