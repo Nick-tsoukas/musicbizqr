@@ -30,7 +30,7 @@
 
     <!-- Band Page Content -->
 
-    <div class="w-full px-6 mt-10 md:max-w-[80vw] md:mx-auto">
+    <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
       <div class="pt-0 sm:p-5">
         <!-- singlesong section -->
         <div v-if="band.data.attributes.singlesong">
@@ -152,15 +152,15 @@
           </div>
 
           <!-- Streaming Links -->
-          <div class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-10">
-            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white ">
+          <div class=" w-full md:w-[100%] md:mx-auto mt-10">
+            <h1 class="text-2xl mb-4 md:text-3xl font-bold text-white ">
               Streaming Links
             </h1>
             <template v-for="platform in streamingPlatforms" :key="platform.name">
               <span v-if="band.data.attributes[platform.name]">
                 <a :href="band.data.attributes[platform.name]" target="_blank" rel="noopener">
                   <button
-                    class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl">
+                    class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl">
                     <img :src="platform.img" class="h-10 absolute left-2" :alt="platform.label" />
                     {{ platform.label }}
                   </button>
@@ -170,8 +170,8 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-6 justify-start w-full md:w-[100%] md:mx-auto mt-10">
-          <h1 class="text-2xl mb-1 font-bold text-white md:text-3xl">
+        <div class=" w-full md:w-[100%] md:mx-auto mt-10">
+          <h1 class="text-2xl mb-4 font-bold text-white md:text-3xl">
             Social Media
           </h1>
 
@@ -240,14 +240,14 @@
               Events and Tours
             </h1>
 
-            <div class="overflow-x-scroll relative">
+            <div class="overflow-x-scroll md:overflow-hidden relative">
               <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
                 <thead>
                   <tr class="border-b border-purple-500">
-                    <th class="px-2 py-4 text-left">Date</th>
-                    <th class="px-2 py-4 text-left">City</th>
-                    <th class="px-2 py-4 text-left">Venue</th>
-                    <th class="px-2 py-4 text-left">Tickets</th>
+                    <th class="px-2 py-2 text-left">Date</th>
+                    <th class="px-2 py-2 text-left">City</th>
+                    <th class="px-2 py-2 text-left">Venue</th>
+                    <th class="px-2 py-2 text-left">Tickets</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -518,8 +518,8 @@ const socialPlatforms = [
 
 // Define streaming platforms
 const streamingPlatforms = [
-  { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
+  { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
   { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
