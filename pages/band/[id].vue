@@ -180,7 +180,7 @@
             <span v-if="band.data.attributes[platform.name]">
               <a :href="band.data.attributes[platform.name]" target="_blank" rel="noopener">
                 <button
-                  class="w-full custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl">
+                  class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl">
                   <img :src="platform.img" class="h-10 absolute left-2" :alt="platform.label" />
                   {{ platform.label }}
                 </button>
