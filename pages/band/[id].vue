@@ -244,10 +244,10 @@
               <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
                 <thead>
                   <tr class="border-b border-purple-500">
-                    <th class="px-2 py-[2px] text-left">Date</th>
-                    <th class="px-2 py-[2px] text-left">City</th>
-                    <th class="px-2 py-[2px] text-left">Venue</th>
-                    <th class="px-2 py-[2px] text-left">Tickets</th>
+                    <th class="px-2 py-[0px] text-left">Date</th>
+                    <th class="px-2 py-[0px] text-left">City</th>
+                    <th class="px-2 py-[0px] text-left">Venue</th>
+                    <th class="px-2 py-[0px] text-left">Tickets</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -499,7 +499,7 @@ import soundcloudIcon from "@/assets/soundcloudlast.png";
 import deezerIcon from "@/assets/dezzer.svg";
 import youtubeIcon from "@/assets/youtube-icon.svg";
 import bandcampIcon from "@/assets/bandcamp.svg";
-import twitterIcon from "@/assets/bandcamp.svg";
+
 
 // Import streaming platform icons
 import spotifyIcon from "@/assets/spotify.svg";
@@ -507,13 +507,19 @@ import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import deezerIcon2 from "@/assets/dezzer.svg";
 import soundcloudIcon2 from "@/assets/soundcloudlast.png";
 import bandcampIcon2 from "@/assets/bandcamp.svg";
+import tiktokIcon from "@/assets/tiktok.png";
+import twitterIcon from "@/assets/twitter.png";
+
+
 
 // Define social media platforms
 const socialPlatforms = [
   { name: "facebook", img: facebookIcon, label: "Facebook" },
   { name: "instagram", img: instagramIcon, label: "Instagram" },
-  { name: "twitch", img: twitchIcon, label: "Twitch" },
   { name: "twitter", img: twitterIcon, label: "Twitter" },
+ { name: "tictok", img: tiktokIcon, label: "Tiktok" },
+ 
+ 
 ];
 
 // Define streaming platforms
@@ -524,6 +530,7 @@ const streamingPlatforms = [
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
   { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
+  { name: "twitch", img: twitchIcon, label: "Twitch" },
   { name: "deezer", img: deezerIcon2, label: "Deezer" },
 ];
 
