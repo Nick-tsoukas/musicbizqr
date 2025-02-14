@@ -320,7 +320,7 @@
     </div>
     <!-- <Footer /> -->
     <div class="h-40 flex justify-center items-center">
-      <img src="@/assets/musicbizlogo.png" class="h-20" />
+      <img src="@/assets/musicbizlogo.png" class="h-12" />
     </div>
   </div>
 </template>
