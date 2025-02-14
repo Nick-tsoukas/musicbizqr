@@ -244,10 +244,10 @@
               <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
                 <thead>
                   <tr class="border-b border-purple-500">
-                    <th class="px-2 py-1 text-left">Date</th>
-                    <th class="px-2 py-1 text-left">City</th>
-                    <th class="px-2 py-1 text-left">Venue</th>
-                    <th class="px-2 py-1 text-left">Tickets</th>
+                    <th class="px-2 py-2 text-left">Date</th>
+                    <th class="px-2 py-2 text-left">City</th>
+                    <th class="px-2 py-2 text-left">Venue</th>
+                    <th class="px-2 py-2 text-left">Tickets</th>
                   </tr>
                 </thead>
                 <tbody>

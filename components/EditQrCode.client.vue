@@ -23,6 +23,7 @@
             </label>
           </div>
         </div>
+
         <!-- Choose QR Type -->
         <div class="bg-white rounded-md">
           <div
@@ -112,6 +113,30 @@
             </div>
           </div>
         </div>
+
+        <!-- Band Selection (Only show if q_type === 'bandProfile') -->
+        <div v-if="q_type === 'bandProfile'" class="bg-white rounded-md p-4">
+          <label class="mdc-text-field mb-4">
+            <span class="mb-1 text-gray-700">Select Band:</span>
+            <select v-model="selectedBand" class="mdc-text-field__input">
+              <option disabled value="">Select a band</option>
+              <!-- "None" option if they don't want to associate this QR with a band -->
+              <option :value="null">None</option>
+              <!-- Render each band from bands.value -->
+              <option
+                v-for="band in bands"
+                :key="band.id"
+                :value="band.id"
+              >
+                {{ band.attributes.name }}
+              </option>
+              <!-- Create new band option -->
+              <option value="createNew">Create New Band</option>
+            </select>
+            <span class="mdc-line-ripple"></span>
+          </label>
+        </div>
+
         <!-- External Link Input (if applicable) -->
         <div v-if="q_type === 'externalURL'" class="bg-white rounded-md p-4">
           <label class="mdc-text-field mb-4">
@@ -120,6 +145,7 @@
             <span class="mdc-line-ripple"></span>
           </label>
         </div>
+
         <!-- Background Options -->
         <div class="bg-white rounded-md">
           <div
@@ -137,6 +163,7 @@
             </label>
           </div>
         </div>
+
         <!-- Foreground Options -->
         <div v-if="!gradient" class="bg-white rounded-md">
           <div
@@ -154,6 +181,7 @@
             </label>
           </div>
         </div>
+
         <!-- Gradient Options -->
         <div class="bg-white rounded-md">
           <div
@@ -203,6 +231,7 @@
             </div>
           </div>
         </div>
+
         <!-- Image Options -->
         <div class="bg-white rounded-md">
           <div
@@ -218,6 +247,7 @@
             </label>
           </div>
         </div>
+
         <!-- Dots Options -->
         <div class="bg-white rounded-md">
           <div
@@ -241,6 +271,7 @@
             </label>
           </div>
         </div>
+
         <!-- Corners Square Options -->
         <div class="bg-white rounded-md">
           <div
@@ -269,6 +300,7 @@
             </label>
           </div>
         </div>
+
         <!-- Corners Dot Options -->
         <div class="bg-white rounded-md">
           <div
@@ -296,6 +328,7 @@
             </label>
           </div>
         </div>
+
         <!-- Update Button -->
         <button @click="updateQrCodeSubmit" class="mdc-button w-full mt-4">
           Update QR Code
@@ -434,21 +467,21 @@ function getQRCodeOptions() {
     options.image = imageSettings.src;
   }
 
-  // Handle gradient and color for dotsOptions
+  // Handle gradient vs. color in dotsOptions
   if (gradient.value) {
     options.dotsOptions.gradient = {
       type: gradientType.value,
-      rotation: (gradientRotation.value * Math.PI) / 180, // Convert degrees to radians
+      rotation: (gradientRotation.value * Math.PI) / 180,
       colorStops: [
         { offset: 0, color: gradientStartColor.value },
         { offset: 1, color: gradientEndColor.value },
       ],
     };
-    // Ensure color is not set when gradient is used
+    // Remove color key when using gradient
     delete options.dotsOptions.color;
   } else {
     options.dotsOptions.color = dotsColor.value;
-    // Ensure gradient is not set when color is used
+    // Remove gradient key when using color
     delete options.dotsOptions.gradient;
   }
 
@@ -489,9 +522,9 @@ const qrSize = ref(300);
 const bgColor = ref('#FFFFFF');
 const fgColor = ref('#000000');
 
-const gradient = ref(false); // Toggle for enabling gradient
-const gradientType = ref('linear'); // 'linear' or 'radial'
-const gradientRotation = ref(0); // For linear gradient rotation in degrees
+const gradient = ref(false); 
+const gradientType = ref('linear'); 
+const gradientRotation = ref(0); 
 const gradientStartColor = ref('#e6289d');
 const gradientEndColor = ref('#40353c');
 
@@ -499,13 +532,12 @@ const name = ref('name');
 const link = ref(null);
 
 const imageSettings = reactive({
-  src: '', // Will be set when image is uploaded
+  src: '',
   imageSize: 0.4,
   margin: 0,
   crossOrigin: 'anonymous',
 });
 
-// New reactive variables for dotsOptions, cornersSquareOptions, cornersDotOptions
 const dotsColor = ref('#000000');
 const dotsType = ref('square');
 
@@ -633,7 +665,7 @@ const updateQrCodeSubmit = async () => {
       body: formData,
     });
 
-    // Routing after successful update based on selected values
+    // Routing after successful update
     if (selectedBand.value === 'createNew') {
       router.push({ path: '/createband', query: { createnew: 'createNew', qrId: qrId } });
     } else if (selectedAlbum.value === 'createNew') {

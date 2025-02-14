@@ -5,9 +5,10 @@
         <div class="spinner"></div>
       </div>
       <!-- QR Code Wrapper -->
-      <div ref="qrcodeWrapper" class="p-4 sticky top-0 z-50  rounded-lg shadow-md">
+      <div ref="qrcodeWrapper" class="p-4 sticky top-0 z-50 rounded-lg shadow-md">
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
+
       <div class="mt-4 flex flex-col space-y-4 w-full">
         <!-- Name Input -->
         <div class="bg-white rounded-md">
@@ -23,6 +24,7 @@
             </label>
           </div>
         </div>
+
         <!-- Choose QR Type -->
         <div class="bg-white rounded-md">
           <div
@@ -112,6 +114,30 @@
             </div>
           </div>
         </div>
+
+        <!-- Band Selection (Only show if route.query.type === 'bandProfile') -->
+        <div v-if="route.query.type === 'bandProfile'" class="bg-white rounded-md p-4">
+          <label class="mdc-text-field mb-4">
+            <span class="mb-1 text-gray-700">Select Band:</span>
+            <select v-model="selectedBand" class="mdc-text-field__input">
+              <option disabled value="">Select a band</option>
+              <!-- "None" option if they don't want to associate this QR with a band -->
+              <option :value="null">None</option>
+              <!-- Render each band from bands array -->
+              <option
+                v-for="band in bands"
+                :key="band.id"
+                :value="band.id"
+              >
+                {{ band.attributes.name }}
+              </option>
+              <!-- Create new band option -->
+              <option value="createNew">Create New Band</option>
+            </select>
+            <span class="mdc-line-ripple"></span>
+          </label>
+        </div>
+
         <!-- External Link Input (if applicable) -->
         <div v-if="route.query.type === 'externalURL'" class="bg-white rounded-md p-4">
           <label class="mdc-text-field mb-4">
@@ -120,6 +146,7 @@
             <span class="mdc-line-ripple"></span>
           </label>
         </div>
+
         <!-- Background Options -->
         <div class="bg-white rounded-md">
           <div
@@ -137,6 +164,7 @@
             </label>
           </div>
         </div>
+
         <!-- Foreground Options -->
         <div v-if="!gradient" class="bg-white rounded-md">
           <div
@@ -154,6 +182,7 @@
             </label>
           </div>
         </div>
+
         <!-- Gradient Options -->
         <div class="bg-white rounded-md">
           <div
@@ -203,6 +232,7 @@
             </div>
           </div>
         </div>
+
         <!-- Image Options -->
         <div class="bg-white rounded-md">
           <div
@@ -218,6 +248,7 @@
             </label>
           </div>
         </div>
+
         <!-- Dots Options -->
         <div class="bg-white rounded-md">
           <div
@@ -241,7 +272,8 @@
             </label>
           </div>
         </div>
-        <!-- Corners Square Options e6289d 40353c -->
+
+        <!-- Corners Square Options -->
         <div class="bg-white rounded-md">
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
@@ -269,6 +301,7 @@
             </label>
           </div>
         </div>
+
         <!-- Corners Dot Options -->
         <div class="bg-white rounded-md">
           <div
@@ -296,6 +329,7 @@
             </label>
           </div>
         </div>
+
         <!-- Save Button -->
         <button @click="saveQrCode" class="mdc-button w-full mt-4">
           Save QR Code
@@ -309,58 +343,93 @@
 import { ref, reactive, watch, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
+// References for the QR code wrapper
 const qrcodeWrapper = ref(null);
 
-const config = useRuntimeConfig(); // Access runtime configuration
-const apiUrl = config.public.strapiUrl; // Get the API base URL
+// Access runtime config if needed
+const config = useRuntimeConfig(); 
+const apiUrl = config.public.strapiUrl; 
 
-const props = defineProps({
-  type: String,
-});
-
-const { create, findOne, update } = useStrapi();
+// Strapi composables & routing
+const props = defineProps({ type: String });
+const { create, findOne, update, find } = useStrapi();
 const user = useStrapiUser();
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
-const uuid = uuidv4();
 
+// We generate a unique URL that the QR code will point to
+const uuid = uuidv4();
 const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`);
 const qrSize = ref(300);
 
+// Colors & Gradient
 const bgColor = ref('#FFFFFF');
-const fgColor = ref('#000000');
-
-const gradient = ref(false); // Toggle for enabling gradient
-const gradientType = ref('linear'); // 'linear' or 'radial'
-const gradientRotation = ref(0); // For linear gradient rotation in degrees
+const fgColor = ref('#000000'); 
+const gradient = ref(false);
+const gradientType = ref('linear');
+const gradientRotation = ref(0);
 const gradientStartColor = ref('#e6289d');
 const gradientEndColor = ref('#40353c');
 
+// Basic form info
 const name = ref('name');
 const link = ref(null);
 const loading = ref(false);
 
+// QR code brand image options
 const imageSettings = reactive({
-  src: '', // Will be set when image is uploaded
+  src: '',
   imageSize: 0.4,
   margin: 0,
   crossOrigin: 'anonymous',
 });
-// rgb(14, 72, 222) converts to #0E48DE
-// rgb(3, 22, 65) converts to #031641
-// New reactive variables for dotsOptions, cornersSquareOptions, cornersDotOptions
+
+// QR code styling
 const dotsColor = ref('#000000');
 const dotsType = ref('square');
-
 const cornersSquareColor = ref('#000000');
 const cornersSquareType = ref('square');
-
 const cornersDotColor = ref('#000000');
 const cornersDotType = ref('square');
 
 const qrCode = ref(null);
 
+// For band selection
+const bands = ref([]);
+const selectedBand = ref(null);
+
+// Fetch the user's bands (and other data if desired) so they can choose one
+onMounted(async () => {
+  // Load and mount the QR code
+  if (process.client) {
+    const { default: QRCodeStyling } = await import('qr-code-styling');
+    qrCode.value = new QRCodeStyling(getQRCodeOptions());
+    qrCode.value.append(qrcodeWrapper.value);
+    initializeWatcher();
+  }
+
+  // Load all user-related resources
+  await fetchUserRelatedData();
+});
+
+async function fetchUserRelatedData() {
+  try {
+    // Only fetch if user is logged in
+    if (!user.value || !user.value.id) return;
+
+    const bandsResponse = await find('bands', {
+      filters: { users_permissions_user: { id: user.value.id } },
+    });
+    bands.value = bandsResponse.data;
+  } catch (error) {
+    console.error('Error fetching user-related data:', error);
+  }
+}
+
+/**
+ * Build the configuration object for our QR code library
+ */
 function getQRCodeOptions() {
   const options = {
     width: qrSize.value,
@@ -380,7 +449,7 @@ function getQRCodeOptions() {
     },
     backgroundOptions: {
       color: bgColor.value,
-      transparent: false, // Explicitly set to false
+      transparent: false,
     },
     imageOptions: {
       crossOrigin: imageSettings.crossOrigin,
@@ -389,43 +458,33 @@ function getQRCodeOptions() {
     },
   };
 
-  // Set image if available
+  // If a logo/image is uploaded
   if (imageSettings.src) {
     options.image = imageSettings.src;
   }
 
-  // Handle gradient and color for dotsOptions
+  // If gradient is checked, apply the gradient to the dots
   if (gradient.value) {
     options.dotsOptions.gradient = {
       type: gradientType.value,
-      rotation: (gradientRotation.value * Math.PI) / 180, // Convert degrees to radians
+      rotation: (gradientRotation.value * Math.PI) / 180,
       colorStops: [
         { offset: 0, color: gradientStartColor.value },
         { offset: 1, color: gradientEndColor.value },
       ],
     };
-    // Ensure color is not set when gradient is used
-    delete options.dotsOptions.color;
+    delete options.dotsOptions.color; // Remove solid color if gradient is used
   } else {
     options.dotsOptions.color = dotsColor.value;
-    // Ensure gradient is not set when color is used
-    delete options.dotsOptions.gradient;
+    delete options.dotsOptions.gradient; // Remove gradient if using solid color
   }
 
   return options;
 }
 
-onMounted(async () => {
-  if (process.client) {
-    const { default: QRCodeStyling } = await import('qr-code-styling');
-    qrCode.value = new QRCodeStyling(getQRCodeOptions());
-    qrCode.value.append(qrcodeWrapper.value);
-
-    // Initialize the watcher after qrCode.value is set
-    initializeWatcher();
-  }
-});
-
+/**
+ * Watch for style changes to dynamically update the QR code
+ */
 function initializeWatcher() {
   watch(
     [
@@ -454,6 +513,9 @@ function initializeWatcher() {
   );
 }
 
+/**
+ * Handle local image file upload
+ */
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -465,24 +527,27 @@ const handleImageUpload = (event) => {
   }
 };
 
+/**
+ * When the user clicks on a particular QR type,
+ * we update the query param so the UI toggles the correct sections.
+ */
 const selectType = (selected) => {
   router.push({
     query: {
-      ...route.query, // Preserve other query params if any
+      ...route.query,
       type: selected,
     },
   });
 };
 
+/**
+ * Save the new QR code and then route the user based on the chosen type.
+ */
 const saveQrCode = async () => {
   try {
     loading.value = true;
 
-    // // Update qrValue based on the selected type
-    // if (route.query.type === 'externalURL' && link.value) {
-    //   qrValue.value = link.value;
-    // }
-
+    // Build form data
     const form = {
       url: qrValue.value,
       users_permissions_user: { id: user.value.id },
@@ -520,51 +585,75 @@ const saveQrCode = async () => {
       },
     };
 
-    // Get the QR code as a blob
+    // If they picked 'bandProfile', assign the band ID (unless they chose "Create New")
+    if (route.query.type === 'bandProfile') {
+      form.band = selectedBand.value !== 'createNew' ? selectedBand.value : null;
+    }
+
+    // Get the QR code as a PNG blob
     const blob = await qrCode.value.getRawData('png');
     const file = new File([blob], 'qrcode.png');
     const formData = new FormData();
     formData.append('files.q_image', file, 'qrcode.png');
     formData.append('data', JSON.stringify(form));
 
-    // Saving the QR code
+    // POST to /qrs
     const { data } = await client(`/qrs`, {
       method: 'POST',
       body: formData,
     });
 
-    console.log('QR code saved successfully:', data);
-
-    // Redirect based on QR type
-    if (data && data.id) {
-      if (route.query.type === 'externalURL') {
-        router.push('/dashboard');
-      } else if (route.query.type === 'bandProfile') {
-        router.push({ name: 'createband', query: { qrId: data.id } });
-      } else if (route.query.type === 'events') {
-        router.push({ name: 'newevent', query: { qrId: data.id } });
-      } else if (route.query.type === 'tours') {
-        router.push({ name: 'newtour', query: { qrId: data.id } });
-      } else if (route.query.type === 'albums') {
-        router.push({ name: 'newalbum', query: { qrId: data.id } });
-      } else if (route.query.type === 'stream') {
-        router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
-      } else if (route.query.type === 'social') {
-        router.push({ name: 'socialpage', query: { qrId: data.id } });
-      } else {
-        router.push('/dashboard');
-      }
-    } else {
+    if (!data || !data.id) {
       loading.value = false;
-      console.error('QR code was not saved, no ID found.');
+      console.error('QR code was not saved (no ID returned).');
+      return;
+    }
+
+    console.log('QR code saved successfully with ID:', data.id);
+
+    // If they selected "Create New Band"
+    if (route.query.type === 'bandProfile' && selectedBand.value === 'createNew') {
+      router.push({ name: 'createband', query: { qrId: data.id } });
+      return;
+    }
+
+    // Otherwise, route based on the chosen type
+    switch (route.query.type) {
+      case 'externalURL':
+        router.push('/dashboard');
+        break;
+      case 'bandProfile':
+        // If they chose an existing band, just go to dashboard or wherever you want:
+        router.push('/dashboard');
+        break;
+      case 'events':
+        router.push({ name: 'newevent', query: { qrId: data.id } });
+        break;
+      case 'tours':
+        router.push({ name: 'newtour', query: { qrId: data.id } });
+        break;
+      case 'albums':
+        router.push({ name: 'newalbum', query: { qrId: data.id } });
+        break;
+      case 'stream':
+        router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
+        break;
+      case 'social':
+        router.push({ name: 'socialpage', query: { qrId: data.id } });
+        break;
+      default:
+        router.push('/dashboard');
+        break;
     }
   } catch (error) {
     loading.value = false;
-    console.error('Error during QR code save:', error.response ? error.response.data : error);
+    console.error(
+      'Error during QR code save:',
+      error.response ? error.response.data : error
+    );
   }
 };
 </script>
-
 
 <style scoped>
 /* Container Styling */
