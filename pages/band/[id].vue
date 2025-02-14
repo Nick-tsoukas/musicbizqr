@@ -244,10 +244,10 @@
               <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
                 <thead>
                   <tr class="border-b border-purple-500">
-                    <th class="px-2 py-[0px] text-left">Date</th>
-                    <th class="px-2 py-[0px] text-left">City</th>
-                    <th class="px-2 py-[0px] text-left">Venue</th>
-                    <th class="px-2 py-[0px] text-left">Tickets</th>
+                    <th class="px-2 py-1 text-left">Date</th>
+                    <th class="px-2 py-1 text-left">City</th>
+                    <th class="px-2 py-1 text-left">Venue</th>
+                    <th class="px-2 py-1 text-left">Tickets</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -258,13 +258,13 @@
                         new Date(event.attributes.date ?? new Date()).toLocaleDateString()
                       }}
                     </td>
-                    <td class="px-2 py-2 whitespace-nowrap text-left">
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{ event.attributes.city ?? "City not specified" }}, {{ event.attributes.state }}
                     </td>
-                    <td class="px-2 py-2 whitespace-nowrap text-left">
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{ event.attributes.venue ?? "Venue not specified" }}
                     </td>
-                    <td class="px-2 py-2 whitespace-nowrap text-left">
+                    <td class="px-2 py-1 whitespace-nowrap text-left">
                       <button @click="router.push(`/event/${event.id}`)" class="text-purple-400">
                         View Event
                       </button>
