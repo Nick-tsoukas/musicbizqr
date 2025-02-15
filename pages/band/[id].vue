@@ -493,6 +493,9 @@ import deezerIcon from "@/assets/dezzer.svg";
 import youtubeIcon from "@/assets/youtube-icon.svg";
 import bandcampIcon from "@/assets/bandcamp.svg";
 
+import reverbnationIcon from "@/assets/reverbnation.png";
+
+
 
 // Import streaming platform icons
 import spotifyIcon from "@/assets/spotify.svg";
@@ -521,6 +524,7 @@ const streamingPlatforms = [
   { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
   { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
+  { name: "reverbnation", img: reverbnationIcon, label: "Reverbnation" },
   { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
   { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
   { name: "twitch", img: twitchIcon, label: "Twitch" },
