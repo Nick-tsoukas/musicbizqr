@@ -513,7 +513,7 @@ const socialPlatforms = [
   { name: "facebook", img: facebookIcon, label: "Facebook" },
   { name: "instagram", img: instagramIcon, label: "Instagram" },
   { name: "twitter", img: twitterIcon, label: "Twitter" },
- { name: "tictok", img: tiktokIcon, label: "Tiktok" },
+ { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
  
  
 ];
