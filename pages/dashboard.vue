@@ -1,7 +1,6 @@
 <template>
   <div class="bg-[#000]">
     <div class="bg-white text-black">
-      <!-- <pre>{{ videoItems }}</pre> -->
     </div>
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
@@ -108,11 +107,10 @@
       </div>
 
       <!-- Social Links Section -->
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="socialItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Social Links List -->
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Social Links</h2>
           <NuxtLink to="/socialpage" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -140,7 +138,7 @@
         </ul>
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Social Links -->
+        
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Social Links</h2>
           <NuxtLink to="/socialpage" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -150,14 +148,14 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Social Link</h2>
         </div>
-      </div>
+      </div> -->
 
       <!-- Events Section -->
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="eventItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Events List -->
+      
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-yellow-500 to-orange-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
           <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -185,7 +183,7 @@
         </ul>
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Events -->
+       
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-yellow-500 to-orange-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
           <NuxtLink to="/newevent" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -195,14 +193,14 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Event</h2>
         </div>
-      </div>
+      </div> -->
 
       <!-- Tours Section -->
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="tourItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Tours List -->
+        
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-purple-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Tours</h2>
           <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -230,7 +228,6 @@
         </ul>
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Tours -->
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-purple-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Tours</h2>
           <NuxtLink to="/newtour" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -240,14 +237,14 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Tour</h2>
         </div>
-      </div>
+      </div> -->
 
       <!-- Albums Section -->
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="albumItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Albums List -->
+        
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-red-500 to-pink-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Albums</h2>
           <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -275,7 +272,7 @@
         </ul>
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Albums -->
+      
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-red-500 to-pink-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Albums</h2>
           <NuxtLink to="/newalbum" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -285,14 +282,13 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Album</h2>
         </div>
-      </div>
+      </div> -->
 
       <!-- Streams Section -->
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="streamItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Streams List -->
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-teal-500 to-green-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Streams</h2>
           <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -320,7 +316,6 @@
         </ul>
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Streams -->
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-teal-500 to-green-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Streams</h2>
           <NuxtLink to="/createstreamlinks" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -330,14 +325,13 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Stream</h2>
         </div>
-      </div>
+      </div> -->
 
       <!-- Videos Section -->
-      <div v-if="loading">
+      <!-- <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="videoItems.length" class="mb-6 border-2 border-white rounded-lg">
-        <!-- Videos List -->
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-indigo-500 to-purple-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos</h2>
           <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -350,7 +344,6 @@
             :key="video.id"
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
-            <!-- Band Info -->
             <div class="flex items-center flex-col gap-4 md:flex-row md:gap-0">
               <img
                 v-if="video.bandimgUrl"
@@ -363,7 +356,7 @@
               </div>
             </div>
 
-            <!-- Actions -->
+          
             <div class="flex items-center gap-4">
               <button @click="router.push(`/video/${video.id}`)" class="text-blue-600 hover:text-blue-900">
                 <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
@@ -379,7 +372,7 @@
         </ul>
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <!-- No Videos -->
+       
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-indigo-500 to-purple-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Videos Pages</h2>
           <NuxtLink to="/createvideogrid" class="mdc-button flex justify-between w-full md:w-[300px]">
@@ -389,7 +382,7 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Video Page</h2>
         </div>
-      </div>
+      </div> -->
 
       <!-- VIEW QR Popup -->
       <div
