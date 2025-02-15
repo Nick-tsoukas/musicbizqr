@@ -8,105 +8,91 @@
       <form class="form-group" @submit.prevent="submitForm">
         <!-- Band Details Section -->
         <div class="bg-[#fff] rounded-md">
-          <div>
-            <div
-              class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-            >
-              <h2 class="font-semibold text-white text-2xl">Band Details</h2>
-            </div>
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Band Details</h2>
+          </div>
+          <div class="p-4">
             <!-- Band Name -->
-            <div class="p-4">
-              <div class="mdc-text-field">
-                <input
-                  type="text"
-                  id="band-name"
-                  class="mdc-text-field__input"
-                  v-model="bandName"
-                  placeholder=" "
-                  required
-                />
-                <label class="mdc-floating-label" for="band-name"
-                  >Band Name</label
-                >
-                <div class="mdc-line-ripple"></div>
-              </div>
+            <div class="mdc-text-field">
+              <input
+                type="text"
+                id="band-name"
+                class="mdc-text-field__input"
+                v-model="bandName"
+                placeholder=" "
+                required
+              />
+              <label class="mdc-floating-label" for="band-name">Band Name</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
 
-              <!-- Genre -->
-              <div class="mdc-text-field">
-                <input
-                  type="text"
-                  id="genre"
-                  class="mdc-text-field__input"
-                  v-model="genre"
-                  placeholder=" "
-                  required
-                />
-                <label class="mdc-floating-label" for="genre">Genre</label>
-                <div class="mdc-line-ripple"></div>
-              </div>
+            <!-- Genre -->
+            <div class="mdc-text-field">
+              <input
+                type="text"
+                id="genre"
+                class="mdc-text-field__input"
+                v-model="genre"
+                placeholder=" "
+                required
+              />
+              <label class="mdc-floating-label" for="genre">Genre</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
 
-              <!-- Bio -->
-              <div class="mdc-text-field">
-                <textarea
-                  id="bio"
-                  class="mdc-text-field__input"
-                  v-model="bio"
-                  placeholder=" "
-                  required
-                ></textarea>
-                <label class="mdc-floating-label" for="bio">Bio</label>
-                <div class="mdc-line-ripple"></div>
-              </div>
+            <!-- Bio -->
+            <div class="mdc-text-field">
+              <textarea
+                id="bio"
+                class="mdc-text-field__input"
+                v-model="bio"
+                placeholder=" "
+                required
+              ></textarea>
+              <label class="mdc-floating-label" for="bio">Bio</label>
+              <div class="mdc-line-ripple"></div>
             </div>
           </div>
         </div>
 
-        <!-- website link and text   -->
+        <!-- Website Link and Text -->
         <div class="bg-[#fff] rounded-md my-10">
-          <div>
-            <div
-              class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-            >
-              <h2 class="font-semibold text-white text-2xl">Website Link and Text</h2>
+          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Website Link and Text</h2>
+          </div>
+          <div class="p-4">
+            <!-- websitelink -->
+            <div class="mdc-text-field">
+              <input
+                type="text"
+                id="websitelink"
+                class="mdc-text-field__input"
+                v-model="websitelink"
+                placeholder="https://yourbandsite.com"
+              />
+              <label class="mdc-floating-label" for="websitelink">Website Link</label>
+              <div class="mdc-line-ripple"></div>
             </div>
-            <!-- websitelink  -->
-            <div class="p-4">
-              <div class="mdc-text-field">
-                <input
-                  type="text"
-                  id="websitelink"
-                  class="mdc-text-field__input"
-                  v-model="websitelink"
-                  placeholder="https://yourbandsite.com "
-                />
-                <label class="mdc-floating-label" for="websitelink"
-                  >Website Link</label
-                >
-                <div class="mdc-line-ripple"></div>
-              </div>
-            </div>
-            <div class="p-4">
-              <div class="mdc-text-field">
-                <input
-                  type="text"
-                  id="websitelinktext"
-                  class="mdc-text-field__input"
-                  v-model="websitelink"
-                  placeholder="YourBandSiteLinkText.com "
-                />
-                <label class="mdc-floating-label" for="websitelinktext"
-                  >Website Link Text To Show</label
-                >
-                <div class="mdc-line-ripple"></div>
-              </div>
+          </div>
+          <div class="p-4">
+            <div class="mdc-text-field">
+              <input
+                type="text"
+                id="websitelinktext"
+                class="mdc-text-field__input"
+                v-model="websitelinktext"
+                placeholder="YourBandSiteLinkText.com"
+              />
+              <label class="mdc-floating-label" for="websitelinktext"
+                >Website Link Text To Show</label
+              >
+              <div class="mdc-line-ripple"></div>
             </div>
           </div>
         </div>
 
         <!-- Band Image -->
-        <div
-          class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
+        <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
@@ -132,9 +118,7 @@
 
         <!-- Band Members Section -->
         <div class="bg-white rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
+          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
             <h2 class="font-semibold text-white text-2xl">Band Members</h2>
           </div>
           <div class="p-4">
@@ -210,14 +194,11 @@
 
         <!-- Social Media Links Section -->
         <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">
-              Social Media Links
-            </h2>
+          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+            <h2 class="font-semibold text-white text-2xl">Social Media Links</h2>
           </div>
           <div class="p-4">
+            <!-- Facebook -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -229,6 +210,7 @@
               <label class="mdc-floating-label" for="facebook">Facebook</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Instagram -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -237,11 +219,10 @@
                 v-model="instagram"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="instagram"
-                >Instagram</label
-              >
+              <label class="mdc-floating-label" for="instagram">Instagram</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Twitch -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -253,6 +234,7 @@
               <label class="mdc-floating-label" for="twitch">Twitch</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Twitter -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -264,6 +246,7 @@
               <label class="mdc-floating-label" for="twitter">Twitter</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- WhatsApp -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -275,17 +258,19 @@
               <label class="mdc-floating-label" for="whatsapp">WhatsApp</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- TikTok (fixed spelling) -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
-                id="tictok"
+                id="tiktok"
                 class="mdc-text-field__input"
-                v-model="tictok"
+                v-model="tiktok"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="tictok">TicTok</label>
+              <label class="mdc-floating-label" for="tiktok">TikTok</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Snapchat -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -302,12 +287,11 @@
 
         <!-- Streaming Links Section -->
         <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
+          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
             <h2 class="font-semibold text-2xl text-white">Streaming Links</h2>
           </div>
           <div class="p-4">
+            <!-- Apple Music -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -321,6 +305,7 @@
               >
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Spotify -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -332,6 +317,7 @@
               <label class="mdc-floating-label" for="spotify">Spotify</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- SoundCloud -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -345,6 +331,7 @@
               >
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- YouTube -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -356,17 +343,19 @@
               <label class="mdc-floating-label" for="youtube">YouTube</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Deezer (fixed spelling) -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
-                id="dezzer"
+                id="deezer"
                 class="mdc-text-field__input"
-                v-model="dezzer"
+                v-model="deezer"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="dezzer">Dezzer</label>
+              <label class="mdc-floating-label" for="deezer">Deezer</label>
               <div class="mdc-line-ripple"></div>
             </div>
+            <!-- Bandcamp -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -383,9 +372,7 @@
 
         <!-- Single Song Section (Media File + Title) -->
         <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
+          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
             <h2 class="font-semibold text-white text-2xl">Single Song</h2>
           </div>
           <div class="p-4">
@@ -421,7 +408,7 @@
           </div>
         </div>
 
-        <!-- Single Video Section (Youtube URL) -->
+        <!-- Single Video Section (YouTube URL) -->
         <div class="bg-[#fff] rounded-md">
           <div
             class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
@@ -445,9 +432,7 @@
           </div>
         </div>
 
-        <button type="submit" class="mdc-button w-full mt-10">
-          Create Profile
-        </button>
+        <button type="submit" class="mdc-button w-full mt-10">Create Profile</button>
       </form>
     </div>
   </div>
@@ -466,70 +451,67 @@ const genre = ref("");
 const bio = ref("");
 const bandImg = ref(null);
 const bandImgUrl = ref(null);
-const websitelink = ref(null);
-const websitelinktext = ref(null)
+const websitelink = ref("");
+const websitelinktext = ref("");
 
-const members = ref([
-  { name: "", instrument: "", image: null, imageUrl: null },
-]);
-
-// new push to github
-// Social media
-const facebook = ref("");
-const instagram = ref("");
-const twitch = ref("");
-const twitter = ref("");
-const whatsapp = ref("");
-const tictok = ref("");
-const snapchat = ref("");
-
-// Streaming
-const appleMusic = ref("");
-const spotify = ref("");
-const soundcloud = ref("");
-const dezzer = ref("");
-const youtube = ref("");
-const bandcamp = ref("");
-
-// Single song (media + title)
-const singlesongTitle = ref("");
-const singlesongFile = ref(null);
-const singlesongFileName = ref("");
-
-// Single video (just Youtube URL)
-const singlevideoYoutubeUrl = ref("");
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  bandImg.value = file;
-  bandImgUrl.value = URL.createObjectURL(file);
+// Band Members
+const members = ref([{ name: "", instrument: "", image: null, imageUrl: null }]);
+const addMember = () => {
+  members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
 };
-
+const removeMember = (index) => {
+  members.value.splice(index, 1);
+};
 const handleMemberImageUpload = (event, index) => {
   const file = event.target.files[0];
   members.value[index].image = file;
   members.value[index].imageUrl = URL.createObjectURL(file);
 };
 
-const addMember = () => {
-  members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
+// Social media
+const facebook = ref("");
+const instagram = ref("");
+const twitch = ref("");
+const twitter = ref("");
+const whatsapp = ref("");
+const tiktok = ref(""); // <--- Updated from tictok
+const snapchat = ref("");
+
+// Streaming
+const appleMusic = ref("");
+const spotify = ref("");
+const soundcloud = ref("");
+const deezer = ref(""); // <--- Updated from dezzer
+const youtube = ref("");
+const bandcamp = ref("");
+
+// Single Song
+const singlesongTitle = ref("");
+const singlesongFile = ref(null);
+const singlesongFileName = ref("");
+
+// Single Video
+const singlevideoYoutubeUrl = ref("");
+
+// Handle band cover image
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  bandImg.value = file;
+  bandImgUrl.value = URL.createObjectURL(file);
 };
 
-const removeMember = (index) => {
-  members.value.splice(index, 1);
-};
-
+// Handle single song
 const handleSingleSongUpload = (event) => {
   const file = event.target.files[0];
   singlesongFile.value = file;
   singlesongFileName.value = singlesongTitle.value || file.name;
 };
 
+// Submit form
 const submitForm = async () => {
   try {
     loading.value = true;
 
-    // Ensure required fields are not empty
     if (!bandName.value || !genre.value || !bio.value) {
       alert("Please fill in the required fields: name, genre, bio.");
       loading.value = false;
@@ -545,15 +527,15 @@ const submitForm = async () => {
       twitch: twitch.value || null,
       twitter: twitter.value || null,
       whatsapp: whatsapp.value || null,
-      tictok: tictok.value || null,
+      tiktok: tiktok.value || null, // Use tiktok
       snapchat: snapchat.value || null,
       appleMusic: appleMusic.value || null,
+      spotify: spotify.value || null,
       soundcloud: soundcloud.value || null,
-      dezzer: dezzer.value || null,
+      deezer: deezer.value || null, // Use deezer
       youtube: youtube.value || null,
       bandcamp: bandcamp.value || null,
-      spotify: spotify.value || null,
-      websitelink : websitelink.value || null,
+      websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
       members: members.value.map((member) => ({
@@ -573,16 +555,19 @@ const submitForm = async () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(form));
 
+    // Band Image
     if (bandImg.value) {
       formData.append("files[bandImg]", bandImg.value);
     }
 
+    // Member Images
     members.value.forEach((member, index) => {
       if (member.image) {
         formData.append(`files[members][${index}][image]`, member.image);
       }
     });
 
+    // Single Song File
     if (singlesongFile.value) {
       formData.append("files[singlesong][song]", singlesongFile.value);
     }
@@ -594,6 +579,7 @@ const submitForm = async () => {
       body: formData,
     });
 
+    // If there's a QR code we need to update with the band ID
     if (route.query.qrId) {
       await update("qrs", route.query.qrId, {
         band: bandData.id,
