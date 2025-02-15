@@ -83,16 +83,7 @@
                 </div>
               </div>
             </section>
-            <!-- bio section -->
-            <!-- 
-            <div v-if="band.data.attributes.bio">
-              <h1
-                class="text-lg my-4 md:text-4xl font-bold text-white md:my-16"
-              >
-                Biography
-              </h1>
-              <p class="text-white">{{ band.data.attributes.bio }}</p>
-            </div> -->
+         
 
             <!-- Album Player Section -->
             <section v-if="albumPlay" class="w-full flex flex-col xl:flex-row gap-4 my-20">
@@ -102,7 +93,9 @@
                 <!-- Include your AudioPlayer component here -->
                 <AudioPlayer :album="albumPlay" />
               </div>
+              
               <div v-else-if="albumPlay.attributes.type === 'streaming'" class="w-full md:w-[70%] mx-0">
+                <div class="text-white" >Hello world </div>
                 <div class="embed-container">
                   <iframe :src="albumPlay.attributes.embedUrl" width="100%" height="380" frameborder="0"
                     allowtransparency="true" allow="encrypted-media"></iframe>
@@ -243,7 +236,7 @@
             <div class="overflow-x-scroll md:overflow-hidden relative">
               <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
                 <thead>
-                  <tr class="border-b border-purple-500">
+                  <tr class="border-b border-purple-500 border-opacity-30">
                     <th class="px-2 py-2 text-left">Date</th>
                     <th class="px-2 py-2 text-left">City</th>
                     <th class="px-2 py-2 text-left">Venue</th>
@@ -251,7 +244,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="event in events" :key="event.id" class="border-b border-purple-500">
+                  <tr v-for="event in events" :key="event.id" class="border-b border-purple-500 border-opacity-20">
                     <!-- Removed any `min-w-[150px]` from here -->
                     <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{
