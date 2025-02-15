@@ -71,7 +71,7 @@
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
           <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Artist Page
           </NuxtLink>
         </div>
         <ul class="px-6 py-6">
