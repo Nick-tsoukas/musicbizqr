@@ -31,16 +31,23 @@
 
     <!-- Playback Controls -->
     <div class="controls">
+      <!-- Previous Button -->
       <button @click="previousSong" class="control-button">
         <img src="@/assets/previous-icon.svg" alt="Previous" />
       </button>
 
+      <!-- Play/Pause Button -->
       <button @click="togglePlay" class="control-button play-pause">
         <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
         <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
       </button>
 
-      <button @click="nextSong" class="control-button">
+      <!-- Next Button (Hidden if only one song) -->
+      <button
+        v-if="songs.length > 1"
+        @click="nextSong"
+        class="control-button"
+      >
         <img src="@/assets/next-icon.svg" alt="Next" />
       </button>
     </div>
@@ -101,7 +108,7 @@ const repeat = ref(false);
 // Computed: Song Data
 const songs = computed(() => {
   try {
-    // If album contains multiple songs
+    // If album has multiple songs
     if (props.album?.attributes?.songs) {
       const songsList = props.album.attributes.songs;
       return Array.isArray(songsList) ? songsList : [songsList];
@@ -119,7 +126,7 @@ const songs = computed(() => {
         },
       ];
     }
-    // Otherwise no valid songs
+    // Otherwise, no valid songs
     console.warn('No valid song data found in album:', props.album);
     return [];
   } catch (error) {
@@ -145,7 +152,9 @@ const albumCoverUrl = computed(() => {
 const currentSongTitle = computed(() =>
   currentSong.value?.title || 'Select a song'
 );
-const artistName = computed(() => props.album.attributes?.artist || 'Unknown Artist');
+const artistName = computed(() =>
+  props.album.attributes?.artist || 'Unknown Artist'
+);
 
 // onMounted: Init volume
 onMounted(async () => {
@@ -155,20 +164,14 @@ onMounted(async () => {
   }
 });
 
-// ** Single-Click Logic **
-// If new song is clicked: load & play immediately
-// If same song is clicked: toggle play/pause
+// Always reset time to zero on click
+// Single-click loads the file and plays from 0
 const playSong = async (song) => {
   if (!audioPlayer.value) return;
 
-  // If same song is clicked, toggle Play/Pause
-  if (currentSong.value && currentSong.value.id === song.id) {
-    togglePlay();
-    return;
-  }
-
-  // Otherwise, new song is selected => load & play immediately
+  // Set the new or same currentSong
   currentSong.value = song;
+
   try {
     let fileUrl = '';
     if (song.file?.data?.attributes?.url) {
@@ -184,13 +187,17 @@ const playSong = async (song) => {
       return;
     }
 
+    // Load the new URL
     audioPlayer.value.src = fileUrl;
     audioPlayer.value.load();
 
-    // Wait for metadata, then play
+    // Wait for metadata
     await new Promise((resolve) => {
       audioPlayer.value.onloadedmetadata = resolve;
     });
+
+    // **Reset time to 0** and play
+    audioPlayer.value.currentTime = 0;
     await audioPlayer.value.play();
     playing.value = true;
   } catch (error) {
@@ -241,6 +248,14 @@ const nextSong = async () => {
 };
 
 const previousSong = async () => {
+  // If only one song => reset same track
+  if (songs.value.length === 1) {
+    if (audioPlayer.value) {
+      audioPlayer.value.currentTime = 0;
+    }
+    return;
+  }
+  // Otherwise normal logic
   const idx = songs.value.findIndex((s) => s.id === currentSong.value?.id);
   let prevIndex = idx - 1;
   if (prevIndex < 0) prevIndex = songs.value.length - 1;
