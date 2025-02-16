@@ -9,8 +9,6 @@
           :options="options"
         /> -->
       <div class="relative isolate min-h-[50vh]">
-        <!-- mobile  -->
-        <!-- <h1 class="mb-16  text-8xl text-white font-extrabold tracking-tight  text-center  md:text-left ">Get your sound out</h1> -->
 
         <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
           <div
@@ -28,11 +26,7 @@
                 class="h-[225px] w-[225px]"
               />
             </div>
-            <!-- write a headline  -->
-            <!-- <p class="text-2xl text-center leading-10 2xl:text-left">
-              Amplify your brand with custom QR codes, personalized splash
-              pages, and seamless social media connections.
-            </p> -->
+       
             <ul
               class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6"
             >
@@ -56,6 +50,7 @@
               </NuxtLink>
             </div>
           </div>
+
           <div
             class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow"
           >
@@ -83,7 +78,7 @@
         </h2>
       </section>
 
-      <section class="mx-auto px-1 pt-6 2xl:pt-0 w-[90vw] 2xl:px-6">
+      <!-- <section class="mx-auto px-1 pt-6 2xl:pt-0 w-[90vw] 2xl:px-6">
         <div class="flex flex-col 2xl:flex-row">
           <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0">
             <svg
@@ -147,28 +142,28 @@
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- image gallery  -->
 
       <div
-        class="flex justify-center py-10 md:py-32 image_gradient my-8 md:my-16"
+        class="flex justify-center py-10 md:pb-32 image_gradient my-8 md:my-16"
       >
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
           <!-- heading  -->
-          <div class="mb-24">
+          <!-- <div class="mb-24">
             <h2
               class="text-3xl text-center md:text-5xl text-white font-bold mb-4"
             >
               Example Desktop Splash Pages
             </h2>
-          </div>
+          </div> -->
           <!-- swiper with cards  -->
           <Swiper
             :modules="[EffectCards]"
             effect="cards"
             grabCursor="true"
-            class="main-gallery pt-10 mt-4 h-auto"
+            class="main-gallery  h-auto"
           >
             <SwiperSlide
               v-for="(slide, index) in slides"
@@ -229,14 +224,38 @@
       <!-- heading of band image  -->
 
       <!-- main band image  -->
-      <div class="w-screen mx-auto">
+      <!-- <div class="w-screen mx-auto">
         <h2
           class="bg-clip-text text-transparent bg-gradient-to-r pb-10 from-pink-500 to-violet-500 text-center font-extrabold tracking-tight text-5xl md:text-8xl lg:text-center"
         >
           Build Your Artist Page
         </h2>
         <img class="mx-auto" :src="bandDeskPage" alt="" />
+      </div> -->
+
+      <div
+  class="relative w-full h-[70vh] bg-fixed bg-center bg-cover"
+  :style="`background-image: url(${aisix})`"
+>
+  <!-- Overlay & Centered Text -->
+  <div
+    class="absolute  inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+  >
+    <div>
+      <h1 class="text-4xl md:text-6xl text-white font-bold">
+      Create Your Profile
+    </h1>
+    <div class="flex gap-6  mt-10 text-white " >
+      <div class="py-2 px-4 w-[25%] text-center font-semibold bg-purple-500 shadow-2xl">
+        Signup
       </div>
+      <div class="py-2 w-[25%] text-center font-semibold px-4 bg-purple-500 shadow-2xl">
+        Login
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
       <!-- end of image galler   -->
       <!-- Chart  -->
       <section class="w-[70vw] mx-auto mt-10 2xl:mt-28">
@@ -458,6 +477,7 @@ import streamScreen from "@/assets/laststreampage.jpg";
 import socialScreen from "@/assets/socialnewpage.jpg";
 import externalScreen from "@/assets/newbandhome.jpg";
 import videoScreen from "@/assets/vidgrid.jpg";
+import aisix from "@/assets/aisix.png";
 
 import { defineComponent, h } from "vue";
 import {
