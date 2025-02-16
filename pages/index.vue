@@ -14,15 +14,18 @@
             class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
           >
             <h1
+              data-aos="fade-up"
               class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center font-extrabold tracking-tight text-7xl md:text-8xl lg:text-left"
             >
               Music Biz Qr
             </h1>
-            <div class="flex justify-center mb-12 2xl:hidden">
+            <div data-aos="fade-left" class="flex justify-center mb-12 2xl:hidden" >
               <img
                 src="@/assets/qrcode.png"
                 alt=""
-                class="h-[225px] w-[225px]"
+                class="h-[225px] w-[225px] "
+                data-aos="fade-left"
+              
               />
             </div>
 
@@ -102,14 +105,16 @@
             </SwiperSlide>
             <NuxtLink
               to="/"
-              class="block  font-bold cta-button-full mb-6 mx-auto md:mx-0 cursor-pointer  text-center text-white"
+              class="block font-bold cta-button-full mb-6 mx-auto md:mx-0 cursor-pointer text-center text-white"
             >
               Preview Page
             </NuxtLink>
           </Swiper>
         </div>
       </div>
-      <section class="min-h-screen flex flex-col items-center justify-center my-28">
+      <section
+        class="min-h-screen flex flex-col items-center justify-center my-28"
+      >
         <h2 class="text-white text-left mt-20 text-5xl font-bold mx-20">
           Add All Your Social Links
         </h2>
@@ -120,10 +125,12 @@
         </div>
       </section>
       <!-- embed section -->
-      <section class="relative min-h-screen  items-center justify-center  pt-24 image_gradient">
+      <section
+        class="relative min-h-screen items-center justify-center pt-24 image_gradient"
+      >
         <div class="flex flex-col items-center md:flex-row">
           <!-- Left Side: Spotify Embed -->
-          <div class="w-full md:w-1/2  flex justify-center">
+          <div class="w-full md:w-1/2 flex justify-center">
             <iframe
               class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
               src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
@@ -134,7 +141,7 @@
           </div>
 
           <!-- Right Side: Music Player Mockup -->
-          <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
+          <div  class="w-full md:w-1/2 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
               <h2 class="text-white font-bold text-5xl mb-4">
@@ -143,7 +150,6 @@
               <p class="text-white text-lg">Get More Listeners</p>
             </div>
           </div>
-       
         </div>
         <!-- Full-Width Icons at Bottom -->
         <div class="left-0 w-auto">
@@ -159,22 +165,22 @@
       </section>
 
       <!-- video section  -->
-      <section class=" min-h-screen flex items-center justify-center pt-24">
-      <div  class="flex flex-col md:flex-row">
+      <section class="min-h-screen flex items-center justify-center pt-24">
+        <div class="flex flex-col md:flex-row">
           <!-- Left Side: Text & Icons -->
           <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
-          <!-- Content Section -->
-          <div class="flex-grow flex flex-col justify-start">
-            <h2 class="text-white font-bold text-5xl mb-4">
-              Watch Our Latest Music Video
-            </h2>
-            <p class="text-white text-lg">
-              Experience the visuals of our latest release
-            </p>
-          </div>
+            <!-- Content Section -->
+            <div class="flex-grow flex flex-col justify-start">
+              <h2 class="text-white font-bold text-5xl mb-4">
+                Watch Our Latest Music Video
+              </h2>
+              <p class="text-white text-lg">
+                Experience the visuals of our latest release
+              </p>
+            </div>
 
-          <!-- Icons Absolutely Positioned at the Bottom -->
-          <!-- <div
+            <!-- Icons Absolutely Positioned at the Bottom -->
+            <!-- <div
             class="flex items-center justify-around space-x-6 p-4 rounded-lg"
           >
             <Icon
@@ -184,91 +190,44 @@
               class="w-10 h-10 text-white hover:text-red-500 transition"
             />
           </div> -->
-        </div>
+          </div>
 
-        <!-- Right Side: YouTube Video with Thumbnail -->
-        <div class="w-full md:w-1/2 flex justify-center items-center">
-          <div class="relative w-[90%] md:w-[80%] max-w-xl">
-            <!-- Thumbnail (Click to Play) -->
-            <div
-              v-if="!isPlaying"
-              class="relative cursor-pointer"
-              @click="isPlaying = true"
-            >
-              <img
-                :src="thumbnail"
-                alt="Video Thumbnail"
-                class="rounded-lg shadow-lg w-full h-auto"
-              />
-              <!-- Play Button Overlay -->
-              <div class="absolute inset-0 flex items-center justify-center">
-                <Icon
-                  icon="mdi:play-circle"
-                  class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
+          <!-- Right Side: YouTube Video with Thumbnail -->
+          <div class="w-full md:w-1/2 flex justify-center items-center">
+            <div class="relative w-[90%] md:w-[80%] max-w-xl">
+              <!-- Thumbnail (Click to Play) -->
+              <div
+                v-if="!isPlaying"
+                class="relative cursor-pointer"
+                @click="isPlaying = true"
+              >
+                <img
+                  :src="thumbnail"
+                  alt="Video Thumbnail"
+                  class="rounded-lg shadow-lg w-full h-auto"
                 />
+                <!-- Play Button Overlay -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <Icon
+                    icon="mdi:play-circle"
+                    class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
+                  />
+                </div>
               </div>
-            </div>
 
-            <!-- YouTube Embed (Shown When Playing) -->
-            <iframe
-              v-if="isPlaying"
-              class="w-full h-64 md:h-96 rounded-lg shadow-lg"
-              :src="videoUrl"
-              frameborder="0"
-              allowfullscreen
-            ></iframe>
+              <!-- YouTube Embed (Shown When Playing) -->
+              <iframe
+                v-if="isPlaying"
+                class="w-full h-64 md:h-96 rounded-lg shadow-lg"
+                :src="videoUrl"
+                frameborder="0"
+                allowfullscreen
+              ></iframe>
+            </div>
           </div>
         </div>
-      </div>
       </section>
 
-      <div
-        class="relative w-full min-h-[100vh] bg-fixed bg-center bg-cover"
-        :style="`background-image: url(${aisix})`"
-      >
-        <!-- Overlay & Centered Text -->
-        <div
-          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center pl-0"
-        >
-        <div class="text-center md:text-left">
-    <!-- Animated Text -->
-    <h1 class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
-      Create Your Profile
-    </h1>
-
-    <!-- Buttons Section -->
-    <div class="flex flex-col justify-center px-2 gap-6 mt-10 text-white md:flex-row md:justify-start">
-      <button class="cta-button">
-        Signup
-      </button>
-      <button class="cta-button">
-        Login
-      </button>
-    </div>
-  </div>
-          <!-- <div>
-            <h1
-              class="text-4xl md:text-6xl text-white text-center md:text-left font-bold"
-            >
-              Create Your Profile
-            </h1>
-            <div
-              class="flex flex-col justify-center px-2 gap-6 mt-10 text-white md:flex-row md:justify-start"
-            >
-              <div
-                class="py-2 px-4 w-full md:w-[25%] text-center font-semibold bg-purple-800 rounded-sm shadow-2xl"
-              >
-                Signup
-              </div>
-              <div
-                class="py-2 w-full md:w-[25%] text-center font-semibold px-4 bg-purple-800 rounded-sm shadow-2xl"
-              >
-                Login
-              </div>
-            </div>
-          </div> -->
-        </div>
-      </div>
       <!-- end of image galler   -->
       <!-- Chart  -->
       <section class="w-[70vw] mx-auto mt-10 2xl:mt-28">
@@ -285,6 +244,34 @@
         </p>
         <BarChart class="mx-auto" />
       </section>
+      <!-- cta   -->
+      <div
+        class="relative w-full min-h-[100vh] bg-fixed bg-center bg-cover"
+        :style="`background-image: url(${aisix})`"
+      >
+        <!-- Overlay & Centered Text -->
+        <div
+          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center pl-0"
+        >
+          <div class="text-center md:text-left">
+            <!-- Animated Text -->
+            <h1
+              class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+            >
+              Create Your Profile
+            </h1>
+
+            <!-- Buttons Section -->
+            <div
+              class="flex flex-col justify-center px-2 gap-6 mt-10 text-white md:flex-row md:justify-start"
+            >
+              <button class="cta-button">Signup</button>
+              <button class="cta-button">Login</button>
+            </div>
+          </div>
+        </div>
+      </div>
+   
 
       <!-- Pricing section -->
       <div class="isolate">
@@ -446,6 +433,7 @@ import { Thumbs } from "swiper/modules";
 import { EffectCards } from "swiper/modules";
 import type { Swiper as SwiperInstance } from "swiper/types";
 import { Icon } from "@iconify/vue";
+
 
 import deezer from "@/assets/dezzer.svg";
 
@@ -890,9 +878,15 @@ const testimonials = [
 }
 /* button s  */
 @keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-gradient {
@@ -908,7 +902,6 @@ const testimonials = [
 .cta-button-full {
   @apply py-3 px-6 w-full md:w-[100%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
 }
-
 
 .animate-scroll {
   display: flex;

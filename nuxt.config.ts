@@ -35,6 +35,7 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
   modules: [
+    'nuxt-aos',
     'nuxt-headlessui',
     "@nuxtjs/tailwindcss",
     "@nuxtjs/strapi",
@@ -43,6 +44,27 @@ export default defineNuxtConfig({
     "nuxt-particles",
     "@unlok-co/nuxt-stripe"
   ],
+
+  aos: {
+    // Global settings:
+    disable: false, // Disable AOS globally (e.g., for mobile devices)
+    startEvent: 'DOMContentLoaded', // Event to initialize AOS
+    initClassName: 'aos-init', // Class applied after initialization
+    animatedClassName: 'aos-animate', // Class applied on animation
+    useClassNames: false, // Add content of `data-aos` as classes on scroll
+    disableMutationObserver: false, // Disable automatic mutations' detections
+    debounceDelay: 50, // Delay on debounce used while resizing window
+    throttleDelay: 99, // Delay on throttle used while scrolling the page
+
+    // Settings that can be overridden on per-element basis:
+    offset: 120, // Offset (in px) from the original trigger point
+    delay: 0, // Delay value from 0 to 3000 (in ms)
+    duration: 400, // Duration value from 0 to 3000 (in ms)
+    easing: 'ease', // Default easing for AOS animations
+    once: false, // Whether animation should happen only once
+    mirror: false, // Whether elements should animate out while scrolling past them
+    anchorPlacement: 'top-bottom', // Defines which position of the element regarding to window should trigger the animation
+  },
 
   stripe: {
     server: {
