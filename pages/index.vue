@@ -421,6 +421,9 @@
       </div>
     </main>
     <!-- <Footer /> -->
+    <div class="h-40 flex justify-center items-center">
+      <img src="@/assets/musicbizlogo.png" class="h-12" />
+    </div>
   </div>
 </template>
 
@@ -431,12 +434,12 @@ import { EffectCards } from "swiper/modules";
 import type { Swiper as SwiperInstance } from "swiper/types";
 
 //  mockups
-import videoMobilePage from "@/assets/screenbandmain.png";
-import streamLinksPage from "@/assets/screenbandmain.png";
-import albumDeskPage from "@/assets/screenbandmain.png";
-import socialDeskPage from "@/assets/screenbandmain.png"; 
+import videoMobilePage from "@/assets/mainbainwithvideo.png";
+import streamLinksPage from "@/assets/mainbainwithvideo.png";
+import albumDeskPage from "@/assets/mainbainwithvideo.png";
+import socialDeskPage from "@/assets/mainbainwithvideo.png"; 
 import bandDeskPage from "@/assets/dannydemo.png";
-import evnetsDesk from "@/assets/screenbandmain.png";
+import evnetsDesk from "@/assets/mainbainwithvideo.png";
 // import videoDesk from "@/assets/desktopvideogrid.png";
 
 import videoDesk from "@/assets/mainbandtwo.png";
