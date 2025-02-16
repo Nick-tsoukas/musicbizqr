@@ -14,7 +14,7 @@
     </div>
 
     <!-- Band Name Below the Image -->
-    <div class="text-center text-white text-4xl font-bold mt-4">
+    <div v-if="band.data.attributes.isBandNameInLogo === false" class="text-center text-white text-4xl font-bold mt-4">
       {{ band.data.attributes.name }}
     </div>
 
@@ -82,7 +82,7 @@
       </div>
 
       <!-- YouTube Player (Loads on Click) -->
-      <div v-else class="relative w-full max-h-[300px]">
+      <div v-else class="relative w-full max-h-[300px] my-6">
         <YouTube :src="singleVideoId" :vars="playerOptions" class="w-full h-full rounded-lg" />
       </div>
     </div>
