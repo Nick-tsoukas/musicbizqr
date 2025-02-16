@@ -9,7 +9,6 @@
           :options="options"
         /> -->
       <div class="relative isolate min-h-[50vh]">
-
         <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
           <div
             class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
@@ -26,7 +25,7 @@
                 class="h-[225px] w-[225px]"
               />
             </div>
-       
+
             <ul
               class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6"
             >
@@ -34,7 +33,9 @@
               <li>Generate splash pages</li>
               <li>Add audio players</li>
               <li>Feature your content links</li>
-              <li>Connnect social media links, streaming services, and websites</li>
+              <li>
+                Connnect social media links, streaming services, and websites
+              </li>
               <li>Analytic tracking</li>
             </ul>
             <div
@@ -65,7 +66,7 @@
 
       <!-- grid of main features and branded qrs -->
       <section
-        class="text-center 2xl:text-left mb-2 mx-auto px-2 w-full lg:w-[90vw] lg:px-6 mt-0 lg:mb-20"
+        class="text-center 2xl:text-left mb-10 mx-auto px-2 w-full lg:w-[90vw] lg:px-6 mt-0 lg:mb-10"
       >
         <h2 class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0">
           <span
@@ -78,184 +79,196 @@
         </h2>
       </section>
 
-      <!-- <section class="mx-auto px-1 pt-6 2xl:pt-0 w-[90vw] 2xl:px-6">
-        <div class="flex flex-col 2xl:flex-row">
-          <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0">
-            <svg
-              viewBox="0 0 366 729"
-              role="img"
-              class="mx-auto w-[15rem] 2xl:w-[22.875rem] max-w-full drop-shadow-xl animate__animated animate__slideInLeft"
-            >
-              <title>App screenshot</title>
-              <defs>
-                <clipPath id="2ade4387-9c63-4fc4-b754-10e687a0d332">
-                  <rect width="316" height="684" rx="36" />
-                </clipPath>
-              </defs>
-              <path
-                fill="#4B5563"
-                d="M363.315 64.213C363.315 22.99 341.312 1 300.092 1H66.751C25.53 1 3.528 22.99 3.528 64.213v44.68l-.857.143A2 2 0 0 0 1 111.009v24.611a2 2 0 0 0 1.671 1.973l.95.158a2.26 2.26 0 0 1-.093.236v26.173c.212.1.398.296.541.643l-1.398.233A2 2 0 0 0 1 167.009v47.611a2 2 0 0 0 1.671 1.973l1.368.228c-.139.319-.314.533-.511.653v16.637c.221.104.414.313.56.689l-1.417.236A2 2 0 0 0 1 237.009v47.611a2 2 0 0 0 1.671 1.973l1.347.225c-.135.294-.302.493-.49.607v377.681c0 41.213 22 63.208 63.223 63.208h95.074c.947-.504 2.717-.843 4.745-.843l.141.001h.194l.086-.001 33.704.005c1.849.043 3.442.37 4.323.838h95.074c41.222 0 63.223-21.999 63.223-63.212v-394.63c-.259-.275-.48-.796-.63-1.47l-.011-.133 1.655-.276A2 2 0 0 0 366 266.62v-77.611a2 2 0 0 0-1.671-1.973l-1.712-.285c.148-.839.396-1.491.698-1.811V64.213Z"
-              />
-              <path
-                fill="#343E4E"
-                d="M16 59c0-23.748 19.252-43 43-43h246c23.748 0 43 19.252 43 43v615c0 23.196-18.804 42-42 42H58c-23.196 0-42-18.804-42-42V59Z"
-              />
-              <foreignObject
-                class="bg-black"
-                width="316"
-                height="684"
-                transform="translate(24 24)"
-                clip-path="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)"
-              >
-                <img :src="imageToRender" alt="" />
-              </foreignObject>
-            </svg>
-          </div>
-          <div
-            class="flex element_scroll flex-row overflow-scroll lg:justify-center 2xl:overflow-hidden 2xl:flex-wrap w-full pt-24 xl:p-4 gap-2"
-          >
-            <div
-              v-for="(page, index) in splashPages"
-              :key="index"
-              @click="selectPage(index, page)"
-              :class="{
-                'transform scale-105 transition duration-300 border-transparent bg-gradient-to-r from-pink-500 to-violet-500':
-                  selectedPage === index,
-                'border-gray-300': selectedPage !== index,
-              }"
-              class="min-w-[50vw] m-2 h-20 w-auto rounded-lg bg-white text-center 2xl:w-[30%] p-0 flex justify-center items-center border-2 text-xl font-semibold relative cursor-pointer"
-            >
-              <img
-                class="hidden top-4 left-4 h-6 lg:h-[50px]"
-                :src="splashImages[index]"
-                alt=""
-              />
-              <span
-                class="text-xl"
-                :class="{
-                  'bg-clip-text text-white': selectedPage === index,
-                  'text-black': selectedPage !== index,
-                }"
-              >
-                {{ page }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section> -->
-
-      <!-- image gallery  -->
-
-      <div
-        class="flex justify-center pt-10 md:pb-32 image_gradient mt-8 md:mt-16"
-      >
+      <div class="flex justify-center image_gradient">
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
-          <!-- heading  -->
-          <!-- <div class="mb-24">
-            <h2
-              class="text-3xl text-center md:text-5xl text-white font-bold mb-4"
-            >
-              Example Desktop Splash Pages
-            </h2>
-          </div> -->
           <!-- swiper with cards  -->
           <Swiper
             :modules="[EffectCards]"
             effect="cards"
             grabCursor="true"
-            class="main-gallery  h-auto"
+            class="main-gallery h-auto"
           >
             <SwiperSlide
               v-for="(slide, index) in slides"
               :key="index"
-              class="flex items-center justify-center"
+              class="flex items-center justify-center mt-16 mb-6 px-2"
             >
               <img
                 :src="slide.image"
                 :srcset="slide.srcset"
                 alt="Main Image"
-                class="w-full md:w-[50vw] h-auto object-cover rounded-lg shadow-lg"
+                class="w-full md:w-[55vw] h-auto object-cover rounded-lg shadow-lg"
               />
             </SwiperSlide>
+            <NuxtLink
+              to="/"
+              class="block  font-bold cta-button-full mb-6 mx-auto md:mx-0 cursor-pointer  text-center text-white"
+            >
+              Preview Page
+            </NuxtLink>
           </Swiper>
-          <!-- smart link section  -->
-
-          <!-- Smart Links and Shares Section -->
-
-          <!-- Thumbnail Swiper -->
-          <!-- <Swiper
-        :modules="[Thumbs]"
-        :onSwiper="setThumbsSwiper"
-        :slides-per-view="4"
-        space-between="10"
-        class="thumbs-gallery"
-      >
-        <SwiperSlide v-for="(slide, index) in slides" :key="index">
-          <img :src="slide.thumbnail" alt="Thumbnail" class="w-full h-auto object-cover" />
-        </SwiperSlide>
-      </Swiper> -->
-
-          <!-- Main Swiper with Effect -->
-          <!-- <Swiper
-        :modules="[Thumbs, EffectCards]"
-        :thumbs="{ swiper: thumbsSwiper }"
-        :effect="swiperEffect"
-        class="main-gallery mt-4 h-80 md:h-96"
-          :breakpoints="{
-         768: { // For screens >= 768px
-          slidesPerView: 1,
-         spaceBetween: 30,
-          effect: 'slide',
-        },
-        0: { // For screens < 768px
-         slidesPerView: 1,
-      spaceBetween: 10,
-         effect: 'cards',
-         },
-        }"
->
-  <SwiperSlide v-for="(slide, index) in slides" :key="index">
-    <img :src="slide.image" alt="Main Image" class="w-full h-full object-cover" />
-  </SwiperSlide>
-</Swiper> -->
         </div>
       </div>
-
-      <!-- heading of band image  -->
-
-      <!-- main band image  -->
-      <!-- <div class="w-screen mx-auto">
-        <h2
-          class="bg-clip-text text-transparent bg-gradient-to-r pb-10 from-pink-500 to-violet-500 text-center font-extrabold tracking-tight text-5xl md:text-8xl lg:text-center"
-        >
-          Build Your Artist Page
+      <section class="min-h-screen flex flex-col items-center justify-center my-28">
+        <h2 class="text-white text-left mt-20 text-5xl font-bold mx-20">
+          Add All Your Social Links
         </h2>
-        <img class="mx-auto" :src="bandDeskPage" alt="" />
-      </div> -->
+        <p class="text-white text-left text-lg mx-20">Engage you followers</p>
+
+        <div class="min-h-[300px] mb-10 flex items-center justify-center">
+          <InfiniteScrollIcons />
+        </div>
+      </section>
+      <!-- embed section -->
+      <section class="relative min-h-screen  items-center justify-center  pt-24 image_gradient">
+        <div class="flex flex-col items-center md:flex-row">
+          <!-- Left Side: Spotify Embed -->
+          <div class="w-full md:w-1/2  flex justify-center">
+            <iframe
+              class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
+              src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
+              frameborder="0"
+              allowtransparency="true"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+
+          <!-- Right Side: Music Player Mockup -->
+          <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
+            <!-- Content Section -->
+            <div class="flex-grow flex flex-col justify-start">
+              <h2 class="text-white font-bold text-5xl mb-4">
+                Embed Music from your streaming platform
+              </h2>
+              <p class="text-white text-lg">Get More Listeners</p>
+            </div>
+          </div>
+       
+        </div>
+        <!-- Full-Width Icons at Bottom -->
+        <div class="left-0 w-auto">
+          <div class="flex items-center py-20 justify-around space-x-6">
+            <Icon
+              v-for="icon in streamingIcons"
+              :key="icon.name"
+              :icon="icon.icon"
+              class="w-10 h-10 text-white hover:text-green-500 transition"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- video section  -->
+      <section class=" min-h-screen flex items-center justify-center pt-24">
+      <div  class="flex flex-col md:flex-row">
+          <!-- Left Side: Text & Icons -->
+          <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
+          <!-- Content Section -->
+          <div class="flex-grow flex flex-col justify-start">
+            <h2 class="text-white font-bold text-5xl mb-4">
+              Watch Our Latest Music Video
+            </h2>
+            <p class="text-white text-lg">
+              Experience the visuals of our latest release
+            </p>
+          </div>
+
+          <!-- Icons Absolutely Positioned at the Bottom -->
+          <!-- <div
+            class="flex items-center justify-around space-x-6 p-4 rounded-lg"
+          >
+            <Icon
+              v-for="icon in streamingIcons"
+              :key="icon.name"
+              :icon="icon.icon"
+              class="w-10 h-10 text-white hover:text-red-500 transition"
+            />
+          </div> -->
+        </div>
+
+        <!-- Right Side: YouTube Video with Thumbnail -->
+        <div class="w-full md:w-1/2 flex justify-center items-center">
+          <div class="relative w-[90%] md:w-[80%] max-w-xl">
+            <!-- Thumbnail (Click to Play) -->
+            <div
+              v-if="!isPlaying"
+              class="relative cursor-pointer"
+              @click="isPlaying = true"
+            >
+              <img
+                :src="thumbnail"
+                alt="Video Thumbnail"
+                class="rounded-lg shadow-lg w-full h-auto"
+              />
+              <!-- Play Button Overlay -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <Icon
+                  icon="mdi:play-circle"
+                  class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
+                />
+              </div>
+            </div>
+
+            <!-- YouTube Embed (Shown When Playing) -->
+            <iframe
+              v-if="isPlaying"
+              class="w-full h-64 md:h-96 rounded-lg shadow-lg"
+              :src="videoUrl"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </div>
+      </section>
 
       <div
-  class="relative w-full h-[100vh] bg-fixed bg-center bg-cover"
-  :style="`background-image: url(${aisix})`"
->
-  <!-- Overlay & Centered Text -->
-  <div
-    class="absolute  inset-0 bg-black bg-opacity-50 flex items-center justify-center pl-0"
-  >
-    <div>
-      <h1 class="text-4xl md:text-6xl text-white text-center md:text-left font-bold">
+        class="relative w-full min-h-[100vh] bg-fixed bg-center bg-cover"
+        :style="`background-image: url(${aisix})`"
+      >
+        <!-- Overlay & Centered Text -->
+        <div
+          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center pl-0"
+        >
+        <div class="text-center md:text-left">
+    <!-- Animated Text -->
+    <h1 class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
       Create Your Profile
     </h1>
-    <div class="flex flex-col justify-center px-2 gap-6  mt-10 text-white md:flex-row md:justify-start " >
-      <div class="py-2 px-4 w-full md:w-[25%] text-center font-semibold bg-purple-500 shadow-2xl">
+
+    <!-- Buttons Section -->
+    <div class="flex flex-col justify-center px-2 gap-6 mt-10 text-white md:flex-row md:justify-start">
+      <button class="cta-button">
         Signup
-      </div>
-      <div class="py-2 w-full md:w-[25%] text-center font-semibold px-4 bg-purple-500 shadow-2xl">
+      </button>
+      <button class="cta-button">
         Login
-      </div>
-    </div>
+      </button>
     </div>
   </div>
-</div>
+          <!-- <div>
+            <h1
+              class="text-4xl md:text-6xl text-white text-center md:text-left font-bold"
+            >
+              Create Your Profile
+            </h1>
+            <div
+              class="flex flex-col justify-center px-2 gap-6 mt-10 text-white md:flex-row md:justify-start"
+            >
+              <div
+                class="py-2 px-4 w-full md:w-[25%] text-center font-semibold bg-purple-800 rounded-sm shadow-2xl"
+              >
+                Signup
+              </div>
+              <div
+                class="py-2 w-full md:w-[25%] text-center font-semibold px-4 bg-purple-800 rounded-sm shadow-2xl"
+              >
+                Login
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
       <!-- end of image galler   -->
       <!-- Chart  -->
       <section class="w-[70vw] mx-auto mt-10 2xl:mt-28">
@@ -432,20 +445,26 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import { Thumbs } from "swiper/modules";
 import { EffectCards } from "swiper/modules";
 import type { Swiper as SwiperInstance } from "swiper/types";
+import { Icon } from "@iconify/vue";
+
+import deezer from "@/assets/dezzer.svg";
+
+const isPlaying = ref(false);
+const videoUrl = "https://www.youtube.com/embed/NU9JoFKlaZ0?autoplay=1";
+const thumbnail = "https://img.youtube.com/vi/NU9JoFKlaZ0/maxresdefault.jpg"; // Replace with your thumbnail image
 
 //  mockups
 import videoMobilePage from "@/assets/mainbainwithvideo.png";
 import streamLinksPage from "@/assets/mainbainwithvideo.png";
 import albumDeskPage from "@/assets/mainbainwithvideo.png";
-import socialDeskPage from "@/assets/mainbainwithvideo.png"; 
+import socialDeskPage from "@/assets/mainbainwithvideo.png";
 import bandDeskPage from "@/assets/dannydemo.png";
 import evnetsDesk from "@/assets/mainbainwithvideo.png";
 // import videoDesk from "@/assets/desktopvideogrid.png";
 
 import videoDesk from "@/assets/mainbandtwo.png";
 
-
-
+// social icon
 
 // Import Swiper styles
 import "swiper/css";
@@ -463,7 +482,13 @@ const slides = [
   // Add more slides as needed
 ];
 
-
+const streamingIcons = [
+  { name: "Spotify", icon: "mdi:spotify" },
+  { name: "Apple Music", icon: "mdi:apple" },
+  { name: "YouTube Music", icon: "mdi:youtube" },
+  { name: "SoundCloud", icon: "mdi:soundcloud" },
+  { name: "Amazon Music", icon: "mdi:amazon" },
+];
 
 // Define your reactive variables with types
 const thumbsSwiper = ref<SwiperInstance | null>(null);
@@ -855,6 +880,41 @@ const testimonials = [
 </script>
 
 <style scoped>
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+/* button s  */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 5s ease infinite;
+}
+
+/* Button Styles */
+.cta-button {
+  @apply py-3 px-6 w-full md:w-[25%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
+}
+
+.cta-button-full {
+  @apply py-3 px-6 w-full md:w-[100%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
+}
+
+
+.animate-scroll {
+  display: flex;
+  white-space: nowrap;
+  animation: scroll 15s linear infinite;
+}
 .custom-gradient {
   background: #a8ff78; /* fallback for old browsers */
   background: -webkit-linear-gradient(
