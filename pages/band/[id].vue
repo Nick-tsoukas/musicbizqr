@@ -53,7 +53,7 @@
           />
         </div>
       
-        <div v-if="band.data.attributes.singlevideo" class="mt-10">
+        <div v-if="band.data.attributes.singlevideo" class="my-16">
     <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
       Featured Video
     </h1>
@@ -190,7 +190,7 @@
           </div>
 
           <!-- Videos Section -->
-          <div v-if="videoItems.length" class="mt-10 mx-auto">
+          <div v-if="videoItems.length" class="my-16 mx-auto">
             <h1 class="text-2xl md:text-3xl font-bold text-white my-16">
               Videos
             </h1>
