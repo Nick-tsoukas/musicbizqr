@@ -147,7 +147,7 @@
       <!-- image gallery  -->
 
       <div
-        class="flex justify-center py-10 md:pb-32 image_gradient my-8 md:my-16"
+        class="flex justify-center pt-10 md:pb-32 image_gradient mt-8 md:mt-16"
       >
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
           <!-- heading  -->
@@ -174,7 +174,7 @@
                 :src="slide.image"
                 :srcset="slide.srcset"
                 alt="Main Image"
-                class="w-[90vw] md:w-full h-auto object-cover rounded-lg shadow-lg"
+                class="w-full md:w-[50vw] h-auto object-cover rounded-lg shadow-lg"
               />
             </SwiperSlide>
           </Swiper>
@@ -234,22 +234,22 @@
       </div> -->
 
       <div
-  class="relative w-full h-[70vh] bg-fixed bg-center bg-cover"
+  class="relative w-full h-[100vh] bg-fixed bg-center bg-cover"
   :style="`background-image: url(${aisix})`"
 >
   <!-- Overlay & Centered Text -->
   <div
-    class="absolute  inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+    class="absolute  inset-0 bg-black bg-opacity-50 flex items-center justify-center pl-0"
   >
     <div>
-      <h1 class="text-4xl md:text-6xl text-white font-bold">
+      <h1 class="text-4xl md:text-6xl text-white text-center md:text-left font-bold">
       Create Your Profile
     </h1>
-    <div class="flex gap-6  mt-10 text-white " >
-      <div class="py-2 px-4 w-[25%] text-center font-semibold bg-purple-500 shadow-2xl">
+    <div class="flex flex-col justify-center px-2 gap-6  mt-10 text-white md:flex-row md:justify-start " >
+      <div class="py-2 px-4 w-full md:w-[25%] text-center font-semibold bg-purple-500 shadow-2xl">
         Signup
       </div>
-      <div class="py-2 w-[25%] text-center font-semibold px-4 bg-purple-500 shadow-2xl">
+      <div class="py-2 w-full md:w-[25%] text-center font-semibold px-4 bg-purple-500 shadow-2xl">
         Login
       </div>
     </div>
@@ -431,13 +431,18 @@ import { EffectCards } from "swiper/modules";
 import type { Swiper as SwiperInstance } from "swiper/types";
 
 //  mockups
-import videoMobilePage from "@/assets/vidgrid.jpg";
-import streamLinksPage from "@/assets/socialpagedesktopnew.png";
-import albumDeskPage from "@/assets/newalbumpagedesktop.png"; // Replace with your actual image file
-import socialDeskPage from "@/assets/socialpagedesktopnew.png"; // Thumbnail images
-import bandDeskPage from "@/assets/newbandpageimage.png";
-import evnetsDesk from "@/assets/eventsdesk.png"; // Thumbnail images
-import videoDesk from "@/assets/desktopvideogrid.png";
+import videoMobilePage from "@/assets/screenbandmain.png";
+import streamLinksPage from "@/assets/screenbandmain.png";
+import albumDeskPage from "@/assets/screenbandmain.png";
+import socialDeskPage from "@/assets/screenbandmain.png"; 
+import bandDeskPage from "@/assets/dannydemo.png";
+import evnetsDesk from "@/assets/screenbandmain.png";
+// import videoDesk from "@/assets/desktopvideogrid.png";
+
+import videoDesk from "@/assets/mainbandtwo.png";
+
+
+
 
 // Import Swiper styles
 import "swiper/css";
@@ -449,11 +454,13 @@ const slides = [
   { image: videoDesk, thumbnail: streamLinksPage },
   { image: evnetsDesk, thumbnail: streamLinksPage },
   { image: streamLinksPage, thumbnail: streamLinksPage },
-  { image: albumDeskPage, thumbnail: streamLinksPage },
-  { image: socialDeskPage, thumbnail: streamLinksPage },
+  // { image: albumDeskPage, thumbnail: streamLinksPage },
+  // { image: socialDeskPage, thumbnail: streamLinksPage },
 
   // Add more slides as needed
 ];
+
+
 
 // Define your reactive variables with types
 const thumbsSwiper = ref<SwiperInstance | null>(null);
@@ -683,30 +690,30 @@ const options = {
   ],
 };
 
-function selectPage(i, page) {
-  if (page == "Artist Page") {
-    // somevaluie is set to bandmobilescreen.png
-    imageToRender.value = bandScreen;
-  }
-  if (page == "Music Player") {
-    // change image to Music Player screenshot and get url
-    imageToRender.value = albumScreen;
-  }
-  if (page == "Streaming Links") {
-    // change image to Streaming screenshot and get url
-    imageToRender.value = streamScreen;
-  }
-  if (page == "Social Media Links") {
-    imageToRender.value = socialScreen;
-  }
-  if (page == "Website Url") {
-    imageToRender.value = bandScreen;
-  }
-  if (page == "Video Grid") {
-    imageToRender.value = videoScreen;
-  }
-  selectedPage.value = i;
-}
+// function selectPage(i, page) {
+//   if (page == "Artist Page") {
+//     // somevaluie is set to bandmobilescreen.png
+//     imageToRender.value = bandScreen;
+//   }
+//   if (page == "Music Player") {
+//     // change image to Music Player screenshot and get url
+//     imageToRender.value = albumScreen;
+//   }
+//   if (page == "Streaming Links") {
+//     // change image to Streaming screenshot and get url
+//     imageToRender.value = streamScreen;
+//   }
+//   if (page == "Social Media Links") {
+//     imageToRender.value = socialScreen;
+//   }
+//   if (page == "Website Url") {
+//     imageToRender.value = bandScreen;
+//   }
+//   if (page == "Video Grid") {
+//     imageToRender.value = videoScreen;
+//   }
+//   selectedPage.value = i;
+// }
 
 function getRandomColor() {
   const letters = "0123456789ABCDEF";
