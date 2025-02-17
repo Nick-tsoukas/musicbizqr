@@ -231,7 +231,7 @@
 
       <!-- end of image galler   -->
       <!-- Chart  -->
-      <!-- <section class="w-[70vw] mx-auto mb-44">
+       <section class="w-[70vw] mx-auto mb-44">
         <h2
           class="text-4xl md:text-4xl lg:text-6xl mb-14 text-center font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
         >
@@ -244,7 +244,8 @@
           elevate your marketing strategies.
         </p>
        
-      </section> -->
+      </section> 
+      <BarChart class="mb-24" />
       <!-- cta   -->
       <div
         class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
