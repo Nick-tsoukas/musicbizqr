@@ -230,7 +230,7 @@
 
       <!-- end of image galler   -->
       <!-- Chart  -->
-      <section class="w-[70vw] mx-auto mb-44">
+      <!-- <section class="w-[70vw] mx-auto mb-44">
         <h2
           class="text-4xl md:text-4xl lg:text-6xl mb-14 text-center font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
         >
@@ -243,7 +243,7 @@
           elevate your marketing strategies.
         </p>
        
-      </section>
+      </section> -->
       <!-- cta   -->
       <div
         class="relative min-w-screen min-h-[100vh] bg-fixed bg-center bg-cover"
