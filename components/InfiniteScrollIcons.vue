@@ -52,9 +52,18 @@ const icons = [
   }
 }
 
+/* Default (Desktop) */
 .animate-scroll {
   display: flex;
   white-space: nowrap;
   animation: scroll 15s linear infinite;
 }
+
+/* Faster Speed on Mobile */
+@media (max-width: 768px) {
+  .animate-scroll {
+    animation-duration: 8s; /* Reduce duration for faster effect */
+  }
+}
+
 </style>

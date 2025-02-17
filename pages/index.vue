@@ -4,10 +4,7 @@
     <!-- Main content -->
     <main>
       <!-- Hero section -->
-      <!-- <NuxtParticles
-          id="tsparticles"
-          :options="options"
-        /> -->
+    
       <div class="relative isolate min-h-[50vh]">
         <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
           <div
@@ -20,7 +17,7 @@
               Music Biz Qr
             </h1>
             <div
-              data-aos="fade-left"
+          
               class="flex justify-center mb-12 2xl:hidden"
             >
               <img
@@ -250,7 +247,7 @@
       </section> -->
       <!-- cta   -->
       <div
-        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.jpg')]"
+        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')]"
       >
         <!-- Dark Overlay -->
         <div
