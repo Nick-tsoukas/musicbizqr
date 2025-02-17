@@ -309,6 +309,7 @@
       </section>
       <!-- cta   -->
       <div
+      ref="parallaxRef"
         class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
       >
         <!-- Dark Overlay -->
@@ -489,6 +490,9 @@ import { Icon } from "@iconify/vue";
 import deezer from "@/assets/dezzer.svg";
 
 const parallaxBg = ref(null);
+
+
+
 
 const handleScroll = () => {
   const scrollPosition = window.scrollY;
