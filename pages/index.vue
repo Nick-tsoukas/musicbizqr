@@ -4,7 +4,7 @@
     <!-- Main content -->
     <main>
       <!-- Hero section -->
-    
+
       <div class="relative isolate min-h-[50vh]">
         <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
           <div
@@ -16,10 +16,7 @@
             >
               Music Biz Qr
             </h1>
-            <div
-          
-              class="flex justify-center mb-12 2xl:hidden"
-            >
+            <div class="flex justify-center mb-12 2xl:hidden">
               <img
                 src="@/assets/qrcode.png"
                 alt=""
@@ -129,7 +126,7 @@
       <section
         class="relative min-h-screen items-center justify-center pt-24 image_gradient"
       >
-        <div class="flex flex-col items-center md:flex-row ">
+        <div class="flex flex-col items-center md:flex-row">
           <!-- Left Side: Spotify Embed -->
           <div class="w-full mb-16 md:mb-0 md:w-1/2 flex justify-center">
             <iframe
@@ -154,7 +151,9 @@
         </div>
         <!-- Full-Width Icons at Bottom -->
         <div class="left-0 w-auto">
-          <div class="flex items-center px-6 md:px-0 py-20 justify-around space-x-6">
+          <div
+            class="flex items-center px-6 md:px-0 py-20 justify-around space-x-6"
+          >
             <Icon
               v-for="icon in streamingIcons"
               :key="icon.name"
@@ -231,7 +230,7 @@
 
       <!-- end of image galler   -->
       <!-- Chart  -->
-       <section class="w-[70vw] mx-auto mb-44">
+      <section class="w-[70vw] mx-auto mb-44">
         <h2
           class="text-4xl md:text-4xl lg:text-6xl mb-14 text-center font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
         >
@@ -243,69 +242,78 @@
           visualization and tracking technologies to boost user engagement and
           elevate your marketing strategies.
         </p>
-       
-      </section> 
+      </section>
       <BarChart class="mb-24" />
 
       <!-- pricing  -->
       <section class="py-20 bg-black text-white">
-    <div class="max-w-7xl mx-auto text-center">
-      <h2 class="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500">
-        Choose Your Plan
-      </h2>
-      <p class="text-lg text-gray-400 mt-4">Simple, transparent pricing.</p>
-    </div>
+        <div class="max-w-7xl mx-auto text-center">
+          <h2
+            class="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
+          >
+            Choose Your Plan
+          </h2>
+          <p class="text-lg text-gray-400 mt-4">Simple, transparent pricing.</p>
+        </div>
 
-    <div class="grid gap-8 mt-12 max-w-6xl mx-auto grid-cols-1 md:grid-cols-3">
-      <!-- Starter Plan -->
-      <div class="pricing-card">
-        <h3 class="text-2xl font-bold">Starter</h3>
-        <p class="text-gray-300">For individuals</p>
-        <p class="text-4xl font-extrabold mt-6">$9<span class="text-lg">/mo</span></p>
-        <ul class="pricing-features">
-          <li>✔ Basic analytics</li>
-          <li>✔ 10 QR Codes</li>
-          <li>✔ Custom Branding</li>
-        </ul>
-        <button class="pricing-button">Get Started</button>
-      </div>
+        <div
+          class="grid gap-8 mt-12 max-w-6xl mx-auto grid-cols-1 md:grid-cols-3"
+        >
+          <!-- Starter Plan -->
+          <div class="pricing-card">
+            <h3 class="text-2xl font-bold">Starter</h3>
+            <p class="text-gray-300">For individuals</p>
+            <p class="text-4xl font-extrabold mt-6">
+              $9<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ Basic analytics</li>
+              <li>✔ 10 QR Codes</li>
+              <li>✔ Custom Branding</li>
+            </ul>
+            <button class="pricing-button">Get Started</button>
+          </div>
 
-      <!-- Pro Plan -->
-      <div class="pricing-card premium">
-        <h3 class="text-2xl font-bold">Pro</h3>
-        <p class="text-gray-300">For small teams</p>
-        <p class="text-4xl font-extrabold mt-6">$29<span class="text-lg">/mo</span></p>
-        <ul class="pricing-features">
-          <li>✔ Advanced analytics</li>
-          <li>✔ Unlimited QR Codes</li>
-          <li>✔ Custom Branding & Themes</li>
-          <li>✔ API Access</li>
-        </ul>
-        <button class="pricing-button">Upgrade</button>
-      </div>
+          <!-- Pro Plan -->
+          <div class="pricing-card premium">
+            <h3 class="text-2xl font-bold">Pro</h3>
+            <p class="text-gray-300">For small teams</p>
+            <p class="text-4xl font-extrabold mt-6">
+              $29<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ Advanced analytics</li>
+              <li>✔ Unlimited QR Codes</li>
+              <li>✔ Custom Branding & Themes</li>
+              <li>✔ API Access</li>
+            </ul>
+            <button class="pricing-button">Upgrade</button>
+          </div>
 
-      <!-- Premium Plan -->
-      <div class="pricing-card">
-        <h3 class="text-2xl font-bold">Premium</h3>
-        <p class="text-gray-300">For enterprises</p>
-        <p class="text-4xl font-extrabold mt-6">$59<span class="text-lg">/mo</span></p>
-        <ul class="pricing-features">
-          <li>✔ All Pro Features</li>
-          <li>✔ Custom Integrations</li>
-          <li>✔ Dedicated Support</li>
-          <li>✔ White Labeling</li>
-        </ul>
-        <button class="pricing-button">Get Premium</button>
-      </div>
-    </div>
-  </section>
+          <!-- Premium Plan -->
+          <div class="pricing-card">
+            <h3 class="text-2xl font-bold">Premium</h3>
+            <p class="text-gray-300">For enterprises</p>
+            <p class="text-4xl font-extrabold mt-6">
+              $59<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ All Pro Features</li>
+              <li>✔ Custom Integrations</li>
+              <li>✔ Dedicated Support</li>
+              <li>✔ White Labeling</li>
+            </ul>
+            <button class="pricing-button">Get Premium</button>
+          </div>
+        </div>
+      </section>
       <!-- cta   -->
       <div
-        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
+        class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
       >
         <!-- Dark Overlay -->
         <div
-          class="absolute inset-0 bg-black/50 flex items-center justify-center"
+          class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
         >
           <div class="text-center md:text-left">
             <!-- Animated Text -->
@@ -314,13 +322,13 @@
             >
               Create Your Profile
             </h1>
-
             <!-- Buttons Section -->
             <div
-              class="flex  w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
+              class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
             >
-              <button class="cta-button-no w-auto mx-auto">Sign Up For A Free Trial</button>
-              <!-- <button class="cta-button">Login</button> -->
+              <button class="cta-button-no w-auto mx-auto">
+                Sign Up For A Free Trial
+              </button>
             </div>
           </div>
         </div>
@@ -488,7 +496,6 @@ const handleScroll = () => {
     parallaxBg.value.style.transform = `translateY(${scrollPosition * 0.4}px)`;
   }
 };
-
 
 const isPlaying = ref(false);
 const videoUrl = "https://www.youtube.com/embed/NU9JoFKlaZ0?autoplay=1";
@@ -926,7 +933,6 @@ const testimonials = [
 </script>
 
 <style scoped>
-
 #tsparticles {
   z-index: -1;
 }
