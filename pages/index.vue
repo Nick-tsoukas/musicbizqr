@@ -115,10 +115,10 @@
       <section
         class="min-h-screen flex flex-col items-center justify-center my-28"
       >
-        <h2 class="text-white text-left mt-20 text-5xl font-bold mx-20">
+        <h2 class="text-white text-left mt-20 text-5xl font-bold mx-2 md:mx-20">
           Add All Your Social Links
         </h2>
-        <p class="text-white text-left text-lg mx-20">Engage you followers</p>
+        <p class="text-white text-left text-lg nx-2 md:mx-20">Engage you followers</p>
 
         <div class="min-h-[300px] mb-10 flex items-center justify-center">
           <InfiniteScrollIcons />
@@ -242,7 +242,7 @@
           visualization and tracking technologies to boost user engagement and
           elevate your marketing strategies.
         </p>
-        <BarChart class="mx-auto" />
+       
       </section>
       <!-- cta   -->
       <div
@@ -442,15 +442,15 @@ const videoUrl = "https://www.youtube.com/embed/NU9JoFKlaZ0?autoplay=1";
 const thumbnail = "https://img.youtube.com/vi/NU9JoFKlaZ0/maxresdefault.jpg"; // Replace with your thumbnail image
 
 //  mockups
-import videoMobilePage from "@/assets/mainbainwithvideo.png";
-import streamLinksPage from "@/assets/mainbainwithvideo.png";
-import albumDeskPage from "@/assets/mainbainwithvideo.png";
-import socialDeskPage from "@/assets/mainbainwithvideo.png";
+import videoMobilePage from "@/assets/mainbainwithvideo.webp";
+import streamLinksPage from "@/assets/mainbainwithvideo.webp";
+import albumDeskPage from "@/assets/mainbainwithvideo.webp";
+import socialDeskPage from "@/assets/mainbainwithvideo.webp";
 import bandDeskPage from "@/assets/dannydemo.png";
-import evnetsDesk from "@/assets/mainbainwithvideo.png";
+import evnetsDesk from "@/assets/mainbainwithvideo.webp";
 // import videoDesk from "@/assets/desktopvideogrid.png";
 
-import videoDesk from "@/assets/mainbandtwo.png";
+import videoDesk from "@/assets/mainbandtwo.webp";
 
 // social icon
 
@@ -500,7 +500,7 @@ import streamScreen from "@/assets/laststreampage.jpg";
 import socialScreen from "@/assets/socialnewpage.jpg";
 import externalScreen from "@/assets/newbandhome.jpg";
 import videoScreen from "@/assets/vidgrid.jpg";
-import aisix from "@/assets/aisix.png";
+import aisix from "@/assets/aisix.webp";
 
 import { defineComponent, h } from "vue";
 import {
