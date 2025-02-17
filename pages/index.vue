@@ -246,31 +246,32 @@
        
       </section> -->
       <!-- cta   -->
-      <div
-        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
-      >
-        <!-- Dark Overlay -->
-        <div
-          class="absolute inset-0 bg-black/50 flex items-center justify-center"
-        >
-          <div class="text-center md:text-left">
-            <!-- Animated Text -->
-            <h1
-              class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
-            >
-              Create Your Profile
-            </h1>
+      <div class="relative min-h-screen">
+    <!-- ✅ Parallax Background -->
+    <div
+      ref="parallaxBg"
+      class="absolute top-0 left-0 w-full h-full bg-cover bg-center z-[-1]"
+      style="background-image: url('/assets/aisix.webp');"
+    ></div>
 
-            <!-- Buttons Section -->
-            <div
-              class="flex flex-col md:flex-row justify-center md:justify-start px-2 gap-6 mt-10 text-white"
-            >
-              <button class="cta-button">Signup</button>
-              <button class="cta-button">Login</button>
-            </div>
-          </div>
+    <!-- ✅ Dark Overlay -->
+    <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+      <div class="text-center md:text-left">
+        <!-- Animated Text -->
+        <h1
+          class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+        >
+          Create Your Profile
+        </h1>
+
+        <!-- Buttons -->
+        <div class="flex flex-col md:flex-row justify-center md:justify-start px-2 gap-6 mt-10 text-white">
+          <button class="cta-button">Signup</button>
+          <button class="cta-button">Login</button>
         </div>
       </div>
+    </div>
+  </div>
 
       <!-- Pricing section -->
       <!-- <div class="isolate">
@@ -425,6 +426,16 @@ import type { Swiper as SwiperInstance } from "swiper/types";
 import { Icon } from "@iconify/vue";
 
 import deezer from "@/assets/dezzer.svg";
+
+const parallaxBg = ref(null);
+
+const handleScroll = () => {
+  const scrollPosition = window.scrollY;
+  if (parallaxBg.value) {
+    parallaxBg.value.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+  }
+};
+
 
 const isPlaying = ref(false);
 const videoUrl = "https://www.youtube.com/embed/NU9JoFKlaZ0?autoplay=1";
@@ -742,6 +753,11 @@ function animateColors() {
 
 onMounted(() => {
   animateColors();
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
 });
 
 const primaryFeatures = [
@@ -857,6 +873,13 @@ const testimonials = [
 </script>
 
 <style scoped>
+
+
+/* ✅ Prevent elements from blocking the background */
+.relative {
+  position: relative;
+  z-index: 2;
+}
 @keyframes scroll {
   from {
     transform: translateX(0);
