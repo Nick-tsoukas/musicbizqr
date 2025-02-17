@@ -172,10 +172,10 @@
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
               <h2 class="text-white font-bold text-5xl mb-4">
-                Watch Our Latest Music Video
+                Embed Your Latest Video
               </h2>
               <p class="text-white text-lg mb-10 md:mb-0">
-                Experience the visuals of our latest release
+                Elevate your profile with interactive embedded videos that showcase your latest releases and creative vision.
               </p>
             </div>
 
@@ -230,20 +230,25 @@
 
       <!-- end of image galler   -->
       <!-- Chart  -->
-      <section class="w-[70vw] mx-auto mb-44">
-        <h2
-          class="text-4xl md:text-4xl lg:text-6xl mb-14 text-center font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
-        >
-          Advanced Analytics
-        </h2>
-        <p class="text-white text-lg lg:text-2xl mb-14 text-center">
-          Enhance your campaign ROI with our comprehensive analytics, turning QR
-          code scans into actionable insights. Leverage state-of-the-art data
-          visualization and tracking technologies to boost user engagement and
-          elevate your marketing strategies.
-        </p>
+      <section class="w-[100vw] mx-auto mb-44">
+        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
+          <div class="container mx-auto text-center px-4">
+            <h2
+              class="text-4xl md:text-4xl lg:text-6xl mb-14 text-center font-extrabold text-white"
+            >
+              Advanced Analytics
+            </h2>
+            <p class="text-white text-lg lg:text-2xl mb-14 text-center">
+              Enhance your campaign ROI with our comprehensive analytics,
+              turning QR code scans into actionable insights. Leverage
+              state-of-the-art data visualization and tracking technologies to
+              boost user engagement and elevate your marketing strategies.
+            </p>
+            <BarChart class="mb-24" />
+
+          </div>
+        </section>
       </section>
-      <BarChart class="mb-24" />
 
       <!-- pricing  -->
       <section class="py-20 bg-black text-white">
@@ -309,7 +314,7 @@
       </section>
       <!-- cta   -->
       <div
-      ref="parallaxRef"
+        ref="parallaxRef"
         class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
       >
         <!-- Dark Overlay -->
@@ -489,11 +494,7 @@ import { Icon } from "@iconify/vue";
 
 import deezer from "@/assets/dezzer.svg";
 
-
 const parallaxBg = ref(null);
-
-
-
 
 const handleScroll = () => {
   const scrollPosition = window.scrollY;

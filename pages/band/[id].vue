@@ -10,14 +10,17 @@
       />
       <!-- Optional overlay -->
       <div class="absolute inset-0 bg-black bg-opacity-0"></div>
-     
     </div>
 
     <!-- Band Name Below the Image -->
-    <div v-if="band.data.attributes.isBandNameInLogo === false" class="text-center text-white text-4xl font-bold mt-4">
+    <div
+      v-if="band.data.attributes.isBandNameInLogo === false"
+      class="text-center text-white text-4xl font-bold mt-4"
+    >
       {{ band.data.attributes.name }}
     </div>
 
+    <!-- <pre class="text-white" >{{ band }}</pre> -->
 
     <div class="flex justify-center">
       <div class="flex flex-col">
@@ -47,12 +50,29 @@
           <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
             Featured Song
           </h1>
-          <AudioPlayer
-            :album="formatSingleSong(band.data.attributes.singlesong)"
-            :placeholderImage="'/placeholder-image.svg'"
-          />
+          <!-- If the singlesong is marked as embedded and has an embedUrl, render the embed -->
+          <div
+            v-if="
+              band.data.attributes.singlesong.isEmbeded &&
+              band.data.attributes.singlesong.embedUrl
+            "
+          >
+            <iframe
+              :src="band.data.attributes.singlesong.embedUrl"
+              frameborder="0"
+              allowfullscreen
+              class="w-full h-64 rounded-lg"
+            ></iframe>
+          </div>
+          <!-- Otherwise, render the AudioPlayer component -->
+          <div v-else>
+            <AudioPlayer
+              :album="formatSingleSong(band.data.attributes.singlesong)"
+              :placeholderImage="'/placeholder-image.svg'"
+            />
+          </div>
         </div>
-      
+
         <div v-if="band.data.attributes.singlevideo" class="my-16">
           <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
             Featured Video
@@ -60,7 +80,11 @@
 
           <div class="relative w-full max-w-[600px] mr-auto">
             <!-- Video Thumbnail & Play Button -->
-            <div v-if="!isVideoPlaying" class="relative cursor-pointer" @click="playVideo">
+            <div
+              v-if="!isVideoPlaying"
+              class="relative cursor-pointer"
+              @click="playVideo"
+            >
               <img
                 :src="singleVideoThumbnail"
                 alt="Video Thumbnail"
@@ -83,7 +107,11 @@
 
             <!-- YouTube Player (Loads on Click) -->
             <div v-else class="relative w-full max-h-[300px] my-6">
-              <YouTube :src="singleVideoId" :vars="playerOptions" class="w-full h-full rounded-lg" />
+              <YouTube
+                :src="singleVideoId"
+                :vars="playerOptions"
+                class="w-full h-full rounded-lg"
+              />
             </div>
           </div>
         </div>
@@ -231,7 +259,9 @@
                         alt="Video Thumbnail"
                         class="absolute top-0 left-0 w-full h-full object-cover rounded-md"
                       />
-                      <div class="absolute inset-0 flex items-center justify-center">
+                      <div
+                        class="absolute inset-0 flex items-center justify-center"
+                      >
                         <svg
                           class="w-16 h-16 text-white opacity-75"
                           xmlns="http://www.w3.org/2000/svg"
@@ -261,12 +291,21 @@
             <h1 class="text-2xl mb-4 md:text-3xl font-bold text-white">
               Streaming Links
             </h1>
-            <template v-for="platform in streamingPlatforms" :key="platform.name">
+            <template
+              v-for="platform in streamingPlatforms"
+              :key="platform.name"
+            >
               <span v-if="band.data.attributes[platform.name]">
                 <!-- Added click handler to track outbound clicks -->
                 <a
                   :href="band.data.attributes[platform.name]"
-                  @click.prevent="handleClick(band.data.id, platform.name, band.data.attributes[platform.name])"
+                  @click.prevent="
+                    handleClick(
+                      band.data.id,
+                      platform.name,
+                      band.data.attributes[platform.name]
+                    )
+                  "
                 >
                   <button
                     class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
@@ -293,7 +332,13 @@
                 <!-- Added click handler to track outbound clicks -->
                 <a
                   :href="band.data.attributes[platform.name]"
-                  @click.prevent="handleClick(band.data.id, platform.name, band.data.attributes[platform.name])"
+                  @click.prevent="
+                    handleClick(
+                      band.data.id,
+                      platform.name,
+                      band.data.attributes[platform.name]
+                    )
+                  "
                 >
                   <button
                     class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
@@ -364,7 +409,9 @@
 
           <!-- Tours Section -->
           <div v-if="tours.length" class="mt-10 mx-auto mb-10">
-            <h1 class="text-2xl sm:text-2xl md:text-3xl font-bold text-white my-16">
+            <h1
+              class="text-2xl sm:text-2xl md:text-3xl font-bold text-white my-16"
+            >
               Tours
             </h1>
             <div class="flex overflow-x-scroll space-x-4 pb-4 no-scrollbar">
@@ -408,7 +455,7 @@ import YouTube from "vue3-youtube";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Thumbs } from "swiper/modules";
 import { EffectCards } from "swiper/modules";
-import scrollDownVideo from '@/assets/scrolldown.webm';
+import scrollDownVideo from "@/assets/scrolldown.webm";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
@@ -455,7 +502,9 @@ const singleVideoId = computed(() => {
   return videoData?.youtubeid ? extractYouTubeId(videoData.youtubeid) : "";
 });
 const singleVideoThumbnail = computed(() => {
-  return singleVideoId.value ? `https://img.youtube.com/vi/${singleVideoId.value}/hqdefault.jpg` : "";
+  return singleVideoId.value
+    ? `https://img.youtube.com/vi/${singleVideoId.value}/hqdefault.jpg`
+    : "";
 });
 const playerOptions = {
   autoplay: 1,
@@ -583,7 +632,9 @@ const formatSingleSong = (song) => {
   return {
     id: song.id,
     attributes: {
-      title: song.title,
+      isEmbeded: song.isEmbeded || false,
+      title: song.title || "Unknown Title",
+      embedUrl: song.embedUrl || "",
       file: {
         data: {
           attributes: {
@@ -597,6 +648,7 @@ const formatSingleSong = (song) => {
     },
   };
 };
+
 onMounted(async () => {
   document.body.classList.add("custom-page-body");
   await fetchBandData();

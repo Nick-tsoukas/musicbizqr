@@ -83,9 +83,7 @@
                 v-model="websitelinktext"
                 placeholder="YourBandSiteLinkText.com"
               />
-              <label class="mdc-floating-label" for="websitelinktext"
-                >Website Link Text To Show</label
-              >
+              <label class="mdc-floating-label" for="websitelinktext">Website Link Text To Show</label>
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
@@ -104,9 +102,9 @@
             @change="handleImageUpload"
             accept="image/*"
           />
-          <label for="band-img" class="styled-file-label w-full text-center"
-            >Choose Band Image</label
-          >
+          <label for="band-img" class="styled-file-label w-full text-center">
+            Choose Band Image
+          </label>
           <div v-if="bandImgUrl" class="mb-4">
             <img
               :src="bandImgUrl"
@@ -135,9 +133,9 @@
                   v-model="member.name"
                   placeholder=" "
                 />
-                <label class="mdc-floating-label" :for="'member-name-' + index"
-                  >Member Name</label
-                >
+                <label class="mdc-floating-label" :for="'member-name-' + index">
+                  Member Name
+                </label>
                 <div class="mdc-line-ripple"></div>
               </div>
               <div class="mdc-text-field mb-4">
@@ -148,9 +146,9 @@
                   v-model="member.instrument"
                   placeholder=" "
                 />
-                <label class="mdc-floating-label" :for="'instrument-' + index"
-                  >Instrument</label
-                >
+                <label class="mdc-floating-label" :for="'instrument-' + index">
+                  Instrument
+                </label>
                 <div class="mdc-line-ripple"></div>
               </div>
               <div class="mb-4">
@@ -164,8 +162,9 @@
                 <label
                   :for="'member-img-' + index"
                   class="styled-file-label w-full text-center"
-                  >Choose Member Image</label
                 >
+                  Choose Member Image
+                </label>
               </div>
               <div v-if="member.imageUrl" class="mb-4">
                 <img
@@ -258,7 +257,7 @@
               <label class="mdc-floating-label" for="whatsapp">WhatsApp</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <!-- TikTok (fixed spelling) -->
+            <!-- TikTok -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -300,9 +299,7 @@
                 v-model="appleMusic"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="appleMusic"
-                >Apple Music</label
-              >
+              <label class="mdc-floating-label" for="appleMusic">Apple Music</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- Spotify -->
@@ -326,9 +323,7 @@
                 v-model="soundcloud"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="soundcloud"
-                >SoundCloud</label
-              >
+              <label class="mdc-floating-label" for="soundcloud">SoundCloud</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- YouTube -->
@@ -343,7 +338,7 @@
               <label class="mdc-floating-label" for="youtube">YouTube</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <!-- Deezer (fixed spelling) -->
+            <!-- Deezer -->
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -370,12 +365,23 @@
           </div>
         </div>
 
-        <!-- Single Song Section (Media File + Title) -->
+        <!-- Single Song Section (Embed or Upload) -->
         <div class="bg-[#fff] rounded-md">
           <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
             <h2 class="font-semibold text-white text-2xl">Single Song</h2>
           </div>
           <div class="p-4">
+            <!-- Toggle: Upload File vs. Embed Content -->
+            <div class="flex space-x-4 mb-4">
+              <label class="text-black">
+                <input type="radio" value="upload" v-model="singlesongType" class="mr-1" />
+                Upload File
+              </label>
+              <label class="text-black">
+                <input type="radio" value="embed" v-model="singlesongType" class="mr-1" />
+                Embed Content
+              </label>
+            </div>
             <div class="mdc-text-field mb-4">
               <input
                 type="text"
@@ -384,54 +390,41 @@
                 v-model="singlesongTitle"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="singlesong-title"
-                >Song Title</label
-              >
+              <label class="mdc-floating-label" for="singlesong-title">Song Title</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <input
-              type="file"
-              id="singlesong-file"
-              class="styled-file-input"
-              @change="handleSingleSongUpload"
-              accept="audio/*"
-            />
-            <label
-              for="singlesong-file"
-              class="styled-file-label w-full text-center"
-            >
-              Choose Single Song File
-            </label>
-            <div v-if="singlesongFileName" class="mt-4 text-white">
-              <p>Selected Song: {{ singlesongTitle || singlesongFileName }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Single Video Section (YouTube URL) -->
-        <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Single Video</h2>
-          </div>
-          <div class="p-4">
-            <div class="mdc-text-field mb-4">
+            <div v-if="singlesongType === 'upload'">
               <input
-                type="url"
-                id="singlevideo-youtube"
-                class="mdc-text-field__input"
-                v-model="singlevideoYoutubeUrl"
-                placeholder=" "
+                type="file"
+                id="singlesong-file"
+                class="styled-file-input"
+                @change="handleSingleSongUpload"
+                accept="audio/*"
               />
-              <label class="mdc-floating-label" for="singlevideo-youtube"
-                >YouTube URL</label
-              >
-              <div class="mdc-line-ripple"></div>
+              <label for="singlesong-file" class="styled-file-label w-full text-center">
+                Choose Single Song File
+              </label>
+              <div v-if="singlesongFileName" class="mt-4 text-white">
+                <p>Selected Song: {{ singlesongTitle || singlesongFileName }}</p>
+              </div>
+            </div>
+            <div v-else>
+              <div class="mdc-text-field mb-4">
+                <input
+                  type="url"
+                  id="singlesong-embed"
+                  class="mdc-text-field__input"
+                  v-model="singlesongEmbedUrl"
+                  placeholder=" "
+                />
+                <label class="mdc-floating-label" for="singlesong-embed">Embed URL</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Submit Button -->
         <button type="submit" class="mdc-button w-full mt-10">Create Profile</button>
       </form>
     </div>
@@ -439,6 +432,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
@@ -474,14 +468,14 @@ const instagram = ref("");
 const twitch = ref("");
 const twitter = ref("");
 const whatsapp = ref("");
-const tiktok = ref(""); // <--- Updated from tictok
+const tiktok = ref(""); // fixed spelling
 const snapchat = ref("");
 
 // Streaming
 const appleMusic = ref("");
 const spotify = ref("");
 const soundcloud = ref("");
-const deezer = ref(""); // <--- Updated from dezzer
+const deezer = ref(""); // fixed spelling
 const youtube = ref("");
 const bandcamp = ref("");
 
@@ -489,6 +483,8 @@ const bandcamp = ref("");
 const singlesongTitle = ref("");
 const singlesongFile = ref(null);
 const singlesongFileName = ref("");
+const singlesongType = ref("upload"); // "upload" or "embed"
+const singlesongEmbedUrl = ref("");
 
 // Single Video
 const singlevideoYoutubeUrl = ref("");
@@ -500,7 +496,7 @@ const handleImageUpload = (event) => {
   bandImgUrl.value = URL.createObjectURL(file);
 };
 
-// Handle single song
+// Handle single song file upload
 const handleSingleSongUpload = (event) => {
   const file = event.target.files[0];
   singlesongFile.value = file;
@@ -511,13 +507,11 @@ const handleSingleSongUpload = (event) => {
 const submitForm = async () => {
   try {
     loading.value = true;
-
     if (!bandName.value || !genre.value || !bio.value) {
       alert("Please fill in the required fields: name, genre, bio.");
       loading.value = false;
       return;
     }
-
     const form = {
       name: bandName.value,
       genre: genre.value,
@@ -527,12 +521,12 @@ const submitForm = async () => {
       twitch: twitch.value || null,
       twitter: twitter.value || null,
       whatsapp: whatsapp.value || null,
-      tiktok: tiktok.value || null, // Use tiktok
+      tiktok: tiktok.value || null,
       snapchat: snapchat.value || null,
       appleMusic: appleMusic.value || null,
       spotify: spotify.value || null,
       soundcloud: soundcloud.value || null,
-      deezer: deezer.value || null, // Use deezer
+      deezer: deezer.value || null,
       youtube: youtube.value || null,
       bandcamp: bandcamp.value || null,
       websitelink: websitelink.value || null,
@@ -542,12 +536,16 @@ const submitForm = async () => {
         name: member.name || "",
         instrument: member.instrument || "",
       })),
+      // Updated: conditionally include file upload or embed URL
       singlesong: {
         title: singlesongTitle.value || "",
-        song: null,
+        ...(singlesongType.value === "upload"
+            ? { song: singlesongFile.value }
+            : { embedUrl: singlesongEmbedUrl.value }
+        ),
       },
       singlevideo: {
-        title: singlesongTitle.value || "",
+        // title: singlesongTitle.value || "",
         youtubeid: singlevideoYoutubeUrl.value || "",
       },
     };
@@ -567,8 +565,8 @@ const submitForm = async () => {
       }
     });
 
-    // Single Song File
-    if (singlesongFile.value) {
+    // Single Song File if type is upload
+    if (singlesongType.value === "upload" && singlesongFile.value) {
       formData.append("files[singlesong][song]", singlesongFile.value);
     }
 
@@ -579,7 +577,6 @@ const submitForm = async () => {
       body: formData,
     });
 
-    // If there's a QR code we need to update with the band ID
     if (route.query.qrId) {
       await update("qrs", route.query.qrId, {
         band: bandData.id,
@@ -593,9 +590,28 @@ const submitForm = async () => {
     console.error("Error creating band profile:", error);
   }
 };
+
+// Fetch bands associated with the user
+onMounted(async () => {
+  try {
+    const response = await client("/bands", {
+      params: {
+        filters: {
+          users_permissions_user: {
+            id: user.value.id,
+          },
+        },
+        populate: ["users_permissions_user"],
+      },
+    });
+    bands.value = response.data;
+  } catch (error) {
+    console.error("Error fetching bands associated with the user:", error);
+  }
+});
 </script>
 
-<style>
+<style scoped>
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -742,8 +758,8 @@ const submitForm = async () => {
 }
 
 .spinner {
-  border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #6200ee; /* Blue */
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #6200ee;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -752,11 +768,7 @@ const submitForm = async () => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="player-container">
+   
     <!-- Now Playing Section -->
     <div class="now-playing">
       <img
@@ -107,7 +108,9 @@ const repeat = ref(false);
 
 // Computed: Song Data
 const songs = computed(() => {
+ 
   try {
+    console.log('why ', props.album)
     // If album has multiple songs
     if (props.album?.attributes?.songs) {
       const songsList = props.album.attributes.songs;
@@ -115,15 +118,18 @@ const songs = computed(() => {
     }
     // If album is just a single song
     if (props.album?.attributes) {
+      console.log('ffffffffffff', props.album)
       return [
-        {
-          id: props.album.id || Date.now(),
-          title: props.album.attributes.title || 'Unknown Title',
-          file: props.album.attributes.file,
-          song: props.album.attributes.song,
-          duration: props.album.attributes.duration || 0,
-          cover: props.album.attributes.cover,
-        },
+      {
+      id: props.album.id || Date.now(),
+      title: props.album.attributes.title || 'Unknown Title',
+      file: props.album.attributes.file,
+      song: props.album.attributes.song,
+      embedUrl: props.album.attributes.embedUrl || "",
+      isEmbeded: false,
+      duration: props.album.attributes.duration || 0,
+      cover: props.album.attributes.cover,
+    },
       ];
     }
     // Otherwise, no valid songs
