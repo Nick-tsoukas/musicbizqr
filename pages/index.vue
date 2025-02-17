@@ -927,7 +927,9 @@ const testimonials = [
 
 <style scoped>
 
-
+#tsparticles {
+  z-index: -1;
+}
 /* ✅ Prevent elements from blocking the background */
 .relative {
   position: relative;
