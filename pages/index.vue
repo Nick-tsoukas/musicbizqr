@@ -489,6 +489,7 @@ import { Icon } from "@iconify/vue";
 
 import deezer from "@/assets/dezzer.svg";
 
+
 const parallaxBg = ref(null);
 
 

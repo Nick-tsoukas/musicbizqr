@@ -1,17 +1,24 @@
 <template>
   <div class="bg-[#000]">
-    <div class="bg-white text-black">
-    </div>
+    <div class="bg-white text-black"></div>
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
 
       <!-- Scans Chart Section -->
-      <div v-if="!loading && scansPerMonth.labels.length" class="mb-6 border-2 border-white rounded-lg">
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8">
+      <div
+        v-if="!loading && scansPerMonth.labels.length"
+        class="mb-6 border-2 border-white rounded-lg"
+      >
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8"
+        >
           <h2 class="text-2xl text-white font-extrabold">Scans Over Time</h2>
         </div>
         <div class="px-6 py-6">
-          <ScansChart :labels="scansPerMonth.labels" :data="scansPerMonth.data" />
+          <ScansChart
+            :labels="scansPerMonth.labels"
+            :data="scansPerMonth.data"
+          />
         </div>
       </div>
 
@@ -19,30 +26,74 @@
       <div v-if="loading">
         <SkeletonLoader />
       </div>
-      <div v-else-if="qrItems.length" class="mb-6 border-2 border-white rounded-lg">
+      <div
+        v-else-if="qrItems.length"
+        class="mb-6 border-2 border-white rounded-lg"
+      >
         <!-- QR Codes List -->
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">QR Codes</h2>
-          <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            QR Codes
+          </h2>
+          <NuxtLink
+            to="/createqr"
+            class="mdc-button flex justify-between w-full md:w-[300px]"
+          >
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create QR
           </NuxtLink>
         </div>
         <ul class="px-6 py-6">
-          <li v-for="qr in qrItems" :key="qr.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
-            <img :src="qr.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+          <li
+            v-for="qr in qrItems"
+            :key="qr.id"
+            class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
+          >
+            <img
+              :src="qr.imageUrl"
+              alt=""
+              class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+            />
             <div class="flex-grow">
-              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ qr.title }}</span>
+              <span
+                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
+                >{{ qr.title }}</span
+              >
             </div>
             <div class="flex items-center gap-4">
               <p class="text-white">Scans: {{ qr.scans ? qr.scans : 0 }}</p>
-              <button @click="viewQr(qr.imageUrl)" class="text-blue-600 hover:text-blue-900">
-                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              <button
+                @click="viewQr(qr.imageUrl)"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                <img
+                  src="@/assets/view-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
-              <button @click="editItem(qr.id, 'editqr')" class="text-blue-600 hover:text-blue-900">
-                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              <button
+                @click="editItem(qr.id, 'editqr')"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                <img
+                  src="@/assets/edit-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
-              <button @click="deleteItem(qr.id, 'qr')" class="text-red-600 hover:text-red-800">
-                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              <button
+                @click="deleteItem(qr.id, 'qr')"
+                class="text-red-600 hover:text-red-800"
+              >
+                <img
+                  src="@/assets/delete-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </li>
@@ -50,14 +101,25 @@
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
         <!-- No QR Codes -->
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">QR Codes</h2>
-          <NuxtLink to="/createqr" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create QR
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            QR Codes
+          </h2>
+          <NuxtLink
+            to="/createqr"
+            class="mdc-button flex justify-between w-full md:w-[300px]"
+          >
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create QR
           </NuxtLink>
         </div>
         <div>
-          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First QR Code</h2>
+          <h2 class="text-center my-4 p-16 text-xl text-white">
+            Create Your First QR Code
+          </h2>
         </div>
       </div>
 
@@ -65,29 +127,85 @@
       <div v-if="loading">
         <SkeletonLoader />
       </div>
-      <div v-else-if="bandItems.length" class="mb-6 border-2 border-white rounded-lg">
+      <div
+        v-else-if="bandItems.length"
+        class="mb-6 border-2 border-white rounded-lg"
+      >
         <!-- Bands List -->
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
-          <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Artist Page
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            Bands
+          </h2>
+          <NuxtLink
+            to="/createband"
+            class="mdc-button flex justify-between w-full md:w-[300px]"
+          >
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create
+            Artist Page
           </NuxtLink>
         </div>
         <ul class="px-6 py-6">
-          <li v-for="band in bandItems" :key="band.id" class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row">
-            <img :src="band.imageUrl" alt="" class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4">
+          <li
+            v-for="band in bandItems"
+            :key="band.id"
+            class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
+          >
+            <img
+              :src="band.imageUrl"
+              alt=""
+              class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+            />
             <div class="flex-grow">
-              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ band.title }}</span>
+              <span
+                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
+                >{{ band.title }}</span
+              >
             </div>
             <div class="flex items-center gap-4">
-              <button @click="router.push(`/band/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              <button
+                @click="router.push(`/band/${band.id}`)"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                <img
+                  src="@/assets/view-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
-              <button @click="router.push(`/editband/${band.id}`)" class="text-blue-600 hover:text-blue-900">
-                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              <button
+                @click="router.push(`/editband/${band.id}`)"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                <img
+                  src="@/assets/edit-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
-              <button @click="deleteItem(band.id, 'band')" class="text-red-600 hover:text-red-800">
-                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+              <button
+                @click="deleteItem(band.id, 'band')"
+                class="text-red-600 hover:text-red-800"
+              >
+                <img
+                  src="@/assets/delete-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
+              </button>
+              <!-- NEW: Analytics Button -->
+              <button
+                @click="router.push(`/analytics/${band.id}`)"
+                class="text-green-600 hover:text-green-900"
+              >
+                <img
+                  src="@/assets/analytics-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </li>
@@ -95,14 +213,26 @@
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
         <!-- No Bands -->
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
-          <NuxtLink to="/createband" class="mdc-button flex justify-between w-full md:w-[300px]">
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="">Create Band
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            Bands
+          </h2>
+          <NuxtLink
+            to="/createband"
+            class="mdc-button flex justify-between w-full md:w-[300px]"
+          >
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create
+            Band
           </NuxtLink>
         </div>
         <div>
-          <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Band</h2>
+          <h2 class="text-center my-4 p-16 text-xl text-white">
+            Create Your First Band
+          </h2>
         </div>
       </div>
 
@@ -391,7 +521,10 @@
       >
         <div class="flex flex-col gap-4">
           <img :src="imageURL" class="max-h-[67vh]" alt="" />
-          <button @click="downloadImage" class="px-4 py-2 bg-blue-500 text-white rounded">
+          <button
+            @click="downloadImage"
+            class="px-4 py-2 bg-blue-500 text-white rounded"
+          >
             Download Image
           </button>
         </div>
@@ -404,8 +537,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-
+import { ref, computed, onMounted } from "vue";
 
 const user = useStrapiUser();
 const router = useRouter();
@@ -440,7 +572,7 @@ const fetchData = async () => {
         fetchVideos(),
       ]);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       loading.value = false;
     }
@@ -449,7 +581,7 @@ const fetchData = async () => {
 
 const fetchQrs = async () => {
   try {
-    const response = await find('qrs', {
+    const response = await find("qrs", {
       filters: {
         users_permissions_user: {
           id: {
@@ -457,11 +589,11 @@ const fetchQrs = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     qrs.value = response.data;
   } catch (error) {
-    console.error('Error fetching QR codes:', error);
+    console.error("Error fetching QR codes:", error);
   }
 };
 
@@ -476,7 +608,7 @@ const fetchScans = async () => {
     }
 
     // Fetch scans where qr.id is in qrIds
-    const response = await find('scans', {
+    const response = await find("scans", {
       filters: {
         qr: {
           id: {
@@ -487,11 +619,11 @@ const fetchScans = async () => {
       pagination: {
         pageSize: 1000, // Adjust as needed
       },
-      populate: '*',
+      populate: "*",
     });
     scans.value = response.data;
   } catch (error) {
-    console.error('Error fetching scans:', error);
+    console.error("Error fetching scans:", error);
   }
 };
 
@@ -504,7 +636,7 @@ const scansPerMonth = computed(() => {
     const date = new Date(dateStr);
 
     if (isNaN(date)) {
-      console.error('Invalid date:', dateStr);
+      console.error("Invalid date:", dateStr);
       return;
     }
 
@@ -520,8 +652,10 @@ const scansPerMonth = computed(() => {
   const data = [];
 
   sortedKeys.forEach((key) => {
-    const [year, month] = key.split('-');
-    const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+    const [year, month] = key.split("-");
+    const monthName = new Date(year, month).toLocaleString("default", {
+      month: "long",
+    });
     labels.push(`${monthName} ${year}`);
     data.push(counts[key]);
   });
@@ -533,8 +667,8 @@ const scansPerMonth = computed(() => {
 // ... (The rest of your fetch functions remain unchanged)
 const fetchBands = async () => {
   try {
-    console.log(user.value)
-    const response = await find('bands', {
+    console.log(user.value);
+    const response = await find("bands", {
       filters: {
         users_permissions_user: {
           id: {
@@ -542,17 +676,17 @@ const fetchBands = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     bands.value = response.data;
   } catch (error) {
-    console.error('Error fetching bands:', error);
+    console.error("Error fetching bands:", error);
   }
 };
 
 const fetchEvents = async () => {
   try {
-    const response = await find('events', {
+    const response = await find("events", {
       filters: {
         users_permissions_user: {
           id: {
@@ -560,17 +694,17 @@ const fetchEvents = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     events.value = response.data;
   } catch (error) {
-    console.error('Error fetching events:', error);
+    console.error("Error fetching events:", error);
   }
 };
 
 const fetchSocials = async () => {
   try {
-    const response = await find('socialpages', {
+    const response = await find("socialpages", {
       filters: {
         users_permissions_user: {
           id: {
@@ -578,17 +712,17 @@ const fetchSocials = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     socials.value = response.data;
   } catch (error) {
-    console.error('Error fetching social pages:', error);
+    console.error("Error fetching social pages:", error);
   }
 };
 
 const fetchTours = async () => {
   try {
-    const response = await find('tours', {
+    const response = await find("tours", {
       filters: {
         users_permissions_user: {
           id: {
@@ -596,17 +730,17 @@ const fetchTours = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     tours.value = response.data;
   } catch (error) {
-    console.error('Error fetching tours:', error);
+    console.error("Error fetching tours:", error);
   }
 };
 
 const fetchStreams = async () => {
   try {
-    const response = await find('streams', {
+    const response = await find("streams", {
       filters: {
         users_permissions_user: {
           id: {
@@ -614,16 +748,16 @@ const fetchStreams = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     streams.value = response.data;
   } catch (error) {
-    console.error('Error fetching streams:', error);
+    console.error("Error fetching streams:", error);
   }
 };
 const fetchVideos = async () => {
   try {
-    const response = await find('videos', {
+    const response = await find("videos", {
       filters: {
         users_permissions_users: {
           id: {
@@ -639,19 +773,17 @@ const fetchVideos = async () => {
     });
 
     videos.value = response.data;
-    console.log(response.data, 'Fetched videos data');
+    console.log(response.data, "Fetched videos data");
   } catch (error) {
-    console.error('Error fetching videos:', error);
+    console.error("Error fetching videos:", error);
   }
 };
 
 // videoItems Computed Property
 
-
-
 const fetchAlbums = async () => {
   try {
-    const response = await find('albums', {
+    const response = await find("albums", {
       filters: {
         users_permissions_user: {
           id: {
@@ -659,11 +791,11 @@ const fetchAlbums = async () => {
           },
         },
       },
-      populate: '*',
+      populate: "*",
     });
     albums.value = response.data;
   } catch (error) {
-    console.error('Error fetching albums:', error);
+    console.error("Error fetching albums:", error);
   }
 };
 // Delete Item Function
@@ -676,14 +808,16 @@ const deleteItem = async (id, type) => {
     loading.value = true;
 
     await client(`/${type}s/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
 
     await fetchData();
 
     loading.value = false;
 
-    alert(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully.`);
+    alert(
+      `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully.`
+    );
   } catch (error) {
     loading.value = false;
     console.error(`Error deleting ${type}:`, error);
@@ -691,7 +825,7 @@ const deleteItem = async (id, type) => {
   }
 };
 
-const imageURL = ref('');
+const imageURL = ref("");
 const qrView = ref(false);
 
 const viewQr = (img) => {
@@ -700,8 +834,8 @@ const viewQr = (img) => {
 };
 
 const downloadImage = () => {
-  const link = document.createElement('a');
-  link.download = 'downloaded-image.jpg';
+  const link = document.createElement("a");
+  link.download = "downloaded-image.jpg";
   link.href = imageURL.value;
   document.body.appendChild(link);
   link.click();
@@ -721,14 +855,15 @@ const qrItems = computed(() =>
   qrs.value.map((qr) => ({
     id: qr.id,
     title: qr.attributes.name,
-    imageUrl: qr.attributes.q_image?.data?.attributes?.url || '',
+    imageUrl: qr.attributes.q_image?.data?.attributes?.url || "",
     scans: qr.attributes.scans || 0, // Assuming scans are stored here
   }))
 );
 
 // Helper function to extract YouTube Video ID from a YouTube URL or ID string
 function extractYouTubeId(url) {
-  const regExp = /^.*(youtu.be\/|v\/|\/u\/\w\/|embed\/|watch\?v=|\&v=|youtube\.com\/v\/|youtube\.com\/embed\/|youtube\.com\/watch\?v=)([^#\&\?]*).*/;
+  const regExp =
+    /^.*(youtu.be\/|v\/|\/u\/\w\/|embed\/|watch\?v=|\&v=|youtube\.com\/v\/|youtube\.com\/embed\/|youtube\.com\/watch\?v=)([^#\&\?]*).*/;
   const match = url.match(regExp);
   return match && match[2].length === 11 ? match[2] : null;
 }
@@ -736,13 +871,13 @@ function extractYouTubeId(url) {
 const videoItems = computed(() =>
   videos.value.map((video) => ({
     id: video.id,
-    title: video.attributes.bandname || 'No Band Name',
-    bandlink: video.attributes.bandlink || '',
+    title: video.attributes.bandname || "No Band Name",
+    bandlink: video.attributes.bandlink || "",
 
     bandimgUrl:
       video.attributes.bandImg?.data?.attributes?.formats?.medium?.url ||
       video.attributes.bandImg?.data?.attributes?.url ||
-      '',
+      "",
 
     youtubeThumbnails:
       video.attributes.mediayoutube?.map((youtubeVideo) => {
@@ -751,7 +886,7 @@ const videoItems = computed(() =>
           videoId,
           thumbnailUrl: videoId
             ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-            : '',
+            : "",
         };
       }) || [],
   }))
@@ -761,7 +896,7 @@ const bandItems = computed(() =>
   bands.value.map((band) => ({
     id: band.id,
     title: band.attributes.name,
-    imageUrl: band.attributes.bandImg?.data?.attributes?.url || '',
+    imageUrl: band.attributes.bandImg?.data?.attributes?.url || "",
   }))
 );
 
@@ -769,7 +904,7 @@ const eventItems = computed(() =>
   events.value.map((event) => ({
     id: event.id,
     title: event.attributes.title,
-    imageUrl: event.attributes.image?.data?.attributes?.url || '',
+    imageUrl: event.attributes.image?.data?.attributes?.url || "",
   }))
 );
 
@@ -777,7 +912,7 @@ const tourItems = computed(() =>
   tours.value.map((tour) => ({
     id: tour.id,
     title: tour.attributes.title,
-    imageUrl: tour.attributes.image?.data?.attributes?.url || '',
+    imageUrl: tour.attributes.image?.data?.attributes?.url || "",
   }))
 );
 
@@ -785,7 +920,7 @@ const socialItems = computed(() =>
   socials.value.map((social) => ({
     id: social.id,
     title: social.attributes.title,
-    imageUrl: social.attributes.img?.data?.attributes?.url || '',
+    imageUrl: social.attributes.img?.data?.attributes?.url || "",
   }))
 );
 
@@ -793,7 +928,7 @@ const albumItems = computed(() =>
   albums.value.map((album) => ({
     id: album.id,
     title: album.attributes.title,
-    imageUrl: album.attributes.cover?.data?.attributes?.url || '',
+    imageUrl: album.attributes.cover?.data?.attributes?.url || "",
   }))
 );
 
@@ -801,7 +936,7 @@ const streamItems = computed(() =>
   streams.value.map((stream) => ({
     id: stream.id,
     title: stream.attributes.bandTitle,
-    imageUrl: stream.attributes.img?.data?.attributes?.url || '',
+    imageUrl: stream.attributes.img?.data?.attributes?.url || "",
   }))
 );
 </script>
