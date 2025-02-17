@@ -246,6 +246,59 @@
        
       </section> 
       <BarChart class="mb-24" />
+
+      <!-- pricing  -->
+      <section class="py-20 bg-black text-white">
+    <div class="max-w-7xl mx-auto text-center">
+      <h2 class="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500">
+        Choose Your Plan
+      </h2>
+      <p class="text-lg text-gray-400 mt-4">Simple, transparent pricing.</p>
+    </div>
+
+    <div class="grid gap-8 mt-12 max-w-6xl mx-auto grid-cols-1 md:grid-cols-3">
+      <!-- Starter Plan -->
+      <div class="pricing-card">
+        <h3 class="text-2xl font-bold">Starter</h3>
+        <p class="text-gray-300">For individuals</p>
+        <p class="text-4xl font-extrabold mt-6">$9<span class="text-lg">/mo</span></p>
+        <ul class="pricing-features">
+          <li>✔ Basic analytics</li>
+          <li>✔ 10 QR Codes</li>
+          <li>✔ Custom Branding</li>
+        </ul>
+        <button class="pricing-button">Get Started</button>
+      </div>
+
+      <!-- Pro Plan -->
+      <div class="pricing-card premium">
+        <h3 class="text-2xl font-bold">Pro</h3>
+        <p class="text-gray-300">For small teams</p>
+        <p class="text-4xl font-extrabold mt-6">$29<span class="text-lg">/mo</span></p>
+        <ul class="pricing-features">
+          <li>✔ Advanced analytics</li>
+          <li>✔ Unlimited QR Codes</li>
+          <li>✔ Custom Branding & Themes</li>
+          <li>✔ API Access</li>
+        </ul>
+        <button class="pricing-button">Upgrade</button>
+      </div>
+
+      <!-- Premium Plan -->
+      <div class="pricing-card">
+        <h3 class="text-2xl font-bold">Premium</h3>
+        <p class="text-gray-300">For enterprises</p>
+        <p class="text-4xl font-extrabold mt-6">$59<span class="text-lg">/mo</span></p>
+        <ul class="pricing-features">
+          <li>✔ All Pro Features</li>
+          <li>✔ Custom Integrations</li>
+          <li>✔ Dedicated Support</li>
+          <li>✔ White Labeling</li>
+        </ul>
+        <button class="pricing-button">Get Premium</button>
+      </div>
+    </div>
+  </section>
       <!-- cta   -->
       <div
         class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
@@ -264,10 +317,10 @@
 
             <!-- Buttons Section -->
             <div
-              class="flex flex-col md:flex-row justify-center md:justify-start px-2 gap-6 mt-10 text-white"
+              class="flex  w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
             >
-              <button class="cta-button">Signup</button>
-              <button class="cta-button">Login</button>
+              <button class="cta-button-no w-auto mx-auto">Sign Up For A Free Trial</button>
+              <!-- <button class="cta-button">Login</button> -->
             </div>
           </div>
         </div>
@@ -880,6 +933,26 @@ const testimonials = [
   position: relative;
   z-index: 2;
 }
+
+/* General Pricing Card Style */
+.pricing-card {
+  @apply bg-gray-900 border border-gray-800 rounded-lg p-8 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50;
+}
+
+/* Premium Plan Highlight */
+.premium {
+  @apply bg-gradient-to-br from-indigo-700 to-purple-700 border-purple-500 shadow-lg shadow-purple-500/50;
+}
+
+/* Pricing Features List */
+.pricing-features {
+  @apply mt-6 space-y-2 text-gray-300;
+}
+
+/* CTA Button */
+.pricing-button {
+  @apply mt-6 w-full py-3 px-6 text-lg font-semibold rounded-lg bg-indigo-600 hover:bg-purple-600 transition-all duration-300;
+}
 @keyframes scroll {
   from {
     transform: translateX(0);
@@ -913,6 +986,10 @@ const testimonials = [
 
 .cta-button-full {
   @apply py-3 px-6 w-full md:w-[100%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
+}
+
+.cta-button-no {
+  @apply py-3 px-6 text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
 }
 
 .animate-scroll {
