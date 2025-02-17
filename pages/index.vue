@@ -247,7 +247,7 @@
       </section> -->
       <!-- cta   -->
       <div
-        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')]"
+        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
       >
         <!-- Dark Overlay -->
         <div
