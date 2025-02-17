@@ -19,13 +19,15 @@
             >
               Music Biz Qr
             </h1>
-            <div data-aos="fade-left" class="flex justify-center mb-12 2xl:hidden" >
+            <div
+              data-aos="fade-left"
+              class="flex justify-center mb-12 2xl:hidden"
+            >
               <img
                 src="@/assets/qrcode.png"
                 alt=""
-                class="h-[225px] w-[225px] "
+                class="h-[225px] w-[225px]"
                 data-aos="fade-left"
-              
               />
             </div>
 
@@ -118,7 +120,9 @@
         <h2 class="text-white text-left mt-20 text-5xl font-bold mx-2 md:mx-20">
           Add All Your Social Links
         </h2>
-        <p class="text-white text-left text-lg nx-2 md:mx-20">Engage you followers</p>
+        <p class="text-white text-left text-lg nx-2 md:mx-20">
+          Engage you followers
+        </p>
 
         <div class="min-h-[300px] mb-10 flex items-center justify-center">
           <InfiniteScrollIcons />
@@ -141,7 +145,7 @@
           </div>
 
           <!-- Right Side: Music Player Mockup -->
-          <div  class="w-full md:w-1/2 flex flex-col justify-between px-6">
+          <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
               <h2 class="text-white font-bold text-5xl mb-4">
@@ -246,12 +250,11 @@
       </section> -->
       <!-- cta   -->
       <div
-        class="relative min-w-screen min-h-[100vh] bg-fixed bg-center bg-cover"
-        :style="`background-image: url(${aisix})`"
+        class="relative w-screen min-h-screen bg-fixed bg-center bg-cover bg-[url('/assets/aisix.jpg')]"
       >
-        <!-- Overlay & Centered Text -->
+        <!-- Dark Overlay -->
         <div
-          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center pl-0"
+          class="absolute inset-0 bg-black/50 flex items-center justify-center"
         >
           <div class="text-center md:text-left">
             <!-- Animated Text -->
@@ -263,7 +266,7 @@
 
             <!-- Buttons Section -->
             <div
-              class="flex flex-col justify-center px-2 gap-6 mt-10 text-white md:flex-row md:justify-start"
+              class="flex flex-col md:flex-row justify-center md:justify-start px-2 gap-6 mt-10 text-white"
             >
               <button class="cta-button">Signup</button>
               <button class="cta-button">Login</button>
@@ -271,7 +274,6 @@
           </div>
         </div>
       </div>
-   
 
       <!-- Pricing section -->
       <!-- <div class="isolate">
@@ -424,7 +426,6 @@ import { Thumbs } from "swiper/modules";
 import { EffectCards } from "swiper/modules";
 import type { Swiper as SwiperInstance } from "swiper/types";
 import { Icon } from "@iconify/vue";
-
 
 import deezer from "@/assets/dezzer.svg";
 
