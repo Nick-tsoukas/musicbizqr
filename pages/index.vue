@@ -129,9 +129,9 @@
       <section
         class="relative min-h-screen items-center justify-center pt-24 image_gradient"
       >
-        <div class="flex flex-col items-center md:flex-row">
+        <div class="flex flex-col items-center md:flex-row ">
           <!-- Left Side: Spotify Embed -->
-          <div class="w-full md:w-1/2 flex justify-center">
+          <div class="w-full mb-16 md:mb-0 md:w-1/2 flex justify-center">
             <iframe
               class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
               src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
@@ -154,7 +154,7 @@
         </div>
         <!-- Full-Width Icons at Bottom -->
         <div class="left-0 w-auto">
-          <div class="flex items-center py-20 justify-around space-x-6">
+          <div class="flex items-center px-6 md:px-0 py-20 justify-around space-x-6">
             <Icon
               v-for="icon in streamingIcons"
               :key="icon.name"
@@ -175,7 +175,7 @@
               <h2 class="text-white font-bold text-5xl mb-4">
                 Watch Our Latest Music Video
               </h2>
-              <p class="text-white text-lg">
+              <p class="text-white text-lg mb-10 md:mb-0">
                 Experience the visuals of our latest release
               </p>
             </div>
@@ -195,7 +195,7 @@
 
           <!-- Right Side: YouTube Video with Thumbnail -->
           <div class="w-full md:w-1/2 flex justify-center items-center">
-            <div class="relative w-[90%] md:w-[80%] max-w-xl">
+            <div class="relative w-[90%] mb-16 md:mb-0 md:w-[80%] max-w-xl">
               <!-- Thumbnail (Click to Play) -->
               <div
                 v-if="!isPlaying"
