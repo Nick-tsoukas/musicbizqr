@@ -76,43 +76,45 @@
         </div>
 
         <div class="relative w-full max-w-[600px] mr-auto">
-          <!-- Video Thumbnail & Play Button -->
-          <div
-            v-if="!isVideoPlaying"
-            class="relative cursor-pointer"
-            @click="playVideo"
-          >
-            <img
-              :src="singleVideoThumbnail"
-              alt="Video Thumbnail"
-              class="w-full max-h-[300px] object-cover rounded-lg"
-            />
-            <div
-              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
-            >
-              <svg
-                class="w-16 h-16 text-white opacity-75"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 84 84"
-              >
-                <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
-                <polygon points="33,24 33,60 60,42" fill="white" />
-              </svg>
-            </div>
-          </div>
+  <!-- Video Thumbnail & Play Button -->
+  <div
+    v-if="!isVideoPlaying"
+    class="relative cursor-pointer"
+    @click="playVideo" 
+  >
+    <img
+      :src="singleVideoThumbnail"
+      alt="Video Thumbnail"
+      class="w-full max-h-[300px] object-cover rounded-lg"
+    />
+    <div
+      class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+    >
+      <svg
+        class="w-16 h-16 text-white opacity-75"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 84 84"
+      >
+        <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+        <polygon points="33,24 33,60 60,42" fill="white" />
+      </svg>
+    </div>
+  </div>
 
-          <!-- YouTube Player (Loads on Click) -->
-          <div v-else class="relative pb-[56.25%] w-full">
-            <iframe
-              :src="singleVideoEmbedUrl"
-              frameborder="0"
-              allow="autoplay; encrypted-media"
-              allowfullscreen
-              class="absolute top-0 left-0 w-full h-full rounded-md"
-            ></iframe>
-          </div>
-        </div>
+  <!-- YouTube Player (Loads on Click) -->
+  <div v-else class="relative pb-[56.25%] w-full">
+    <iframe
+      :src="singleVideoEmbedUrl"
+      frameborder="0"
+      autoplay="1"
+      allow="autoplay; encrypted-media"
+      allowfullscreen
+      class="absolute top-0 left-0 w-full h-full rounded-md"
+    ></iframe>
+  </div>
+</div>
+
 
         <!-- website link  -->
         <div v-if="band.data.websitelink" class="mt-4">
@@ -573,7 +575,7 @@ const singleVideoEmbedUrl = computed(() => {
     console.log(match, )
     if (match) {
       const videoId = match[1];
-      return `https://www.youtube.com/embed/${videoId}`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
     }
   }
   return ''; // Return an empty string if no valid URL is found
