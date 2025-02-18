@@ -512,6 +512,9 @@ const submitForm = async () => {
       loading.value = false;
       return;
     }
+
+    const normalizedSingleSongEmbedUrl = normalizeStreamingUrl(singlesongEmbedUrl.value);
+    const normalizedSingleVideoUrl = normalizeStreamingUrl(singlevideoYoutubeUrl.value);
     const form = {
       name: bandName.value,
       genre: genre.value,
@@ -590,6 +593,77 @@ const submitForm = async () => {
     console.error("Error creating band profile:", error);
   }
 };
+
+const normalizeStreamingUrl = (url) => {
+  if (!url) return null;
+
+  // Trim the URL to avoid issues with extra spaces
+  url = url.trim();
+
+  // Spotify URL check
+  if (url.includes("spotify.com")) {
+    const match = url.match(/(?:spotify\.com\/(track|album|playlist)\/)([^?]+)/);
+    if (match) {
+      const [_, type, id] = match;
+      // Return Spotify embed URL for a track, album, or playlist
+      return `https://open.spotify.com/embed/${type}/${id}`;
+    }
+  }
+
+  // Apple Music URL check
+  if (url.includes("music.apple.com")) {
+    const match = url.match(/(?:music\.apple\.com\/[a-z]{2}\/album\/)([^?]+)/);
+    if (match) {
+      const id = match[1];
+      // Return Apple Music embed URL for an album
+      return `https://embed.music.apple.com/us/album/${id}`;
+    }
+  }
+
+  // YouTube URL check
+  if (url.includes("youtube.com")) {
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/))([^&?]+)/);
+    if (match) {
+      const videoId = match[1];
+      // Return YouTube embed URL for the video
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+  }
+
+  // SoundCloud URL check
+  if (url.includes("soundcloud.com")) {
+    const match = url.match(/(?:soundcloud\.com\/)([^?\/]+\/[^?\/]+)/);
+    if (match) {
+      const trackPath = match[1];
+      // Return SoundCloud embed URL for the track
+      return `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${trackPath}`;
+    }
+  }
+
+  // Deezer URL check
+  if (url.includes("deezer.com")) {
+    const match = url.match(/(?:deezer\.com\/[^?]+\/track\/)(\d+)/);
+    if (match) {
+      const trackId = match[1];
+      // Return Deezer embed URL for the track
+      return `https://www.deezer.com/widgets/player?trackid=${trackId}`;
+    }
+  }
+
+  // Bandcamp URL check
+  if (url.includes("bandcamp.com")) {
+    const match = url.match(/(?:bandcamp\.com\/track\/)([^?]+)/);
+    if (match) {
+      const trackId = match[1];
+      // Return Bandcamp embed URL for the track
+      return `https://bandcamp.com/EmbeddedPlayer/album=${trackId}`;
+    }
+  }
+
+  // Return null if the URL is invalid or unsupported
+  return null;
+};
+
 
 // Fetch bands associated with the user
 onMounted(async () => {
