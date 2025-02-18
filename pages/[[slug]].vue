@@ -3,7 +3,7 @@
     <!-- <pre class="text-white" >{{ band }}</pre> -->
     <!-- Hero Section -->
     <!-- Image Container -->
-   
+
     <div class="relative w-full h-[35vh] md:h-[60vh]">
       <img
         v-if="band.data.bandImg"
@@ -76,45 +76,48 @@
         </div>
 
         <div class="relative w-full max-w-[600px] mr-auto">
-  <!-- Video Thumbnail & Play Button -->
-  <div
-    v-if="!isVideoPlaying"
-    class="relative cursor-pointer"
-    @click="playVideo" 
-  >
-    <img
-      :src="singleVideoThumbnail"
-      alt="Video Thumbnail"
-      class="w-full max-h-[300px] object-cover rounded-lg"
-    />
-    <div
-      class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
-    >
-      <svg
-        class="w-16 h-16 text-white opacity-75"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 84 84"
-      >
-        <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
-        <polygon points="33,24 33,60 60,42" fill="white" />
-      </svg>
-    </div>
-  </div>
+         
+          <h1 :vif="band.singlevideo" class="text-2xl my-10 md:text-3xl font-bold text-white md:my-10">
+            Featured Video
+          </h1>
+          <!-- Video Thumbnail & Play Button -->
+          <div
+            v-if="!isVideoPlaying"
+            class="relative cursor-pointer mb-10"
+            @click="playVideo"
+          >
+            <img
+              :src="singleVideoThumbnail"
+              alt="Video Thumbnail"
+              class="w-full max-h-[300px] object-cover rounded-lg"
+            />
+            <div
+              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+            >
+              <svg
+                class="w-16 h-16 text-white opacity-75"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 84 84"
+              >
+                <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+                <polygon points="33,24 33,60 60,42" fill="white" />
+              </svg>
+            </div>
+          </div>
 
-  <!-- YouTube Player (Loads on Click) -->
-  <div v-else class="relative pb-[56.25%] w-full">
-    <iframe
-      :src="singleVideoEmbedUrl"
-      frameborder="0"
-      autoplay="1"
-      allow="autoplay; encrypted-media"
-      allowfullscreen
-      class="absolute top-0 left-0 w-full h-full rounded-md"
-    ></iframe>
-  </div>
-</div>
-
+          <!-- YouTube Player (Loads on Click) -->
+          <div v-else class="relative pb-[56.25%] w-full">
+            <iframe
+              :src="singleVideoEmbedUrl"
+              frameborder="0"
+              autoplay="1"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              class="absolute top-0 left-0 w-full h-full rounded-md"
+            ></iframe>
+          </div>
+        </div>
 
         <!-- website link  -->
         <div v-if="band.data.websitelink" class="mt-4">
@@ -467,45 +470,48 @@ import "swiper/css/effect-cards";
 //   if (embedMatch) {
 //     return embedMatch[1];
 //   }
-  
+
 //   // Check if URL is a watch URL (https://www.youtube.com/watch?v=...)
 //   const watchMatch = url.match(/[?&]v=([^&]+)/);
 //   if (watchMatch) {
 //     return watchMatch[1];
 //   }
-  
+
 //   return null; // Return null if the URL is not valid
 // };
 
 const generateThumbnailUrl = (videoId) => {
-  console.log('get video idfdssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss', videoId)
+  console.log(
+    "get video idfdssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+    videoId
+  );
   if (videoId) {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   }
-  return '';
+  return "";
 };
 
 const generateEmbedUrl = (videoId) => {
   if (videoId) {
     return `https://www.youtube.com/embed/${videoId}`;
   }
-  return '';
+  return "";
 };
 
 const handleVideoUrl = (inputUrl) => {
   const videoId = extractYouTubeId(inputUrl);
-   console.log('fsdfasdsadfsadfsadfsadfsadfsadfsadfkjsadkjfhasdlkfjhsad')
+  console.log("fsdfasdsadfsadfsadfsadfsadfsadfsadfkjsadkjfhasdlkfjhsad");
   if (!videoId) {
-    console.error('Invalid YouTube URL');
+    console.error("Invalid YouTube URL");
     return; // Handle invalid URL case (e.g., show an error message)
   }
-  
+
   const thumbnailUrl = generateThumbnailUrl(videoId);
   const embedUrl = generateEmbedUrl(videoId);
 
-  console.log('Video ID:', videoId);
-  console.log('Thumbnail URL:', thumbnailUrl);
-  console.log('Embed URL:', embedUrl);
+  console.log("Video ID:", videoId);
+  console.log("Thumbnail URL:", thumbnailUrl);
+  console.log("Embed URL:", embedUrl);
 
   return { thumbnailUrl, embedUrl };
 };
@@ -535,9 +541,9 @@ const truncatedBio = computed(() => {
   return bio.length > maxBioLength ? bio.slice(0, maxBioLength) + "..." : bio;
 });
 
-const videoUrl = ref('');
-const thumbnailUrl = ref('');
-const embedUrl = ref('');
+const videoUrl = ref("");
+const thumbnailUrl = ref("");
+const embedUrl = ref("");
 
 const processVideoUrl = () => {
   const { thumbnailUrl: tUrl, embedUrl: eUrl } = handleVideoUrl(videoUrl.value);
@@ -554,7 +560,10 @@ const isVideoPlaying = ref(false);
 function extractYouTubeId(url) {
   console.log("this is the url  ", url);
   const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
-  console.log(match ? match[1] : url, 'fdsfsddskljlkjsfadlkjhasdflkjhasdfkljhsdaflkhjhlfsadhkljsadfhkljsdfahkasdf')
+  console.log(
+    match ? match[1] : url,
+    "fdsfsddskljlkjsfadlkjhasdflkjhasdfkljhsdaflkhjhlfsadhkljsadfhkljsdfahkasdf"
+  );
   return match ? match[1] : url;
 }
 
@@ -572,13 +581,13 @@ const singleVideoEmbedUrl = computed(() => {
   const watchUrl = band.value?.data?.singlevideo?.youtubeid;
   if (watchUrl) {
     const match = watchUrl.match(/[?&]v=([^&]+)/);
-    console.log(match, )
+    console.log(match);
     if (match) {
       const videoId = match[1];
       return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
     }
   }
-  return ''; // Return an empty string if no valid URL is found
+  return ""; // Return an empty string if no valid URL is found
 });
 
 function convertToEmbedUrl(watchUrl) {
@@ -590,7 +599,10 @@ function convertToEmbedUrl(watchUrl) {
   return null; // If the URL is not valid or doesn't match the YouTube format
 }
 
-console.log(singleVideoThumbnail,' fdsfdslkfj;lakjfsadl;kjf;lasdkjfl;askj  ;lkjasdf;lkjasdf ;lkjsadfl;kj l;asdkjfdsa;lkj')
+console.log(
+  singleVideoThumbnail,
+  " fdsfdslkfj;lakjfsadl;kjf;lasdkjfl;askj  ;lkjasdf;lkjasdf ;lkjsadfl;kj l;asdkjfdsa;lkj"
+);
 const playerOptions = {
   autoplay: 1,
   rel: 0,
