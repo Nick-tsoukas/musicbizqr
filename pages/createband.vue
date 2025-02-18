@@ -8,7 +8,9 @@
       <form class="form-group" @submit.prevent="submitForm">
         <!-- Band Details Section -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-white text-2xl">Band Details</h2>
           </div>
           <div class="p-4">
@@ -22,7 +24,9 @@
                 placeholder=" "
                 required
               />
-              <label class="mdc-floating-label" for="band-name">Band Name</label>
+              <label class="mdc-floating-label" for="band-name"
+                >Band Name</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
 
@@ -57,8 +61,12 @@
 
         <!-- Website Link and Text -->
         <div class="bg-[#fff] rounded-md my-10">
-          <div class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-            <h2 class="font-semibold text-white text-2xl">Website Link and Text</h2>
+          <div
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">
+              Website Link and Text
+            </h2>
           </div>
           <div class="p-4">
             <!-- websitelink -->
@@ -70,7 +78,9 @@
                 v-model="websitelink"
                 placeholder="https://yourbandsite.com"
               />
-              <label class="mdc-floating-label" for="websitelink">Website Link</label>
+              <label class="mdc-floating-label" for="websitelink"
+                >Website Link</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
@@ -83,14 +93,18 @@
                 v-model="websitelinktext"
                 placeholder="YourBandSiteLinkText.com"
               />
-              <label class="mdc-floating-label" for="websitelinktext">Website Link Text To Show</label>
+              <label class="mdc-floating-label" for="websitelinktext"
+                >Website Link Text To Show</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
         </div>
 
         <!-- Band Image -->
-        <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+        <div
+          class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
@@ -116,7 +130,9 @@
 
         <!-- Band Members Section -->
         <div class="bg-white rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-white text-2xl">Band Members</h2>
           </div>
           <div class="p-4">
@@ -193,8 +209,12 @@
 
         <!-- Social Media Links Section -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
-            <h2 class="font-semibold text-white text-2xl">Social Media Links</h2>
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">
+              Social Media Links
+            </h2>
           </div>
           <div class="p-4">
             <!-- Facebook -->
@@ -218,7 +238,9 @@
                 v-model="instagram"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="instagram">Instagram</label>
+              <label class="mdc-floating-label" for="instagram"
+                >Instagram</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- Twitch -->
@@ -286,7 +308,9 @@
 
         <!-- Streaming Links Section -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-2xl text-white">Streaming Links</h2>
           </div>
           <div class="p-4">
@@ -299,7 +323,9 @@
                 v-model="appleMusic"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="appleMusic">Apple Music</label>
+              <label class="mdc-floating-label" for="appleMusic"
+                >Apple Music</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- Spotify -->
@@ -323,7 +349,9 @@
                 v-model="soundcloud"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="soundcloud">SoundCloud</label>
+              <label class="mdc-floating-label" for="soundcloud"
+                >SoundCloud</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- YouTube -->
@@ -366,19 +394,32 @@
         </div>
 
         <!-- Single Song Section (Embed or Upload) -->
+        <!-- Single Song Section (Embed or Upload) -->
         <div class="bg-[#fff] rounded-md">
-          <div class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
             <h2 class="font-semibold text-white text-2xl">Single Song</h2>
           </div>
           <div class="p-4">
             <!-- Toggle: Upload File vs. Embed Content -->
             <div class="flex space-x-4 mb-4">
               <label class="text-black">
-                <input type="radio" value="upload" v-model="singlesongType" class="mr-1" />
+                <input
+                  type="radio"
+                  value="upload"
+                  v-model="singlesongType"
+                  class="mr-1"
+                />
                 Upload File
               </label>
               <label class="text-black">
-                <input type="radio" value="embed" v-model="singlesongType" class="mr-1" />
+                <input
+                  type="radio"
+                  value="embed"
+                  v-model="singlesongType"
+                  class="mr-1"
+                />
                 Embed Content
               </label>
             </div>
@@ -390,7 +431,9 @@
                 v-model="singlesongTitle"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="singlesong-title">Song Title</label>
+              <label class="mdc-floating-label" for="singlesong-title"
+                >Song Title</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
             <div v-if="singlesongType === 'upload'">
@@ -401,11 +444,16 @@
                 @change="handleSingleSongUpload"
                 accept="audio/*"
               />
-              <label for="singlesong-file" class="styled-file-label w-full text-center">
+              <label
+                for="singlesong-file"
+                class="styled-file-label w-full text-center"
+              >
                 Choose Single Song File
               </label>
               <div v-if="singlesongFileName" class="mt-4 text-white">
-                <p>Selected Song: {{ singlesongTitle || singlesongFileName }}</p>
+                <p>
+                  Selected Song: {{ singlesongTitle || singlesongFileName }}
+                </p>
               </div>
             </div>
             <div v-else>
@@ -417,7 +465,9 @@
                   v-model="singlesongEmbedUrl"
                   placeholder=" "
                 />
-                <label class="mdc-floating-label" for="singlesong-embed">Embed URL</label>
+                <label class="mdc-floating-label" for="singlesong-embed"
+                  >Embed URL</label
+                >
                 <div class="mdc-line-ripple"></div>
               </div>
             </div>
@@ -425,14 +475,16 @@
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="mdc-button w-full mt-10">Create Profile</button>
+        <button type="submit" class="mdc-button w-full mt-10">
+          Create Profile
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
@@ -449,7 +501,9 @@ const websitelink = ref("");
 const websitelinktext = ref("");
 
 // Band Members
-const members = ref([{ name: "", instrument: "", image: null, imageUrl: null }]);
+const members = ref([
+  { name: "", instrument: "", image: null, imageUrl: null },
+]);
 const addMember = () => {
   members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
 };
@@ -480,10 +534,10 @@ const youtube = ref("");
 const bandcamp = ref("");
 
 // Single Song
+const singlesongType = ref("upload"); // "upload" or "embed"
 const singlesongTitle = ref("");
 const singlesongFile = ref(null);
 const singlesongFileName = ref("");
-const singlesongType = ref("upload"); // "upload" or "embed"
 const singlesongEmbedUrl = ref("");
 
 // Single Video
@@ -513,8 +567,12 @@ const submitForm = async () => {
       return;
     }
 
-    const normalizedSingleSongEmbedUrl = normalizeStreamingUrl(singlesongEmbedUrl.value);
-    const normalizedSingleVideoUrl = normalizeStreamingUrl(singlevideoYoutubeUrl.value);
+    const normalizedSingleSongEmbedUrl = normalizeStreamingUrl(
+      singlesongEmbedUrl.value
+    );
+    const normalizedSingleVideoUrl = normalizeStreamingUrl(
+      singlevideoYoutubeUrl.value
+    );
     const form = {
       name: bandName.value,
       genre: genre.value,
@@ -543,9 +601,8 @@ const submitForm = async () => {
       singlesong: {
         title: singlesongTitle.value || "",
         ...(singlesongType.value === "upload"
-            ? { song: singlesongFile.value }
-            : { embedUrl: singlesongEmbedUrl.value }
-        ),
+          ? { song: singlesongFile.value }
+          : { embedUrl: singlesongEmbedUrl.value }),
       },
       singlevideo: {
         // title: singlesongTitle.value || "",
@@ -597,15 +654,11 @@ const submitForm = async () => {
 const normalizeStreamingUrl = (url) => {
   if (!url) return null;
 
-  // Trim the URL to avoid issues with extra spaces
-  url = url.trim();
-
   // Spotify URL check
   if (url.includes("spotify.com")) {
     const match = url.match(/(?:spotify\.com\/(track|album|playlist)\/)([^?]+)/);
     if (match) {
       const [_, type, id] = match;
-      // Return Spotify embed URL for a track, album, or playlist
       return `https://open.spotify.com/embed/${type}/${id}`;
     }
   }
@@ -615,7 +668,6 @@ const normalizeStreamingUrl = (url) => {
     const match = url.match(/(?:music\.apple\.com\/[a-z]{2}\/album\/)([^?]+)/);
     if (match) {
       const id = match[1];
-      // Return Apple Music embed URL for an album
       return `https://embed.music.apple.com/us/album/${id}`;
     }
   }
@@ -625,7 +677,6 @@ const normalizeStreamingUrl = (url) => {
     const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/))([^&?]+)/);
     if (match) {
       const videoId = match[1];
-      // Return YouTube embed URL for the video
       return `https://www.youtube.com/embed/${videoId}`;
     }
   }
@@ -635,7 +686,6 @@ const normalizeStreamingUrl = (url) => {
     const match = url.match(/(?:soundcloud\.com\/)([^?\/]+\/[^?\/]+)/);
     if (match) {
       const trackPath = match[1];
-      // Return SoundCloud embed URL for the track
       return `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${trackPath}`;
     }
   }
@@ -645,25 +695,13 @@ const normalizeStreamingUrl = (url) => {
     const match = url.match(/(?:deezer\.com\/[^?]+\/track\/)(\d+)/);
     if (match) {
       const trackId = match[1];
-      // Return Deezer embed URL for the track
       return `https://www.deezer.com/widgets/player?trackid=${trackId}`;
-    }
-  }
-
-  // Bandcamp URL check
-  if (url.includes("bandcamp.com")) {
-    const match = url.match(/(?:bandcamp\.com\/track\/)([^?]+)/);
-    if (match) {
-      const trackId = match[1];
-      // Return Bandcamp embed URL for the track
-      return `https://bandcamp.com/EmbeddedPlayer/album=${trackId}`;
     }
   }
 
   // Return null if the URL is invalid or unsupported
   return null;
 };
-
 
 // Fetch bands associated with the user
 onMounted(async () => {
@@ -842,7 +880,11 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

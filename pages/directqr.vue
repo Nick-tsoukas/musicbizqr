@@ -75,21 +75,23 @@ onMounted(async () => {
 
       // Check the QR type and perform the appropriate redirection
       if (qType === 'bandProfile' && qr.attributes.band?.data) {
-        const bandId = qr.attributes.band.data.id;
-        console.log('Redirecting to band:', bandId);
-        router.push({ path: `/band/${bandId}` });
+        // Get the slug from the band's related data\
+        console.log(' qr.attributes.band.data.attributes.slug')
+        const bandSlug = qr.attributes.band.data.attributes.slug;
+        console.log('Redirecting to band:', bandSlug);
+        router.push({ path: `/${bandSlug}` });  // Redirect using band slug
       } else if (qType === 'events' && qr.attributes.event?.data) {
-        const eventId = qr.attributes.event.data.id;
-        console.log('Redirecting to event:', eventId);
-        router.push({ path: `/event/${eventId}` });
+        const eventSlug = qr.attributes.event.data.attributes.slug; // Get slug for event
+        console.log('Redirecting to event:', eventSlug);
+        router.push({ path: `/event/${eventSlug}` });
       } else if (qType === 'tours' && qr.attributes.tour?.data) {
-        const tourId = qr.attributes.tour.data.id;
-        console.log('Redirecting to tour:', tourId);
-        router.push({ path: `/tour/${tourId}` });
+        const tourSlug = qr.attributes.tour.data.attributes.slug; // Get slug for tour
+        console.log('Redirecting to tour:', tourSlug);
+        router.push({ path: `/tour/${tourSlug}` });
       } else if (qType === 'albums' && qr.attributes.album?.data) {
-        const albumId = qr.attributes.album.data.id;
-        console.log('Redirecting to album:', albumId);
-        router.push({ path: `/album/${albumId}` });
+        const albumSlug = qr.attributes.album.data.attributes.slug; // Get slug for album
+        console.log('Redirecting to album:', albumSlug);
+        router.push({ path: `/album/${albumSlug}` });
       } else if (qType === 'stream' && qr.attributes.stream?.data) {
         const streamId = qr.attributes.stream.data.id;
         console.log('Redirecting to stream link:', streamId);
@@ -122,7 +124,6 @@ onMounted(async () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
   z-index: 9999;
   display: flex;
   align-items: center;

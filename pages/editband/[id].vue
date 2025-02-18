@@ -4,6 +4,8 @@
       <div class="spinner"></div>
     </div>
 
+    <pre class="text-white">{{ band }}</pre>
+
     <div class="container-mdc bg-black max-w-5xl">
       <h1 class="title text-black">Edit Band</h1>
       <form @submit.prevent="submitEditBand" class="rounded-md p-4">
@@ -301,29 +303,51 @@
               <div class="mdc-line-ripple"></div>
             </div>
 
-            <!-- Song File Upload -->
-            <input
-              type="file"
-              id="edit-singlesong-file"
-              class="styled-file-input"
-              @change="handleSingleSongUpload"
-              accept="audio/*"
-            />
-            <label
-              for="edit-singlesong-file"
-              class="styled-file-label w-full text-center"
-              >Choose Single Song File</label
-            >
+            <!-- Toggle: Upload File vs Embed Content -->
+            <div class="flex space-x-4 mb-4">
+              <label class="text-black">
+                <input type="radio" value="upload" v-model="singlesongType" class="mr-1" />
+                Upload File
+              </label>
+              <label class="text-black">
+                <input type="radio" value="embed" v-model="singlesongType" class="mr-1" />
+                Embed Content
+              </label>
+            </div>
 
-            <!-- Show existing single song info if available -->
-            <div v-if="band.singlesong?.song && !isSingleSongFile" class="mt-4">
-              <p>
-                Current Song:
-                {{
-                  band.singlesong.song.data?.attributes.name ||
-                  band.singlesong.song.data?.attributes.url
-                }}
-              </p>
+            <!-- File Upload (Only visible when "Upload File" is selected) -->
+            <div v-if="singlesongType === 'upload'">
+              <input
+                type="file"
+                id="edit-singlesong-file"
+                class="styled-file-input"
+                @change="handleSingleSongUpload"
+                accept="audio/*"
+              />
+              <label for="edit-singlesong-file" class="styled-file-label w-full text-center">Choose Single Song File</label>
+
+              <!-- Show the currently uploaded song if no new file is selected -->
+              <div v-if="band.singlesong?.song && !isSingleSongFile" class="mt-4">
+                <p>
+                  Current Song:
+                  {{ band.singlesong.song.data?.name || band.singlesong.song.data?.url }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Embed URL (Only visible when "Embed Content" is selected) -->
+            <div v-else>
+              <div class="mdc-text-field mb-4">
+                <input
+                  type="url"
+                  id="edit-singlesong-embed"
+                  class="mdc-text-field__input"
+                  v-model="band.singlesong.embedUrl"
+                  placeholder=" "
+                />
+                <label class="mdc-floating-label" for="edit-singlesong-embed">Embed URL</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
             </div>
           </div>
 
@@ -389,13 +413,14 @@ const band = ref({
   singlesong: {
     title: "",
     song: null, // This can be an object from Strapi or a File
+    embedUrl: "", // For embed content
   },
   singlevideo: {
     youtubeid: "",
   },
 });
 
-// If user uploads a *new* single-song file
+const singlesongType = ref("upload"); // "upload" or "embed"
 const isSingleSongFile = ref(false);
 
 // ---------- UPLOAD HANDLERS ----------
@@ -409,7 +434,7 @@ const handleBandImageUpload = (e) => {
   }
 };
 
-// SingleSong file
+// Single Song file
 const handleSingleSongUpload = (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -419,46 +444,44 @@ const handleSingleSongUpload = (e) => {
 };
 
 // ---------- FETCH & FILL FORM ----------
+
 const fetchBand = async () => {
   const bandId = route.params.id;
   try {
     loading.value = true;
     const response = await findOne("bands", bandId, {
-      populate: ["bandImg", "singlesong.song", "singlevideo"],
+      populate: ["bandImg", "singlesong.song", "singlevideo"], // Ensuring related fields are populated
     });
     loading.value = false;
+    console.log(response.data, 'this is the data getting back ');
 
     if (response.data) {
-      const attributes = response.data.attributes;
       band.value = {
-        name: attributes.name,
-        genre: attributes.genre,
-        bio: attributes.bio,
-        // Band Img (as media object)
-        bandImg: attributes.bandImg ? attributes.bandImg.data : null,
-        imageUrl: attributes.bandImg
-          ? attributes.bandImg.data.attributes.url
-          : null,
-        facebook: attributes.facebook || "",
-        instagram: attributes.instagram || "",
-        twitch: attributes.twitch || "",
-        twitter: attributes.twitter || "",
-        whatsapp: attributes.whatsapp || "",
-        tiktok: attributes.tiktok || "",
-        snapchat: attributes.snapchat || "",
-        appleMusic: attributes.appleMusic || "",
-        spotify: attributes.spotify || "",
-        soundcloud: attributes.soundcloud || "",
-        youtube: attributes.youtube || "",
-        deezer: attributes.deezer || "",
-        bandcamp: attributes.bandcamp || "",
+        name: response.data.name || "",
+        genre: response.data.genre || "",
+        bio: response.data.bio || "",
+        bandImg: response.data.bandImg ? response.data.bandImg.data : null,
+        imageUrl: response.data.bandImg ? response.data.bandImg.data.attributes.url : null,
+        facebook: response.data.facebook || "",
+        instagram: response.data.instagram || "",
+        twitch: response.data.twitch || "",
+        twitter: response.data.twitter || "",
+        whatsapp: response.data.whatsapp || "",
+        tiktok: response.data.tiktok || "",
+        snapchat: response.data.snapchat || "",
+        appleMusic: response.data.appleMusic || "",
+        spotify: response.data.spotify || "",
+        soundcloud: response.data.soundcloud || "",
+        youtube: response.data.youtube || "",
+        deezer: response.data.deezer || "",
+        bandcamp: response.data.bandcamp || "",
         singlesong: {
-          title: attributes.singlesong?.title || "",
-          // If no new file is uploaded, we keep the old data
-          song: attributes.singlesong?.song || null,
+          title: response.data.singlesong?.title || "",
+          song: response.data.singlesong?.song || null,
+          embedUrl: response.data.singlesong?.embedUrl || "",
         },
         singlevideo: {
-          youtubeid: attributes.singlevideo?.youtubeid || "",
+          youtubeid: response.data.singlevideo?.youtubeid || "",
         },
       };
     }
@@ -471,6 +494,7 @@ const fetchBand = async () => {
 onMounted(fetchBand);
 
 // ---------- SUBMIT FORM ----------
+
 const submitEditBand = async () => {
   const bandId = route.params.id;
   try {
@@ -498,6 +522,7 @@ const submitEditBand = async () => {
 
       singlesong: {
         title: band.value.singlesong.title,
+        embedUrl: band.value.singlesong.embedUrl,
       },
       singlevideo: {
         youtubeid: band.value.singlevideo.youtubeid,
