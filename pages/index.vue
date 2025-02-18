@@ -28,14 +28,15 @@
             <ul
               class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6"
             >
-              <li>Create QR codes</li>
-              <li>Generate splash pages</li>
-              <li>Add audio players</li>
-              <li>Feature your content links</li>
-              <li>
+              <li>Create Artist QR codes</li>
+              <li>Generate Artist Splash Page For Streaming and Social Media</li>
+              <li>Enable Artist Featured Song Player</li>
+              <li>Enable Artist Featured Video Player</li>
+              <li>Create Ticket Purchase Links</li>
+              <!-- <li>
                 Connnect social media links, streaming services, and websites
-              </li>
-              <li>Analytic tracking</li>
+              </li> -->
+              <li>Track Artist Links Activity</li>
             </ul>
             <div
               class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6"
@@ -109,16 +110,18 @@
         </div>
       </div>
       <section
-        class="min-h-screen flex flex-col items-center justify-center my-28"
+        class="min-h-screen flex flex-col items-center justify-around my-6 md:my-28"
       >
-        <h2 class="text-white text-left mt-20 text-5xl font-bold mx-2 md:mx-20">
+       <div>
+        <h2 class="text-white text-left  text-4xl font-bold mx-2 md:mx-20">
           Add All Your Social Links
         </h2>
-        <p class="text-white text-left text-lg nx-2 md:mx-20">
+        <p class="text-white w-full pt-6 text-left text-lg px-2 mx-2 md:mx-20">
           Engage you followers
         </p>
+       </div>
 
-        <div class="min-h-[300px] mb-10 flex items-center justify-center">
+        <div class="  flex items-center justify-center">
           <InfiniteScrollIcons />
         </div>
       </section>
@@ -142,7 +145,7 @@
           <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white font-bold text-5xl mb-4">
+              <h2 class="text-white font-bold text-4xl mb-4">
                 Embed Music from your streaming platform
               </h2>
               <p class="text-white text-lg">Get More Listeners</p>
@@ -171,7 +174,7 @@
           <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white font-bold text-5xl mb-4">
+              <h2 class="text-white font-bold text-4xl mb-4">
                 Embed Your Latest Video
               </h2>
               <p class="text-white text-lg mb-10 md:mb-0">
@@ -244,7 +247,7 @@
               state-of-the-art data visualization and tracking technologies to
               boost user engagement and elevate your marketing strategies.
             </p>
-            <BarChart class="mb-24" />
+            <BarChart class="" />
 
           </div>
         </section>
@@ -321,7 +324,7 @@
         <div
           class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
         >
-          <div class="text-center md:text-left">
+          <div class="text-center h-full flex flex-col justify-center items-center md:text-left">
             <!-- Animated Text -->
             <h1
               class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"

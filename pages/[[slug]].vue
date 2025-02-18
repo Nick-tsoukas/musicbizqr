@@ -384,16 +384,16 @@
                     <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{
                         new Date(
-                          event.attributes.date ?? new Date()
+                          event.date ?? new Date()
                         ).toLocaleDateString()
                       }}
                     </td>
                     <td class="px-2 py-1 whitespace-nowrap text-left">
-                      {{ event.attributes.city ?? "City not specified" }},
-                      {{ event.attributes.state }}
+                      {{ event.city ?? "City not specified" }},
+                      {{ event.state }}
                     </td>
                     <td class="px-2 py-1 whitespace-nowrap text-left">
-                      {{ event.attributes.venue ?? "Venue not specified" }}
+                      {{ event.venue ?? "Venue not specified" }}
                     </td>
                     <td class="px-2 py-1 whitespace-nowrap text-left">
                       <button
@@ -498,11 +498,12 @@ const formattedBio = computed(() => {
 });
 const isVideoPlaying = ref(false);
 function extractYouTubeId(url) {
+  console.log('this is the url  ', url)
   const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   return match ? match[1] : url;
 }
 const singleVideoId = computed(() => {
-  const videoData = band.value?.data?.attributes?.singlevideo;
+  const videoData = band.value?.data?.singlevideo;
   return videoData?.youtubeid ? extractYouTubeId(videoData.youtubeid) : "";
 });
 const singleVideoThumbnail = computed(() => {
@@ -545,7 +546,7 @@ const fetchVideos = async () => {
       },
     });
     videoItems.value = response.data.map((videoData) => {
-      const thumbnails = videoData.attributes.mediayoutube.map(
+      const thumbnails = videoData.mediayoutube.map(
         (youtubeVideo) => {
           const thumbnailData = getYouTubeThumbnail(youtubeVideo);
           console.log("Extracted Video ID:", thumbnailData.videoId);
