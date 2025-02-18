@@ -105,7 +105,7 @@
           <!-- YouTube Player (Loads on Click) -->
           <div v-else class="relative pb-[56.25%] w-full">
             <iframe
-              :src="band.data.singlevideo.youtubeid"
+              :src="singleVideoEmbedUrl"
               frameborder="0"
               allow="autoplay; encrypted-media"
               allowfullscreen
@@ -459,6 +459,55 @@ import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
 
+// const extractYouTubeId = (url) => {
+//   // Check if URL is an embed URL (https://www.youtube.com/embed/...)
+//   const embedMatch = url.match(/youtube\.com\/embed\/([^?]+)/);
+//   if (embedMatch) {
+//     return embedMatch[1];
+//   }
+  
+//   // Check if URL is a watch URL (https://www.youtube.com/watch?v=...)
+//   const watchMatch = url.match(/[?&]v=([^&]+)/);
+//   if (watchMatch) {
+//     return watchMatch[1];
+//   }
+  
+//   return null; // Return null if the URL is not valid
+// };
+
+const generateThumbnailUrl = (videoId) => {
+  console.log('get video idfdssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss', videoId)
+  if (videoId) {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  }
+  return '';
+};
+
+const generateEmbedUrl = (videoId) => {
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return '';
+};
+
+const handleVideoUrl = (inputUrl) => {
+  const videoId = extractYouTubeId(inputUrl);
+   console.log('fsdfasdsadfsadfsadfsadfsadfsadfsadfkjsadkjfhasdlkfjhsad')
+  if (!videoId) {
+    console.error('Invalid YouTube URL');
+    return; // Handle invalid URL case (e.g., show an error message)
+  }
+  
+  const thumbnailUrl = generateThumbnailUrl(videoId);
+  const embedUrl = generateEmbedUrl(videoId);
+
+  console.log('Video ID:', videoId);
+  console.log('Thumbnail URL:', thumbnailUrl);
+  console.log('Embed URL:', embedUrl);
+
+  return { thumbnailUrl, embedUrl };
+};
+
 const { trackClick } = useBeacon(); // <-- Extract trackClick from composable
 const handleClick = (bandId, platform, destinationUrl) => {
   trackClick(bandId, platform, destinationUrl);
@@ -483,6 +532,16 @@ const truncatedBio = computed(() => {
   const bio = band.value?.data?.attributes?.bio || "";
   return bio.length > maxBioLength ? bio.slice(0, maxBioLength) + "..." : bio;
 });
+
+const videoUrl = ref('');
+const thumbnailUrl = ref('');
+const embedUrl = ref('');
+
+const processVideoUrl = () => {
+  const { thumbnailUrl: tUrl, embedUrl: eUrl } = handleVideoUrl(videoUrl.value);
+  thumbnailUrl.value = tUrl;
+  embedUrl.value = eUrl;
+};
 const toggleBio = () => {
   isExpanded.value = !isExpanded.value;
 };
@@ -493,8 +552,10 @@ const isVideoPlaying = ref(false);
 function extractYouTubeId(url) {
   console.log("this is the url  ", url);
   const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+  console.log(match ? match[1] : url, 'fdsfsddskljlkjsfadlkjhasdflkjhasdfkljhsdaflkhjhlfsadhkljsadfhkljsdfahkasdf')
   return match ? match[1] : url;
 }
+
 const singleVideoId = computed(() => {
   const videoData = band.value?.data?.singlevideo;
   return videoData?.youtubeid ? extractYouTubeId(videoData.youtubeid) : "";
@@ -504,6 +565,30 @@ const singleVideoThumbnail = computed(() => {
     ? `https://img.youtube.com/vi/${singleVideoId.value}/hqdefault.jpg`
     : "";
 });
+
+const singleVideoEmbedUrl = computed(() => {
+  const watchUrl = band.value?.data?.singlevideo?.youtubeid;
+  if (watchUrl) {
+    const match = watchUrl.match(/[?&]v=([^&]+)/);
+    console.log(match, )
+    if (match) {
+      const videoId = match[1];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+  }
+  return ''; // Return an empty string if no valid URL is found
+});
+
+function convertToEmbedUrl(watchUrl) {
+  const match = watchUrl.match(/[?&]v=([^&]+)/);
+  if (match) {
+    const videoId = match[1];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return null; // If the URL is not valid or doesn't match the YouTube format
+}
+
+console.log(singleVideoThumbnail,' fdsfdslkfj;lakjfsadl;kjf;lasdkjfl;askj  ;lkjasdf;lkjasdf ;lkjsadfl;kj l;asdkjfdsa;lkj')
 const playerOptions = {
   autoplay: 1,
   rel: 0,
