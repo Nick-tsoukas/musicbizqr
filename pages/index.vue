@@ -544,7 +544,6 @@ const streamingIcons = [
   { name: "Apple Music", icon: "mdi:apple" },
   { name: "YouTube Music", icon: "mdi:youtube" },
   { name: "SoundCloud", icon: "mdi:soundcloud" },
-  { name: "Amazon Music", icon: "mdi:amazon" },
 ];
 
 // Define your reactive variables with types
