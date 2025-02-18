@@ -3,6 +3,7 @@
     <!-- <pre class="text-white" >{{ band }}</pre> -->
     <!-- Hero Section -->
     <!-- Image Container -->
+   
     <div class="relative w-full h-[35vh] md:h-[60vh]">
       <img
         v-if="band.data.bandImg"
@@ -55,8 +56,7 @@
           <!-- If the singlesong is marked as embedded and has an embedUrl, render the embed -->
           <div
             v-if="
-              band.data.singlesong.isEmbeded &&
-              band.data.singlesong.embedUrl
+              band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl
             "
           >
             <iframe
@@ -75,46 +75,42 @@
           </div>
         </div>
 
-        <div v-if="band.data.singlevideo" class="my-16">
-          <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
-            Featured Video
-          </h1>
-
-          <div class="relative w-full max-w-[600px] mr-auto">
-            <!-- Video Thumbnail & Play Button -->
+        <div class="relative w-full max-w-[600px] mr-auto">
+          <!-- Video Thumbnail & Play Button -->
+          <div
+            v-if="!isVideoPlaying"
+            class="relative cursor-pointer"
+            @click="playVideo"
+          >
+            <img
+              :src="singleVideoThumbnail"
+              alt="Video Thumbnail"
+              class="w-full max-h-[300px] object-cover rounded-lg"
+            />
             <div
-              v-if="!isVideoPlaying"
-              class="relative cursor-pointer"
-              @click="playVideo"
+              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
             >
-              <img
-                :src="singleVideoThumbnail"
-                alt="Video Thumbnail"
-                class="w-full max-h-[300px] object-cover rounded-lg"
-              />
-              <div
-                class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+              <svg
+                class="w-16 h-16 text-white opacity-75"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 84 84"
               >
-                <svg
-                  class="w-16 h-16 text-white opacity-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 84 84"
-                >
-                  <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
-                  <polygon points="33,24 33,60 60,42" fill="white" />
-                </svg>
-              </div>
+                <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+                <polygon points="33,24 33,60 60,42" fill="white" />
+              </svg>
             </div>
+          </div>
 
-            <!-- YouTube Player (Loads on Click) -->
-            <div v-else class="relative w-full max-h-[300px] my-6">
-              <YouTube
-                :src="singleVideoId"
-                :vars="playerOptions"
-                class="w-full h-full rounded-lg"
-              />
-            </div>
+          <!-- YouTube Player (Loads on Click) -->
+          <div v-else class="relative pb-[56.25%] w-full">
+            <iframe
+              :src="band.data.singlevideo.youtubeid"
+              frameborder="0"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              class="absolute top-0 left-0 w-full h-full rounded-md"
+            ></iframe>
           </div>
         </div>
 
@@ -123,10 +119,7 @@
           <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:mt-6">
             Website Link
           </h1>
-          <a
-            class="text-purple-500 text-xl"
-            :href="band.data.websitelink"
-          >
+          <a class="text-purple-500 text-xl" :href="band.data.websitelink">
             <span :vif="band.data.websitelinktext">{{
               band.data.websitelinktext
             }}</span>
@@ -239,15 +232,19 @@
                     <!-- Display YouTube player when video is playing -->
                     <div
                       v-if="playingVideos[thumbnail.videoId]"
-                      class="relative aspect-video"
+                      class="relative w-full my-6"
                     >
-                      <YouTube
-                        :src="thumbnail.videoId"
-                        :width="640"
-                        :height="360"
-                        :vars="playerOptions"
-                        class="absolute top-0 left-0 w-full h-full rounded-md"
-                      />
+                      <!-- Wrapper to maintain aspect ratio -->
+                      <div class="relative w-[200px] h-[200px]">
+                        <!-- <iframe
+                        src="https://www.youtube.com/embed/v9gbo7_z0mc?si=KfeNevNqiYT92IZl"
+                          frameborder="0"
+                          allow="autoplay; encrypted-media"
+                          allowfullscreen
+                          style="width: 100%; height: 100%; border-radius: 8px"
+                          class="rounded-md"
+                        ></iframe> -->
+                      </div>
                     </div>
 
                     <!-- Display thumbnail and play button when video is not playing -->
@@ -383,9 +380,7 @@
                   >
                     <td class="px-2 py-1 whitespace-nowrap text-left">
                       {{
-                        new Date(
-                          event.date ?? new Date()
-                        ).toLocaleDateString()
+                        new Date(event.date ?? new Date()).toLocaleDateString()
                       }}
                     </td>
                     <td class="px-2 py-1 whitespace-nowrap text-left">
@@ -492,13 +487,11 @@ const toggleBio = () => {
   isExpanded.value = !isExpanded.value;
 };
 const formattedBio = computed(() => {
-  return band?.data?.attributes?.bio
-    ? band.data.bio.split(/\n+/)
-    : [];
+  return band?.data?.attributes?.bio ? band.data.bio.split(/\n+/) : [];
 });
 const isVideoPlaying = ref(false);
 function extractYouTubeId(url) {
-  console.log('this is the url  ', url)
+  console.log("this is the url  ", url);
   const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   return match ? match[1] : url;
 }
@@ -546,13 +539,11 @@ const fetchVideos = async () => {
       },
     });
     videoItems.value = response.data.map((videoData) => {
-      const thumbnails = videoData.mediayoutube.map(
-        (youtubeVideo) => {
-          const thumbnailData = getYouTubeThumbnail(youtubeVideo);
-          console.log("Extracted Video ID:", thumbnailData.videoId);
-          return thumbnailData;
-        }
-      );
+      const thumbnails = videoData.mediayoutube.map((youtubeVideo) => {
+        const thumbnailData = getYouTubeThumbnail(youtubeVideo);
+        console.log("Extracted Video ID:", thumbnailData.videoId);
+        return thumbnailData;
+      });
       return {
         id: videoData.id,
         title: videoData.attributes.bandname || "No Band Name",
@@ -583,7 +574,7 @@ const fetchBandData = async () => {
   );
 
   const data = await response.json();
-  
+
   if (response.status === 404) {
     console.error("Band not found for slug:", route.params.slug);
     band.value = null;
@@ -604,8 +595,6 @@ const fetchBandData = async () => {
     }
   }
 };
-
-
 
 const setAlbum = (id) => {
   const album = albums.value.find((album) => album.id === id);
@@ -669,7 +658,6 @@ const formatSingleSong = (song) => {
     },
   };
 };
-
 
 onMounted(async () => {
   document.body.classList.add("custom-page-body");
