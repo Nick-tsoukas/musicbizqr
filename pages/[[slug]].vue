@@ -450,6 +450,8 @@
 </template>
 
 <script setup>
+console.log("slug page triggered");
+
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon"; // <-- Added import for beacon tracking
@@ -562,32 +564,47 @@ const fetchVideos = async () => {
     console.error("Error fetching videos:", error);
   }
 };
+const slug = computed(() => route.params.slug || "default-slug"); // Debug
+console.log("Using Slug: fdsfsdfsdfsdfsdfsdfsdfsdfsdf", slug.value);
+console.log("Route params slug:", route.params.slug);
+
 const fetchBandData = async () => {
-  try {
-    const apiUrl = useRuntimeConfig().public.strapiUrl;
-    const response = await fetch(
-      `${apiUrl}/api/bands/${route.params.id}?` +
-        "populate[events][populate]=image&" +
-        "populate[tours][populate]=*&" +
-        "populate[albums][populate]=cover,songs.file&" +
-        "populate[singlesong][populate]=song&" + // ✅ Ensure this field is populated
-        "populate[singlesong][populate]=cover&" +
-        "populate[singlevideo]=*&" +
-        "populate=bandImg"
-    );
+  const apiUrl = useRuntimeConfig().public.strapiUrl;
+  const response = await fetch(
+    `${apiUrl}/api/bands/slug/${route.params.slug}?` + // ✅ Correct endpoint
+      "populate[events][populate]=image&" +
+      "populate[tours][populate]=*&" +
+      "populate[albums][populate]=cover,songs.file&" +
+      "populate[singlesong][populate][song]=*&" +
+      "populate[singlesong][populate][cover]=*&" +
+      "populate[singlevideo]=*&" +
+      "populate=bandImg"
+  );
 
-    const data = await response.json();
-    console.log("Fetched band data:", data);
+  const data = await response.json();
+  
+  if (response.status === 404) {
+    console.error("Band not found for slug:", route.params.slug);
+    band.value = null;
+    return;
+  }
 
-    if (data && data.data) {
-      band.value = data; // Assign data to band
-    } else {
-      console.error("No band data found.");
+  console.log("Fetched band data by slug:", data);
+
+  // ✅ Update data parsing to match the API response
+  if (data?.data) {
+    band.value = data;
+    albums.value = band.value?.data?.albums || [];
+    events.value = band.value?.data?.events || [];
+    tours.value = band.value?.data?.tours || [];
+
+    if (albums.value.length > 0) {
+      setAlbum(albums.value[0].id);
     }
-  } catch (error) {
-    console.error("Error fetching band data:", error);
   }
 };
+
+
 
 const setAlbum = (id) => {
   const album = albums.value.find((album) => album.id === id);

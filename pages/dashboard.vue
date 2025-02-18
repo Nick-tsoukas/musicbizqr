@@ -167,7 +167,7 @@
             </div>
             <div class="flex items-center gap-4">
               <button
-                @click="router.push(`/band/${band.id}`)"
+                @click="router.push(`/${band.slug}`)"
                 class="text-blue-600 hover:text-blue-900"
               >
                 <img
@@ -667,7 +667,6 @@ const scansPerMonth = computed(() => {
 // ... (The rest of your fetch functions remain unchanged)
 const fetchBands = async () => {
   try {
-    console.log(user.value);
     const response = await find("bands", {
       filters: {
         users_permissions_user: {
@@ -678,11 +677,21 @@ const fetchBands = async () => {
       },
       populate: "*",
     });
-    bands.value = response.data;
+    console.log('this is the fetch bands ', response.data)
+    if (response.data && Array.isArray(response.data)) {
+      bands.value = response.data; // Assign as array
+    } else {
+      bands.value = []; // Fallback to an empty array
+    }
+
+    console.log("Fetched bands:", bands.value);
   } catch (error) {
     console.error("Error fetching bands:", error);
+    bands.value = [];
   }
 };
+
+
 
 const fetchEvents = async () => {
   try {
@@ -893,12 +902,17 @@ const videoItems = computed(() =>
 );
 
 const bandItems = computed(() =>
-  bands.value.map((band) => ({
-    id: band.id,
-    title: band.attributes.name,
-    imageUrl: band.attributes.bandImg?.data?.attributes?.url || "",
-  }))
+  Array.isArray(bands.value)
+    ? bands.value.map((band) => ({
+        id: band.id,
+        title: band.name || "Untitled Band", // No 'attributes' field in response
+        slug: band.slug || "no-slug", // Handle missing slug
+        imageUrl: band.bandImg?.formats?.medium?.url || band.bandImg?.url || "", // Safely access image URL
+      }))
+    : [] // Prevent errors if bands.value is not an array
 );
+
+
 
 const eventItems = computed(() =>
   events.value.map((event) => ({

@@ -1,6 +1,6 @@
 <template>
   <div class="player-container">
-   
+   <!-- <pre class="text-white" >{{ props }}</pre> -->
     <!-- Now Playing Section -->
     <div class="now-playing">
       <img
