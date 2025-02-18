@@ -113,7 +113,7 @@
         class="min-h-screen flex flex-col items-center justify-around my-6 md:my-28"
       >
        <div>
-        <h2 class="text-white text-left  text-4xl font-bold mx-2 md:mx-20">
+        <h2 class="text-white text-left  text-4xl lg:text-6xl font-bold mx-2 md:mx-20">
           Add All Your Social Links
         </h2>
         <p class="text-white w-full pt-6 text-left text-lg px-2 mx-2 md:mx-20">
@@ -145,7 +145,7 @@
           <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white font-bold text-4xl mb-4">
+              <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
                 Embed Music from your streaming platform
               </h2>
               <p class="text-white text-lg">Get More Listeners</p>
@@ -174,7 +174,7 @@
           <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white font-bold text-4xl mb-4">
+              <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
                 Embed Your Latest Video
               </h2>
               <p class="text-white text-lg mb-10 md:mb-0">
