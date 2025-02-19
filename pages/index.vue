@@ -29,7 +29,9 @@
               class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6"
             >
               <li>Create Artist QR codes</li>
-              <li>Generate Artist Splash Page For Streaming and Social Media</li>
+              <li>
+                Generate Artist Splash Page For Streaming and Social Media
+              </li>
               <li>Enable Artist Featured Song Player</li>
               <li>Enable Artist Featured Video Player</li>
               <li>Create Ticket Purchase Links</li>
@@ -68,7 +70,7 @@
       <section
         class="text-center 2xl:text-left mb-10 mx-auto px-2 w-full lg:w-[90vw] lg:px-6 mt-0 lg:mb-10"
       >
-        <h2 class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0">
+        <!-- <h2 class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0">
           <span
             class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
             >Example Splash Pages</span
@@ -76,10 +78,15 @@
           <span
             class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 italic"
           ></span>
-        </h2>
+        </h2> -->
       </section>
 
-      <div class="flex justify-center image_gradient">
+      <div class="flex flex-col justify-center image_gradient">
+        <h2
+          class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0 pt-16 text-center"
+        >
+          Example Splash Pages
+        </h2>
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
           <!-- swiper with cards  -->
           <Swiper
@@ -110,28 +117,46 @@
         </div>
       </div>
       <section
-        class="min-h-screen flex flex-col items-center justify-around my-6 md:my-28"
+        class="min-h-screen flex flex-col items-center justify-between py-12 md:py-16 px-4"
       >
-       <div>
-        <h2 class="text-white text-left  text-4xl lg:text-6xl font-bold mx-2 md:mx-20">
-          Add All Your Social Links
-        </h2>
-        <p class="text-white w-full pt-6 text-left text-lg px-2 mx-2 md:mx-20">
-          Engage you followers
-        </p>
-       </div>
+        <!-- Text Section -->
+        <div class="max-w-4xl text-center md:text-center flex-grow">
+          <h2 class="text-white text-4xl lg:text-6xl font-bold mx-auto md:mx-0">
+            Add All Your Social Links
+          </h2>
+          <p class="text-white text-lg mt-6 md:mt-8 mx-auto md:mx-0">
+            Give your audience a single link to access all your socials
+            instantly. Whether it’s Instagram, TikTok, Spotify, or YouTube, keep
+            your fans connected with your latest updates, releases, and content.
+          </p>
+        </div>
 
-        <div class="  flex items-center justify-center">
+        <!-- Icons Section -->
+        <div
+          class="w-full flex items-center justify-center mt-auto pb-6 md:pb-12"
+        >
           <InfiniteScrollIcons />
         </div>
       </section>
+
       <!-- embed section -->
       <section
-        class="relative min-h-screen items-center justify-center pt-24 image_gradient"
+        class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient"
       >
-        <div class="flex flex-col items-center md:flex-row">
-          <!-- Left Side: Spotify Embed -->
-          <div class="w-full mb-16 md:mb-0 md:w-1/2 flex justify-center">
+        <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row" >
+            <!-- left Side: Music Player Mockup -->
+            <div class="w-full md:w-3/5 flex flex-col justify-between px-6">
+            <!-- Content Section -->
+            <div class="flex-grow flex flex-col justify-start">
+              <h2 class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl">
+                Embed Music from your streaming platform
+              </h2>
+              <p class="text-white text-lg text-center md:text-left pb-10 md:pb-0">Get More Listeners</p>
+            </div>
+          </div>
+
+          <!-- right Side: Spotify Embed -->
+          <div class="w-full mb-16 md:mb-0 md:w-2/5 flex justify-center" >
             <iframe
               class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
               src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
@@ -141,21 +166,12 @@
             ></iframe>
           </div>
 
-          <!-- Right Side: Music Player Mockup -->
-          <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
-            <!-- Content Section -->
-            <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
-                Embed Music from your streaming platform
-              </h2>
-              <p class="text-white text-lg">Get More Listeners</p>
-            </div>
-          </div>
+        
         </div>
         <!-- Full-Width Icons at Bottom -->
         <div class="left-0 w-auto">
           <div
-            class="flex items-center px-6 md:px-0 py-20 justify-around space-x-6"
+            class="flex items-center px-6 md:px-0 pb-10 md:py-20 justify-around space-x-6"
           >
             <Icon
               v-for="icon in streamingIcons"
@@ -167,77 +183,65 @@
         </div>
       </section>
 
+      
+
       <!-- video section  -->
-      <section class="min-h-screen flex items-center justify-center pt-24">
-        <div class="flex flex-col md:flex-row">
-          <!-- Left Side: Text & Icons -->
-          <div class="w-full md:w-1/2 flex flex-col justify-between px-6">
-            <!-- Content Section -->
-            <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
-                Embed Your Latest Video
-              </h2>
-              <p class="text-white text-lg mb-10 md:mb-0">
-                Elevate your profile with interactive embedded videos that showcase your latest releases and creative vision.
-              </p>
-            </div>
+      <section
+        class="min-h-screen flex flex-col items-center justify-center pt-10 md:py-24"
+      >
+        <!-- Text Section -->
+        <div class="text-center px-6 max-w-4xl">
+          <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
+            Embed Your Latest Video
+          </h2>
+          <p class="text-white text-lg mb-10">
+            Elevate your profile with interactive embedded videos that showcase
+            your latest releases and creative vision.
+          </p>
+        </div>
 
-            <!-- Icons Absolutely Positioned at the Bottom -->
-            <!-- <div
-            class="flex items-center justify-around space-x-6 p-4 rounded-lg"
-          >
-            <Icon
-              v-for="icon in streamingIcons"
-              :key="icon.name"
-              :icon="icon.icon"
-              class="w-10 h-10 text-white hover:text-red-500 transition"
-            />
-          </div> -->
-          </div>
-
-          <!-- Right Side: YouTube Video with Thumbnail -->
-          <div class="w-full md:w-1/2 flex justify-center items-center">
-            <div class="relative w-[90%] mb-16 md:mb-0 md:w-[80%] max-w-xl">
-              <!-- Thumbnail (Click to Play) -->
-              <div
-                v-if="!isPlaying"
-                class="relative cursor-pointer"
-                @click="isPlaying = true"
-              >
-                <img
-                  :src="thumbnail"
-                  alt="Video Thumbnail"
-                  class="rounded-lg shadow-lg w-full h-auto"
+        <!-- Video Section -->
+        <div class="w-full flex justify-center">
+          <div class="relative w-[90vw] md:w-[80vw] max-w-4xl">
+            <!-- Thumbnail (Click to Play) -->
+            <div
+              v-if="!isPlaying"
+              class="relative cursor-pointer"
+              @click="isPlaying = true"
+            >
+              <img
+                :src="thumbnail"
+                alt="Video Thumbnail"
+                class="rounded-lg shadow-lg w-full h-auto"
+              />
+              <!-- Play Button Overlay -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <Icon
+                  icon="mdi:play-circle"
+                  class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
                 />
-                <!-- Play Button Overlay -->
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <Icon
-                    icon="mdi:play-circle"
-                    class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
-                  />
-                </div>
               </div>
-
-              <!-- YouTube Embed (Shown When Playing) -->
-              <iframe
-                v-if="isPlaying"
-                class="w-full h-64 md:h-96 rounded-lg shadow-lg"
-                :src="videoUrl"
-                frameborder="0"
-                allowfullscreen
-              ></iframe>
             </div>
+
+            <!-- YouTube Embed (Shown When Playing) -->
+            <iframe
+              v-if="isPlaying"
+              class="w-full h-64 md:h-96 rounded-lg shadow-lg"
+              :src="videoUrl"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
           </div>
         </div>
       </section>
 
       <!-- end of image galler   -->
       <!-- Chart  -->
-      <section class="w-[100vw] mx-auto mb-44">
-        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 py-20">
+      <section class="w-[100vw] mx-auto">
+        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20">
           <div class="container mx-auto text-center px-4">
             <h2
-              class="text-4xl md:text-4xl lg:text-6xl mb-14 text-center font-extrabold text-white"
+              class="text-4xl md:text-4xl lg:text-6xl pb-10 text-center font-extrabold text-white"
             >
               Advanced Analytics
             </h2>
@@ -248,13 +252,12 @@
               boost user engagement and elevate your marketing strategies.
             </p>
             <BarChart class="" />
-
           </div>
         </section>
       </section>
 
       <!-- pricing  -->
-      <section class="py-20 bg-black text-white">
+      <section class=" py-10 md:py-20 bg-black text-white">
         <div class="max-w-7xl mx-auto text-center">
           <h2
             class="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
@@ -324,7 +327,9 @@
         <div
           class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
         >
-          <div class="text-center h-full flex flex-col justify-center items-center md:text-left">
+          <div
+            class="text-center h-full flex flex-col justify-center items-center md:text-left"
+          >
             <!-- Animated Text -->
             <h1
               class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
