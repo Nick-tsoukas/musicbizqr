@@ -88,28 +88,30 @@
           Example Splash Pages
         </h2>
         <div class="w-full max-w-md md:max-w-5xl mx-auto">
-          <!-- swiper with cards  -->
+          <!-- Swiper with Cards -->
           <Swiper
             :modules="[EffectCards]"
             effect="cards"
             grabCursor="true"
-            class="main-gallery h-auto"
+            class="main-gallery h-auto md:w-[60vw]"
           >
             <SwiperSlide
               v-for="(slide, index) in slides"
               :key="index"
-              class="flex items-center justify-center mt-16 mb-6 px-2"
+              class="flex items-center justify-center mt-10 mb-6 px-2"
             >
               <img
                 :src="slide.image"
                 :srcset="slide.srcset"
                 alt="Main Image"
-                class="w-full md:w-[55vw] h-auto object-cover rounded-lg shadow-lg"
+                class="w-full md:w-[50vw] max-h-[80vh] object-contain rounded-lg shadow-lg"
               />
             </SwiperSlide>
+
+            <!-- Preview Button -->
             <NuxtLink
               to="/"
-              class="block font-bold cta-button-full mb-6 mx-auto md:mx-0 cursor-pointer text-center text-white"
+              class="block font-bold cta-button-full my-16 mx-auto text-center text-white"
             >
               Preview Page
             </NuxtLink>
@@ -143,20 +145,26 @@
       <section
         class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient"
       >
-        <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row" >
-            <!-- left Side: Music Player Mockup -->
-            <div class="w-full md:w-3/5 flex flex-col justify-between px-6">
+        <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row">
+          <!-- left Side: Music Player Mockup -->
+          <div class="w-full md:w-3/5 flex flex-col justify-between px-6">
             <!-- Content Section -->
             <div class="flex-grow flex flex-col justify-start">
-              <h2 class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl">
+              <h2
+                class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl"
+              >
                 Embed Music from your streaming platform
               </h2>
-              <p class="text-white text-lg text-center md:text-left pb-10 md:pb-0">Get More Listeners</p>
+              <p
+                class="text-white text-lg text-center md:text-left pb-10 md:pb-0"
+              >
+                Get More Listeners
+              </p>
             </div>
           </div>
 
           <!-- right Side: Spotify Embed -->
-          <div class="w-full mb-16 md:mb-0 md:w-2/5 flex justify-center" >
+          <div class="w-full mb-16 md:mb-0 md:w-2/5 flex justify-center">
             <iframe
               class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
               src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
@@ -165,8 +173,6 @@
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             ></iframe>
           </div>
-
-        
         </div>
         <!-- Full-Width Icons at Bottom -->
         <div class="left-0 w-auto">
@@ -182,8 +188,6 @@
           </div>
         </div>
       </section>
-
-      
 
       <!-- video section  -->
       <section
@@ -238,7 +242,9 @@
       <!-- end of image galler   -->
       <!-- Chart  -->
       <section class="w-[100vw] mx-auto">
-        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20">
+        <section
+          class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20"
+        >
           <div class="container mx-auto text-center px-4">
             <h2
               class="text-4xl md:text-4xl lg:text-6xl pb-10 text-center font-extrabold text-white"
@@ -257,7 +263,7 @@
       </section>
 
       <!-- pricing  -->
-      <section class=" py-10 md:py-20 bg-black text-white">
+      <section class="py-10 md:py-20 bg-black text-white">
         <div class="max-w-7xl mx-auto text-center">
           <h2
             class="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
@@ -347,144 +353,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Pricing section -->
-      <!-- <div class="isolate">
-        <div class="flow-root bg-[#000] py-16 sm:pt-32 lg:pb-0">
-          <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="relative z-10">
-              <h1
-                class="mx-auto max-w-4xl text-center text-2xl lg:text-5xl font-bold tracking-tight text-white"
-              >
-                Simple pricing, cancel anytime
-              </h1>
-              <p
-                class="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-white/60"
-              ></p>
-              <div class="mt-16 flex justify-center">
-                <fieldset aria-label="Payment frequency">
-                  <RadioGroup
-                    v-model="frequency"
-                    class="grid grid-cols-2 gap-x-1 rounded-full bg-white/5 p-1 text-center text-xs font-semibold leading-5 text-white"
-                  >
-                    <RadioGroupOption
-                      as="template"
-                      v-for="option in pricing.frequencies"
-                      :key="option.value"
-                      :value="option"
-                      v-slot="{ checked }"
-                    >
-                      <div
-                        :class="[
-                          checked ? 'bg-indigo-500' : '',
-                          'cursor-pointer rounded-full px-2.5 py-1',
-                        ]"
-                      >
-                        {{ option.label }}
-                      </div>
-                    </RadioGroupOption>
-                  </RadioGroup>
-                </fieldset>
-              </div>
-            </div>
-            <div
-              class="flex flex-col lg:flex lg:flex-row justify-center items-center gap-20"
-            >
-          
-
-              <div
-                v-for="tier in pricing.tiers"
-                :key="tier.id"
-                :class="[
-                  tier.featured
-                    ? 'z-10 bg-white shadow-xl ring-1 ring-gray-900/10'
-                    : 'bg-gray-800/80 ring-1 ring-white/10 lg:bg-transparent lg:pb-14 lg:ring-0',
-                  'relative rounded-2xl',
-                ]"
-              >
-                <div class="p-8 lg:pt-12 xl:p-10 xl:pt-14">
-                  <h2
-                    :id="tier.id"
-                    :class="[
-                      tier.featured ? 'text-gray-900' : 'text-white',
-                      'text-sm font-semibold leading-6',
-                    ]"
-                  >
-                    {{ tier.name }}
-                  </h2>
-                  <div
-                    class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:flex-col lg:items-stretch"
-                  >
-                    <div class="mt-2 flex items-center gap-x-4">
-                      <p
-                        :class="[
-                          tier.featured ? 'text-gray-900' : 'text-white',
-                          'text-4xl font-bold tracking-tight',
-                        ]"
-                      >
-                        {{ tier.price[frequency.value] }}
-                      </p>
-                      <div class="text-sm leading-5">
-                        <p
-                          :class="
-                            tier.featured ? 'text-gray-900' : 'text-white'
-                          "
-                        >
-                          USD
-                        </p>
-                        <p
-                          :class="
-                            tier.featured ? 'text-gray-500' : 'text-gray-400'
-                          "
-                        >
-                          {{ `Billed ${frequency.value}` }}
-                        </p>
-                      </div>
-                    </div>
-                    <a
-                      :href="tier.href"
-                      :aria-describedby="tier.id"
-                      :class="[
-                        tier.featured
-                          ? 'bg-indigo-600 shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600'
-                          : 'bg-white/10 hover:bg-white/20 focus-visible:outline-white',
-                        'rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-                      ]"
-                      >Buy this plan</a
-                    >
-                  </div>
-                  <div class="mt-8 flow-root sm:mt-10">
-                    <ul
-                      role="list"
-                      :class="[
-                        tier.featured
-                          ? 'divide-gray-900/5 border-gray-900/5 text-gray-600'
-                          : 'divide-white/5 border-white/5 text-white',
-                        '-my-2 divide-y border-t text-sm leading-6 lg:border-t-0',
-                      ]"
-                    >
-                      <li
-                        v-for="mainFeature in tier.mainFeatures"
-                        :key="mainFeature"
-                        class="flex gap-x-3 py-2"
-                      >
-                        <CheckIcon
-                          :class="[
-                            tier.featured ? 'text-indigo-600' : 'text-gray-500',
-                            'h-6 w-5 flex-none',
-                          ]"
-                          aria-hidden="true"
-                        />
-                        {{ mainFeature }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
     </main>
     <!-- <Footer /> -->
     <div class="h-40 flex justify-center items-center">
@@ -521,7 +389,9 @@ import streamLinksPage from "@/assets/mainbainwithvideo.webp";
 import albumDeskPage from "@/assets/mainbainwithvideo.webp";
 import socialDeskPage from "@/assets/mainbainwithvideo.webp";
 import bandDeskPage from "@/assets/dannydemo.png";
+// import evnetsDesk from "@/assets/mainbainwithvideo.webp";
 import evnetsDesk from "@/assets/mainbainwithvideo.webp";
+
 // import videoDesk from "@/assets/desktopvideogrid.png";
 
 import videoDesk from "@/assets/mainbandtwo.webp";

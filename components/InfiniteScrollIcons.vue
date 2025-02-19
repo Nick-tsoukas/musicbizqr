@@ -7,9 +7,9 @@
           <div
             v-for="icon in icons"
             :key="icon.name + n"
-            class="h-20 w-20 md:w-36 md:h-36 flex items-center justify-center"
+            class="h-20 w-20 md:w-28 md:h-28 flex items-center justify-center"
           >
-            <Icon :icon="icon.icon" class="h-20 w-20 md:w-36 md:h-36 text-purple-900" />
+            <Icon :icon="icon.icon" class="h-20 w-20 md:w-28 md:h-28 text-purple-900" />
           </div>
         </template>
       </div>
