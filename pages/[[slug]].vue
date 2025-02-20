@@ -445,45 +445,15 @@ const getYouTubeThumbnail = (youtubeVideo) => {
     thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
   };
 };
-const fetchVideos = async () => {
-  try {
-    const response = await find("videos", {
-      filters: {
-        bands: {
-          id: { $eq: route.params.id },
-        },
-      },
-      populate: {
-        mediayoutube: true,
-        bandImg: true,
-      },
-    });
-    videoItems.value = response.data.map((videoData) => {
-      const thumbnails = videoData.mediayoutube.map((youtubeVideo) => {
-        const thumbnailData = getYouTubeThumbnail(youtubeVideo);
-        console.log("Extracted Video ID:", thumbnailData.videoId);
-        return thumbnailData;
-      });
-      return {
-        id: videoData.id,
-        title: videoData.attributes.bandname || "No Band Name",
-        bandlink: videoData.attributes.bandlink || "",
-        bandimgUrl: videoData.attributes.bandImg?.data?.attributes?.url || "",
-        youtubeThumbnails: thumbnails,
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching videos:", error);
-  }
-};
-const slug = computed(() => route.params.slug || "default-slug"); // Debug
-console.log("Using Slug: fdsfsdfsdfsdfsdfsdfsdfsdfsdf", slug.value);
-console.log("Route params slug:", route.params.slug);
+
+
+const slug = computed(() =>route.params.slug?.toLowerCase() ?? ''); // Debug
+
 
 const fetchBandData = async () => {
   const apiUrl = useRuntimeConfig().public.strapiUrl;
   const response = await fetch(
-    `${apiUrl}/api/bands/slug/${route.params.slug}?` + // ✅ Correct endpoint
+    `${apiUrl}/api/bands/slug/${route.params.slug?.toLowerCase() ?? ''}?` + // ✅ Correct endpoint
       "populate[events][populate]=image&" +
       "populate[tours][populate]=*&" +
       "populate[albums][populate]=cover,songs.file&" +
@@ -582,7 +552,7 @@ const formatSingleSong = (song) => {
 onMounted(async () => {
   document.body.classList.add("custom-page-body");
   await fetchBandData();
-  await fetchVideos();
+  // await fetchVideos();
 });
 onBeforeUnmount(() => {
   document.body.classList.remove("custom-page-body");
