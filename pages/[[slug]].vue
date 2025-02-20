@@ -1,5 +1,9 @@
 <template>
-  <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
+  <div>
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+    <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
     <!-- <pre class="text-white" >{{ band }}</pre> -->
     <!-- Hero Section -->
     <!-- Image Container -->
@@ -268,6 +272,7 @@
       <img src="@/assets/musicbizlogo.png" class="h-12" />
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -284,6 +289,8 @@ import scrollDownVideo from "@/assets/scrolldown.webm";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
+
+const loading = ref(true)
 
 // const extractYouTubeId = (url) => {
 //   // Check if URL is an embed URL (https://www.youtube.com/embed/...)
@@ -484,6 +491,7 @@ const fetchBandData = async () => {
       setAlbum(albums.value[0].id);
     }
   }
+  loading.value = false
 };
 
 const setAlbum = (id) => {
@@ -594,5 +602,22 @@ onBeforeUnmount(() => {
 }
 .mdc-button-green:hover {
   background-color: #45a049;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #6200ee;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-top: 2rem;
 }
 </style>
