@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h1>Signup Success</h1>
-    <p v-if="loading">Creating your account...</p>
-    <p v-else-if="error">{{ error }}</p>
-    <p v-else>Account Created! Redirecting...</p>
+    <h1 class="text-white">Signup Success</h1>
+    <p class="text-white" v-if="loading">Creating your account...</p>
+    <p class="text-white" v-else-if="error">{{ error }}</p>
+    <p class="text-white" v-else>Account Created! Redirecting...</p>
   </div>
 </template>
 
@@ -22,8 +22,10 @@ const error = ref('')
 onMounted(async () => {
   try {
     const sessionId = route.query.session_id
+    console.log('this is session id' , route.query.session_id)
     if (!sessionId) {
       error.value = "No session_id found."
+      console.log(error.value)
       loading.value = false
       return
     }
@@ -35,6 +37,7 @@ onMounted(async () => {
 
     if (!email || !password || !name) {
       error.value = "Missing signup info."
+      console.log(error.value)
       loading.value = false
       return
     }
@@ -43,6 +46,7 @@ onMounted(async () => {
     const strapiUser = await confirmPayment(sessionId as string, email, password, name)
     if (!strapiUser) {
       error.value = "User creation failed."
+      console.log(error.value)
       loading.value = false
       return
     }
@@ -65,6 +69,7 @@ onMounted(async () => {
     router.push('/dashboard')
   } catch (err: any) {
     error.value = err.message || "Error creating account."
+    console.log('there is an error ', err)
   } finally {
     loading.value = false
   }
