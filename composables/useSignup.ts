@@ -44,7 +44,7 @@ export function useSignup() {
     })
 
     if (error.value) {
-      throw new Error(error.value.data?.message || 'Error confirming payment')
+      throw new Error(error.value.data?.message || 'Error confirming payment here ' , error)
     }
     return data.value?.user
   }
