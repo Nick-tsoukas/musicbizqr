@@ -26,6 +26,8 @@
     "@unlok-co/nuxt-stripe": "^4.0.1",
     "@vee-validate/nuxt": "^4.13.0",
     "@vueuse/core": "^12.7.0",
+    "aframe": "^1.7.0",
+    "aframe-html-shader": "^0.2.0",
     "animate.css": "^4.1.1",
     "aos": "^2.3.4",
     "chart.js": "^4.4.3",
