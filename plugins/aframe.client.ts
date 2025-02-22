@@ -1,11 +1,6 @@
-// plugins/aframe.client.ts
+import 'aframe'
+import 'aframe-html-shader'
 
-// Import A-Frame (this registers the global AFRAME object)
-import 'aframe';
-// Import the aframe-html-shader so we can render HTML as a texture
-import 'aframe-html-shader';
-
-// Optionally, you can log that A-Frame has been loaded
-if (process.client) {
-  console.log("A-Frame and aframe-html-shader loaded");
-}
+export default defineNuxtPlugin(() => {
+  console.log("A-Frame and aframe-html-shader loaded")
+})

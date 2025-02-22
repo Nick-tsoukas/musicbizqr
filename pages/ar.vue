@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 class="text-white" >This is the ar page </h1>
     <!-- AR Scene using A-Frame and AR.js -->
     <a-scene embedded arjs="sourceType: webcam;">
       <!-- A marker (you can use the default 'hiro' marker) -->
