@@ -35,7 +35,7 @@ console.log('creating account this is onmounted hook ')
     const email = localStorage.getItem('signup_email')
     const password = localStorage.getItem('signup_password')
     const name = localStorage.getItem('signup_name')
-    console.log(email, password, name, 'this is the localstorage data still in onmontued hook'), 
+    console.log(email, password, name, 'this is the localstorage data still in onmontued hook') 
     if (!email || !password || !name) {
       error.value = "Missing signup info."
       console.log(error.value)
