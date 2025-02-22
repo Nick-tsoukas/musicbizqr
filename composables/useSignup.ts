@@ -38,23 +38,41 @@ export function useSignup() {
   }
 
   // 3) Confirm Payment / Create User in Strapi
-  const confirmPayment = async (sessionId: string, email: string, password: string, name: string) => {
-    console.log('confirmpayment ', sessionId,email, password , ' this is the data ' )
-    const { data, error } = await useFetch('/api/stripe/confirm-payment', {
+  const confirmPayment = async (
+    sessionId: string,
+    email: string,
+    password: string,
+    name: string
+  ) => {
+    console.log(
+      "confirmpayment called with:",
+      sessionId,
+      email,
+      password,
+      name
+    );
+    console.log("strapiBaseURL:", strapiBaseURL);
+    
+    const { data, error } = await useFetch("/api/stripe/confirm-payment", {
       baseURL: strapiBaseURL,
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ session_id: sessionId, email, password, name }),
-    })
+      body: JSON.stringify({ session_id: sessionId, email, password, name })
+    });
   
     if (error.value) {
-      console.error('STRIPE CONFIRM PAYMENT ERROR:', error.value.data)
-      throw new Error(error.value.data?.message ?? JSON.stringify(error.value.data))
+      console.error("STRIPE CONFIRM PAYMENT ERROR:", error.value);
+      throw new Error(
+        error.value.data?.message ?? JSON.stringify(error.value.data)
+      );
     }
-    return data.value?.user
-  }
+    
+    console.log("confirmPayment response data:", data.value);
+    return data.value?.user;
+  };
+  
   
   console.log('no error in the post to confirm payment yet ')
 
