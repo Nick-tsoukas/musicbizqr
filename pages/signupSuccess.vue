@@ -18,6 +18,7 @@ const { confirmPayment, loginUser } = useSignup()
 
 const loading = ref(true)
 const error = ref('')
+console.log('creating account this is before hook hook ')
 
 onMounted(async () => {
 console.log('creating account this is onmounted hook ')
@@ -35,6 +36,7 @@ console.log('creating account this is onmounted hook ')
     const email = localStorage.getItem('signup_email')
     const password = localStorage.getItem('signup_password')
     const name = localStorage.getItem('signup_name')
+
     console.log(email, password, name, 'this is the localstorage data still in onmontued hook') 
     if (!email || !password || !name) {
       error.value = "Missing signup info."
@@ -74,7 +76,7 @@ console.log('creating account this is onmounted hook ')
     router.push('/dashboard')
   } catch (err: any) {
     error.value = err.message || "Error creating account."
-    console.log('there is an error this is the catch statment ', err)
+    console.log('there is an error this is the catch statment ', error.value)
   } finally {
     loading.value = false
   }
