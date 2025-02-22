@@ -20,6 +20,7 @@ const loading = ref(true)
 const error = ref('')
 
 onMounted(async () => {
+console.log('creating account this is onmounted hook ')
   try {
     const sessionId = route.query.session_id
     console.log('this is session id' , route.query.session_id)
@@ -34,17 +35,21 @@ onMounted(async () => {
     const email = localStorage.getItem('signup_email')
     const password = localStorage.getItem('signup_password')
     const name = localStorage.getItem('signup_name')
-
+    console.log(email, password, name, 'this is the localstorage data still in onmontued hook'), 
     if (!email || !password || !name) {
       error.value = "Missing signup info."
       console.log(error.value)
       loading.value = false
       return
     }
+    console.log('About to call confirmPayment with:', sessionId, email, password, name);
 
     // 1) Confirm Payment (and create user in Strapi)
     const strapiUser = await confirmPayment(sessionId as string, email, password, name)
+    console.log(strapiUser, 'is there a strapi user ')
     if (!strapiUser) {
+      console.log('this is the errror when creating strapi user if!strapi user ')
+
       error.value = "User creation failed."
       console.log(error.value)
       loading.value = false
@@ -69,7 +74,7 @@ onMounted(async () => {
     router.push('/dashboard')
   } catch (err: any) {
     error.value = err.message || "Error creating account."
-    console.log('there is an error ', err)
+    console.log('there is an error this is the catch statment ', err)
   } finally {
     loading.value = false
   }
