@@ -41,40 +41,38 @@ export function useSignup() {
   const confirmPayment = async (
     sessionId: string,
     email: string,
-    password: string
+    password: string,
+    name: string
   ) => {
-    console.log("confirmpayment called with:", sessionId, email, password);
+    console.log("confirmpayment called with:", sessionId, email, password, name);
     console.log("strapiBaseURL:", strapiBaseURL);
   
-    // Construct the full URL for the endpoint
+    // Construct and log the full URL for debugging
     const fullUrl = `${strapiBaseURL}/api/stripe/confirm-payment`;
     console.log("Posting to URL:", fullUrl);
   
     try {
-      const response = await fetch(fullUrl, {
+      const res = await fetch(fullUrl, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        // Pass the body as a JSON string
-        body: JSON.stringify({ session_id: sessionId, email, password }),
+        // Serialize the body as JSON so that Strapi receives all four fields
+        body: JSON.stringify({ session_id: sessionId, email, password, name })
       });
-  
-      // Parse the JSON response
-      const data = await response.json();
+      const data = await res.json();
       console.log("confirmPayment response data:", data);
-  
-      // Check if the response was not OK and throw an error if so
-      if (!response.ok) {
+      
+      if (!res.ok) {
         throw new Error(data.message || "Payment confirmation failed.");
       }
-  
       return data?.user;
     } catch (error: any) {
       console.error("Error in confirmPayment:", error);
       throw new Error(error.message || "Payment confirmation failed.");
     }
   };
+  
   
   
   
