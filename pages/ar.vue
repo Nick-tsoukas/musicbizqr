@@ -4,7 +4,7 @@
     <!-- AR Scene using A-Frame and AR.js -->
     <a-scene embedded arjs="sourceType: webcam;">
       <!-- A marker (you can use the default 'hiro' marker) -->
-      <a-marker preset="hiro">
+      <a-marker type="pattern" url="/markers/pattern-marker.patt">
         <!-- The plane that will display the YouTube video using aframe-html-shader -->
         <a-entity
           position="0 0 0"
