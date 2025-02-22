@@ -42,15 +42,9 @@ export function useSignup() {
     sessionId: string,
     email: string,
     password: string,
-    name: string
+  
   ) => {
-    console.log(
-      "confirmpayment called with:",
-      sessionId,
-      email,
-      password,
-      name
-    );
+    console.log("confirmpayment called with:", sessionId, email, password);
     console.log("strapiBaseURL:", strapiBaseURL);
     
     const { data, error } = await useFetch("/api/stripe/confirm-payment", {
@@ -59,9 +53,9 @@ export function useSignup() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ session_id: sessionId, email, password, name })
+      body: { session_id: sessionId, email, password }
     });
-  
+    
     if (error.value) {
       console.error("STRIPE CONFIRM PAYMENT ERROR:", error.value);
       throw new Error(
@@ -72,6 +66,7 @@ export function useSignup() {
     console.log("confirmPayment response data:", data.value);
     return data.value?.user;
   };
+  
   
   
   console.log('no error in the post to confirm payment yet ')
