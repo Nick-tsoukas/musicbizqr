@@ -8,83 +8,79 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-const { create, update } = useStrapi();
 const router = useRouter();
 const route = useRoute();
-const client = useStrapiClient();
-
-
 
 onMounted(async () => {
   try {
-    // Get the full URL including query parameters
-    const fullUrl = window.location.href;
-    console.log('Full URL:', fullUrl);
+    // Extract the UID from the query parameter "id"
+    const uid = String(route.query.id);
+    console.log('Extracted UID:', uid);
 
-    // Fetch the QR data using the full URL
-    const response = await client('/qrs', {
+    if (!uid) {
+      console.error('No UID provided in the URL.');
+      router.push('/error');
+      return;
+    }
+
+    // Fetch the QR record using a filter on slugId with bracket notation, using production URL
+    const qrResponse = await $fetch('https://qrserver-production.up.railway.app/api/qrs', {
       method: 'GET',
       params: {
-        filters: { url: fullUrl },
-        populate: '*',
-      },
+        'filters[slugId][$eq]': uid,
+        populate: '*'
+      }
     });
-    const qrData = response.data;
-    console.log('QR Data:', qrData);
+    console.log('QR Response:', qrResponse);
 
+    const qrData = qrResponse.data;
     if (qrData && qrData.length > 0) {
       const qr = qrData[0];
-      // console.log('QR Object:', qr);
       const qrId = qr.id;
 
-      // Track the scan by creating a new scan record in Strapi
-      // The 'date' field uses the current date/time and the relation 'qr' links to the QR record
-      await client('/scans', {
+      // Record the scan by creating a new scan record in Strapi on production
+      await $fetch('https://qrserver-production.up.railway.app/api/scans', {
         method: 'POST',
-        data: {
-          date: new Date().toISOString(),
-          qr: qrId
+        body: {
+          data: {
+            date: new Date().toISOString(),
+            qr: qrId
+          }
         }
       });
-      // console.log('Scan recorded for QR ID:', qrId);
+      console.log('Scan recorded for QR ID:', qrId);
 
-      // Accessing attributes and relationships from the QR code
+      // Determine redirection based on QR type
       const qType = qr.attributes.q_type;
       const link = qr.attributes.link;
 
-      // Check the QR type and perform the appropriate redirection
       if (qType === 'bandProfile' && qr.attributes.band?.data) {
         const bandSlug = qr.attributes.band.data.attributes.slug;
         router.push({ path: `/${bandSlug}` });
       } else if (qType === 'events' && qr.attributes.event?.data) {
         const eventSlug = qr.attributes.event.data.attributes.slug;
-        console.log('Redirecting to event:', eventSlug);
         router.push({ path: `/event/${eventSlug}` });
       } else if (qType === 'tours' && qr.attributes.tour?.data) {
         const tourSlug = qr.attributes.tour.data.attributes.slug;
-        console.log('Redirecting to tour:', tourSlug);
         router.push({ path: `/tour/${tourSlug}` });
       } else if (qType === 'albums' && qr.attributes.album?.data) {
         const albumSlug = qr.attributes.album.data.attributes.slug;
-        console.log('Redirecting to album:', albumSlug);
         router.push({ path: `/album/${albumSlug}` });
       } else if (qType === 'stream' && qr.attributes.stream?.data) {
         const streamId = qr.attributes.stream.data.id;
-        console.log('Redirecting to stream link:', streamId);
         router.push({ path: `/stream/${streamId}` });
       } else if (qType === 'social') {
-        console.log('Redirecting to social links page');
         router.push({ path: `/social/${qrId}` });
       } else if (qType === 'externalURL' && link) {
-        console.log('Redirecting to external URL:', link);
         window.location.href = link;
       } else {
         console.log('No matching QR type found. Redirecting to dashboard.');
         router.push('/dashboard');
       }
     } else {
-      console.error('QR code not found for URL:', fullUrl);
+      console.error('QR record not found for UID:', uid);
       router.push('/error');
     }
   } catch (error) {
