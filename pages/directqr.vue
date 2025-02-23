@@ -49,7 +49,7 @@ onMounted(async () => {
       // Update the scan count in the QR code
       try {
         await update('qrs', qrId, {
-          scans: newScanCount,
+          data: { scans: newScanCount },
         });
         console.log(`Scan count updated to ${newScanCount}`);
       } catch (updateError) {
@@ -59,9 +59,9 @@ onMounted(async () => {
       // Create a new scan entry in 'scans' collection
       try {
         await create('scans', {
-          date: new Date().toISOString(),
-          qr: {
-            id: qrId,
+          data: {
+            date: new Date().toISOString(),
+            qr: qrId,
           },
         });
         console.log('Scan entry created');
@@ -75,8 +75,8 @@ onMounted(async () => {
 
       // Check the QR type and perform the appropriate redirection
       if (qType === 'bandProfile' && qr.attributes.band?.data) {
-        // Get the slug from the band's related data\
-        console.log(' qr.attributes.band.data.attributes.slug')
+        // Get the slug from the band's related data
+        console.log(' qr.attributes.band.data.attributes.slug');
         const bandSlug = qr.attributes.band.data.attributes.slug;
         console.log('Redirecting to band:', bandSlug);
         router.push({ path: `/${bandSlug}` });  // Redirect using band slug
