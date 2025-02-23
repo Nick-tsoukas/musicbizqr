@@ -3,24 +3,7 @@
     <div class="bg-white text-black"></div>
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
-
-      <!-- Scans Chart Section -->
-      <div
-        v-if="!loading && scansPerMonth.labels.length"
-        class="mb-6 border-2 border-white rounded-lg"
-      >
-        <div
-          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8"
-        >
-          <h2 class="text-2xl text-white font-extrabold">Scans Over Time</h2>
-        </div>
-        <div class="px-6 py-6">
-          <ScansChart
-            :labels="scansPerMonth.labels"
-            :data="scansPerMonth.data"
-          />
-        </div>
-      </div>
+      
 
       <!-- QR Codes Section -->
       <div v-if="loading">
@@ -64,7 +47,7 @@
               >
             </div>
             <div class="flex items-center gap-4">
-              <p class="text-white">Scans: {{ qr.scans ? qr.scans : 0 }}</p>
+              <p class="text-white">Scans: {{ qr.scans.data.length ? qr.scans.data.length : 0 }}</p>
               <button
                 @click="viewQr(qr.imageUrl)"
                 class="text-blue-600 hover:text-blue-900"
@@ -233,6 +216,25 @@
           <h2 class="text-center my-4 p-16 text-xl text-white">
             Create Your First Band
           </h2>
+        </div>
+      </div>
+
+      <!-- <pre class="text-white">this is scan data {{ scans }}</pre> -->
+      <!-- Scans Chart Section -->
+      <div
+        v-if="!loading && scansPerMonth.labels.length"
+        class="mb-6 border-2 border-white rounded-lg"
+      >
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8"
+        >
+          <h2 class="text-2xl text-white font-extrabold">Scans Over Time</h2>
+        </div>
+        <div class="px-6 py-6">
+          <ScansChart
+            :labels="scansPerMonth.labels"
+            :data="scansPerMonth.data"
+          />
         </div>
       </div>
 
