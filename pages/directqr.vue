@@ -18,28 +18,22 @@ onMounted(async () => {
   try {
     // Get the full URL including the query parameters
     const fullUrl = window.location.href;
-
-    console.log('Full URL:', fullUrl); // For debugging
+    console.log('Full URL:', fullUrl);
 
     // Fetch the QR data using the full URL
     const response = await client('/qrs', {
       method: 'GET',
       params: {
-        filters: {
-          url: fullUrl, // Use the full URL for filtering
-        },
-        populate: '*', // To fetch related data like band, event, tour, etc.
+        filters: { url: fullUrl },
+        populate: '*',
       },
     });
-
     const qrData = response.data;
-
-    console.log('QR Data:', qrData); // For debugging
+    console.log('QR Data:', qrData);
 
     if (qrData && qrData.length > 0) {
       const qr = qrData[0];
       console.log('QR Object:', qr);
-
       const qrId = qr.id;
 
       // **Increment the scan count**
@@ -56,18 +50,35 @@ onMounted(async () => {
         console.error('Error updating scan count:', updateError);
       }
 
-      // Create a new scan entry in 'scans' collection
+      // ----- Create a new scan entry in 'scans' collection -----
+      // Variant 1: Pass the relation as a plain ID
       try {
-        await create('scans', {
+        const scanResponse = await create('scans', {
           data: {
             date: new Date().toISOString(),
             qr: qrId,
           },
         });
-        console.log('Scan entry created');
+        console.log('Scan entry created (Variant 1):', scanResponse);
       } catch (createError) {
-        console.error('Error creating scan entry:', createError);
+        console.error('Error creating scan entry (Variant 1):', createError);
       }
+
+      // If Variant 1 does not create the relation, try Variant 2:
+      /*
+      try {
+        const scanResponse = await create('scans', {
+          data: {
+            date: new Date().toISOString(),
+            qr: { id: qrId },
+          },
+        });
+        console.log('Scan entry created (Variant 2):', scanResponse);
+      } catch (createError) {
+        console.error('Error creating scan entry (Variant 2):', createError);
+      }
+      */
+      // --------------------------------------------------------
 
       // Accessing attributes and relationships from the QR code
       const qType = qr.attributes.q_type;
@@ -75,21 +86,19 @@ onMounted(async () => {
 
       // Check the QR type and perform the appropriate redirection
       if (qType === 'bandProfile' && qr.attributes.band?.data) {
-        // Get the slug from the band's related data
-        console.log(' qr.attributes.band.data.attributes.slug');
         const bandSlug = qr.attributes.band.data.attributes.slug;
         console.log('Redirecting to band:', bandSlug);
-        router.push({ path: `/${bandSlug}` });  // Redirect using band slug
+        router.push({ path: `/${bandSlug}` });
       } else if (qType === 'events' && qr.attributes.event?.data) {
-        const eventSlug = qr.attributes.event.data.attributes.slug; // Get slug for event
+        const eventSlug = qr.attributes.event.data.attributes.slug;
         console.log('Redirecting to event:', eventSlug);
         router.push({ path: `/event/${eventSlug}` });
       } else if (qType === 'tours' && qr.attributes.tour?.data) {
-        const tourSlug = qr.attributes.tour.data.attributes.slug; // Get slug for tour
+        const tourSlug = qr.attributes.tour.data.attributes.slug;
         console.log('Redirecting to tour:', tourSlug);
         router.push({ path: `/tour/${tourSlug}` });
       } else if (qType === 'albums' && qr.attributes.album?.data) {
-        const albumSlug = qr.attributes.album.data.attributes.slug; // Get slug for album
+        const albumSlug = qr.attributes.album.data.attributes.slug;
         console.log('Redirecting to album:', albumSlug);
         router.push({ path: `/album/${albumSlug}` });
       } else if (qType === 'stream' && qr.attributes.stream?.data) {
