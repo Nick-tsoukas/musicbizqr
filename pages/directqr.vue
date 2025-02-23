@@ -14,9 +14,11 @@ const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
 
+
+
 onMounted(async () => {
   try {
-    // Get the full URL including the query parameters
+    // Get the full URL including query parameters
     const fullUrl = window.location.href;
     console.log('Full URL:', fullUrl);
 
@@ -33,52 +35,19 @@ onMounted(async () => {
 
     if (qrData && qrData.length > 0) {
       const qr = qrData[0];
-      console.log('QR Object:', qr);
+      // console.log('QR Object:', qr);
       const qrId = qr.id;
 
-      // **Increment the scan count**
-      const currentScanCount = qr.attributes.scans || 0;
-      const newScanCount = currentScanCount + 1;
-
-      // Update the scan count in the QR code
-      try {
-        await update('qrs', qrId, {
-          data: { scans: newScanCount },
-        });
-        console.log(`Scan count updated to ${newScanCount}`);
-      } catch (updateError) {
-        console.error('Error updating scan count:', updateError);
-      }
-
-      // ----- Create a new scan entry in 'scans' collection -----
-      // Variant 1: Pass the relation as a plain ID
-      try {
-        const scanResponse = await create('scans', {
-          data: {
-            date: new Date().toISOString(),
-            qr: qrId,
-          },
-        });
-        console.log('Scan entry created (Variant 1):', scanResponse);
-      } catch (createError) {
-        console.error('Error creating scan entry (Variant 1):', createError);
-      }
-
-      // If Variant 1 does not create the relation, try Variant 2:
-      /*
-      try {
-        const scanResponse = await create('scans', {
-          data: {
-            date: new Date().toISOString(),
-            qr: { id: qrId },
-          },
-        });
-        console.log('Scan entry created (Variant 2):', scanResponse);
-      } catch (createError) {
-        console.error('Error creating scan entry (Variant 2):', createError);
-      }
-      */
-      // --------------------------------------------------------
+      // Track the scan by creating a new scan record in Strapi
+      // The 'date' field uses the current date/time and the relation 'qr' links to the QR record
+      await client('/scans', {
+        method: 'POST',
+        data: {
+          date: new Date().toISOString(),
+          qr: qrId
+        }
+      });
+      // console.log('Scan recorded for QR ID:', qrId);
 
       // Accessing attributes and relationships from the QR code
       const qType = qr.attributes.q_type;
@@ -87,7 +56,6 @@ onMounted(async () => {
       // Check the QR type and perform the appropriate redirection
       if (qType === 'bandProfile' && qr.attributes.band?.data) {
         const bandSlug = qr.attributes.band.data.attributes.slug;
-        console.log('Redirecting to band:', bandSlug);
         router.push({ path: `/${bandSlug}` });
       } else if (qType === 'events' && qr.attributes.event?.data) {
         const eventSlug = qr.attributes.event.data.attributes.slug;
