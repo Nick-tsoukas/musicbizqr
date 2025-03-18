@@ -561,6 +561,7 @@ const socials = ref([]);
 const videos = ref([]);
 
 const fetchData = async () => {
+  console.log('fetching data ', user.value , 'is user.value here', user)
   if (user.value) {
     try {
       await fetchQrs(); // Fetch QR codes first
@@ -570,11 +571,11 @@ const fetchData = async () => {
       await Promise.all([
         fetchBands(),
         fetchEvents(),
-        fetchTours(),
-        fetchAlbums(),
-        fetchStreams(),
-        fetchSocials(),
-        fetchVideos(),
+        // fetchTours(),
+        // fetchAlbums(),
+        // fetchStreams(),
+        // fetchSocials(),
+        // fetchVideos(),
       ]);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -699,18 +700,21 @@ const fetchBands = async () => {
 
 
 const fetchEvents = async () => {
+  console.log("fetchEvents called");
   try {
     const response = await find("events", {
       filters: {
         users_permissions_user: {
           id: {
-            $eq: user.value.id,
+            $eq: user.value?.id,
           },
         },
       },
       populate: "*",
     });
-    events.value = response.data;
+    console.log("Fetched events response:", response);
+    events.value = response?.data || [];
+    console.log("Events assigned:", events.value);
   } catch (error) {
     console.error("Error fetching events:", error);
   }
