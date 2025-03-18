@@ -21,7 +21,7 @@
           <h2 class="text-2xl font-semibold flex items-center mb-4">
             <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
           </h2>
-          <p class="text-lg" v-html="formattedDescription"></p>
+          <p class="text-lg leading-snug" v-html="formattedDescription"></p>
         </section>
         <!-- Date & Time -->
         <section v-if="eventData.date || eventData.time" class="mb-6">
