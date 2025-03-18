@@ -13,7 +13,7 @@
       </div> -->
     </div>
     <!-- Event Details Section -->
-     <pre class="text-white" >{{ eventData }}</pre>
+    
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Left Column -->
       <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6">
@@ -163,22 +163,20 @@ const formatDate = (dateStr) => {
   }
 };
 
-const formatTime = (timeStr) => {
-  if (!timeStr) {
-    console.log('there is no time string .........')
-    return '';
-  }
-  console.log(timeStr)
+function formatTime(timeStr) {
+  if (!timeStr) return '';
   try {
-    const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
-    console.log(parsedTime)
-    console.log('Parsed time:', parsedTime); // Log the parsed time for debugging
-    return format(parsedTime, 'hh:mm a'); // 12-hour format with AM/PM
+    // Detect whether there's a '.' in there
+    const hasMilliseconds = timeStr.includes('.');
+    // Choose the appropriate format
+    const parsePattern = hasMilliseconds ? 'HH:mm:ss.SSS' : 'HH:mm:ss';
+    const parsedTime = parse(timeStr, parsePattern, new Date());
+    return format(parsedTime, 'h:mm a'); // => "5:00 PM" or "5:30 PM", etc.
   } catch (error) {
     console.error('Error parsing time:', error);
     return timeStr;
   }
-};
+}
 
 const hasSocialLinks = computed(() => {
   return (
