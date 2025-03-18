@@ -168,7 +168,8 @@ const formatTime = (timeStr) => {
   }
   try {
     const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
-    return format(parsedTime, 'hh:mm a');
+    console.log('Parsed time:', parsedTime); // Log the parsed time for debugging
+    return format(parsedTime, 'hh:mm a'); // 12-hour format with AM/PM
   } catch (error) {
     console.error('Error parsing time:', error);
     return timeStr;
