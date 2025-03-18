@@ -204,6 +204,10 @@
         </div>
       </div>
 
+      <div class="bg-black text-white" @click="logTime" >
+        log time 
+      </div>
+
       <!-- Save Changes Button -->
       <button type="submit" class="mdc-button mb-4 w-full mt-10">
         Save Changes
@@ -218,6 +222,8 @@ const router = useRouter();
 const client = useStrapiClient();
 const user = useStrapiUser();
 const loading = ref(false);
+import { parse, format } from 'date-fns';
+
 
 const event = ref({
   title: "",
@@ -271,8 +277,24 @@ const handleEventImageUpload = (e) => {
   event.value.imageUrl = URL.createObjectURL(file);
 };
 
+const formatTime = (timeStr) => {
+  if (!timeStr) return '';
+  console.log('formating time ')
+
+  try {
+    // The browser <input type="time" /> typically returns "HH:mm"
+    const parsedTime = parse(timeStr, 'HH:mm', new Date());
+    // Convert to the exact format Strapi expects: "HH:mm:ss.SSS"
+    return format(parsedTime, 'HH:mm:ss.SSS');
+  } catch (error) {
+    console.error('Error parsing/formatting time:', error);
+    return timeStr;
+  }
+};
 const submitEditEvent = async () => {
   const eventId = route.params.id;
+  const newTime = formatTime(event.value.time)
+  console.log('this is the new time format ' , newTime)
   try {
     loading.value = true;
     const eventForm = new FormData();
@@ -280,7 +302,7 @@ const submitEditEvent = async () => {
       title: event.value.title ?? undefined,
       description: event.value.description ?? undefined,
       date: event.value.date ?? undefined,
-      time: event.value.time ?? undefined,
+      time: formatTime(event.value.time) ?? undefined,
       city: event.value.city ?? undefined,
       state: event.value.state ?? undefined,
       venue: event.value.venue ?? undefined,
