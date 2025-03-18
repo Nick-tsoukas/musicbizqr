@@ -8,15 +8,21 @@
         alt="Event Hero Image"
         class="w-full h-full object-cover"
       />
-      <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end p-4">
+      <!-- <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end p-4">
         <h1 class="text-4xl md:text-6xl text-white font-bold">{{ eventData.title }}</h1>
-      </div>
+      </div> -->
     </div>
-
     <!-- Event Details Section -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Left Column -->
       <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6">
+        <!-- Description -->
+        <section v-if="eventData.description" class="mb-6">
+          <h2 class="text-2xl font-semibold flex items-center mb-4">
+            <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
+          </h2>
+          <p class="text-lg" v-html="formattedDescription"></p>
+        </section>
         <!-- Date & Time -->
         <section v-if="eventData.date || eventData.time" class="mb-6">
           <h2 class="text-2xl font-semibold flex items-center mb-4">
@@ -27,12 +33,12 @@
         </section>
 
         <!-- Description -->
-        <section v-if="eventData.description" class="mb-6">
+        <!-- <section v-if="eventData.description" class="mb-6">
           <h2 class="text-2xl font-semibold flex items-center mb-4">
             <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
           </h2>
           <p class="text-lg">{{ eventData.description }}</p>
-        </section>
+        </section> -->
 
         <!-- Location -->
         <section v-if="eventData.venue || eventData.address || eventData.city || eventData.state" class="mb-6">
@@ -141,6 +147,9 @@ onMounted(async () => {
   }
 });
 
+const formattedDescription = computed(() => {
+  return eventData.value?.description ? eventData.value.description.replace(/\n/g, '<br>') : '';
+});
 const formatDate = (dateStr) => {
   if (!dateStr) {
     return '';

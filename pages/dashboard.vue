@@ -219,24 +219,7 @@
         </div>
       </div>
 
-      <!-- <pre class="text-white">this is scan data {{ scans }}</pre> -->
-      <!-- Scans Chart Section -->
-      <div
-        v-if="!loading && scansPerMonth.labels.length"
-        class="mb-6 border-2 border-white rounded-lg"
-      >
-        <div
-          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8"
-        >
-          <h2 class="text-2xl text-white font-extrabold">Scans Over Time</h2>
-        </div>
-        <div class="px-6 py-6">
-          <ScansChart
-            :labels="scansPerMonth.labels"
-            :data="scansPerMonth.data"
-          />
-        </div>
-      </div>
+    
 
       <!-- Social Links Section -->
       <!-- <div v-if="loading">
@@ -283,7 +266,7 @@
       </div> -->
 
       <!-- Events Section -->
-      <!-- <div v-if="loading">
+      <div v-if="loading">
         <SkeletonLoader />
       </div>
       <div v-else-if="eventItems.length" class="mb-6 border-2 border-white rounded-lg">
@@ -325,7 +308,27 @@
         <div>
           <h2 class="text-center my-4 p-16 text-xl text-white">Create Your First Event</h2>
         </div>
-      </div> -->
+      </div>
+
+        <!-- <pre class="text-white">this is scan data {{ scans }}</pre> -->
+      <!-- Scans Chart Section -->
+      <div
+        v-if="!loading && scansPerMonth.labels.length"
+        class="mb-6 border-2 border-white rounded-lg"
+      >
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8"
+        >
+          <h2 class="text-2xl text-white font-extrabold">Scans Over Time</h2>
+        </div>
+        <div class="px-6 py-6">
+           <span>Analytics</span>
+          <ScansChart
+            :labels="scansPerMonth.labels"
+            :data="scansPerMonth.data"
+          />
+        </div>
+      </div>
 
       <!-- Tours Section -->
       <!-- <div v-if="loading">

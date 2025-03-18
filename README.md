@@ -1,11 +1,18 @@
 # task list for today 
+- [] make sure create new event page is working and user can select a band to relate to the event
+- [] add dannys event 
+- [] check the edit event works
+- [] sign up for proton mail and get the email confirmation working 
+- [] add a description to the analytics icon 
+- [] write more information about the free trial 
+- [] give danny a login and password 
+- [] create a way for user to reset password 
+- [] email confirmation ? for new user sign up 
+- [] change section on lading page that is using swiper for the preview images of the link tree page 
+- [] add a way for user to cancle thire trial or membership
+- [] lock user out is after trail 
+- [] have candy beta test the app 
 
-
-
-
-
-- [x] create data modle 
-- [] fefactor album page to allow for streaming 
 
 ## music 
 - [] custom album or streaming embeded content both 

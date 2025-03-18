@@ -5,6 +5,7 @@
     </div>
     <div class="bg-black">
       <h1 class="title text-white">Create New Event</h1>
+    
 
       <form class="form-group" @submit.prevent="submitNewEvent">
 
@@ -163,7 +164,7 @@
             <div class="mdc-text-field mb-4">
               <select v-model="newEvent.band" class="mdc-text-field__input">
                 <option value="" disabled>Select Band (Optional)</option>
-                <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.attributes.name }}</option>
+                <option v-for="band in bands" :key="band.id" :value="band.id">{{ band.name }}</option>
               </select>
               <label class="mdc-floating-label" for="new-event-band">Select Band</label>
               <div class="mdc-line-ripple"></div>
@@ -294,6 +295,9 @@ onMounted(async () => {
       },
     });
     bands.value = response.data;
+    if (bands.value.length > 0) {
+      newEvent.value.band = bands.value[0].id;
+    }
   } catch (error) {
     console.error('Error fetching bands:', error);
   }
