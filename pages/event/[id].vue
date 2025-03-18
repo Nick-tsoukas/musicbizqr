@@ -13,6 +13,7 @@
       </div> -->
     </div>
     <!-- Event Details Section -->
+     <pre class="text-white" >{{ eventData }}</pre>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Left Column -->
       <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6">
@@ -167,6 +168,7 @@ const formatTime = (timeStr) => {
     console.log('there is no time string .........')
     return '';
   }
+  console.log(timeStr)
   try {
     const parsedTime = parse(timeStr, 'HH:mm:ss.SSS', new Date());
     console.log(parsedTime)
