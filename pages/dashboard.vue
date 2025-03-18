@@ -183,7 +183,7 @@
               <button
                 @click="router.push(`/analytics/${band.id}`)"
                 class="text-green-600 hover:text-green-900"
-              >
+              > <span>Analytics</span>
                 <img
                   src="@/assets/analytics-icon.svg"
                   class="h-6 w-6"
