@@ -22,7 +22,6 @@
       {{ band.data.name }}
     </div>
 
-    <!-- <pre class="text-white" >{{ band }}</pre> -->
 
     <div class="flex justify-center">
       <div class="flex flex-col">
@@ -50,8 +49,10 @@
         <!-- singlesong section -->
         <div v-if="band.data.singlesong">
           <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
-            Featured Song
+            Featured Song  
           </h1>
+       
+
           <!-- If the singlesong is marked as embedded and has an embedUrl, render the embed -->
           <div
             v-if="
@@ -362,6 +363,7 @@
             <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">
               Events and Tours
             </h1>
+
 
             <div class="overflow-x-scroll md:overflow-hidden relative">
               <table

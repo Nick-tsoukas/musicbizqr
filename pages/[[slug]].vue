@@ -4,115 +4,117 @@
       <div class="spinner"></div>
     </div>
     <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
-    <!-- <pre class="text-white" >{{ band }}</pre> -->
-    <!-- Hero Section -->
-    <!-- Image Container -->
+      <!-- <pre class="text-white" >{{ band }}</pre> -->
+      <!-- Hero Section -->
+      <!-- Image Container -->
 
-    <div class="relative w-full h-[35vh] md:h-[60vh]">
-      <img
-        v-if="band.data.bandImg"
-        class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
-        :src="band.data.bandImg.url"
-        alt="Band Image"
-      />
-      <!-- Optional overlay -->
-      <div class="absolute inset-0 bg-black bg-opacity-0"></div>
-    </div>
+      <div class="relative w-full h-[35vh] md:h-[60vh]">
+        <img
+          v-if="band.data.bandImg"
+          class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
+          :src="band.data.bandImg.url"
+          alt="Band Image"
+        />
+        <!-- Optional overlay -->
+        <div class="absolute inset-0 bg-black bg-opacity-0"></div>
+      </div>
 
-    <!-- Band Name Below the Image -->
-    <div
-      v-if="band.data.isBandNameInLogo === false"
-      class="text-center text-white text-4xl font-bold mt-4"
-    >
-      {{ band.data.name }}
-    </div>
+      <!-- Band Name Below the Image -->
+      <div
+        v-if="band.data.isBandNameInLogo === false"
+        class="text-center text-white text-4xl font-bold mt-4"
+      >
+        {{ band.data.name }}
+      </div>
 
-    <!-- <pre class="text-white" >{{ band }}</pre> -->
+      <!-- <pre class="text-white" >{{ band }}</pre> -->
 
-    <div class="flex justify-center">
-      <div class="flex flex-col">
-        <h3
-          v-if="band.data.bio"
-          class="text-[16px] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line"
-        >
-          {{ band.data.bio }}
-        </h3>
-        <div v-if="band.data.biotagline">
-          <!-- change text  -->
+      <div class="flex justify-center">
+        <div class="flex flex-col">
           <h3
-            class="text-[16px] mx-auto max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
+            v-if="band.data.bio"
+            class="text-[16px] mx-auto mt-4 max-w-5xl text-center text-white md:text-2xl leading-tight whitespace-pre-line"
           >
-            {{ band.data.biotagline }}
+            {{ band.data.bio }}
           </h3>
+          <div v-if="band.data.biotagline">
+            <!-- change text  -->
+            <h3
+              class="text-[16px] mx-auto max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
+            >
+              {{ band.data.biotagline }}
+            </h3>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Band Page Content -->
+      <!-- Band Page Content -->
 
-    <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
-      <div class="pt-0 sm:p-5">
-        <!-- singlesong section -->
-        <div v-if="band.data.singlesong">
-          <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
-            Featured Song
-          </h1>
-          <!-- If the singlesong is marked as embedded and has an embedUrl, render the embed -->
-          <div
-            v-if="
-              band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl
-            "
-          >
-            <iframe
-              :src="band.data.singlesong.embedUrl"
-              frameborder="0"
-              allowfullscreen
-              class="w-full h-64 rounded-lg"
-            ></iframe>
-          </div>
-          <!-- Otherwise, render the AudioPlayer component -->
-          <div v-else>
-            <AudioPlayer
-              :album="formatSingleSong(band.data.singlesong)"
-              :placeholderImage="'/placeholder-image.svg'"
-            />
-          </div>
-        </div>
-
-        <div class="relative w-full max-w-[600px] mr-auto">
-         
-          <h1 :vif="band.singlevideo" class="text-2xl my-10 md:text-3xl font-bold text-white md:my-10">
-            Featured Video
-          </h1>
-          <!-- Video Thumbnail & Play Button -->
-          <div
-            v-if="!isVideoPlaying"
-            class="relative cursor-pointer mb-10"
-            @click="playVideo"
-          >
-            <img
-              :src="singleVideoThumbnail"
-              alt="Video Thumbnail"
-              class="w-full max-h-[300px] object-cover rounded-lg"
-            />
+      <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <div class="pt-0 sm:p-5">
+          <!-- singlesong section -->
+          <div v-if="band.data.singlesong">
+            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
+              Featured Song
+            </h1>
+            <!-- If the singlesong is marked as embedded and has an embedUrl, render the embed -->
             <div
-              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+              v-if="
+                band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl
+              "
             >
-              <svg
-                class="w-16 h-16 text-white opacity-75"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 84 84"
-              >
-                <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
-                <polygon points="33,24 33,60 60,42" fill="white" />
-              </svg>
+              <iframe
+                :src="band.data.singlesong.embedUrl"
+                frameborder="0"
+                allowfullscreen
+                class="w-full h-64 rounded-lg"
+              ></iframe>
+            </div>
+            <!-- Otherwise, render the AudioPlayer component -->
+            <div v-else>
+              <AudioPlayer
+                :album="formatSingleSong(band.data.singlesong)"
+                :placeholderImage="'/placeholder-image.svg'"
+              />
             </div>
           </div>
 
-          <!-- YouTube Player (Loads on Click) -->
-          <div v-else class="relative pb-[56.25%] w-full">
-            <!-- <iframe
+          <div class="relative w-full max-w-[600px] mr-auto">
+            <h1
+              :vif="band.singlevideo"
+              class="text-2xl my-10 md:text-3xl font-bold text-white md:my-10"
+            >
+              Featured Video
+            </h1>
+            <!-- Video Thumbnail & Play Button -->
+            <div
+              v-if="!isVideoPlaying"
+              class="relative cursor-pointer mb-10"
+              @click="playVideo"
+            >
+              <img
+                :src="singleVideoThumbnail"
+                alt="Video Thumbnail"
+                class="w-full max-h-[300px] object-cover rounded-lg"
+              />
+              <div
+                class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+              >
+                <svg
+                  class="w-16 h-16 text-white opacity-75"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 84 84"
+                >
+                  <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
+                  <polygon points="33,24 33,60 60,42" fill="white" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- YouTube Player (Loads on Click) -->
+            <div v-else class="relative pb-[56.25%] w-full">
+              <!-- <iframe
               :src="singleVideoEmbedUrl"
               frameborder="0"
               autoplay="1"
@@ -120,158 +122,159 @@
               allowfullscreen
               class="absolute top-0 left-0 w-full h-full rounded-md"
             ></iframe> -->
-            <YouTube
+              <YouTube
                 :src="singleVideoEmbedUrl"
                 :vars="playerOptions"
                 class="w-full h-full rounded-lg"
               />
-          </div>
-        </div>
-
-        <!-- website link  -->
-        <div v-if="band.data.websitelink" class="mt-4">
-          <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:mt-6">
-            Website Link
-          </h1>
-          <a class="text-purple-500 text-xl" :href="band.data.websitelink">
-            <span :vif="band.data.websitelinktext">{{
-              band.data.websitelinktext
-            }}</span>
-          </a>
-        </div>
-
-        <div>
-      
-
-        
-          <!-- Streaming Links -->
-          <div class="w-full md:w-[100%] md:mx-auto mt-10">
-            <h1 class="text-2xl mb-4 md:text-3xl font-bold text-white">
-              Streaming Links
-            </h1>
-            <template
-              v-for="platform in streamingPlatforms"
-              :key="platform.name"
-            >
-              <span v-if="band.data[platform.name]">
-                <!-- Added click handler to track outbound clicks -->
-                <a
-                  :href="band.data[platform.name]"
-                  @click.prevent="
-                    handleClick(
-                      band.data.id,
-                      platform.name,
-                      band.data[platform.name]
-                    )
-                  "
-                >
-                  <button
-                    class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
-                  >
-                    <img
-                      :src="platform.img"
-                      class="h-10 absolute left-2"
-                      :alt="platform.label"
-                    />
-                    {{ platform.label }}
-                  </button>
-                </a>
-              </span>
-            </template>
-          </div>
-
-          <!-- Social Media -->
-          <div class="w-full md:w-[100%] md:mx-auto mt-10">
-            <h1 class="text-2xl mb-4 font-bold text-white md:text-3xl">
-              Social Media
-            </h1>
-            <template v-for="platform in socialPlatforms" :key="platform.name">
-              <span v-if="band.data[platform.name]">
-                <!-- Added click handler to track outbound clicks -->
-                <a
-                  :href="band.data[platform.name]"
-                  @click.prevent="
-                    handleClick(
-                      band.data.id,
-                      platform.name,
-                      band.data[platform.name]
-                    )
-                  "
-                >
-                  <button
-                    class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
-                  >
-                    <img
-                      :src="platform.img"
-                      class="h-10 absolute left-2"
-                      :alt="platform.label"
-                    />
-                    {{ platform.label }}
-                  </button>
-                </a>
-              </span>
-            </template>
-          </div>
-
-          <!-- Events Section -->
-          <div v-if="events.length" class="w-full mt-10">
-            <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">
-              Events and Tours
-            </h1>
-
-            <div class="overflow-x-scroll md:overflow-hidden relative">
-              <table
-                class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-              >
-                <thead>
-                  <tr class="border-b border-purple-500 border-opacity-30">
-                    <th class="px-2 py-2 text-left">Date</th>
-                    <th class="px-2 py-2 text-left">City</th>
-                    <th class="px-2 py-2 text-left">Venue</th>
-                    <th class="px-2 py-2 text-left">Tickets</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="event in events"
-                    :key="event.id"
-                    class="border-b border-purple-500 border-opacity-20"
-                  >
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
-                      {{
-                        new Date(event.date ?? new Date()).toLocaleDateString()
-                      }}
-                    </td>
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
-                      {{ event.city ?? "City not specified" }},
-                      {{ event.state }}
-                    </td>
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
-                      {{ event.venue ?? "Venue not specified" }}
-                    </td>
-                    <td class="px-2 py-1 whitespace-nowrap text-left">
-                      <button
-                        @click="router.push(`/event/${event.id}`)"
-                        class="text-purple-400"
-                      >
-                        View Event
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
 
-         
+          <!-- website link  -->
+          <div v-if="band.data.websitelink" class="mt-4">
+            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:mt-6">
+              Website Link
+            </h1>
+            <a class="text-purple-500 text-xl" :href="band.data.websitelink">
+              <span :vif="band.data.websitelinktext">{{
+                band.data.websitelinktext
+              }}</span>
+            </a>
+          </div>
+
+          <div>
+            <!-- Streaming Links -->
+            <div class="w-full md:w-[100%] md:mx-auto mt-10">
+              <h1 class="text-2xl mb-4 md:text-3xl font-bold text-white">
+                Streaming Links
+              </h1>
+              <template
+                v-for="platform in streamingPlatforms"
+                :key="platform.name"
+              >
+                <span v-if="band.data[platform.name]">
+                  <!-- Added click handler to track outbound clicks -->
+                  <a
+                    :href="band.data[platform.name]"
+                    @click.prevent="
+                      handleClick(
+                        band.data.id,
+                        platform.name,
+                        band.data[platform.name]
+                      )
+                    "
+                  >
+                    <button
+                      class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
+                    >
+                      <img
+                        :src="platform.img"
+                        class="h-10 absolute left-2"
+                        :alt="platform.label"
+                      />
+                      {{ platform.label }}
+                    </button>
+                  </a>
+                </span>
+              </template>
+            </div>
+
+            <!-- Social Media -->
+            <div class="w-full md:w-[100%] md:mx-auto mt-10">
+              <h1 class="text-2xl mb-4 font-bold text-white md:text-3xl">
+                Social Media
+              </h1>
+              <template
+                v-for="platform in socialPlatforms"
+                :key="platform.name"
+              >
+                <span v-if="band.data[platform.name]">
+                  <!-- Added click handler to track outbound clicks -->
+                  <a
+                    :href="band.data[platform.name]"
+                    @click.prevent="
+                      handleClick(
+                        band.data.id,
+                        platform.name,
+                        band.data[platform.name]
+                      )
+                    "
+                  >
+                    <button
+                      class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
+                    >
+                      <img
+                        :src="platform.img"
+                        class="h-10 absolute left-2"
+                        :alt="platform.label"
+                      />
+                      {{ platform.label }}
+                    </button>
+                  </a>
+                </span>
+              </template>
+            </div>
+
+            <!-- Events Section -->
+            <!-- <pre class="text-white"> there is an evnt here{{ events }}</pre> -->
+            <div v-if="events.length" class="w-full mt-10">
+              <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">
+                Events and Tours
+              </h1>
+
+              <div class="overflow-x-scroll md:overflow-hidden relative">
+                <table
+                  class="w-full table-auto bg-black text-white rounded-md shadow-lg"
+                >
+                  <thead>
+                    <tr class="border-b border-purple-500 border-opacity-30">
+                      <th class="px-2 py-2 text-left">Date</th>
+                      <th class="px-2 py-2 text-left">City</th>
+                      <th class="px-2 py-2 text-left">Venue</th>
+                      <th class="px-2 py-2 text-left">Tickets</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="event in events"
+                      :key="event.id"
+                      class="border-b border-purple-500 border-opacity-20"
+                    >
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        {{
+                          new Date(event.date + "T00:00:00").toLocaleDateString(
+                            "en-US"
+                          )
+                        }}
+                      </td>
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        {{ event.city ?? "City not specified" }},
+                        {{ event.state }}
+                      </td>
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        {{ event.venue ?? "Venue not specified" }}
+                      </td>
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        <button
+                          @click="router.push(`/event/${event.id}`)"
+                          class="text-purple-400"
+                        >
+                          View Event
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <!-- <Footer /> -->
+      <div class="h-40 flex justify-center items-center">
+        <img src="@/assets/musicbizlogo.png" class="h-12" />
+      </div>
     </div>
-    <!-- <Footer /> -->
-    <div class="h-40 flex justify-center items-center">
-      <img src="@/assets/musicbizlogo.png" class="h-12" />
-    </div>
-  </div>
   </div>
 </template>
 
@@ -290,7 +293,7 @@ import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
 
-const loading = ref(true)
+const loading = ref(true);
 
 // const extractYouTubeId = (url) => {
 //   // Check if URL is an embed URL (https://www.youtube.com/embed/...)
@@ -453,14 +456,12 @@ const getYouTubeThumbnail = (youtubeVideo) => {
   };
 };
 
-
-const slug = computed(() =>route.params.slug?.toLowerCase() ?? ''); // Debug
-
+const slug = computed(() => route.params.slug?.toLowerCase() ?? ""); // Debug
 
 const fetchBandData = async () => {
   const apiUrl = useRuntimeConfig().public.strapiUrl;
   const response = await fetch(
-    `${apiUrl}/api/bands/slug/${route.params.slug?.toLowerCase() ?? ''}?` + // ✅ Correct endpoint
+    `${apiUrl}/api/bands/slug/${route.params.slug?.toLowerCase() ?? ""}?` + // ✅ Correct endpoint
       "populate[events][populate]=image&" +
       "populate[tours][populate]=*&" +
       "populate[albums][populate]=cover,songs.file&" +
@@ -491,7 +492,7 @@ const fetchBandData = async () => {
       setAlbum(albums.value[0].id);
     }
   }
-  loading.value = false
+  loading.value = false;
 };
 
 const setAlbum = (id) => {

@@ -3,7 +3,7 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-    <pre class="text-white">{{ band }}</pre>
+    <!-- <pre class="text-white">{{ band }}</pre> -->
     <div class="container-mdc bg-black max-w-5xl">
       <h1 class="title text-black">Edit Band</h1>
       <form @submit.prevent="submitEditBand" class="rounded-md p-4">
