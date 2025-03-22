@@ -1,8 +1,6 @@
 <script setup>
-
 import { useRuntimeConfig } from '#imports';
 import { ref } from 'vue';
-
 
 const { register, login } = useStrapiAuth();
 const router = useRouter();
@@ -11,12 +9,13 @@ const { values, defineField } = useForm();
 const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 
+const showPassword = ref(false);
 const loading = ref(false);
-const errorMessage = ref(''); // Ref to store the error message
+const errorMessage = ref('');
 
 // Get Strapi Base URL from runtime config
 const config = useRuntimeConfig();
-const strapiBaseUrl = config.public.strapiUrl; // Ensure this is set in nuxt.config.js
+const strapiBaseUrl = config.public.strapiUrl;
 
 const signUp = async () => {
   try {
@@ -29,7 +28,6 @@ const signUp = async () => {
 
 const loginUser = async () => {
   loading.value = true;
-
   try {
     await login({ identifier: values.email, password: values.password });
     router.push('/dashboard');
@@ -42,7 +40,6 @@ const loginUser = async () => {
 };
 
 const loginWithProvider = (provider) => {
-  // Redirect to the Strapi provider endpoint
   window.location.href = `${strapiBaseUrl}/api/connect/${provider}`;
 };
 </script>
@@ -73,24 +70,40 @@ const loginWithProvider = (provider) => {
           />
           <label for="email" class="mdc-floating-label">Email</label>
           <span class="mdc-line-ripple"></span>
-          <!-- Optional clear form functionality -->
-          <!-- <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearForm" /> -->
         </div>
 
-        <!-- Password input -->
-        <div class="mdc-text-field mdc-text-field--filled mb-8">
+        <!-- Password input with toggle -->
+        <div class="mdc-text-field mdc-text-field--filled mb-8 relative">
           <input
             id="password"
             v-model="password"
             v-bind="passwordAttrs"
-            type="password"
-            class="mdc-text-field__input"
+            :type="showPassword ? 'text' : 'password'"
+            class="mdc-text-field__input pr-10"
             placeholder="Enter your password"
           />
           <label for="password" class="mdc-floating-label">Password</label>
           <span class="mdc-line-ripple"></span>
-          <!-- Optional clear form functionality -->
-          <!-- <img src="@/assets/cancel-icon.svg" alt="Cancel Icon" class="cancel-icon" @click="clearForm" /> -->
+
+          <!-- Toggle show/hide password button -->
+          <button
+            type="button"
+            class="absolute right-4 top-4 text-gray-500 focus:outline-none"
+            @click="showPassword = !showPassword"
+          >
+            <!-- Eye Icon -->
+            <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <!-- Eye Off Icon -->
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.975 9.975 0 012.187-3.368m3.048-2.634A9.935 9.935 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.271 5.145M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+</svg>
+
+          </button>
         </div>
 
         <!-- Login button -->
@@ -98,20 +111,10 @@ const loginWithProvider = (provider) => {
           <button @click="loginUser" class="mdc-button mdc-button--raised w-full mb-4">
             Login
           </button>
-          <p class="text-right">
+          <p class="text-center">
             Need an account?
             <NuxtLink to="/signup" class="text-underline text-blue-800">SIGN UP</NuxtLink>
           </p>
-        </div>
-
-        <!-- Social login buttons -->
-        <div class="mt-4">
-          <button @click="loginWithProvider('google')" class="mdc-button mdc-button--raised w-full mb-2">
-            Login with Google
-          </button>
-          <button @click="loginWithProvider('facebook')" class="mdc-button mdc-button--raised w-full">
-            Login with Facebook
-          </button>
         </div>
       </div>
     </div>
@@ -124,6 +127,13 @@ const loginWithProvider = (provider) => {
 }
 
 .text-red-500 {
-  color: #f56565; /* Tailwind red for error message */
+  color: #f56565;
+}
+
+button svg {
+  transition: color 0.2s;
+}
+button:hover svg {
+  color: #7c3aed; /* Purple-600 on hover */
 }
 </style>
