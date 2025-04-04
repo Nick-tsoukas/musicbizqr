@@ -1,4 +1,25 @@
 # task list for today 
+
+- [] set up email service and email confirmation 
+- [] account page 
+  - [] reset password
+  - [] update email address (user email )
+  - [] cancel trial 
+  - [] cancel account 
+- [] custorm service email (tech support ) 
+- [] last design home landing ( polish )
+- [] test stripe time feature 14 free trail test out what 14
+  - 11 day in your trial 
+   - [] confrim subscrition 
+
+  - [] kill featuer when card is delicie 
+  
+
+
+
+
+
+# task list for today 
 - [] make sure create new event page is working and user can select a band to relate to the event
 - [] add dannys event 
 - [] check the edit event works

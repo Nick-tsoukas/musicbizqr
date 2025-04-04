@@ -37,6 +37,7 @@
     "qr-border-plugin": "^0.0.10",
     "qr-code-styling": "^1.8.4",
     "qrcode.vue": "^3.6.0",
+    "resend": "^4.2.0",
     "swiper": "^11.1.14",
     "tsparticles": "^3.5.0",
     "uuid": "^10.0.0",
