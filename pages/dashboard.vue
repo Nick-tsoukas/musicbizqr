@@ -543,7 +543,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+
 
 const user = useStrapiUser();
 
@@ -553,7 +553,7 @@ const route = useRoute();
 const client = useStrapiClient();
 const { find } = useStrapi();
 
-const { setToken, fetchUser } = useStrapiAuth()
+ const { setToken, fetchUser } = useStrapiAuth()
 
 const loading = ref(true);
 const qrs = ref([]);
@@ -866,29 +866,21 @@ const downloadImage = () => {
   document.body.removeChild(link);
 };
 
-onMounted(() => {
+onMounted(async () => {
   const token = route.query.token
   if (token && typeof token === 'string') {
-    // 1) Use the Strapi Auth composable's setToken method:
     setToken(token)
     console.log('Auto-logged in with token:', token)
-
-    // 2) Remove the query param to clean up the URL
+    
     router.replace({ query: {} })
-
-    // 3) Optionally call fetchUser() to refresh the user object
-    //    from your Strapi API. This can help ensure the user is
-    //    immediately available in user.value
+    
+    // Now we can await fetchUser(), because we've made onMounted async
     await fetchUser()
-
-    // 4) If your module only reads tokens at startup, you might still
-    //    need a page reload. Test first without it:
-    // window.location.reload()
   }
 
   // Continue with your data fetching logic:
   fetchData()
-});
+})
 
 const editItem = (id, page) => {
   router.push({ path: `/${page}/${id}` });
