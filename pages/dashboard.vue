@@ -544,13 +544,17 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useStrapiUser, useStrapiClient, useStrapi, useStrapiAuth } from '#imports'
 
 const user = useStrapiUser();
+
 const router = useRouter();
 const route = useRoute();
 
 const client = useStrapiClient();
 const { find } = useStrapi();
+
+const { setToken, fetchUser } = useStrapiAuth()
 
 const loading = ref(true);
 const qrs = ref([]);
@@ -864,22 +868,27 @@ const downloadImage = () => {
 };
 
 onMounted(() => {
-   // Check if the dashboard URL contains a 'token' query parameter
-   const token = route.query.token
+  const token = route.query.token
   if (token && typeof token === 'string') {
-    // Save the token to localStorage using the key your Nuxt Strapi module expects.
-    // Many modules use "strapi_jwt" as the key.
-    localStorage.setItem('strapi_jwt', token)
+    // 1) Use the Strapi Auth composable's setToken method:
+    setToken(token)
     console.log('Auto-logged in with token:', token)
-    
-    // Optionally, remove the token query parameter from the URL to clean up the address bar:
-    // This uses router.replace to remove query parameters without reloading the page.
+
+    // 2) Remove the query param to clean up the URL
     router.replace({ query: {} })
-    
-    // If needed, force a page reload so that any user state is reinitialized using the new token:
+
+    // 3) Optionally call fetchUser() to refresh the user object
+    //    from your Strapi API. This can help ensure the user is
+    //    immediately available in user.value
+    await fetchUser()
+
+    // 4) If your module only reads tokens at startup, you might still
+    //    need a page reload. Test first without it:
     // window.location.reload()
   }
-  fetchData();
+
+  // Continue with your data fetching logic:
+  fetchData()
 });
 
 const editItem = (id, page) => {
