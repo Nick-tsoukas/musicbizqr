@@ -862,6 +862,21 @@ const downloadImage = () => {
 };
 
 onMounted(() => {
+   // Check if the dashboard URL contains a 'token' query parameter
+   const token = route.query.token
+  if (token && typeof token === 'string') {
+    // Save the token to localStorage using the key your Nuxt Strapi module expects.
+    // Many modules use "strapi_jwt" as the key.
+    localStorage.setItem('strapi_jwt', token)
+    console.log('Auto-logged in with token:', token)
+    
+    // Optionally, remove the token query parameter from the URL to clean up the address bar:
+    // This uses router.replace to remove query parameters without reloading the page.
+    router.replace({ query: {} })
+    
+    // If needed, force a page reload so that any user state is reinitialized using the new token:
+    window.location.reload()
+  }
   fetchData();
 });
 
