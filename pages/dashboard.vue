@@ -547,6 +547,8 @@ import { ref, computed, onMounted } from "vue";
 
 const user = useStrapiUser();
 const router = useRouter();
+const route = useRoute();
+
 const client = useStrapiClient();
 const { find } = useStrapi();
 
@@ -875,7 +877,7 @@ onMounted(() => {
     router.replace({ query: {} })
     
     // If needed, force a page reload so that any user state is reinitialized using the new token:
-    window.location.reload()
+    // window.location.reload()
   }
   fetchData();
 });
