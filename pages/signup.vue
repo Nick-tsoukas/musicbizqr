@@ -95,10 +95,9 @@ const handleSignup = async () => {
     const checkoutUrl = await createCheckoutSession(customerId)
 
     // 3) Temporarily store the user data so we can use it after redirect
-    localStorage.setItem('signup_email', formData.value.email)
-    localStorage.setItem('signup_password', formData.value.password)
-    localStorage.setItem('signup_name', formData.value.name)
-
+    sessionStorage.setItem('signup_email', formData.value.email)
+sessionStorage.setItem('signup_password', formData.value.password)
+sessionStorage.setItem('signup_name', formData.value.name)
     // 4) Redirect to Stripe
     window.location.href = checkoutUrl
   } catch (err) {
