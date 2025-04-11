@@ -544,7 +544,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useStrapiUser, useStrapiClient, useStrapi, useStrapiAuth } from '#imports'
 
 const user = useStrapiUser();
 
