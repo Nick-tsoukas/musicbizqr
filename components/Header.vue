@@ -11,6 +11,8 @@
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
         <p v-if="user" @click="logoutUser" class="nav-link">Logout</p>
         <NuxtLink to="/contact" class="nav-link">Contact</NuxtLink>
+        <NuxtLink v-if="user" to="/account" class="nav-link">Account</NuxtLink>
+
       </nav>
       <button @click="toggleMenu" class="animated__animate__slideInDown md:hidden focus:outline-none">
         <svg
@@ -49,6 +51,8 @@
         <NuxtLink v-if="!user" to="/login" @click="toggleMenu" class="mobile-nav-link">Login</NuxtLink>
         <NuxtLink v-if="user" to="/" @click="logoutUserMobile" class="mobile-nav-link">Logout</NuxtLink>
         <NuxtLink to="/contact" @click="toggleMenu" class="mobile-nav-link">Contact</NuxtLink>
+        <NuxtLink v-if="user" to="/account" class="nav-link">Account</NuxtLink>
+
       </div>
     </nav>
   </header>
