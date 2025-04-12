@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-[#000] text-white shadow-lg">
+  <header class="bg-[#000] text-white shadow-lg z-50">
     <div class=" p-5 mx-auto flex items-center justify-between px-4 py-4">
       <img src="@/assets/musicbizlogo.png" class="h-8" />
       <!-- <div class="text-xl font-bold">MusicBizQR</div> -->
