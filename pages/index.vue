@@ -1,6 +1,7 @@
 <template>
   <div class="bg-[#000] overflow-x-hidden">
-    <NuxtParticles id="tsparticles" :options="options" />
+    <div class="relative min-h-screen">
+    <NuxtParticles id="tsparticles" :options="options"    class="fixed inset-0 -z-10 pointer-events-none"  />
     <!-- Main content -->
     <main>
       <!-- Hero section -->
@@ -358,6 +359,7 @@
     <div class="h-40 flex justify-center items-center">
       <img src="@/assets/musicbizlogo.png" class="h-12" />
     </div>
+   </div>
   </div>
 </template>
 
@@ -612,41 +614,29 @@ const pricing = {
 const frequency = ref(pricing.frequencies[0]);
 
 const options = {
+  // Disable built-in full-screen so it doesn't hijack scroll
+  fullScreen: { enable: false },
+
+  // Style the canvas container to be a full-page background
   style: {
     position: "absolute",
-    padding: "1rem",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    zIndex: -1,
+    // Prevent the canvas from blocking scroll/touch
+    pointerEvents: "none",
   },
+
   particles: {
-    fullScreen: {
-      enable: true,
-      zIndex: -1,
-    },
-    color: {
-      value: "#fff",
-    },
-    links: {
-      color: "#fff",
-      enable: true,
-    },
-    move: {
-      enable: true,
-    },
-    number: {
-      value: 100,
-    },
+    // Everything else you had stays the same
+    color: { value: "#fff" },
+    links: { color: "#fff", enable: true },
+    move: { enable: true },
+    number: { value: 100 },
   },
-  responsive: [
-    {
-      breakpoint: 768, // Mobile breakpoint (width ≤ 768px)
-      options: {
-        particles: {
-          number: {
-            value: 30, // Reduced number of particles on mobile
-          },
-        },
-      },
-    },
-  ],
+  // etc.
 };
 
 // function selectPage(i, page) {

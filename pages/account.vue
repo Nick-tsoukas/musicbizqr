@@ -17,7 +17,7 @@
               class="w-full border rounded px-3 py-2"
             />
           </div>
-          <!-- Email (if you allow the user to update it) -->
+          <!-- Email -->
           <div class="mb-4">
             <label class="block text-gray-600 mb-1">Email</label>
             <input
@@ -26,6 +26,7 @@
               class="w-full border rounded px-3 py-2"
             />
           </div>
+
           <button
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             @click="updateProfile"
@@ -42,7 +43,7 @@
           <label class="block text-gray-600 mb-1">Current Password</label>
           <input
             type="password"
-            v-model="passwordForm.currentPassword"
+            v-model="passwordFormData.currentPassword"
             class="w-full border rounded px-3 py-2"
           />
         </div>
@@ -50,7 +51,7 @@
           <label class="block text-gray-600 mb-1">New Password</label>
           <input
             type="password"
-            v-model="passwordForm.password"
+            v-model="passwordFormData.password"
             class="w-full border rounded px-3 py-2"
           />
         </div>
@@ -58,13 +59,13 @@
           <label class="block text-gray-600 mb-1">Confirm New Password</label>
           <input
             type="password"
-            v-model="passwordForm.passwordConfirmation"
+            v-model="passwordFormData.passwordConfirmation"
             class="w-full border rounded px-3 py-2"
           />
         </div>
         <button
           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          @click="changePassword"
+          @click="onChangePassword"
         >
           Update Password
         </button>
@@ -81,28 +82,36 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useStrapiAuth, useStrapiUser, useStrapiClient } from '#imports' // or '@nuxtjs/strapi' depending on your setup
+import { useStrapiAuth, useStrapiClient } from '#imports' 
+// ^ Removed useStrapiUser (unused) to avoid conflicts
 
-// We'll use these composables from the Strapi module
 const { user, fetchUser, changePassword } = useStrapiAuth()
 const client = useStrapiClient()
 
-// Data references
+// Loading state for the profile section
 const fetchingProfile = ref(true)
-const profileForm = ref({ name: '', email: '' })
-const passwordForm = ref({ currentPassword: '', password: '', passwordConfirmation: '' })
 
-// Feedback states for password change
+// Profile form
+const profileForm = ref({ name: '', email: '' })
+
+// Password form data (renamed to avoid VarRedeclaration conflicts)
+const passwordFormData = ref({
+  currentPassword: '',
+  password: '',
+  passwordConfirmation: ''
+})
+
+// Feedback states for the password section
 const passwordError = ref('')
 const passwordSuccess = ref('')
 
 onMounted(async () => {
   try {
-    // If user.value is not loaded yet, fetch it
+    // If user not yet fetched, fetch it now
     if (!user.value) {
       await fetchUser()
     }
-    // Populate the form with the user's current details
+    // Populate the profile form once user is available
     if (user.value) {
       profileForm.value.name = user.value.username || user.value.name || ''
       profileForm.value.email = user.value.email || ''
@@ -114,17 +123,16 @@ onMounted(async () => {
 
 async function updateProfile() {
   try {
-    // Example: update user's name/email
-    // Adjust this call to match your user structure or a custom endpoint in Strapi
-    const updatedUser = await client('/users/me', {
+    // Example endpoint & payload: adjust as needed
+    await client('/users/me', {
       method: 'PUT',
       body: {
         username: profileForm.value.name,
-        email: profileForm.value.email
-      }
+        email: profileForm.value.email,
+      },
     })
-    alert('Profile updated successfully')
-    // Optionally re-fetch user to refresh state
+    alert('Profile updated successfully!')
+    // Refresh user data
     await fetchUser()
   } catch (err: any) {
     console.error(err)
@@ -132,19 +140,18 @@ async function updateProfile() {
   }
 }
 
-async function changePassword() {
+async function onChangePassword() {
   passwordError.value = ''
   passwordSuccess.value = ''
 
   try {
-    // `changePassword` is provided by the Strapi module
     await changePassword({
-      currentPassword: passwordForm.value.currentPassword,
-      password: passwordForm.value.password,
-      passwordConfirmation: passwordForm.value.passwordConfirmation
+      currentPassword: passwordFormData.value.currentPassword,
+      password: passwordFormData.value.password,
+      passwordConfirmation: passwordFormData.value.passwordConfirmation
     })
     // Clear form
-    passwordForm.value = { currentPassword: '', password: '', passwordConfirmation: '' }
+    passwordFormData.value = { currentPassword: '', password: '', passwordConfirmation: '' }
     passwordSuccess.value = 'Password updated successfully!'
   } catch (err: any) {
     console.error(err)
