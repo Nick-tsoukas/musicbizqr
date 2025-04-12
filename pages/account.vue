@@ -30,7 +30,11 @@
         Update Account
       </button>
     </form>
-
+    <div v-if="data">
+  <p>Plan: {{ data.subscription?.plan.nickname || 'Trial' }}</p>
+  <p>Status: {{ data.subscription?.status || 'trialing' }}</p>
+  <p v-if="data.trialEndsAt">Trial Ends: {{ format(new Date(data.trialEndsAt), 'PPP') }}</p>
+</div>
     <div class="mt-12 border-t border-gray-700 pt-8">
       <h2 class="text-2xl font-semibold mb-2">Subscription</h2>
       <p class="text-gray-300 mb-4">Status: {{ subscriptionStatus }}</p>
@@ -61,6 +65,13 @@ onMounted(() => {
     email.value = user.value.email;
   }
   fetchSubscriptionStatus();
+});
+
+const { data, error } = await useFetch('/api/stripe/billing', {
+  baseURL: 'http://localhost:1337',
+  headers: {
+    Authorization: `Bearer ${useStrapiToken().value}`,
+  },
 });
 
 const updateAccount = async () => {
