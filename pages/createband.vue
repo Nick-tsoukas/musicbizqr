@@ -110,7 +110,7 @@
         <div class="mb-4 py-10 bg-white p-4">
           <input
             type="file"
-            required
+           
             id="band-img"
             class="styled-file-input"
             @change="handleImageUpload"
@@ -479,6 +479,9 @@
           Create Profile
         </button>
       </form>
+      <!-- <button class="text-white bg-red-500" @click="submitForm">test post function </button>
+      <button class="text-white bg-red-500" @click="logUser">log User </button> -->
+
     </div>
   </div>
 </template>
@@ -490,6 +493,7 @@ const route = useRoute();
 const client = useStrapiClient();
 const { update } = useStrapi();
 const user = useStrapiUser();
+import { useStrapiToken } from '#imports'
 
 const loading = ref(false);
 const bandName = ref("");
@@ -499,6 +503,8 @@ const bandImg = ref(null);
 const bandImgUrl = ref(null);
 const websitelink = ref("");
 const websitelinktext = ref("");
+const bands = ref([]);
+
 
 // Band Members
 const members = ref([
@@ -557,22 +563,18 @@ const handleSingleSongUpload = (event) => {
   singlesongFileName.value = singlesongTitle.value || file.name;
 };
 
+// test post 
+
+
+
+
+
+const logUser = () => {
+  console.log(user, ' user is here ')
+}
 // Submit form
 const submitForm = async () => {
   try {
-    loading.value = true;
-    if (!bandName.value || !genre.value || !bio.value) {
-      alert("Please fill in the required fields: name, genre, bio.");
-      loading.value = false;
-      return;
-    }
-
-    const normalizedSingleSongEmbedUrl = normalizeStreamingUrl(
-      singlesongEmbedUrl.value
-    );
-    const normalizedSingleVideoUrl = normalizeStreamingUrl(
-      singlevideoYoutubeUrl.value
-    );
     const form = {
       name: bandName.value,
       genre: genre.value,
@@ -593,63 +595,59 @@ const submitForm = async () => {
       websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
-      members: members.value.map((member) => ({
-        name: member.name || "",
-        instrument: member.instrument || "",
+      members: members.value.map(member => ({
+        name: member.name || '',
+        instrument: member.instrument || '',
       })),
-      // Updated: conditionally include file upload or embed URL
       singlesong: {
-        title: singlesongTitle.value || "",
-        ...(singlesongType.value === "upload"
-          ? { song: singlesongFile.value }
-          : { embedUrl: singlesongEmbedUrl.value }),
+        title: singlesongTitle.value || '',
+        ...(singlesongType.value === 'embed' && {
+          embedUrl: singlesongEmbedUrl.value,
+        }),
       },
       singlevideo: {
-        // title: singlesongTitle.value || "",
-        youtubeid: singlevideoYoutubeUrl.value || "",
+        youtubeid: singlevideoYoutubeUrl.value || '',
       },
     };
 
     const formData = new FormData();
-    formData.append("data", JSON.stringify(form));
+    formData.append('data', JSON.stringify(form));
 
-    // Band Image
     if (bandImg.value) {
-      formData.append("files[bandImg]", bandImg.value);
+      formData.append('files.bandImg', bandImg.value);
     }
 
-    // Member Images
+    // Append member images
     members.value.forEach((member, index) => {
       if (member.image) {
-        formData.append(`files[members][${index}][image]`, member.image);
+        formData.append(`files.members.${index}.image`, member.image);
       }
     });
 
-    // Single Song File if type is upload
-    if (singlesongType.value === "upload" && singlesongFile.value) {
-      formData.append("files[singlesong][song]", singlesongFile.value);
+    // Append single song file
+    if (singlesongType.value === 'upload' && singlesongFile.value) {
+      formData.append('files.singlesong.song', singlesongFile.value);
     }
 
-    console.log("FormData:", Array.from(formData.entries()));
-
-    const { data: bandData } = await client("/bands", {
-      method: "POST",
+    const res = await fetch('http://localhost:1337/api/bands', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${useStrapiToken().value}`,
+      },
       body: formData,
     });
 
-    if (route.query.qrId) {
-      await update("qrs", route.query.qrId, {
-        band: bandData.id,
-      });
-    }
+    const result = await res.json();
+    console.log('Band created:', result);
 
-    console.log("Band profile created successfully:", bandData);
-    router.push("/dashboard");
-  } catch (error) {
-    loading.value = false;
-    console.error("Error creating band profile:", error);
+    if (!res.ok) throw result;
+
+  } catch (err) {
+    console.error('Failed to create band:', err);
   }
 };
+
+
 
 const normalizeStreamingUrl = (url) => {
   if (!url) return null;

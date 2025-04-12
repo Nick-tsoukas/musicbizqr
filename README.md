@@ -1,11 +1,21 @@
+
 # task list for today 
 
-- [] set up email service and email confirmation 
-- [] account page 
+- [x] set up email service and email confirmation 
+- [] account page (working on now )
   - [] reset password
   - [] update email address (user email )
   - [] cancel trial 
   - [] cancel account 
+
+  ### notes on the account page 
+ - on the account page the ui needs to show perinent user profile information
+ - display useremail/username 
+ - give option to change password 
+ - give optoin to change the user email and trigger another email confiramtion 
+ - display status of trail 
+ - display subscription status (subscribed, suspended)
+ - function to cancel the subscription 
 - [] custorm service email (tech support ) 
 - [] last design home landing ( polish )
 - [] test stripe time feature 14 free trail test out what 14

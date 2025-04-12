@@ -48,7 +48,6 @@
     "vue3-particles": "^2.12.0",
     "vue3-youtube": "^0.1.9",
     "yup": "^1.4.0"
-    
   },
   "devDependencies": {
     "@nuxt/types": "^2.17.4",
