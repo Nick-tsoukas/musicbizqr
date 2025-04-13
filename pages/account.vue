@@ -143,7 +143,7 @@ const fetchSubscriptionStatus = async () => {
 const goToBillingPortal = async () => {
   loading.value = true;
   try {
-    const res: any = await client('/create-billing-portal-session', {
+    const res: any = await client('stripe/create-billing-portal-session', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token.value}`,
