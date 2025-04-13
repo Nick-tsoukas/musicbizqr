@@ -126,7 +126,7 @@ const updateAccount = async () => {
 const fetchSubscriptionStatus = async () => {
   loading.value = true;
   try {
-    const res: any = await client('/subscription-status', {
+    const res: any = await client('stripe/subscription-status', {
       headers: {
         Authorization: `Bearer ${token.value}`,
       },
