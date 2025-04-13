@@ -57,9 +57,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useLoadingIndicator } from '#app';
 
-const { start, finish } = useLoadingIndicator();
 const config = useRuntimeConfig();
 
 const user = useStrapiUser();
@@ -70,6 +68,7 @@ const email = ref('');
 const password = ref('');
 const subscriptionStatus = ref('Loading...');
 const billingData = ref<any>(null);
+const loading = ref(false); // ✅ Replaces useLoadingIndicator
 
 onMounted(async () => {
   if (user.value) {
@@ -80,7 +79,7 @@ onMounted(async () => {
 });
 
 const fetchBillingInfo = async () => {
-  start();
+  loading.value = true;
   try {
     const { data, error } = await useFetch('/api/stripe/billing', {
       baseURL: config.public.strapiUrl,
@@ -89,16 +88,13 @@ const fetchBillingInfo = async () => {
       },
     });
 
-    if (error.value) {
-      throw new Error(error.value.message || 'Unknown billing info error');
-    }
-
+    if (error.value) throw new Error(error.value.message || 'Billing info error');
     billingData.value = data.value;
-    console.log('✅ Billing info loaded:', billingData.value);
+    console.log('✅ Billing info:', billingData.value);
   } catch (err) {
-    console.error('❌ Error fetching billing info:', err);
+    console.error('❌ Billing info failed:', err);
   } finally {
-    finish();
+    loading.value = false;
   }
 };
 
@@ -107,10 +103,9 @@ const updateAccount = async () => {
     email: email.value,
     username: email.value,
   };
-
   if (password.value) updates.password = password.value;
 
-  start();
+  loading.value = true;
   try {
     await client(`/users/${user.value.id}`, {
       method: 'PUT',
@@ -119,37 +114,34 @@ const updateAccount = async () => {
         Authorization: `Bearer ${token.value}`,
       },
     });
-    console.log('✅ Account updated successfully');
-    alert('Account updated.');
+    alert('✅ Account updated!');
   } catch (err) {
     console.error('❌ Update failed:', err);
     alert('Failed to update account');
   } finally {
-    finish();
+    loading.value = false;
   }
 };
 
 const fetchSubscriptionStatus = async () => {
-  start();
+  loading.value = true;
   try {
     const res: any = await client('/subscription-status', {
       headers: {
         Authorization: `Bearer ${token.value}`,
       },
     });
-
     subscriptionStatus.value = res?.status || 'Unknown';
-    console.log('✅ Subscription status:', subscriptionStatus.value);
   } catch (err) {
     subscriptionStatus.value = 'Error fetching status';
-    console.error('❌ Error fetching subscription status:', err);
+    console.error('❌ Subscription status error:', err);
   } finally {
-    finish();
+    loading.value = false;
   }
 };
 
 const goToBillingPortal = async () => {
-  start();
+  loading.value = true;
   try {
     const res: any = await client('/create-billing-portal-session', {
       method: 'POST',
@@ -159,17 +151,15 @@ const goToBillingPortal = async () => {
     });
 
     if (res?.url) {
-      console.log('✅ Redirecting to billing portal...');
       window.location.href = res.url;
     } else {
-      alert('Failed to redirect to billing portal');
-      console.warn('⚠️ No URL returned from billing portal session');
+      alert('⚠️ Failed to open billing portal');
     }
   } catch (err) {
     console.error('❌ Billing portal error:', err);
-    alert('Error loading billing portal');
+    alert('Error opening billing portal');
   } finally {
-    finish();
+    loading.value = false;
   }
 };
 </script>
