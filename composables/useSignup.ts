@@ -44,34 +44,32 @@ export function useSignup() {
     password: string,
     name: string
   ) => {
-    console.log("confirmpayment called with:", sessionId, email, password, name);
-    console.log("strapiBaseURL:", strapiBaseURL);
+    console.log("confirmPayment called with:", sessionId, email, password, name);
   
-    // Construct and log the full URL for debugging
     const fullUrl = `${strapiBaseURL}/api/stripe/confirm-payment`;
-    console.log("Posting to URL:", fullUrl);
   
     try {
       const res = await fetch(fullUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        // Serialize the body as JSON so that Strapi receives all four fields
-        body: JSON.stringify({ session_id: sessionId, email, password, name })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, email, password, name }),
       });
-      const data = await res.json();
+  
+      const data = await res.json(); // ❗ Always parse the response
+  
       console.log("confirmPayment response data:", data);
-      
+  
       if (!res.ok) {
-        throw new Error(data.message || "Payment confirmation failed.");
+        throw new Error(data?.message || "Payment confirmation failed.");
       }
-      return data?.user;
+  
+      return data; // ✅ Return the full data object (must include `message`)
     } catch (error: any) {
       console.error("Error in confirmPayment:", error);
-      throw new Error(error.message || "Payment confirmation failed.");
+      throw new Error(error?.message || "Unexpected error confirming payment.");
     }
   };
+  
   
   
   
