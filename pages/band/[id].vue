@@ -91,7 +91,7 @@
               <img
                 :src="singleVideoThumbnail"
                 alt="Video Thumbnail"
-                class="w-full max-h-[300px] object-cover rounded-lg"
+                class="w-full max-h-[300px] object-cover  object-center rounded-lg"
               />
               <div
                 class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
