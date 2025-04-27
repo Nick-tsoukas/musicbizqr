@@ -488,6 +488,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+const config = useRuntimeConfig()
+
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
@@ -574,8 +576,10 @@ const logUser = () => {
 }
 // Submit form
 const submitForm = async () => {
+  loading.value = true;
   try {
-    const form = {
+    // 1) Build the payload object
+    const payload = {
       name: bandName.value,
       genre: genre.value,
       bio: bio.value,
@@ -595,41 +599,37 @@ const submitForm = async () => {
       websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
-      members: members.value.map(member => ({
-        name: member.name || '',
-        instrument: member.instrument || '',
+      members: members.value.map(m => ({
+        name: m.name || '',
+        instrument: m.instrument || '',
       })),
       singlesong: {
         title: singlesongTitle.value || '',
-        ...(singlesongType.value === 'embed' && {
-          embedUrl: singlesongEmbedUrl.value,
-        }),
+        ...(singlesongType.value === 'embed' && { embedUrl: singlesongEmbedUrl.value }),
       },
       singlevideo: {
         youtubeid: singlevideoYoutubeUrl.value || '',
       },
     };
 
+    // 2) Wrap in FormData for media uploads
     const formData = new FormData();
-    formData.append('data', JSON.stringify(form));
-
+    formData.append('data', JSON.stringify(payload));
     if (bandImg.value) {
       formData.append('files.bandImg', bandImg.value);
     }
-
-    // Append member images
-    members.value.forEach((member, index) => {
-      if (member.image) {
-        formData.append(`files.members.${index}.image`, member.image);
+    members.value.forEach((m, idx) => {
+      if (m.image) {
+        formData.append(`files.members.${idx}.image`, m.image);
       }
     });
-
-    // Append single song file
     if (singlesongType.value === 'upload' && singlesongFile.value) {
       formData.append('files.singlesong.song', singlesongFile.value);
     }
 
-    const res = await fetch('http://localhost:1337/api/bands', {
+    // 3) POST to Strapi
+    const endpoint = `${config.public.strapiUrl}/api/bands`;
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${useStrapiToken().value}`,
@@ -638,14 +638,26 @@ const submitForm = async () => {
     });
 
     const result = await res.json();
-    console.log('Band created:', result);
+    if (!res.ok) {
+      throw result;
+    }
 
-    if (!res.ok) throw result;
-
+    // 4) Pull the newly-created slug and navigate
+    const newSlug = result.data?.attributes?.slug;
+    if (newSlug) {
+      // this will hit your root [[slug]].vue page
+      await navigateTo({ name: 'slug', params: { slug: newSlug } })
+    } else {
+      console.warn('Created band has no slug, falling back home');
+      await router.push('/dashboard');
+    }
   } catch (err) {
     console.error('Failed to create band:', err);
+  } finally {
+    loading.value = false;
   }
 };
+
 
 
 

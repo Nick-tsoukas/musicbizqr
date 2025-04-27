@@ -833,6 +833,7 @@ const deleteItem = async (id, type) => {
 
     await client(`/${type}s/${id}`, {
       method: "DELETE",
+      headers: { Authorization: `Bearer ${useStrapiToken().value}` }
     });
 
     await fetchData();
