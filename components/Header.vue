@@ -6,7 +6,6 @@
       <nav class="hidden md:flex space-x-4">
         <NuxtLink to="/" class="nav-link">Home</NuxtLink>
         <NuxtLink v-if="user" to="/dashboard" class="nav-link  ">Dashboard</NuxtLink>
-        <NuxtLink v-if="user" to="/createqr" class="nav-link">+ Create QR</NuxtLink>
         <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
         <p v-if="user" @click="logoutUser" class="nav-link">Logout</p>
