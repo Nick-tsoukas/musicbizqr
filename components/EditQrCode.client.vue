@@ -128,7 +128,7 @@
                 :key="band.id"
                 :value="band.id"
               >
-                {{ band.attributes.name }}
+                {{ band.name }}
               </option>
               <!-- Create new band option -->
               <option value="createNew">Create New Band</option>

@@ -8,7 +8,9 @@
       <div ref="qrcodeWrapper" class="p-4 sticky top-0 z-50 rounded-lg shadow-md">
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
-
+      <div>
+      
+      </div>
       <div class="mt-4 flex flex-col space-y-4 w-full">
         <!-- Name Input -->
         <div class="bg-white rounded-md">
@@ -129,7 +131,7 @@
                 :key="band.id"
                 :value="band.id"
               >
-                {{ band.attributes.name }}
+                {{ band.name }}
               </option>
               <!-- Create new band option -->
               <option value="createNew">Create New Band</option>
@@ -340,8 +342,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted, computed } from 'vue';
+import { useAsyncData } from '#app';
 import { v4 as uuidv4 } from 'uuid';
+
 
 // References for the QR code wrapper
 const qrcodeWrapper = ref(null);
@@ -396,7 +400,9 @@ const cornersDotType = ref('square');
 const qrCode = ref(null);
 
 // For band selection
-const bands = ref([]);
+// const bands = ref([]);
+const bands = computed(() => bandsData.value || []);
+
 const selectedBand = ref(null);
 
 // Fetch the user's bands (and other data if desired) so they can choose one
@@ -410,22 +416,55 @@ onMounted(async () => {
   }
 
   // Load all user-related resources
-  await fetchUserRelatedData();
+  // await fetchUserRelatedData();
 });
 
-async function fetchUserRelatedData() {
-  try {
-    // Only fetch if user is logged in
-    if (!user.value || !user.value.id) return;
-
-    const bandsResponse = await find('bands', {
+// useAsyncData will automatically refetch when its watch source (userId) changes
+const {
+  data: bandsData,
+  pending: bandsLoading,
+  error: bandsError,
+} = useAsyncData(
+  // 💥 must be a string
+  'user-bands',
+  async () => {
+    if (!user.value?.id) {
+      return [];
+    }
+    const res = await find('bands', {
       filters: { users_permissions_user: { id: user.value.id } },
     });
-    bands.value = bandsResponse.data;
-  } catch (error) {
-    console.error('Error fetching user-related data:', error);
+    // normalize the shape
+    if (Array.isArray(res.data))      return res.data;
+    if (Array.isArray(res.data?.data)) return res.data.data;
+    return [];
+  },
+  {
+    // re-run whenever user.value.id changes
+    watch: () => user.value?.id,
+    immediate: true,
   }
-}
+);
+
+// expose a clean `bands` array to your template
+
+// async function fetchUserRelatedData() {
+//   try {
+
+//     // Only fetch if user is logged in
+//     if (!user.value || !user.value.id) return;
+
+//     const bandsResponse = await find('bands', {
+//       filters: { users_permissions_user: { id: user.value.id } },
+//     });
+//     bands.value = bandsResponse.data;
+//     console.log(bandsResponse , ' this is the bands array ')
+//   } catch (error) {
+//     console.log(bandsResponse , ' this is the bands array ')
+
+//     console.error('Error fetching user-related data:', error);
+//   }
+// }
 
 /**
  * Build the configuration object for our QR code library
