@@ -92,7 +92,7 @@
             class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one band allowed
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one artist allowed
           </button>
         </div>
 
@@ -143,7 +143,7 @@
         </ul>
 
         <div v-else class="px-6 py-6 text-center text-white">
-          Create Your First Band
+          Create Artist Page
         </div>
       </div>
 
