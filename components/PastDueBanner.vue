@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isPastDue && daysLeft > 0"
+    v-if="showBanner"
     class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-md mb-6"
   >
     <div class="flex items-center justify-between">
@@ -24,48 +24,68 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useFetch } from '#app'
 
-// reactive state
-const statusData = ref<{
+interface StatusData {
   status: string
   gracePeriodStart: string | null
-} | null>(null)
-const portalUrl = ref<string | null>(null)
-
-// fetch user’s subscription status on mount
-async function loadStatus() {
-  const { data } = await useFetch('/stripe/subscription-status')
-  statusData.value = data.value
 }
+
+const statusData = ref<StatusData | null>(null)
+const portalUrl   = ref<string | null>(null)
+
+async function loadStatus() {
+  try {
+    const res = await $fetch<StatusData>('/stripe/subscription-status', {
+      credentials: 'include'
+    })
+    console.log('Fetched subscription status:', res)
+    statusData.value = res
+  } catch (err) {
+    console.error('Error fetching subscription status:', err)
+  }
+}
+
 onMounted(loadStatus)
 
-// compute flags
 const isPastDue = computed(() => statusData.value?.status === 'pastDue')
+
 const daysLeft = computed(() => {
   if (!statusData.value?.gracePeriodStart) return 0
-  const start = new Date(statusData.value.gracePeriodStart).getTime()
-  const elapsed = Date.now() - start
-  const remainingMs = 3 * 24 * 60 * 60 * 1000 - elapsed
-  return remainingMs > 0 ? Math.ceil(remainingMs / (24 * 60 * 60 * 1000)) : 0
+  const startMs     = new Date(statusData.value.gracePeriodStart).getTime()
+  const elapsedMs   = Date.now() - startMs
+  const msPerDay    = 24 * 60 * 60 * 1000
+  const remainingMs = 3 * msPerDay - elapsedMs
+  return remainingMs > 0 ? Math.ceil(remainingMs / msPerDay) : 0
 })
 
-// create (or reuse) a portal session
-async function fetchPortal() {
-  const { data } = await useFetch('/stripe/create-billing-portal-session', {
-    method: 'POST',
-  })
-  portalUrl.value = data.value.url
-}
+const showBanner = computed(() => {
+  if (!statusData.value) return false
+  if (isPastDue.value && daysLeft.value > 0) {
+    return true
+  }
+  // debug log so you can see why it’s hidden
+  console.log(
+    'PastDueBanner hidden →',
+    'status=', statusData.value.status,
+    'daysLeft=', daysLeft.value
+  )
+  return false
+})
 
-// redirect user
-function goToBilling() {
-  if (!portalUrl.value) {
-    fetchPortal().then(() => {
-      if (portalUrl.value) window.location.href = portalUrl.value
-    })
-  } else {
-    window.location.href = portalUrl.value
+async function goToBilling() {
+  try {
+    if (!portalUrl.value) {
+      const res = await $fetch<{ url: string }>('/stripe/create-billing-portal-session', {
+        method: 'POST',
+        credentials: 'include'
+      })
+      portalUrl.value = res.url
+    }
+    if (portalUrl.value) {
+      window.location.href = portalUrl.value
+    }
+  } catch (err) {
+    console.error('Error creating billing portal session:', err)
   }
 }
 </script>
