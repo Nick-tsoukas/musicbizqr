@@ -2,11 +2,12 @@
   <div class="bg-[#000]">
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
-
+      <PastDueBanner />
       <!-- QR Codes Section -->
       <div v-if="loading">
         <SkeletonLoader />
       </div>
+      
       <div v-else class="mb-6 border-2 border-white rounded-lg">
         <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
           <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">QR Codes</h2>
