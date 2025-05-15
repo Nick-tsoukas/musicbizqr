@@ -126,13 +126,24 @@ const updateAccount = async () => {
 const fetchSubscriptionStatus = async () => {
   loading.value = true;
   try {
-    const res: any = await client('stripe/subscription-status', {
+    // 1) use useFetch exactly like you did for billing
+    const { data, error } = await useFetch('/api/stripe/subscription-status', {
+      baseURL: config.public.strapiUrl,
       headers: {
         Authorization: `Bearer ${token.value}`,
       },
     });
-    subscriptionStatus.value = res?.status || 'Unknown';
-  } catch (err) {
+
+    // 2) throw if Strapi returned an error
+    if (error.value) {
+      throw new Error(error.value.message || 'Unknown error');
+    }
+
+    // 3) unwrap the `status` field from the JSON payload
+    subscriptionStatus.value = data.value.status;
+    console.log('✅ Subscription status:', subscriptionStatus.value);
+
+  } catch (err: any) {
     subscriptionStatus.value = 'Error fetching status';
     console.error('❌ Subscription status error:', err);
   } finally {
