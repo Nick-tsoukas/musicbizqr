@@ -46,7 +46,7 @@
       </div>
 
       <div class="mt-8">
-        <p class="text-gray-300 mb-4">Status: {{ subscriptionStatus }}</p>
+       
         <button
           @click="goToBillingPortal"
           class="bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-all"
