@@ -34,8 +34,12 @@
 
       <div v-if="billingData" class="mt-12 border-t border-gray-700 pt-8">
         <h2 class="text-2xl font-semibold mb-2">Subscription</h2>
-        <p class="text-gray-300">Plan: {{ billingData.subscription?.plan.nickname || 'Trial' }}</p>
-        <p class="text-gray-300">Status: {{ billingData.subscription?.status || 'trialing' }}</p>
+        <p class="text-gray-300">
+          Plan: {{ billingData.subscription?.plan.nickname || 'Trial' }}
+        </p>
+        <p class="text-gray-300">
+          Status: {{ billingData.subscription?.status || 'trialing' }}
+        </p>
         <p class="text-gray-300" v-if="billingData.trialEndsAt">
           Trial Ends: {{ format(new Date(billingData.trialEndsAt), 'PPP') }}
         </p>
@@ -59,23 +63,21 @@ import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 
 const config = useRuntimeConfig();
-
-const user = useStrapiUser();
-const token = useStrapiToken();
+const user   = useStrapiUser();
+const token  = useStrapiToken();
 const client = useStrapiClient();
 
-const email = ref('');
-const password = ref('');
+const email              = ref('');
+const password           = ref('');
+const billingData        = ref<any>(null);
 const subscriptionStatus = ref('Loading...');
-const billingData = ref<any>(null);
-const loading = ref(false); // ✅ Replaces useLoadingIndicator
+const loading            = ref(false);
 
 onMounted(async () => {
   if (user.value) {
     email.value = user.value.email;
   }
   await fetchBillingInfo();
-  await fetchSubscriptionStatus();
 });
 
 const fetchBillingInfo = async () => {
@@ -83,16 +85,22 @@ const fetchBillingInfo = async () => {
   try {
     const { data, error } = await useFetch('/api/stripe/billing', {
       baseURL: config.public.strapiUrl,
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
+      headers: { Authorization: `Bearer ${token.value}` },
     });
 
-    if (error.value) throw new Error(error.value.message || 'Billing info error');
+    if (error.value) {
+      throw new Error(error.value.message || 'Billing info error');
+    }
+
     billingData.value = data.value;
+    // Set the status straight from billingData
+    subscriptionStatus.value =
+      data.value.subscription?.status || 'trialing';
+
     console.log('✅ Billing info:', billingData.value);
-  } catch (err) {
+  } catch (err: any) {
     console.error('❌ Billing info failed:', err);
+    subscriptionStatus.value = 'Error loading billing';
   } finally {
     loading.value = false;
   }
@@ -100,7 +108,7 @@ const fetchBillingInfo = async () => {
 
 const updateAccount = async () => {
   const updates: Record<string, string> = {
-    email: email.value,
+    email:    email.value,
     username: email.value,
   };
   if (password.value) updates.password = password.value;
@@ -109,10 +117,8 @@ const updateAccount = async () => {
   try {
     await client(`/users/${user.value.id}`, {
       method: 'PUT',
-      body: updates,
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
+      body:   updates,
+      headers: { Authorization: `Bearer ${token.value}` },
     });
     alert('✅ Account updated!');
   } catch (err) {
@@ -123,43 +129,16 @@ const updateAccount = async () => {
   }
 };
 
-const fetchSubscriptionStatus = async () => {
-  loading.value = true;
-  try {
-    // 1) use useFetch exactly like you did for billing
-    const { data, error } = await useFetch('/api/stripe/subscription-status', {
-      baseURL: config.public.strapiUrl,
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
-
-    // 2) throw if Strapi returned an error
-    if (error.value) {
-      throw new Error(error.value.message || 'Unknown error');
-    }
-
-    // 3) unwrap the `status` field from the JSON payload
-    subscriptionStatus.value = data.value.status;
-    console.log('✅ Subscription status:', subscriptionStatus.value);
-
-  } catch (err: any) {
-    subscriptionStatus.value = 'Error fetching status';
-    console.error('❌ Subscription status error:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
 const goToBillingPortal = async () => {
   loading.value = true;
   try {
-    const res: any = await client('stripe/create-billing-portal-session', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
+    const res: any = await client(
+      'stripe/create-billing-portal-session',
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token.value}` },
+      }
+    );
 
     if (res?.url) {
       window.location.href = res.url;
