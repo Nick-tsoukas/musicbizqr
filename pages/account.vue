@@ -39,8 +39,12 @@
         </p>
         <p class="text-gray-300">
           Status:
-          <span v-if="isPastDue" class="text-red-400">Past Due</span>
-          <span v-else>{{ billingData.subscription?.status || 'trialing' }}</span>
+          <span
+            :class="{'text-red-400 font-semibold': isPastDue}"
+            class="capitalize"
+          >
+            {{ displayStatus }}
+          </span>
         </p>
         <p class="text-gray-300" v-if="billingData.trialEndsAt">
           Trial Ends: {{ format(new Date(billingData.trialEndsAt), 'PPP') }}
@@ -76,10 +80,23 @@ const password    = ref('');
 const billingData = ref<any>(null);
 const loading     = ref(false);
 
-// Computed flag for past-due invoices
-const isPastDue = computed(() =>
-  billingData.value?.subscription?.status === 'pastDue'
+// derive a raw status string
+const status = computed<string>(() => 
+  billingData.value?.subscription?.status || 'trialing'
 );
+
+// normalize and detect past due (stripe uses snake_case "past_due")
+const isPastDue = computed<boolean>(() => {
+  const s = status.value;
+  return s === 'past_due' || s === 'pastDue';
+});
+
+// display-friendly status
+const displayStatus = computed<string>(() => {
+  if (isPastDue.value) return 'Past Due';
+  // capitalize first letter
+  return status.value.charAt(0).toUpperCase() + status.value.slice(1);
+});
 
 onMounted(async () => {
   if (user.value) {
@@ -98,9 +115,9 @@ const fetchBillingInfo = async () => {
     if (error.value) {
       throw new Error(error.value.message || 'Billing info error');
     }
-
     billingData.value = data.value;
-    console.log('✅ Billing info:', billingData.value);
+    console.log('🔍 fetched billingData:', billingData.value);
+    console.log('🔍 raw status:', status.value);
   } catch (err: any) {
     console.error('❌ Billing info failed:', err);
   } finally {
@@ -138,11 +155,8 @@ const goToBillingPortal = async () => {
       method: 'POST',
       headers: { Authorization: `Bearer ${token.value}` },
     });
-    if (res?.url) {
-      window.location.href = res.url;
-    } else {
-      alert('⚠️ Failed to open billing portal');
-    }
+    if (res?.url) window.location.href = res.url;
+    else alert('⚠️ Failed to open billing portal');
   } catch (err) {
     console.error('❌ Billing portal error:', err);
     alert('Error opening billing portal');
@@ -158,11 +172,8 @@ const payInvoice = async () => {
       method: 'POST',
       headers: { Authorization: `Bearer ${token.value}` },
     });
-    if (res?.url) {
-      window.location.href = res.url;
-    } else {
-      alert('⚠️ Failed to load invoice payment');
-    }
+    if (res?.url) window.location.href = res.url;
+    else alert('⚠️ Failed to load invoice payment');
   } catch (err) {
     console.error('❌ Pay invoice error:', err);
     alert('Error loading invoice payment');
