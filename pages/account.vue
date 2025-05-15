@@ -33,25 +33,29 @@
       </form>
 
       <div v-if="billingData" class="mt-12 border-t border-gray-700 pt-8">
-        <h2 class="text-2xl font-semibold mb-2">Subscription</h2>
+        <h2 class="text-2xl font-semibold mb-2">Subscription Status</h2>
         <p class="text-gray-300">
           Plan: {{ billingData.subscription?.plan.nickname || 'Trial' }}
         </p>
         <p class="text-gray-300">
-          Status: {{ billingData.subscription?.status || 'trialing' }}
+          Status:
+          <span v-if="isPastDue" class="text-red-400">Past Due</span>
+          <span v-else>{{ billingData.subscription?.status || 'trialing' }}</span>
         </p>
         <p class="text-gray-300" v-if="billingData.trialEndsAt">
           Trial Ends: {{ format(new Date(billingData.trialEndsAt), 'PPP') }}
         </p>
+        <p class="text-gray-300" v-if="billingData.trialEndsAt">
+          Renews at $7.00 per month
+        </p>
       </div>
 
       <div class="mt-8">
-       
         <button
-          @click="goToBillingPortal"
+          @click="isPastDue ? payInvoice() : goToBillingPortal()"
           class="bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-all"
         >
-          Manage Billing Info
+          {{ isPastDue ? 'Pay Invoice' : 'Manage Billing Info' }}
         </button>
       </div>
     </div>
@@ -59,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 
 const config = useRuntimeConfig();
@@ -67,11 +71,15 @@ const user   = useStrapiUser();
 const token  = useStrapiToken();
 const client = useStrapiClient();
 
-const email              = ref('');
-const password           = ref('');
-const billingData        = ref<any>(null);
-const subscriptionStatus = ref('Loading...');
-const loading            = ref(false);
+const email       = ref('');
+const password    = ref('');
+const billingData = ref<any>(null);
+const loading     = ref(false);
+
+// Computed flag for past-due invoices
+const isPastDue = computed(() =>
+  billingData.value?.subscription?.status === 'pastDue'
+);
 
 onMounted(async () => {
   if (user.value) {
@@ -87,20 +95,14 @@ const fetchBillingInfo = async () => {
       baseURL: config.public.strapiUrl,
       headers: { Authorization: `Bearer ${token.value}` },
     });
-
     if (error.value) {
       throw new Error(error.value.message || 'Billing info error');
     }
 
     billingData.value = data.value;
-    // Set the status straight from billingData
-    subscriptionStatus.value =
-      data.value.subscription?.status || 'trialing';
-
     console.log('✅ Billing info:', billingData.value);
   } catch (err: any) {
     console.error('❌ Billing info failed:', err);
-    subscriptionStatus.value = 'Error loading billing';
   } finally {
     loading.value = false;
   }
@@ -132,14 +134,10 @@ const updateAccount = async () => {
 const goToBillingPortal = async () => {
   loading.value = true;
   try {
-    const res: any = await client(
-      'stripe/create-billing-portal-session',
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token.value}` },
-      }
-    );
-
+    const res: any = await client('stripe/create-billing-portal-session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
     if (res?.url) {
       window.location.href = res.url;
     } else {
@@ -148,6 +146,26 @@ const goToBillingPortal = async () => {
   } catch (err) {
     console.error('❌ Billing portal error:', err);
     alert('Error opening billing portal');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const payInvoice = async () => {
+  loading.value = true;
+  try {
+    const res: any = await client('stripe/pay-invoice-session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    if (res?.url) {
+      window.location.href = res.url;
+    } else {
+      alert('⚠️ Failed to load invoice payment');
+    }
+  } catch (err) {
+    console.error('❌ Pay invoice error:', err);
+    alert('Error loading invoice payment');
   } finally {
     loading.value = false;
   }
