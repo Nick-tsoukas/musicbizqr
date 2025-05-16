@@ -34,9 +34,11 @@
 
       <div v-if="billingData" class="mt-12 border-t border-gray-700 pt-8">
         <h2 class="text-2xl font-semibold mb-2">Subscription Status</h2>
+
         <p class="text-gray-300">
           Plan: {{ billingData.subscription?.plan.nickname || 'Trial' }}
         </p>
+
         <p class="text-gray-300">
           Status:
           <span
@@ -46,10 +48,11 @@
             {{ displayStatus }}
           </span>
         </p>
-        <p class="text-gray-300" v-if="billingData.trialEndsAt">
+
+        <p v-if="billingData.trialEndsAt" class="text-gray-300">
           Trial Ends: {{ format(new Date(billingData.trialEndsAt), 'PPP') }}
         </p>
-        <p class="text-gray-300" v-if="billingData.trialEndsAt">
+        <p v-if="billingData.trialEndsAt" class="text-gray-300">
           Renews at $7.00 per month
         </p>
       </div>
@@ -71,63 +74,95 @@ import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 
 const config = useRuntimeConfig();
-const user   = useStrapiUser();       // Strapi user store
+const user   = useStrapiUser();
 const token  = useStrapiToken();
 const client = useStrapiClient();
 
 const email       = ref('');
 const password    = ref('');
 const billingData = ref<any>(null);
-const loading     = ref(false);
 
-// 1) The status your Strapi DB has stored:
-const strapiStatus = computed<string>(() =>
-  user.value?.subscriptionStatus || ''
+const strapiStatus = computed(() => user.value?.subscriptionStatus || '');
+const stripeStatus = computed(() => billingData.value?.subscription?.status || 'trialing');
+const normalizedStatus = computed(() =>
+  strapiStatus.value === 'pastDue' ? 'pastDue' : stripeStatus.value
 );
-
-// 2) The status Stripe returns via billingData:
-const stripeStatus = computed<string>(() =>
-  billingData.value?.subscription?.status || 'trialing'
-);
-
-// 3) Final normalized status (Strapi’s overrides Stripe’s only when pastDue)
-const normalizedStatus = computed<string>(() =>
-  strapiStatus.value === 'pastDue'
-    ? 'pastDue'
-    : stripeStatus.value
-);
-
-// 4) Past-due flag if either form matches
-const isPastDue = computed<boolean>(() =>
+const isPastDue = computed(() =>
   normalizedStatus.value === 'past_due' ||
   normalizedStatus.value === 'pastDue'
 );
-
-// 5) Display-friendly text
-const displayStatus = computed<string>(() => {
-  if (isPastDue.value) return 'Past Due';
-  // Capitalize other statuses
-  return normalizedStatus.value.charAt(0).toUpperCase() +
-         normalizedStatus.value.slice(1);
-});
+const displayStatus = computed(() =>
+  isPastDue.value
+    ? 'Past Due'
+    : normalizedStatus.value.charAt(0).toUpperCase() +
+      normalizedStatus.value.slice(1)
+);
 
 onMounted(async () => {
-  if (user.value) {
-    email.value = user.value.email;
-  }
+  if (user.value) email.value = user.value.email;
   await fetchBillingInfo();
 });
 
-const fetchBillingInfo = async () => {
-  loading.value = true;
+async function fetchBillingInfo() {
   try {
     const { data, error } = await useFetch('/api/stripe/billing', {
       baseURL: config.public.strapiUrl,
       headers: { Authorization: `Bearer ${token.value}` },
     });
-    if (error.value) {
-      throw new Error(error.value.message || 'Billing info error');
-    }
+    if (error.value) throw error.value;
     billingData.value = data.value;
-    // Sync Strapi store if you want UI components to see the new status:
-    user.value.subscriptionStatus = normalizedS
+    // keep your user store in sync
+    user.value.subscriptionStatus = normalizedStatus.value;
+  } catch (e) {
+    console.error('Billing fetch error', e);
+  }
+}
+
+async function updateAccount() {
+  const updates: Record<string, string> = {
+    email: email.value,
+    username: email.value,
+  };
+  if (password.value) updates.password = password.value;
+
+  try {
+    await client(`/users/${user.value.id}`, {
+      method: 'PUT',
+      body:   updates,
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    alert('Account updated!');
+  } catch (e) {
+    console.error('Update error', e);
+    alert('Failed to update account');
+  }
+}
+
+async function goToBillingPortal() {
+  try {
+    const res: any = await client('stripe/create-billing-portal-session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    if (res.url) window.location.href = res.url;
+    else alert('Unable to open billing portal');
+  } catch (e) {
+    console.error('Portal error', e);
+    alert('Error opening billing portal');
+  }
+}
+
+async function payInvoice() {
+  try {
+    const res: any = await client('stripe/pay-invoice-session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    if (res.url) window.location.href = res.url;
+    else alert('Unable to load invoice payment');
+  } catch (e) {
+    console.error('Pay invoice error', e);
+    alert('Error loading invoice payment');
+  }
+}
+</script>
