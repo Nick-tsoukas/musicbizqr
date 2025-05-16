@@ -59,7 +59,7 @@
 
       <div class="mt-8">
         <button
-          @click="isPastDue ? payInvoice() : goToBillingPortal()"
+          @click="goToBillingPortal()"
           class="bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-all"
         >
           {{ isPastDue ? 'Pay Invoice' : 'Manage Billing Info' }}
@@ -82,14 +82,14 @@ const email       = ref('');
 const password    = ref('');
 const billingData = ref<any>(null);
 
+// derive statuses
 const strapiStatus = computed(() => user.value?.subscriptionStatus || '');
 const stripeStatus = computed(() => billingData.value?.subscription?.status || 'trialing');
 const normalizedStatus = computed(() =>
   strapiStatus.value === 'pastDue' ? 'pastDue' : stripeStatus.value
 );
 const isPastDue = computed(() =>
-  normalizedStatus.value === 'past_due' ||
-  normalizedStatus.value === 'pastDue'
+  normalizedStatus.value === 'past_due' || normalizedStatus.value === 'pastDue'
 );
 const displayStatus = computed(() =>
   isPastDue.value
@@ -111,7 +111,7 @@ async function fetchBillingInfo() {
     });
     if (error.value) throw error.value;
     billingData.value = data.value;
-    // keep your user store in sync
+    // sync the Strapi store
     user.value.subscriptionStatus = normalizedStatus.value;
   } catch (e) {
     console.error('Billing fetch error', e);
@@ -120,7 +120,7 @@ async function fetchBillingInfo() {
 
 async function updateAccount() {
   const updates: Record<string, string> = {
-    email: email.value,
+    email:    email.value,
     username: email.value,
   };
   if (password.value) updates.password = password.value;
@@ -144,25 +144,14 @@ async function goToBillingPortal() {
       method: 'POST',
       headers: { Authorization: `Bearer ${token.value}` },
     });
-    if (res.url) window.location.href = res.url;
-    else alert('Unable to open billing portal');
+    if (res?.url) {
+      window.location.href = res.url;
+    } else {
+      alert('Unable to open billing portal');
+    }
   } catch (e) {
     console.error('Portal error', e);
     alert('Error opening billing portal');
-  }
-}
-
-async function payInvoice() {
-  try {
-    const res: any = await client('stripe/pay-invoice-session', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token.value}` },
-    });
-    if (res.url) window.location.href = res.url;
-    else alert('Unable to load invoice payment');
-  } catch (e) {
-    console.error('Pay invoice error', e);
-    alert('Error loading invoice payment');
   }
 }
 </script>
