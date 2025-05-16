@@ -40,7 +40,7 @@
         <p class="text-gray-300">
           Status:
           <span
-            :class="{'text-red-400 font-semibold': isPastDue}"
+            :class="{ 'text-red-400 font-semibold': isPastDue }"
             class="capitalize"
           >
             {{ displayStatus }}
@@ -71,7 +71,7 @@ import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 
 const config = useRuntimeConfig();
-const user   = useStrapiUser();
+const user   = useStrapiUser();       // Strapi user store
 const token  = useStrapiToken();
 const client = useStrapiClient();
 
@@ -80,22 +80,35 @@ const password    = ref('');
 const billingData = ref<any>(null);
 const loading     = ref(false);
 
-// derive a raw status string
-const status = computed<string>(() => 
+// 1) The status your Strapi DB has stored:
+const strapiStatus = computed<string>(() =>
+  user.value?.subscriptionStatus || ''
+);
+
+// 2) The status Stripe returns via billingData:
+const stripeStatus = computed<string>(() =>
   billingData.value?.subscription?.status || 'trialing'
 );
 
-// normalize and detect past due (stripe uses snake_case "past_due")
-const isPastDue = computed<boolean>(() => {
-  const s = status.value;
-  return s === 'past_due' || s === 'pastDue';
-});
+// 3) Final normalized status (Strapi’s overrides Stripe’s only when pastDue)
+const normalizedStatus = computed<string>(() =>
+  strapiStatus.value === 'pastDue'
+    ? 'pastDue'
+    : stripeStatus.value
+);
 
-// display-friendly status
+// 4) Past-due flag if either form matches
+const isPastDue = computed<boolean>(() =>
+  normalizedStatus.value === 'past_due' ||
+  normalizedStatus.value === 'pastDue'
+);
+
+// 5) Display-friendly text
 const displayStatus = computed<string>(() => {
   if (isPastDue.value) return 'Past Due';
-  // capitalize first letter
-  return status.value.charAt(0).toUpperCase() + status.value.slice(1);
+  // Capitalize other statuses
+  return normalizedStatus.value.charAt(0).toUpperCase() +
+         normalizedStatus.value.slice(1);
 });
 
 onMounted(async () => {
@@ -116,69 +129,5 @@ const fetchBillingInfo = async () => {
       throw new Error(error.value.message || 'Billing info error');
     }
     billingData.value = data.value;
-    console.log('🔍 fetched billingData:', billingData.value);
-    console.log('🔍 raw status:', status.value);
-  } catch (err: any) {
-    console.error('❌ Billing info failed:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const updateAccount = async () => {
-  const updates: Record<string, string> = {
-    email:    email.value,
-    username: email.value,
-  };
-  if (password.value) updates.password = password.value;
-
-  loading.value = true;
-  try {
-    await client(`/users/${user.value.id}`, {
-      method: 'PUT',
-      body:   updates,
-      headers: { Authorization: `Bearer ${token.value}` },
-    });
-    alert('✅ Account updated!');
-  } catch (err) {
-    console.error('❌ Update failed:', err);
-    alert('Failed to update account');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const goToBillingPortal = async () => {
-  loading.value = true;
-  try {
-    const res: any = await client('stripe/create-billing-portal-session', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token.value}` },
-    });
-    if (res?.url) window.location.href = res.url;
-    else alert('⚠️ Failed to open billing portal');
-  } catch (err) {
-    console.error('❌ Billing portal error:', err);
-    alert('Error opening billing portal');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const payInvoice = async () => {
-  loading.value = true;
-  try {
-    const res: any = await client('stripe/pay-invoice-session', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token.value}` },
-    });
-    if (res?.url) window.location.href = res.url;
-    else alert('⚠️ Failed to load invoice payment');
-  } catch (err) {
-    console.error('❌ Pay invoice error:', err);
-    alert('Error loading invoice payment');
-  } finally {
-    loading.value = false;
-  }
-};
-</script>
+    // Sync Strapi store if you want UI components to see the new status:
+    user.value.subscriptionStatus = normalizedS
