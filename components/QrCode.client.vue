@@ -5,12 +5,13 @@
         <div class="spinner"></div>
       </div>
       <!-- QR Code Wrapper -->
-      <div ref="qrcodeWrapper" class="p-4 sticky top-0 z-50 rounded-lg shadow-md">
+      <div
+        ref="qrcodeWrapper"
+        class="p-4 sticky top-0 z-50 rounded-lg shadow-md"
+      >
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
-      <div>
-      
-      </div>
+      <div></div>
       <div class="mt-4 flex flex-col space-y-4 w-full">
         <!-- Name Input -->
         <div class="bg-white rounded-md">
@@ -21,7 +22,12 @@
           </div>
           <div class="p-4">
             <label class="mdc-text-field mb-4">
-              <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter Name" />
+              <input
+                v-model="name"
+                type="text"
+                class="mdc-text-field__input"
+                placeholder="Enter Name"
+              />
               <span class="mdc-line-ripple"></span>
             </label>
           </div>
@@ -32,7 +38,9 @@
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <span class="mb-1 text-white text-xl font-semibold">Choose QR Type</span>
+            <span class="mb-1 text-white text-xl font-semibold"
+              >Choose QR Type</span
+            >
           </div>
           <div class="p-4">
             <div class="flex flex-wrap gap-4">
@@ -41,14 +49,14 @@
                 @click="selectType('bandProfile')"
                 :class="{
                   'border-green': route.query.type == 'bandProfile',
-                  'border-black': route.query.type !== 'bandProfile'
+                  'border-black': route.query.type !== 'bandProfile',
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
-                <span>Band</span>
+                <span>Artist Page</span>
               </div>
               <!-- Event -->
-              <div
+              <!-- <div
                 @click="selectType('events')"
                 :class="{
                   'border-green': route.query.type == 'events',
@@ -57,9 +65,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Event</span>
-              </div>
+              </div> -->
               <!-- Tour -->
-              <div
+              <!-- <div
                 @click="selectType('tours')"
                 :class="{
                   'border-green': route.query.type == 'tours',
@@ -68,9 +76,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Tour</span>
-              </div>
+              </div> -->
               <!-- Album -->
-              <div
+              <!-- <div
                 @click="selectType('albums')"
                 :class="{
                   'border-green': route.query.type == 'albums',
@@ -79,9 +87,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Album</span>
-              </div>
+              </div> -->
               <!-- Social Links -->
-              <div
+              <!-- <div
                 @click="selectType('social')"
                 :class="{
                   'border-green': route.query.type == 'social',
@@ -90,9 +98,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Social Links</span>
-              </div>
+             </div> -->
               <!-- Stream -->
-              <div
+              <!-- <div
                 @click="selectType('stream')"
                 :class="{
                   'border-green': route.query.type == 'stream',
@@ -101,13 +109,13 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Stream</span>
-              </div>
+              </div> -->
               <!-- External URL -->
               <div
                 @click="selectType('externalURL')"
                 :class="{
                   'border-green': route.query.type == 'externalURL',
-                  'border-black': route.query.type !== 'externalURL'
+                  'border-black': route.query.type !== 'externalURL',
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
@@ -118,7 +126,10 @@
         </div>
 
         <!-- Band Selection (Only show if route.query.type === 'bandProfile') -->
-        <div v-if="route.query.type === 'bandProfile'" class="bg-white rounded-md p-4">
+        <div
+          v-if="route.query.type === 'bandProfile'"
+          class="bg-white rounded-md p-4"
+        >
           <label class="mdc-text-field mb-4">
             <span class="mb-1 text-gray-700">Select Band:</span>
             <select v-model="selectedBand" class="mdc-text-field__input">
@@ -126,11 +137,7 @@
               <!-- "None" option if they don't want to associate this QR with a band -->
               <option :value="null">None</option>
               <!-- Render each band from bands array -->
-              <option
-                v-for="band in bands"
-                :key="band.id"
-                :value="band.id"
-              >
+              <option v-for="band in bands" :key="band.id" :value="band.id">
                 {{ band.name }}
               </option>
               <!-- Create new band option -->
@@ -141,47 +148,48 @@
         </div>
 
         <!-- External Link Input (if applicable) -->
-        <div v-if="route.query.type === 'externalURL'" class="bg-white rounded-md p-4">
+        <div
+          v-if="route.query.type === 'externalURL'"
+          class="bg-white rounded-md p-4"
+        >
           <label class="mdc-text-field mb-4">
             <span class="mb-1 text-gray-700">External Link:</span>
-            <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
+            <input
+              v-model="link"
+              type="text"
+              class="mdc-text-field__input"
+              placeholder="Enter URL"
+            />
             <span class="mdc-line-ripple"></span>
           </label>
         </div>
 
-        <!-- Background Options -->
+        <!-- Background & Foreground Colors -->
         <div class="bg-white rounded-md">
+          <!-- unified header -->
           <div
-            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+            class="flex bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 items-center"
           >
-            <h2 class="font-semibold text-white text-xl">Background Options</h2>
+            <h2 class="font-semibold text-white text-xl">
+              Background & Foreground Colors
+            </h2>
           </div>
-          <div class="p-4">
-            <label class="color-picker-label mb-4">
-              <span class="mb-1 text-gray-700">Background Color:</span>
-              <div class="color-picker">
-                <input v-model="bgColor" type="text" class="color-text-input" />
-                <input v-model="bgColor" type="color" class="color-input" />
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Foreground Options -->
-        <div v-if="!gradient" class="bg-white rounded-md">
-          <div
-            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-xl">Foreground Options</h2>
-          </div>
-          <div class="p-4">
-            <label class="color-picker-label mb-4">
-              <span class="mb-1 text-gray-700">Foreground Color:</span>
-              <div class="color-picker">
-                <input v-model="dotsColor" type="text" class="color-text-input" />
-                <input v-model="dotsColor" type="color" class="color-input" />
-              </div>
-            </label>
+          <!-- two-column pickers -->
+          <div class="p-4 flex flex-col gap-6 sm:flex-row md:grid-cols-2">
+            <!-- Background -->
+            <div>
+              <label class="flex items-center">
+                <span class="mr-2 text-gray-700">Background:</span>
+                <ColorSwatchPicker v-model="bgColor" />
+              </label>
+            </div>
+            <!-- Foreground -->
+            <div>
+              <label class="flex items-center">
+                <span class="mr-2 text-gray-700">Foreground:</span>
+                <ColorSwatchPicker v-model="dotsColor" />
+              </label>
+            </div>
           </div>
         </div>
 
@@ -207,7 +215,9 @@
                 <span class="mdc-line-ripple"></span>
               </label>
               <label class="mdc-text-field mb-4">
-                <span class="mb-1 text-gray-700">Gradient Rotation (degrees):</span>
+                <span class="mb-1 text-gray-700"
+                  >Gradient Rotation (degrees):</span
+                >
                 <input
                   v-model.number="gradientRotation"
                   type="number"
@@ -217,19 +227,16 @@
                 />
                 <span class="mdc-line-ripple"></span>
               </label>
-              <label class="color-picker-label mb-4">
-                <span class="mb-1 text-gray-700">Gradient Start Color:</span>
-                <div class="color-picker">
-                  <input v-model="gradientStartColor" type="text" class="color-text-input" />
-                  <input v-model="gradientStartColor" type="color" class="color-input" />
-                </div>
+              <label class="color-picker-label mb-4 flex items-center">
+                <span class="mb-1 text-gray-700 mr-2"
+                  >Gradient Start Color:</span
+                >
+                <ColorSwatchPicker v-model="gradientStartColor" />
               </label>
-              <label class="color-picker-label mb-4">
-                <span class="mb-1 text-gray-700">Gradient End Color:</span>
-                <div class="color-picker">
-                  <input v-model="gradientEndColor" type="text" class="color-text-input" />
-                  <input v-model="gradientEndColor" type="color" class="color-input" />
-                </div>
+
+              <label class="color-picker-label mb-4 flex items-center">
+                <span class="mb-1 text-gray-700 mr-2">Gradient End Color:</span>
+                <ColorSwatchPicker v-model="gradientEndColor" />
               </label>
             </div>
           </div>
@@ -245,7 +252,11 @@
           <div class="p-4">
             <label class="mdc-text-field mb-4">
               <span class="mb-1 text-gray-700">Upload Logo:</span>
-              <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
+              <input
+                type="file"
+                @change="handleImageUpload"
+                class="mdc-text-field__input"
+              />
               <span class="mdc-line-ripple"></span>
             </label>
           </div>
@@ -280,15 +291,25 @@
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="font-semibold text-white text-xl">Corners Square Options</h2>
+            <h2 class="font-semibold text-white text-xl">
+              Corners Square Options
+            </h2>
           </div>
           <div class="p-4">
             <!-- Corners Square Color -->
             <label class="color-picker-label mb-4">
               <span class="mb-1 text-gray-700">Corners Square Color:</span>
               <div class="color-picker">
-                <input v-model="cornersSquareColor" type="text" class="color-text-input" />
-                <input v-model="cornersSquareColor" type="color" class="color-input" />
+                <input
+                  v-model="cornersSquareColor"
+                  type="text"
+                  class="color-text-input"
+                />
+                <input
+                  v-model="cornersSquareColor"
+                  type="color"
+                  class="color-input"
+                />
               </div>
             </label>
             <!-- Corners Square Type -->
@@ -309,15 +330,25 @@
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="font-semibold text-white text-xl">Corners Dot Options</h2>
+            <h2 class="font-semibold text-white text-xl">
+              Corners Dot Options
+            </h2>
           </div>
           <div class="p-4">
             <!-- Corners Dot Color -->
             <label class="color-picker-label mb-4">
               <span class="mb-1 text-gray-700">Corners Dot Color:</span>
               <div class="color-picker">
-                <input v-model="cornersDotColor" type="text" class="color-text-input" />
-                <input v-model="cornersDotColor" type="color" class="color-input" />
+                <input
+                  v-model="cornersDotColor"
+                  type="text"
+                  class="color-text-input"
+                />
+                <input
+                  v-model="cornersDotColor"
+                  type="color"
+                  class="color-input"
+                />
               </div>
             </label>
             <!-- Corners Dot Type -->
@@ -342,17 +373,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted, computed } from 'vue';
-import { useAsyncData } from '#app';
-import { v4 as uuidv4 } from 'uuid';
-
+import { ref, reactive, watch, onMounted, computed } from "vue";
+import { useAsyncData } from "#app";
+import { v4 as uuidv4 } from "uuid";
 
 // References for the QR code wrapper
 const qrcodeWrapper = ref(null);
 
 // Access runtime config if needed
-const config = useRuntimeConfig(); 
-const apiUrl = config.public.strapiUrl; 
+const config = useRuntimeConfig();
+const apiUrl = config.public.strapiUrl;
 
 // Strapi composables & routing
 const props = defineProps({ type: String });
@@ -368,34 +398,34 @@ const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`);
 const qrSize = ref(300);
 
 // Colors & Gradient
-const bgColor = ref('#FFFFFF');
-const fgColor = ref('#000000'); 
+const bgColor = ref("#FFFFFF");
+const fgColor = ref("#000000");
 const gradient = ref(false);
-const gradientType = ref('linear');
+const gradientType = ref("linear");
 const gradientRotation = ref(0);
-const gradientStartColor = ref('#e6289d');
-const gradientEndColor = ref('#40353c');
+const gradientStartColor = ref("#e6289d");
+const gradientEndColor = ref("#40353c");
 
 // Basic form info
-const name = ref('name');
+const name = ref("name");
 const link = ref(null);
 const loading = ref(false);
 
 // QR code brand image options
 const imageSettings = reactive({
-  src: '',
+  src: "",
   imageSize: 0.4,
   margin: 0,
-  crossOrigin: 'anonymous',
+  crossOrigin: "anonymous",
 });
 
 // QR code styling
-const dotsColor = ref('#000000');
-const dotsType = ref('square');
-const cornersSquareColor = ref('#000000');
-const cornersSquareType = ref('square');
-const cornersDotColor = ref('#000000');
-const cornersDotType = ref('square');
+const dotsColor = ref("#000000");
+const dotsType = ref("square");
+const cornersSquareColor = ref("#000000");
+const cornersSquareType = ref("square");
+const cornersDotColor = ref("#000000");
+const cornersDotType = ref("square");
 
 const qrCode = ref(null);
 
@@ -409,7 +439,7 @@ const selectedBand = ref(null);
 onMounted(async () => {
   // Load and mount the QR code
   if (process.client) {
-    const { default: QRCodeStyling } = await import('qr-code-styling');
+    const { default: QRCodeStyling } = await import("qr-code-styling");
     qrCode.value = new QRCodeStyling(getQRCodeOptions());
     qrCode.value.append(qrcodeWrapper.value);
     initializeWatcher();
@@ -426,16 +456,16 @@ const {
   error: bandsError,
 } = useAsyncData(
   // 💥 must be a string
-  'user-bands',
+  "user-bands",
   async () => {
     if (!user.value?.id) {
       return [];
     }
-    const res = await find('bands', {
+    const res = await find("bands", {
       filters: { users_permissions_user: { id: user.value.id } },
     });
     // normalize the shape
-    if (Array.isArray(res.data))      return res.data;
+    if (Array.isArray(res.data)) return res.data;
     if (Array.isArray(res.data?.data)) return res.data.data;
     return [];
   },
@@ -474,7 +504,7 @@ function getQRCodeOptions() {
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value,
-    errorCorrectionLevel: 'H',
+    errorCorrectionLevel: "H",
     dotsOptions: {
       type: dotsType.value,
     },
@@ -625,69 +655,73 @@ const saveQrCode = async () => {
     };
 
     // If they picked 'bandProfile', assign the band ID (unless they chose "Create New")
-    if (route.query.type === 'bandProfile') {
-      form.band = selectedBand.value !== 'createNew' ? selectedBand.value : null;
+    if (route.query.type === "bandProfile") {
+      form.band =
+        selectedBand.value !== "createNew" ? selectedBand.value : null;
     }
 
     // Get the QR code as a PNG blob
-    const blob = await qrCode.value.getRawData('png');
-    const file = new File([blob], 'qrcode.png');
+    const blob = await qrCode.value.getRawData("png");
+    const file = new File([blob], "qrcode.png");
     const formData = new FormData();
-    formData.append('files.q_image', file, 'qrcode.png');
-    formData.append('data', JSON.stringify(form));
+    formData.append("files.q_image", file, "qrcode.png");
+    formData.append("data", JSON.stringify(form));
 
     // POST to /qrs
     const { data } = await client(`/qrs`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
 
     if (!data || !data.id) {
       loading.value = false;
-      console.error('QR code was not saved (no ID returned).');
+      console.error("QR code was not saved (no ID returned).");
       return;
     }
 
-    console.log('QR code saved successfully with ID:', data.id);
+    console.log("QR code saved successfully with ID:", data.id);
 
     // If they selected "Create New Band"
-    if (route.query.type === 'bandProfile' && selectedBand.value === 'createNew') {
-      router.push({ name: 'createband', query: { qrId: data.id } });
+    if (
+      route.query.type === "bandProfile" &&
+      selectedBand.value === "createNew"
+    ) {
+      router.push({ name: "createband", query: { qrId: data.id } });
       return;
     }
 
     // Otherwise, route based on the chosen type
     switch (route.query.type) {
-      case 'externalURL':
-        router.push('/dashboard');
+      case "externalURL":
+        router.push("/dashboard");
         break;
-      case 'bandProfile':
+      case "bandProfile":
         // If they chose an existing band, just go to dashboard or wherever you want:
-        router.push('/dashboard');
+        router.push("/dashboard");
         break;
-      case 'events':
-        router.push({ name: 'newevent', query: { qrId: data.id } });
+      case "events":
+        router.push({ name: "newevent", query: { qrId: data.id } });
         break;
-      case 'tours':
-        router.push({ name: 'newtour', query: { qrId: data.id } });
+      case "tours":
+        router.push({ name: "newtour", query: { qrId: data.id } });
         break;
-      case 'albums':
-        router.push({ name: 'newalbum', query: { qrId: data.id } });
+      case "albums":
+        router.push({ name: "newalbum", query: { qrId: data.id } });
         break;
-      case 'stream':
-        router.push({ name: 'createnewstreamlinks', query: { qrId: data.id } });
+      case "stream":
+        router.push({ name: "createnewstreamlinks", query: { qrId: data.id } });
         break;
-      case 'social':
-        router.push({ name: 'socialpage', query: { qrId: data.id } });
+      case "social":
+        router.push({ name: "socialpage", query: { qrId: data.id } });
         break;
       default:
-        router.push('/dashboard');
+        router.push("/dashboard");
         break;
     }
   } catch (error) {
     loading.value = false;
     console.error(
-      'Error during QR code save:',
+      "Error during QR code save:",
       error.response ? error.response.data : error
     );
   }
@@ -774,7 +808,7 @@ const saveQrCode = async () => {
   text-transform: uppercase;
   letter-spacing: 0.0892857143em;
   color: #fff;
-  background-color: #2C2C2C;
+  background-color: #2c2c2c;
   border: none;
   border-radius: 4px;
   cursor: pointer;
