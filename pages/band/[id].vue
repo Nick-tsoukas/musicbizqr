@@ -95,7 +95,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import YouTube from 'vue3-youtube';
 import AudioPlayer from '@/components/AudioPlayer.vue';
 import { useRuntimeConfig } from '#imports';
-import { useStrapi } from '@nuxtjs/strapi';
+
 
 const band = ref<any>(null);
 const isVideoPlaying = ref(false);
