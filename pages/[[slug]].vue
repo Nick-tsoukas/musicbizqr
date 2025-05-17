@@ -3,8 +3,11 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-    <div v-else-if="band && band.data" class="bg-[#000] w-screen mx-auto">
+    <div v-if="band && band.data" class="bg-[#000] w-screen mx-auto">
+      <!-- <pre class="text-white" >{{ band }}</pre> -->
       <!-- Hero Section -->
+      <!-- Image Container -->
+
       <div class="relative w-full h-[35vh] md:h-[60vh]">
         <img
           v-if="band.data.bandImg"
@@ -12,10 +15,11 @@
           :src="band.data.bandImg.url"
           alt="Band Image"
         />
+        <!-- Optional overlay -->
         <div class="absolute inset-0 bg-black bg-opacity-0"></div>
       </div>
 
-      <!-- Band Name -->
+      <!-- Band Name Below the Image -->
       <div
         v-if="band.data.isBandNameInLogo === false"
         class="text-center text-white text-4xl font-bold mt-4"
@@ -23,7 +27,8 @@
         {{ band.data.name }}
       </div>
 
-      <!-- Bio & Tagline -->
+      <!-- <pre class="text-white" >{{ band }}</pre> -->
+
       <div class="flex justify-center">
         <div class="flex flex-col">
           <h3
@@ -33,8 +38,9 @@
             {{ band.data.bio }}
           </h3>
           <div v-if="band.data.biotagline">
+            <!-- change text  -->
             <h3
-              class="text-[16px] mx-auto max-w-3xl text-center text-white md:text-2xl leading-tight mt-0 whitespace-pre-line"
+              class="text-[16px] mx-auto max-w-3xl text-center text-white md:text-2xl leading-tight whitespace-pre-line mt-0"
             >
               {{ band.data.biotagline }}
             </h3>
@@ -42,33 +48,46 @@
         </div>
       </div>
 
+      <!-- Band Page Content -->
+
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <div class="pt-0 sm:p-5">
-          <!-- Featured Song -->
+          <!-- singlesong section -->
           <div
-            v-if="band.data.singlesong && (band.data.singlesong.embedUrl || band.data.singlesong.song)"
-          >
-            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
-              Featured Song
-            </h1>
+  v-if="
+    band.data.singlesong &&
+    (
+      (band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl) ||
+      (!band.data.singlesong.isEmbeded && band.data.singlesong.song)
+    )
+  "
+>
+  <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
+    Featured Song
+  </h1>
 
-            <div v-if="band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl">
-              <iframe
-                :src="band.data.singlesong.embedUrl"
-                frameborder="0"
-                allowfullscreen
-                class="w-full h-64 rounded-lg"
-              ></iframe>
-            </div>
-            <div v-else>
-              <AudioPlayer
-                :album="formatSingleSong(band.data.singlesong)"
-                placeholderImage="/placeholder-image.svg"
-              />
-            </div>
-          </div>
+  <!-- Embedded Player -->
+  <div
+    v-if="band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl"
+  >
+    <iframe
+      :src="band.data.singlesong.embedUrl"
+      frameborder="0"
+      allowfullscreen
+      class="w-full h-64 rounded-lg"
+    ></iframe>
+  </div>
 
-          <!-- Featured Video -->
+  <!-- Fallback AudioPlayer -->
+  <div v-else>
+    <AudioPlayer
+      :album="formatSingleSong(band.data.singlesong)"
+      placeholderImage="/placeholder-image.svg"
+    />
+  </div>
+</div>
+
+
           <div
             v-if="band.data.singlevideo && band.data.singlevideo.youtubeid"
             class="relative w-full max-w-[600px] mr-auto"
@@ -77,6 +96,7 @@
               Featured Video
             </h1>
 
+            <!-- Video Thumbnail & Play Button -->
             <div
               v-if="!isVideoPlaying"
               class="relative cursor-pointer mb-10"
@@ -87,7 +107,9 @@
                 alt="Video Thumbnail"
                 class="w-full max-h-[300px] object-cover rounded-lg"
               />
-              <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+              <div
+                class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+              >
                 <svg
                   class="w-16 h-16 text-white opacity-75"
                   xmlns="http://www.w3.org/2000/svg"
@@ -100,6 +122,7 @@
               </div>
             </div>
 
+            <!-- YouTube Player (Loads on Click) -->
             <div v-else class="relative pb-[56.25%] w-full">
               <YouTube
                 :src="singleVideoEmbedUrl"
@@ -109,241 +132,488 @@
             </div>
           </div>
 
-          <!-- Social Links -->
-          <div v-if="socialPlatforms.some(p => band.data[p.name])" class="mt-10">
-            <h2 class="text-2xl font-bold text-white md:my-4">Follow Us</h2>
-            <div class="flex space-x-4">
-              <a
+          <!-- website link  -->
+          <div v-if="band.data.websitelink" class="mt-4">
+            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:mt-6">
+              Website Link
+            </h1>
+            <a class="text-purple-500 text-xl" :href="band.data.websitelink">
+              <span :vif="band.data.websitelinktext">{{
+                band.data.websitelinktext
+              }}</span>
+            </a>
+          </div>
+
+          <div>
+            <!-- Streaming Links -->
+            <div class="w-full md:w-[100%] md:mx-auto mt-10">
+              <h1 class="text-2xl mb-4 md:text-3xl font-bold text-white">
+                Streaming Links
+              </h1>
+              <template
+                v-for="platform in streamingPlatforms"
+                :key="platform.name"
+              >
+                <span v-if="band.data[platform.name]">
+                  <!-- Added click handler to track outbound clicks -->
+                  <a
+                    :href="band.data[platform.name]"
+                    @click.prevent="
+                      handleClick(
+                        band.data.id,
+                        platform.name,
+                        band.data[platform.name]
+                      )
+                    "
+                  >
+                    <button
+                      class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
+                    >
+                      <img
+                        :src="platform.img"
+                        class="h-10 absolute left-2"
+                        :alt="platform.label"
+                      />
+                      {{ platform.label }}
+                    </button>
+                  </a>
+                </span>
+              </template>
+            </div>
+
+            <!-- Social Media -->
+            <div class="w-full md:w-[100%] md:mx-auto mt-10">
+              <h1 class="text-2xl mb-4 font-bold text-white md:text-3xl">
+                Social Media
+              </h1>
+              <template
                 v-for="platform in socialPlatforms"
                 :key="platform.name"
-                v-if="band.data[platform.name]"
-                :href="band.data[platform.name]"
-                target="_blank"
-                rel="noopener"
-                @click.prevent="handleClick(band.data.id, platform.name, band.data[platform.name])"
               >
-                <img
-                  :src="platform.img"
-                  :alt="platform.label"
-                  class="w-8 h-8 filter brightness-0 invert"
-                />
-              </a>
+                <span v-if="band.data[platform.name]">
+                  <!-- Added click handler to track outbound clicks -->
+                  <a
+                    :href="band.data[platform.name]"
+                    @click.prevent="
+                      handleClick(
+                        band.data.id,
+                        platform.name,
+                        band.data[platform.name]
+                      )
+                    "
+                  >
+                    <button
+                      class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
+                    >
+                      <img
+                        :src="platform.img"
+                        class="h-10 absolute left-2"
+                        :alt="platform.label"
+                      />
+                      {{ platform.label }}
+                    </button>
+                  </a>
+                </span>
+              </template>
             </div>
-          </div>
 
-          <!-- Streaming Links -->
-          <div
-            v-if="streamingPlatforms.some(p => band.data[p.name])"
-            class="mt-10"
-          >
-            <h2 class="text-2xl font-bold text-white md:my-4">
-              Listen On
-            </h2>
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-              <a
-                v-for="platform in streamingPlatforms"
-                :key="platform.name + platform.label"
-                v-if="band.data[platform.name]"
-                :href="band.data[platform.name]"
-                target="_blank"
-                rel="noopener"
-                @click.prevent="handleClick(band.data.id, platform.name, band.data[platform.name])"
-              >
-                <img
-                  :src="platform.img"
-                  :alt="platform.label"
-                  class="w-10 h-10 filter brightness-0 invert"
-                />
-              </a>
-            </div>
-          </div>
+            <!-- Events Section -->
+            <!-- <pre class="text-white"> there is an evnt here{{ events }}</pre> -->
+            <div v-if="events.length" class="w-full mt-10">
+              <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">
+                Events and Tours
+              </h1>
 
-          <!-- Upcoming Events -->
-          <div v-if="events.length" class="mt-10 px-6 md:max-w-[80vw] md:mx-auto">
-            <h2 class="text-2xl font-bold text-white mb-4">Upcoming Events</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div
-                v-for="ev in events"
-                :key="ev.id"
-                class="bg-white rounded-lg p-4"
-              >
-                <h3 class="text-lg font-semibold mb-2">
-                  {{ formatDate(ev.attributes.date) }} – {{ ev.attributes.title }}
-                </h3>
-                <p class="text-sm text-gray-700 mb-1">
-                  {{ ev.attributes.venue }}, {{ ev.attributes.city }}, {{ ev.attributes.state }}
-                </p>
-                <p class="text-sm text-gray-600 mb-2">
-                  {{ truncate(ev.attributes.description, 100) }}
-                </p>
-                <a
-                  v-if="ev.attributes.link"
-                  :href="ev.attributes.link"
-                  target="_blank"
-                  class="text-blue-500 hover:underline"
+              <div class="overflow-x-scroll md:overflow-hidden relative">
+                <table
+                  class="w-full table-auto bg-black text-white rounded-md shadow-lg"
                 >
-                  Learn more
-                </a>
+                  <thead>
+                    <tr class="border-b border-purple-500 border-opacity-30">
+                      <th class="px-2 py-2 text-left">Date</th>
+                      <th class="px-2 py-2 text-left">City</th>
+                      <th class="px-2 py-2 text-left">Venue</th>
+                      <th class="px-2 py-2 text-left">Tickets</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="event in events"
+                      :key="event.id"
+                      class="border-b border-purple-500 border-opacity-20"
+                    >
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        {{
+                          new Date(event.date + "T00:00:00").toLocaleDateString(
+                            "en-US"
+                          )
+                        }}
+                      </td>
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        {{ event.city ?? "City not specified" }},
+                        {{ event.state }}
+                      </td>
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        {{ event.venue ?? "Venue not specified" }}
+                      </td>
+                      <td class="px-2 py-1 whitespace-nowrap text-left">
+                        <button
+                          @click="router.push(`/event/${event.id}`)"
+                          class="text-purple-400"
+                        >
+                          View Event
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Footer Logo -->
+      <!-- <Footer /> -->
       <div class="h-40 flex justify-center items-center">
-        <img src="@/assets/musicbizlogo.png" class="h-12" alt="MusicBiz Logo" />
+        <img src="@/assets/musicbizlogo.png" class="h-12" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
-import { useRuntimeConfig, useRoute, useRouter } from "#imports";
-import YouTube from "vue3-youtube";
-import { useBeacon } from "@/composables/useBeacon";
-import AudioPlayer from "@/components/AudioPlayer.vue";
+console.log("slug page triggered");
 
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { useRuntimeConfig } from "#imports";
+import { useBeacon } from "@/composables/useBeacon"; // <-- Added import for beacon tracking
+import YouTube from "vue3-youtube";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import { Thumbs } from "swiper/modules";
+import { EffectCards } from "swiper/modules";
+import scrollDownVideo from "@/assets/scrolldown.webm";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
 
+const loading = ref(true);
+
+// const extractYouTubeId = (url) => {
+//   // Check if URL is an embed URL (https://www.youtube.com/embed/...)
+//   const embedMatch = url.match(/youtube\.com\/embed\/([^?]+)/);
+//   if (embedMatch) {
+//     return embedMatch[1];
+//   }
+
+//   // Check if URL is a watch URL (https://www.youtube.com/watch?v=...)
+//   const watchMatch = url.match(/[?&]v=([^&]+)/);
+//   if (watchMatch) {
+//     return watchMatch[1];
+//   }
+
+//   return null; // Return null if the URL is not valid
+// };
+
+const generateThumbnailUrl = (videoId) => {
+  console.log(
+    "get video idfdssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+    videoId
+  );
+  if (videoId) {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  }
+  return "";
+};
+
+const generateEmbedUrl = (videoId) => {
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return "";
+};
+
+const handleVideoUrl = (inputUrl) => {
+  const videoId = extractYouTubeId(inputUrl);
+  console.log("fsdfasdsadfsadfsadfsadfsadfsadfsadfkjsadkjfhasdlkfjhsad");
+  if (!videoId) {
+    console.error("Invalid YouTube URL");
+    return; // Handle invalid URL case (e.g., show an error message)
+  }
+
+  const thumbnailUrl = generateThumbnailUrl(videoId);
+  const embedUrl = generateEmbedUrl(videoId);
+
+  console.log("Video ID:", videoId);
+  console.log("Thumbnail URL:", thumbnailUrl);
+  console.log("Embed URL:", embedUrl);
+
+  return { thumbnailUrl, embedUrl };
+};
+
+const { trackClick } = useBeacon(); // <-- Extract trackClick from composable
+const handleClick = (bandId, platform, destinationUrl) => {
+  trackClick(bandId, platform, destinationUrl);
+};
+
+const { find } = useStrapi();
+const route = useRoute();
+const router = useRouter();
+
+const band = ref(null);
+const albums = ref([]);
+const events = ref([]);
+const tours = ref([]);
+const albumPlay = ref(null);
+const videos = ref([]);
+const videoItems = ref([]);
+const playingVideos = ref({});
+const loadingVideos = ref(true);
+const isExpanded = ref(false);
+const maxBioLength = 300;
+const truncatedBio = computed(() => {
+  const bio = band.value?.data?.attributes?.bio || "";
+  return bio.length > maxBioLength ? bio.slice(0, maxBioLength) + "..." : bio;
+});
+
+const videoUrl = ref("");
+const thumbnailUrl = ref("");
+const embedUrl = ref("");
+
+const processVideoUrl = () => {
+  const { thumbnailUrl: tUrl, embedUrl: eUrl } = handleVideoUrl(videoUrl.value);
+  thumbnailUrl.value = tUrl;
+  embedUrl.value = eUrl;
+};
+const toggleBio = () => {
+  isExpanded.value = !isExpanded.value;
+};
+const formattedBio = computed(() => {
+  return band?.data?.attributes?.bio ? band.data.bio.split(/\n+/) : [];
+});
+const isVideoPlaying = ref(false);
+function extractYouTubeId(url) {
+  console.log("this is the url  ", url);
+  const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+  console.log(
+    match ? match[1] : url,
+    "fdsfsddskljlkjsfadlkjhasdflkjhasdfkljhsdaflkhjhlfsadhkljsadfhkljsdfahkasdf"
+  );
+  return match ? match[1] : url;
+}
+
+const singleVideoId = computed(() => {
+  const videoData = band.value?.data?.singlevideo;
+  return videoData?.youtubeid ? extractYouTubeId(videoData.youtubeid) : "";
+});
+const singleVideoThumbnail = computed(() => {
+  return singleVideoId.value
+    ? `https://img.youtube.com/vi/${singleVideoId.value}/hqdefault.jpg`
+    : "";
+});
+
+const singleVideoEmbedUrl = computed(() => {
+  const watchUrl = band.value?.data?.singlevideo?.youtubeid;
+  if (watchUrl) {
+    const match = watchUrl.match(/[?&]v=([^&]+)/);
+    console.log(match);
+    if (match) {
+      const videoId = match[1];
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }
+  }
+  return ""; // Return an empty string if no valid URL is found
+});
+
+function convertToEmbedUrl(watchUrl) {
+  const match = watchUrl.match(/[?&]v=([^&]+)/);
+  if (match) {
+    const videoId = match[1];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return null; // If the URL is not valid or doesn't match the YouTube format
+}
+
+console.log(
+  singleVideoThumbnail,
+  " fdsfdslkfj;lakjfsadl;kjf;lasdkjfl;askj  ;lkjasdf;lkjasdf ;lkjsadfl;kj l;asdkjfdsa;lkj"
+);
+const playerOptions = {
+  autoplay: 1,
+  rel: 0,
+  modestbranding: 1,
+};
+const playVideo = () => {
+  isVideoPlaying.value = true;
+};
+// const playVideo = (videoId) => {
+//   playingVideos.value[videoId] = true;
+// };
+const getYouTubeThumbnail = (youtubeVideo) => {
+  const url = youtubeVideo.videoid;
+  const videoIdMatch =
+    url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+  const videoId = videoIdMatch ? videoIdMatch[1] : url;
+  return {
+    videoId,
+    thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+  };
+};
+
+const slug = computed(() => route.params.slug?.toLowerCase() ?? ""); // Debug
+
+const fetchBandData = async () => {
+  const apiUrl = useRuntimeConfig().public.strapiUrl;
+  const response = await fetch(
+    `${apiUrl}/api/bands/slug/${route.params.slug?.toLowerCase() ?? ""}?` + // ✅ Correct endpoint
+      "populate[events][populate]=image&" +
+      "populate[tours][populate]=*&" +
+      "populate[albums][populate]=cover,songs.file&" +
+      "populate[singlesong][populate][song]=*&" +
+      "populate[singlesong][populate][cover]=*&" +
+      "populate[singlevideo]=*&" +
+      "populate=bandImg"
+  );
+
+  const data = await response.json();
+
+  if (response.status === 404) {
+    console.error("Band not found for slug:", route.params.slug);
+    band.value = null;
+    return;
+  }
+
+  console.log("Fetched band data by slug:", data);
+
+  // ✅ Update data parsing to match the API response
+  if (data?.data) {
+    band.value = data;
+    albums.value = band.value?.data?.albums || [];
+    events.value = band.value?.data?.events || [];
+    tours.value = band.value?.data?.tours || [];
+
+    if (albums.value.length > 0) {
+      setAlbum(albums.value[0].id);
+    }
+  }
+  loading.value = false;
+};
+
+const setAlbum = (id) => {
+  const album = albums.value.find((album) => album.id === id);
+  if (album) {
+    albumPlay.value = album;
+  }
+};
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
-import twitterIcon from "@/assets/twitter.png";
-import tiktokIcon from "@/assets/tiktok.png";
-import youtubeIcon from "@/assets/youtube-icon.svg";
-import youtubeMusicIcon from "@/assets/youtube-icon.svg";
-import spotifyIcon from "@/assets/spotify.svg";
-import appleMusicIcon from "@/assets/apple.svg";
-import reverbnationIcon from "@/assets/reverbnation.png";
-import soundcloudIcon from "@/assets/soundcloudlast.png";
-import bandcampIcon from "@/assets/bandcamp.svg";
 import twitchIcon from "@/assets/twitchfree.png";
+import appleMusicIcon from "@/assets/apple.svg";
+import soundcloudIcon from "@/assets/soundcloudlast.png";
 import deezerIcon from "@/assets/dezzer.svg";
-
-const loading = ref(true);
-const band = ref(null);
-const events = ref([]);
-
+import youtubeIcon from "@/assets/youtube-icon.svg";
+import bandcampIcon from "@/assets/bandcamp.svg";
+import reverbnationIcon from "@/assets/reverbnation.png";
+import spotifyIcon from "@/assets/spotify.svg";
+import youtubeMusicIcon from "@/assets/youtube-icon.svg";
+import deezerIcon2 from "@/assets/dezzer.svg";
+import soundcloudIcon2 from "@/assets/soundcloudlast.png";
+import bandcampIcon2 from "@/assets/bandcamp.svg";
+import tiktokIcon from "@/assets/tiktok.png";
+import twitterIcon from "@/assets/twitter.png";
 const socialPlatforms = [
   { name: "facebook", img: facebookIcon, label: "Facebook" },
   { name: "instagram", img: instagramIcon, label: "Instagram" },
   { name: "twitter", img: twitterIcon, label: "Twitter" },
-  { name: "tiktok", img: tiktokIcon, label: "TikTok" },
+  { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
-
 const streamingPlatforms = [
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
-  { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
+  { name: "youtube", img: youtubeMusicIcon, label: "YouTube Music" },
   { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
-  { name: "reverbnation", img: reverbnationIcon, label: "ReverbNation" },
-  { name: "soundcloud", img: soundcloudIcon, label: "SoundCloud" },
-  { name: "bandcamp", img: bandcampIcon, label: "Bandcamp" },
+  { name: "reverbnation", img: reverbnationIcon, label: "Reverbnation" },
+  { name: "soundcloud", img: soundcloudIcon2, label: "SoundCloud" },
+  { name: "bandcamp", img: bandcampIcon2, label: "Bandcamp" },
   { name: "twitch", img: twitchIcon, label: "Twitch" },
-  { name: "deezer", img: deezerIcon, label: "Deezer" },
+  { name: "deezer", img: deezerIcon2, label: "Deezer" },
 ];
-
-const { trackClick } = useBeacon();
-const route = useRoute();
-const router = useRouter();
-const config = useRuntimeConfig();
-
-const isVideoPlaying = ref(false);
-const playerOptions = { autoplay: 1, rel: 0, modestbranding: 1 };
-
-const singleVideoId = computed(() => {
-  const url = band.value?.data?.singlevideo?.youtubeid || "";
-  const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
-  return match ? match[1] : "";
-});
-
-const singleVideoThumbnail = computed(() =>
-  singleVideoId.value
-    ? `https://img.youtube.com/vi/${singleVideoId.value}/hqdefault.jpg`
-    : ""
-);
-
-const singleVideoEmbedUrl = computed(() => {
-  return singleVideoId.value
-    ? `https://www.youtube.com/embed/${singleVideoId.value}?autoplay=1`
-    : "";
-});
-
-const playVideo = () => {
-  isVideoPlaying.value = true;
-};
-
 const formatSingleSong = (song) => {
+  console.log("Formatting song data:", song);
   if (!song) return null;
+
   return {
-    id: song.id,
+    id: song.id || null,
     attributes: {
-      isEmbeded: song.isEmbeded,
-      title:     song.title,
-      embedUrl:  song.embedUrl,
+      isEmbeded: song.isEmbeded || false,
+      title: song.title || "Unknown Title",
+      embedUrl: song.embedUrl || "",
       file: {
-        data: { attributes: { url: song.song?.url || null } },
+        data: {
+          attributes: {
+            url: song.song?.url || null, // ✅ Fix here: Access the correct file URL
+          },
+        },
       },
-      artist: band.value?.data?.name || "",
+      duration: song.duration || 0,
+      cover: song.cover?.data || null,
+      artist: band.value?.data?.name || "Unknown Artist", // ✅ Fix: `name` is at the root level, not in `attributes`
     },
   };
 };
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    month: "short",
-    day:   "numeric",
-    year:  "numeric",
-  });
-}
-
-function truncate(text, length) {
-  return text?.length > length ? text.slice(0, length) + "…" : text;
-}
-
-async function fetchBandData() {
-  loading.value = true;
-  const slug = (route.params.slug || "").toLowerCase();
-  const url =
-    `${config.public.strapiUrl}/api/bands/slug/${slug}?` +
-    "populate[bandImg]=*&" +
-    "populate[singlesong][populate]=song&" +
-    "populate[singlevideo]=*&" +
-    "populate[events][populate]=*&" +
-    socialPlatforms.map(p => `populate[${p.name}]=true`).join("&") + "&" +
-    streamingPlatforms.map(p => `populate[${p.name}]=true`).join("&");
-
-  const res = await fetch(url);
-  const json = await res.json();
-  band.value = json;
-  events.value = json.data.events || [];
-  loading.value = false;
-}
-
-onMounted(() => {
+onMounted(async () => {
   document.body.classList.add("custom-page-body");
-  fetchBandData();
+  await fetchBandData();
+  // await fetchVideos();
 });
-
 onBeforeUnmount(() => {
   document.body.classList.remove("custom-page-body");
 });
 </script>
 
 <style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.embed-container {
+  position: relative;
+  overflow: hidden;
+  padding-top: 56.25%;
+  /* Aspect ratio for 16:9 */
+}
+.embed-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 .custom-page-body {
   background-color: #000;
 }
+.custom-border {
+  border: 0.1px solid white;
+}
+.mdc-button-green {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+.mdc-button-green:hover {
+  background-color: #45a049;
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
 }
+
 .spinner {
   border: 8px solid #f3f3f3;
   border-top: 8px solid #6200ee;
@@ -351,18 +621,6 @@ onBeforeUnmount(() => {
   width: 60px;
   height: 60px;
   animation: spin 1s linear infinite;
-  margin: 2rem auto;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.filter {
-  filter: brightness(0) invert(1);
-}
-img {
-  max-width: 100%;
-  display: block;
+  margin-top: 2rem;
 }
 </style>
