@@ -1,721 +1,666 @@
 <template>
-  <div class="bg-[#000] w-[90vw] mx-auto">
+  <div class="bg-[#000] w-[90vw] mx-auto z-0">
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-    <!-- <pre class="text-white">{{ band }}</pre> -->
     <div class="container-mdc bg-black max-w-5xl">
-      <h1 class="title text-black">Edit Band</h1>
-      <form @submit.prevent="submitEditBand" class="rounded-md p-4">
-        <div class="form-group">
-          <!-- Band Details -->
+      <h1 class="title text-white">Edit Band Profile</h1>
+      <form class="form-group" @submit.prevent="submitForm">
+        <!-- Band Details Section -->
+        <div class="bg-[#fff] rounded-md">
           <div
-            class="flex flex-col p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="text-white text-xl font-semibold">Band Details</h2>
+            <h2 class="font-semibold text-white text-2xl">Band Details</h2>
           </div>
-          <div class="bg-white p-10">
+          <div class="p-4">
             <!-- Band Name -->
-            <div class="mdc-text-field mb-4">
+            <div class="mdc-text-field">
               <input
                 type="text"
-                id="edit-band-name"
+                id="band-name"
                 class="mdc-text-field__input"
-                v-model="band.name"
+                v-model="bandName"
                 placeholder=" "
                 required
               />
-              <label class="mdc-floating-label" for="edit-band-name">Band Name</label>
+              <label class="mdc-floating-label" for="band-name"
+                >Band Name</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
-
             <!-- Genre -->
-            <div class="mdc-text-field mb-4">
+            <div class="mdc-text-field">
               <input
                 type="text"
-                id="edit-band-genre"
+                id="genre"
                 class="mdc-text-field__input"
-                v-model="band.genre"
+                v-model="genre"
                 placeholder=" "
                 required
               />
-              <label class="mdc-floating-label" for="edit-band-genre">Genre</label>
+              <label class="mdc-floating-label" for="genre">Genre</label>
               <div class="mdc-line-ripple"></div>
             </div>
-
             <!-- Bio -->
             <div class="mdc-text-field">
               <textarea
-                id="edit-band-bio"
+                id="bio"
                 class="mdc-text-field__input"
-                v-model="band.bio"
+                v-model="bio"
                 placeholder=" "
                 required
               ></textarea>
-              <label class="mdc-floating-label" for="edit-band-bio">Bio</label>
+              <label class="mdc-floating-label" for="bio">Bio</label>
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
+        </div>
 
-          <!-- Band Image Upload -->
+        <!-- Website Link and Text -->
+        <div class="bg-[#fff] rounded-md my-10">
           <div
-            class="flex flex-col p-6 mt-10 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6"
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h3 class="font-semibold text-white text-xl">Upload Image</h3>
+            <h2 class="font-semibold text-white text-2xl">
+              Website Link and Text
+            </h2>
           </div>
-          <div class="bg-white p-4">
-            <div v-if="band.imageUrl" class="mb-4">
-              <img
-                :src="band.imageUrl"
-                alt="Band Image"
-                class="w-full h-auto rounded-lg shadow-md mb-4"
-              />
-            </div>
-            <input
-              type="file"
-              id="edit-band-image"
-              class="styled-file-input"
-              @change="handleBandImageUpload"
-              accept="image/*"
-            />
-            <label for="edit-band-image" class="styled-file-label w-full text-center"
-              >Choose Band Image</label
-            >
-          </div>
-
-          <!-- Social Media Links -->
-          <div
-            class="flex flex-col p-6 mt-10 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6"
-          >
-            <h3 class="font-semibold text-white text-xl">Social Media Links</h3>
-          </div>
-          <div class="bg-white p-4">
-            <!-- Facebook -->
-            <div class="mdc-text-field my-4">
-              <input
-                type="url"
-                id="edit-band-facebook"
-                class="mdc-text-field__input"
-                v-model="band.facebook"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-facebook"
-                >Facebook</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Instagram -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-instagram"
-                class="mdc-text-field__input"
-                v-model="band.instagram"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-instagram"
-                >Instagram</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Twitch -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-twitch"
-                class="mdc-text-field__input"
-                v-model="band.twitch"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-twitch">Twitch</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Twitter -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-twitter"
-                class="mdc-text-field__input"
-                v-model="band.twitter"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-twitter"
-                >Twitter</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- WhatsApp -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-whatsapp"
-                class="mdc-text-field__input"
-                v-model="band.whatsapp"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-whatsapp"
-                >WhatsApp</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- TikTok -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-tiktok"
-                class="mdc-text-field__input"
-                v-model="band.tiktok"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-tiktok"
-                >TikTok</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Snapchat -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-snapchat"
-                class="mdc-text-field__input"
-                v-model="band.snapchat"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-snapchat"
-                >Snapchat</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-          </div>
-
-          <!-- Streaming Links -->
-          <div
-            class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h3 class="font-semibold text-white text-xl">Streaming Links</h3>
-          </div>
-          <div class="bg-white p-4">
-            <!-- Apple Music -->
-            <div class="mdc-text-field my-4">
-              <input
-                type="url"
-                id="edit-band-appleMusic"
-                class="mdc-text-field__input"
-                v-model="band.appleMusic"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-appleMusic"
-                >Apple Music</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Spotify -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-spotify"
-                class="mdc-text-field__input"
-                v-model="band.spotify"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-spotify"
-                >Spotify</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- SoundCloud -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-soundcloud"
-                class="mdc-text-field__input"
-                v-model="band.soundcloud"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-soundcloud"
-                >SoundCloud</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- YouTube -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-youtube"
-                class="mdc-text-field__input"
-                v-model="band.youtube"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-youtube"
-                >YouTube</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Deezer -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-deezer"
-                class="mdc-text-field__input"
-                v-model="band.deezer"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-deezer"
-                >Deezer</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Bandcamp -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="edit-band-bandcamp"
-                class="mdc-text-field__input"
-                v-model="band.bandcamp"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="edit-band-bandcamp"
-                >Bandcamp</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-          </div>
-
-          <!-- Single Song Section -->
-          <div
-            class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6"
-          >
-            <h3 class="font-semibold text-white text-xl">Single Song</h3>
-          </div>
-          <div class="bg-white p-4">
-            <!-- Song Title -->
-            <div class="mdc-text-field mb-4">
+          <div class="p-4">
+            <div class="mdc-text-field">
               <input
                 type="text"
-                id="edit-singlesong-title"
+                id="websitelink"
                 class="mdc-text-field__input"
-                v-model="band.singlesong.title"
-                placeholder=" "
+                v-model="websitelink"
+                placeholder="https://yourbandsite.com"
               />
-              <label class="mdc-floating-label" for="edit-singlesong-title"
-                >Song Title</label
+              <label class="mdc-floating-label" for="websitelink"
+                >Website Link</label
               >
               <div class="mdc-line-ripple"></div>
             </div>
+          </div>
+          <div class="p-4">
+            <div class="mdc-text-field">
+              <input
+                type="text"
+                id="websitelinktext"
+                class="mdc-text-field__input"
+                v-model="websitelinktext"
+                placeholder="YourBandSiteLinkText.com"
+              />
+              <label class="mdc-floating-label" for="websitelinktext"
+                >Website Link Text To Show</label
+              >
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
 
-            <!-- Radio Buttons for Embed vs. File Upload -->
-            <div class="mb-4">
-              <label class="text-black mr-4">
+        <!-- Band Image -->
+        <div
+          class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
+        </div>
+        <div class="mb-4 py-10 bg-white p-4">
+          <div v-if="bandImgUrl" class="mb-4">
+            <img
+              :src="bandImgUrl"
+              alt="Band Image"
+              class="w-full max-h-[300px] object-contain"
+            />
+          </div>
+          <input
+            type="file"
+            id="band-img"
+            class="styled-file-input"
+            @change="handleImageUpload"
+            accept="image/*"
+          />
+          <label for="band-img" class="styled-file-label w-full text-center"
+            >Choose Band Image</label
+          >
+        </div>
+
+        <!-- Band Members Section -->
+        <!-- <div class="bg-white rounded-md">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Band Members</h2>
+          </div>
+          <div class="p-4">
+            <div v-for="(member, i) in members" :key="i" class="member-container">
+              <div class="mdc-text-field mb-4">
+                <input
+                  type="text"
+                  :id="'member-name-' + i"
+                  class="mdc-text-field__input"
+                  v-model="member.name"
+                  placeholder=" "
+                />
+                <label class="mdc-floating-label" :for="'member-name-' + i">Member Name</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
+              <div class="mdc-text-field mb-4">
+                <input
+                  type="text"
+                  :id="'instrument-' + i"
+                  class="mdc-text-field__input"
+                  v-model="member.instrument"
+                  placeholder=" "
+                />
+                <label class="mdc-floating-label" :for="'instrument-' + i">Instrument</label>
+                <div class="mdc-line-ripple"></div>
+              </div>
+              <div class="mb-4">
+                <input
+                  type="file"
+                  :id="'member-img-' + i"
+                  class="styled-file-input"
+                  @change="e => handleMemberImageUpload(e, i)"
+                  accept="image/*"
+                />
+                <label :for="'member-img-' + i" class="styled-file-label w-full text-center">Choose Member Image</label>
+              </div>
+              <div v-if="member.imageUrl" class="mb-4">
+                <img
+                  :src="member.imageUrl"
+                  alt="Member Image"
+                  class="w-full h-auto rounded-lg shadow-md object-contain"
+                />
+              </div>
+              <button type="button" class="mdc-button mb-4 w-full" @click="removeMember(i)">Remove Member</button>
+            </div>
+            <button type="button" class="mdc-button mb-8 w-full" @click="addMember">+ Add Member</button>
+          </div>
+        </div> -->
+
+        <!-- Social Media Links Section -->
+        <div class="bg-[#fff] rounded-md">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">
+              Social Media Links
+            </h2>
+          </div>
+          <div class="p-4 grid grid-cols-2 gap-4">
+            <div
+              v-for="net in Object.keys(social)"
+              :key="net"
+              class="mdc-text-field"
+            >
+              <input
+                :id="net"
+                type="url"
+                class="mdc-text-field__input"
+                v-model="social[net]"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" :for="net">{{
+                net.charAt(0).toUpperCase() + net.slice(1)
+              }}</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Streaming Links Section -->
+        <div class="bg-[#fff] rounded-md">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Streaming Links</h2>
+          </div>
+          <div class="p-4 grid grid-cols-2 gap-4">
+            <div
+              v-for="stream in Object.keys(streaming)"
+              :key="stream"
+              class="mdc-text-field"
+            >
+              <input
+                :id="stream"
+                type="url"
+                class="mdc-text-field__input"
+                v-model="streaming[stream]"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" :for="stream">{{
+                stream
+              }}</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Song Section -->
+        <div class="bg-[#fff] rounded-md">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Featured Song</h2>
+          </div>
+          <div class="p-4">
+            <div class="flex space-x-4 mb-4">
+              <label class="text-black">
                 <input
                   type="radio"
-                  v-model="band.singlesong.isEmbeded"
-                  :value="true"
+                  value="upload"
+                  v-model="singlesongType"
+                  class="mr-1"
                 />
-                Use Embed
+                Upload File
               </label>
               <label class="text-black">
                 <input
                   type="radio"
-                  v-model="band.singlesong.isEmbeded"
-                  :value="false"
+                  value="embed"
+                  v-model="singlesongType"
+                  class="mr-1"
                 />
-                Upload File
+                Use Embed
               </label>
             </div>
-
-            <!-- If isEmbeded is true, show embed URL input -->
-            <div v-if="band.singlesong.isEmbeded" class="mdc-text-field mb-4">
+            <div class="mdc-text-field mb-4">
               <input
                 type="text"
-                id="edit-singlesong-embedUrl"
+                id="singlesong-title"
                 class="mdc-text-field__input"
-                v-model="band.singlesong.embedUrl"
+                v-model="singlesongTitle"
                 placeholder=" "
               />
-              <label
-                class="mdc-floating-label"
-                for="edit-singlesong-embedUrl"
-                >Embed URL</label
+              <label class="mdc-floating-label" for="singlesong-title"
+                >Song Title</label
               >
               <div class="mdc-line-ripple"></div>
             </div>
-
-            <!-- Otherwise show file input -->
-            <div v-else>
+            <div v-if="singlesongType === 'upload'">
               <input
                 type="file"
-                id="edit-singlesong-file"
+                id="singlesong-file"
                 class="styled-file-input"
                 @change="handleSingleSongUpload"
                 accept="audio/*"
               />
               <label
-                for="edit-singlesong-file"
+                for="singlesong-file"
                 class="styled-file-label w-full text-center"
-                >Choose Single Song File</label
+                >Choose Song File</label
               >
-
-              <!-- Show existing single song info if available -->
-              <div v-if="band.singlesong?.song && !isSingleSongFile" class="mt-4">
-                <p>
-                  Current Song:
-                  {{
-                    band.singlesong.song.data?.attributes.name ||
-                    band.singlesong.song.data?.attributes.url
-                  }}
-                </p>
-              </div>
             </div>
-          </div>
-
-          <!-- Single Video Section -->
-          <div
-            class="flex flex-col mt-10 p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6"
-          >
-            <h3 class="font-semibold text-white text-xl">Single Video</h3>
-          </div>
-          <div class="bg-white p-4">
-            <div class="mdc-text-field mb-4">
+            <div v-else class="mdc-text-field mb-4">
               <input
                 type="url"
-                id="edit-singlevideo-youtube"
+                id="singlesong-embed"
                 class="mdc-text-field__input"
-                v-model="band.singlevideo.youtubeid"
+                v-model="singlesongEmbedUrl"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="edit-singlevideo-youtube"
-                >YouTube URL</label
+              <label class="mdc-floating-label" for="singlesong-embed"
+                >Embed URL</label
               >
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
-
-          <!-- Save Button -->
-          <button type="submit" class="mdc-button w-full mt-10">Save Changes</button>
         </div>
+
+        <!-- Featured Video Section -->
+        <div class="bg-[#fff] rounded-md">
+          <div
+            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Featured Video</h2>
+          </div>
+          <div class="p-4">
+            <div class="mdc-text-field mb-4">
+              <input
+                type="url"
+                id="singlevideo-youtube"
+                class="mdc-text-field__input"
+                v-model="singlevideoYoutubeUrl"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="singlevideo-youtube"
+                >YouTube Video URL</label
+              >
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <button type="submit" class="mdc-button w-full mt-10">
+          Save Changes
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 <script setup>
-const route = useRoute();
+import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useRuntimeConfig, useStrapiUser, useStrapiToken } from "#imports";
+
+const config = useRuntimeConfig();
 const router = useRouter();
-const { findOne } = useStrapi();
-const user = useStrapiUser();
-const client = useStrapiClient();
+const route  = useRoute();
+const user   = useStrapiUser();
+const token  = useStrapiToken();
 
-const loading = ref(false);
+const loading         = ref(false);
 
-// Tracks the band data
-const band = ref({
-  name: "",
-  genre: "",
-  bio: "",
-  bandImg: null,
-  imageUrl: null,
-  facebook: "",
+// Band basics
+const bandName        = ref("");
+const genre           = ref("");
+const bio             = ref("");
+const websitelink     = ref("");
+const websitelinktext = ref("");
+
+// Track existing vs new image
+const bandImgFile     = ref(null);
+const bandImgUrl      = ref("");
+const bandImgId       = ref(null);
+
+// Members (if you still need them)
+const members         = ref([]);
+
+// Social media links
+const social = ref({
+  facebook:  "",
   instagram: "",
-  twitch: "",
-  twitter: "",
-  whatsapp: "",
-  tiktok: "",
-  snapchat: "",
-  appleMusic: "",
-  spotify: "",
-  soundcloud: "",
-  youtube: "",
-  deezer: "",
-  bandcamp: "",
-  // The component ID must be here if we want to preserve the same component
-  singlesong: {
-    id: null,
-    title: "",
-    song: null, // This can be an object from Strapi or a File
-    embedUrl: "",
-    isEmbeded: false,
-  },
-  singlevideo: {
-    youtubeid: "",
-  },
+  twitch:    "",
+  twitter:   "",
+  whatsapp:  "",
+  tiktok:    "",
+  snapchat:  ""
 });
 
-// If user uploads a *new* single-song file
-const isSingleSongFile = ref(false);
+// Streaming links
+const streaming = ref({
+  appleMusic: "",
+  spotify:    "",
+  soundcloud: "",
+  youtube:    "",
+  deezer:     "",
+  bandcamp:   ""
+});
 
-// ---------- UPLOAD HANDLERS ----------
+// Featured song/video
+const singlesongType      = ref("upload");
+const singlesongTitle     = ref("");
+const singlesongFile      = ref(null);
+const singlesongEmbedUrl  = ref("");
+const singlevideoYoutubeUrl = ref("");
 
-// Band image
-const handleBandImageUpload = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    band.value.bandImg = file;
-    band.value.imageUrl = URL.createObjectURL(file);
-  }
-};
+// Fetch & populate form
+async function fetchBand() {
+  loading.value = true;
+  const id = route.params.id;
+  console.log("🔍 fetchBand start, id=", id);
 
-// SingleSong file
-const handleSingleSongUpload = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    band.value.singlesong.song = file;
-    isSingleSongFile.value = true;
-  }
-};
-
-// ---------- FETCH & FILL FORM ----------
-const fetchBand = async () => {
-  const bandId = route.params.id;
   try {
-    loading.value = true;
-    const response = await findOne("bands", bandId, {
-      populate: ["bandImg", "singlesong.song", "singlevideo"],
+    const res = await fetch(
+      `${config.public.strapiUrl}/api/bands/${id}` +
+      `?populate=bandImg,members.image,singlesong.song,singlevideo`
+    );
+    const j = await res.json();
+    console.log("📥 fetchBand response", j);
+
+    const attrs = j.data.attributes;
+    bandName.value        = attrs.name  || "";
+    genre.value           = attrs.genre || "";
+    bio.value             = attrs.bio   || "";
+    websitelink.value     = attrs.websitelink     || "";
+    websitelinktext.value = attrs.websitelinktext || "";
+
+    // remember existing image
+    const imgData = attrs.bandImg?.data;
+    bandImgId.value  = imgData?.id || null;
+    bandImgUrl.value = imgData?.attributes?.url || "";
+
+    // members
+    members.value = (attrs.members?.data || []).map(m => ({
+      name:       m.attributes.name       || "",
+      instrument: m.attributes.instrument || "",
+      image:      null,
+      imageUrl:   m.attributes.image?.data?.attributes?.url || null
+    }));
+    console.log("👥 members populated:", members.value);
+
+    // social links
+    Object.keys(social.value).forEach(key => {
+      social.value[key] = attrs[key] || "";
     });
-    loading.value = false;
-    console.log("this is the response ", response.data);
-    if (response.data) {
-      // The fields are at the top level (Strapi v4)
-      const attributes = response.data;
 
-      band.value = {
-        id: response.data.id,
-        name: attributes.name,
-        genre: attributes.genre,
-        bio: attributes.bio,
-        biotagline: attributes.biotagline || "",
-        websitelink: attributes.websitelink || "",
-        websitelinktext: attributes.websitelinktext || "",
-        facebook: attributes.facebook || "",
-        instagram: attributes.instagram || "",
-        twitch: attributes.twitch || "",
-        twitter: attributes.twitter || "",
-        whatsapp: attributes.whatsapp || "",
-        tiktok: attributes.tiktok || "",
-        snapchat: attributes.snapchat || "",
-        appleMusic: attributes.appleMusic || "",
-        spotify: attributes.spotify || "",
-        soundcloud: attributes.soundcloud || "",
-        youtube: attributes.youtube || "",
-        deezer: attributes.deezer || "",
-        bandcamp: attributes.bandcamp || "",
-        reverbnation: attributes.reverbnation || "",
+    // streaming links
+    Object.keys(streaming.value).forEach(key => {
+      streaming.value[key] = attrs[key] || "";
+    });
 
-        // For bandImg, same structure
-        bandImg: attributes.bandImg || null,
-        imageUrl: attributes.bandImg ? attributes.bandImg.url : "",
-
-        // For singlesong, include its id to preserve the component
-        singlesong: attributes.singlesong
-          ? {
-              id: attributes.singlesong.id || null,
-              title: attributes.singlesong.title || "",
-              song: attributes.singlesong.song || null,
-              embedUrl: attributes.singlesong.embedUrl || "",
-              isEmbeded: attributes.singlesong.isEmbeded ?? false,
-            }
-          : {
-              id: null,
-              title: "",
-              song: null,
-              embedUrl: "",
-              isEmbeded: false,
-            },
-
-        // singlevideo
-        singlevideo: attributes.singlevideo
-          ? { youtubeid: attributes.singlevideo.youtubeid || "" }
-          : { youtubeid: "" },
-      };
+    // featured song
+    if (attrs.singlesong?.data) {
+      const ss = attrs.singlesong.data.attributes;
+      singlesongTitle.value   = ss.title || "";
+      if (ss.embedUrl) {
+        singlesongType.value     = "embed";
+        singlesongEmbedUrl.value = ss.embedUrl;
+      }
     }
-  } catch (error) {
-    loading.value = false;
-    console.error("Error fetching band:", error);
-  }
-};
 
+    // featured video
+    singlevideoYoutubeUrl.value =
+      attrs.singlevideo?.data?.attributes?.youtubeid || "";
+
+  } catch(err) {
+    console.error("❌ fetchBand failed:", err);
+  } finally {
+    loading.value = false;
+  }
+}
 onMounted(fetchBand);
 
-// ---------- SUBMIT FORM ----------
-import { toRaw } from "vue";
+// Handlers
+function handleImageUpload(e) {
+  bandImgFile.value = e.target.files[0];
+  bandImgUrl.value  = URL.createObjectURL(bandImgFile.value);
+}
+function handleSingleSongUpload(e) {
+  singlesongFile.value = e.target.files[0];
+}
 
-const submitEditBand = async () => {
-  const bandId = route.params.id;
+// Submit: first JSON PUT, then separate upload if needed
+async function submitForm() {
+  loading.value = true;
+  const id = route.params.id;
+  let newImageId = null;
+
   try {
-    loading.value = true;
+    // 1) If user selected a new image, upload it & link it to this Band
+    if (bandImgFile.value) {
+      console.log("📤 uploading new bandImg file first…");
+      const fm = new FormData();
+      fm.append("files", bandImgFile.value, bandImgFile.value.name);
+      fm.append("ref",     "api::band.band");
+      fm.append("refId",   id);
+      fm.append("field",   "bandImg");
 
-    // 1. Build JSON payload for non-media fields
-    const bandData = {
-      name: band.value.name,
-      genre: band.value.genre,
-      bio: band.value.bio,
-      facebook: band.value.facebook,
-      instagram: band.value.instagram,
-      twitch: band.value.twitch,
-      twitter: band.value.twitter,
-      whatsapp: band.value.whatsapp,
-      tiktok: band.value.tiktok,
-      snapchat: band.value.snapchat,
-      appleMusic: band.value.appleMusic,
-      spotify: band.value.spotify,
-      soundcloud: band.value.soundcloud,
-      youtube: band.value.youtube,
-      deezer: band.value.deezer,
-      bandcamp: band.value.bandcamp,
+      const upRes = await fetch(
+        `${config.public.strapiUrl}/api/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token.value}`
+          },
+          body: fm
+        }
+      );
+      const upJson = await upRes.json();
+      console.log("📥 image upload response:", upJson);
+      if (!upRes.ok) throw upJson;
+      newImageId = upJson[0]?.id;
+    }
+
+    // 2) Build the full payload, injecting newImageId if present,
+    //    or preserving the old one if not
+    const payload = {
+      name:      bandName.value,
+      genre:     genre.value,
+      bio:       bio.value,
+      websitelink:     websitelink.value     || null,
+      websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
 
-      // Preserve the singlesong component
-      singlesong: {
-        id: band.value.singlesong.id, // Include the ID so Strapi knows it's the same component
-        title: band.value.singlesong.title,
-        embedUrl: band.value.singlesong.embedUrl,
-        isEmbeded: band.value.singlesong.isEmbeded,
-      },
+      // pick up whichever image relation we have
+      ...( newImageId
+          ? { bandImg: newImageId }
+          : !bandImgFile.value && bandImgId.value
+            ? { bandImg: bandImgId.value }
+            : {}
+      ),
 
-      // Singlevideo
-      singlevideo: {
-        youtubeid: band.value.singlevideo.youtubeid,
+      members: members.value.map(m => ({
+        name:       m.name,
+        instrument: m.instrument
+      })),
+      ...social.value,
+      ...streaming.value,
+      singlesong: {
+        title:    singlesongTitle.value || "",
+        embedUrl: singlesongType.value === "embed"
+                    ? singlesongEmbedUrl.value
+                    : ""
       },
+      singlevideo: {
+        youtubeid: singlevideoYoutubeUrl.value || ""
+      }
     };
 
-    // If no new single-song file was uploaded, preserve the existing media ID
-    if (!isSingleSongFile.value && band.value.singlesong.song) {
-      if (band.value.singlesong.song.data?.id) {
-        bandData.singlesong.song = band.value.singlesong.song.data.id;
-      }
-    }
+    console.log("⏳ submitForm attributes payload:", payload);
 
-    console.log("Payload to send:", bandData);
-
-    // Check if new files need to be uploaded
-    const hasNewFiles =
-      band.value.bandImg instanceof File ||
-      (isSingleSongFile.value && band.value.singlesong.song instanceof File);
-
-    if (!hasNewFiles) {
-      // Send JSON if no new files
-      await client(`/bands/${bandId}`, {
+    // 3) Now update everything in one JSON PUT
+    console.log("📤 JSON update with image relation…");
+    const putRes = await fetch(
+      `${config.public.strapiUrl}/api/bands/${id}`,
+      {
         method: "PUT",
-        body: { data: bandData },
-      });
-    } else {
-      // Create FormData for multipart
-      const bandForm = new FormData();
-      bandForm.append("data", JSON.stringify(bandData));
-
-      // Append new band image file if it exists
-      if (band.value.bandImg instanceof File) {
-        bandForm.append("files.bandImg", band.value.bandImg);
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:   `Bearer ${token.value}`
+        },
+        body: JSON.stringify({ data: payload })
       }
+    );
+    const putJson = await putRes.json();
+    console.log("📥 JSON update response:", putJson);
+    if (!putRes.ok) throw putJson;
 
-      // Append new single-song file if uploaded
-      if (isSingleSongFile.value && band.value.singlesong.song instanceof File) {
-        bandForm.append(
-          "files.singlesong.song",
-          band.value.singlesong.song,
-          band.value.singlesong.song.name
-        );
-      }
-
-      // Use the /api/bands/:id endpoint for multipart
-      await client(`/api/bands/${bandId}`, {
-        method: "PUT",
-        body: bandForm,
-      });
-    }
-
-    loading.value = false;
+    // 4) Redirect on success
     router.push("/dashboard");
-  } catch (error) {
+
+  } catch(err) {
+    console.error("❌ submitForm error:", err);
+    alert(err.error?.message || "Update failed—check console for details");
+  } finally {
     loading.value = false;
-    console.error("Error updating band:", error);
   }
-};
+}
+
 </script>
+
+
+
+
+
+
+
+
 
 <style scoped>
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Container */
 .container-mdc {
   margin: 1rem auto;
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-/* Title */
 .title {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
 }
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #6200ee;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-/* Text Fields */
 .mdc-text-field {
   position: relative;
   margin-bottom: 1.5rem;
-  display: inline-block;
   width: 100%;
 }
-
-.mdc-text-field__input::placeholder {
-  color: transparent;
-}
-
-.mdc-text-field__input:focus::placeholder {
-  color: #aaa;
-}
-
 .mdc-text-field__input {
-  font-size: 1rem;
-  line-height: 1.5;
+  width: 100%;
   padding: 0.75rem 0.5rem;
   border: 1px solid #000;
   border-radius: 10px;
   outline: none;
-  width: 100%;
 }
-
 .mdc-floating-label {
   position: absolute;
-  z-index: 99999;
   top: 0.75rem;
   left: 0.5rem;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  font-size: 1rem;
   background: white;
-  line-height: 1;
-  color: #aaa;
-  pointer-events: none;
-  transition: transform 0.2s, color 0.2s;
+  padding: 0 0.2em;
+  transition:
+    transform 0.2s,
+    color 0.2s;
 }
-
 .mdc-text-field__input:focus + .mdc-floating-label,
 .mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
   transform: translateY(-1.5rem);
   color: #6200ee;
 }
-
 .mdc-line-ripple {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #6200ee;
+  background: #6200ee;
   transform: scaleX(0);
   transition: transform 0.2s;
 }
-
 .mdc-text-field__input:focus ~ .mdc-line-ripple {
   transform: scaleX(1);
 }
 
-/* Button */
-.mdc-button {
+.mdc-button,
+.styled-file-label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -723,63 +668,31 @@ const submitEditBand = async () => {
   font-size: 0.875rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #2c2c2c;
-  border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+.mdc-button {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
   margin-top: 1rem;
 }
-
 .mdc-button:hover {
-  background-color: #3700b3;
+  background: #3700b3;
 }
-
-/* File Input */
 .styled-file-input {
   display: none;
 }
-
 .styled-file-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
+  background: #2c2c2c;
   color: #fff;
-  background-color: #2c2c2c;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
-
 .styled-file-label:hover {
-  background-color: #3700b3;
+  background: #3700b3;
 }
-
 .styled-file-label.w-full {
-  display: block;
   width: 100%;
   text-align: center;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.h-auto {
-  height: auto;
-}
-
-.rounded-lg {
-  border-radius: 8px;
-}
-
-.shadow-md {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

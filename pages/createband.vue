@@ -108,28 +108,29 @@
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
+          
+          <div v-if="bandImgUrl" class="flex justify-center items-center max-h-[400px] p-4 rounded-lg">
+            <img
+              :src="bandImgUrl"
+              alt="Band Image"
+              class="max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-md "
+            />
+          </div>
           <input
             type="file"
            
             id="band-img"
-            class="styled-file-input"
+            class="styled-file-input  "
             @change="handleImageUpload"
             accept="image/*"
           />
-          <label for="band-img" class="styled-file-label w-full text-center">
+          <label for="band-img" class="styled-file-label w-full text-center my-10  ">
             Choose Band Image
           </label>
-          <div v-if="bandImgUrl" class="mb-4">
-            <img
-              :src="bandImgUrl"
-              alt="Band Image"
-              class="w-full h-auto rounded-lg shadow-md"
-            />
-          </div>
         </div>
 
         <!-- Band Members Section -->
-        <div class="bg-white rounded-md">
+        <!-- <div class="bg-white rounded-md">
           <div
             class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
@@ -205,7 +206,7 @@
               + Add Member
             </button>
           </div>
-        </div>
+        </div> -->
 
         <!-- Social Media Links Section -->
         <div class="bg-[#fff] rounded-md">
@@ -404,7 +405,7 @@
           <div class="p-4">
             <!-- Toggle: Upload File vs. Embed Content -->
             <div class="flex space-x-4 mb-4">
-              <label class="text-black">
+              <label class="text-black style-file-lable">
                 <input
                   type="radio"
                   value="upload"
@@ -853,7 +854,7 @@ onMounted(async () => {
   text-transform: uppercase;
   letter-spacing: 0.0892857143em;
   color: #fff;
-  background-color: #2c2c2c;
+  background-color: #7c3aed;
   border: none;
   border-radius: 4px;
   cursor: pointer;
