@@ -634,7 +634,7 @@ const options = {
     color: { value: "#fff" },
     links: { color: "#fff", enable: true },
     move: { enable: true },
-    number: { value: 100 },
+    number: { value: 50 },
   },
   // etc.
 };

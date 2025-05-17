@@ -343,7 +343,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useRuntimeConfig, useStrapiUser, useStrapiToken } from "#imports";
+
 
 const config = useRuntimeConfig();
 const router = useRouter();
