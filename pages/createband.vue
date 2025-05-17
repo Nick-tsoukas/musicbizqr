@@ -269,7 +269,7 @@
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- WhatsApp -->
-            <div class="mdc-text-field mb-4">
+            <!-- <div class="mdc-text-field mb-4">
               <input
                 type="url"
                 id="whatsapp"
@@ -279,7 +279,7 @@
               />
               <label class="mdc-floating-label" for="whatsapp">WhatsApp</label>
               <div class="mdc-line-ripple"></div>
-            </div>
+            </div> -->
             <!-- TikTok -->
             <div class="mdc-text-field mb-4">
               <input
@@ -293,7 +293,7 @@
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- Snapchat -->
-            <div class="mdc-text-field mb-4">
+            <!-- <div class="mdc-text-field mb-4">
               <input
                 type="url"
                 id="snapchat"
@@ -303,7 +303,7 @@
               />
               <label class="mdc-floating-label" for="snapchat">Snapchat</label>
               <div class="mdc-line-ripple"></div>
-            </div>
+            </div> -->
           </div>
         </div>
 
@@ -365,6 +365,18 @@
                 placeholder=" "
               />
               <label class="mdc-floating-label" for="youtube">YouTube</label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+            <!-- reverbnation -->
+            <div class="mdc-text-field mb-4">
+              <input
+                type="url"
+                id="reverbnation"
+                class="mdc-text-field__input"
+                v-model="reverbnation"
+                placeholder="reverbnation "
+              />
+              <label class="mdc-floating-label" for="reverbnation">Reverbnation</label>
               <div class="mdc-line-ripple"></div>
             </div>
             <!-- Deezer -->
@@ -533,6 +545,8 @@ const twitter = ref("");
 const whatsapp = ref("");
 const tiktok = ref(""); // fixed spelling
 const snapchat = ref("");
+const reverbnation = ref("");
+
 
 // Streaming
 const appleMusic = ref("");
@@ -588,9 +602,11 @@ const submitForm = async () => {
       instagram: instagram.value || null,
       twitch: twitch.value || null,
       twitter: twitter.value || null,
-      whatsapp: whatsapp.value || null,
+      // whatsapp: whatsapp.value || null,
       tiktok: tiktok.value || null,
-      snapchat: snapchat.value || null,
+      // snapchat: snapchat.value || null,
+      reverbnation: reverbnation.value || null,
+
       appleMusic: appleMusic.value || null,
       spotify: spotify.value || null,
       soundcloud: soundcloud.value || null,
