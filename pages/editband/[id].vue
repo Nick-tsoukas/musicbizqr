@@ -290,6 +290,14 @@
                 class="styled-file-label w-full text-center"
                 >Choose Song File</label
               >
+              <button
+                type="button"
+                v-if="singlesongTitle || singlesongEmbedUrl || singlesongFileId"
+                @click="deleteSong"
+                class="mdc-button mdc-button--danger mt-4 w-full"
+              >
+                Delete Song
+              </button>
             </div>
             <div v-else class="mdc-text-field mb-4">
               <input
@@ -327,6 +335,14 @@
                 >YouTube Video URL</label
               >
               <div class="mdc-line-ripple"></div>
+              <button
+                type="button"
+                v-if="singlevideoYoutubeUrl"
+                @click="deleteVideo"
+                class="mdc-button mdc-button--danger mt-4 w-full"
+              >
+                Delete Video
+              </button>
             </div>
           </div>
         </div>
@@ -344,118 +360,138 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-
 const config = useRuntimeConfig();
 const router = useRouter();
-const route  = useRoute();
-const user   = useStrapiUser();
-const token  = useStrapiToken();
+const route = useRoute();
+const user = useStrapiUser();
+const token = useStrapiToken();
 
-const loading         = ref(false);
+const loading = ref(false);
+
+// flags for “delete on save”
+const removeSong = ref(false);
+const removeVideo = ref(false);
 
 // Band basics
-const bandName        = ref("");
-const genre           = ref("");
-const bio             = ref("");
-const websitelink     = ref("");
+const bandName = ref("");
+const genre = ref("");
+const bio = ref("");
+const websitelink = ref("");
 const websitelinktext = ref("");
 
 // Track existing vs new image
-const bandImgFile     = ref(null);
-const bandImgUrl      = ref("");
-const bandImgId       = ref(null);
+const bandImgFile = ref(null);
+const bandImgUrl = ref("");
+const bandImgId = ref(null);
 
-// Members (if you still need them)
-const members         = ref([]);
+// Members
+const members = ref([]);
 
 // Social media links
 const social = ref({
-  facebook:  "",
+  facebook: "",
   instagram: "",
-  twitch:    "",
-  twitter:   "",
-  whatsapp:  "",
-  tiktok:    "",
-  snapchat:  ""
+  twitch: "",
+  twitter: "",
+  whatsapp: "",
+  tiktok: "",
+  snapchat: "",
 });
 
 // Streaming links
 const streaming = ref({
   appleMusic: "",
-  spotify:    "",
+  spotify: "",
   soundcloud: "",
-  youtube:    "",
-  deezer:     "",
-  bandcamp:   ""
+  youtube: "",
+  deezer: "",
+  bandcamp: "",
 });
 
 // Featured song/video
-const singlesongType      = ref("upload");
-const singlesongTitle     = ref("");
-const singlesongFile      = ref(null);
-const singlesongEmbedUrl  = ref("");
+const singlesongType = ref("upload");
+const singlesongTitle = ref("");
+const singlesongEmbedUrl = ref("");
+const singlesongFile = ref(null);
+const singlesongFileId = ref(null); // preserve existing file relation
+
 const singlevideoYoutubeUrl = ref("");
 
-// Fetch & populate form
+// Clear the song fields and mark for removal on Save
+function deleteSong() {
+  if (!confirm("Remove the featured song from this form?")) return;
+  removeSong.value = true;
+  singlesongTitle.value = "";
+  singlesongEmbedUrl.value = "";
+  singlesongFile.value = null;
+  singlesongFileId.value = null;
+}
+
+// Clear the video field and mark for removal on Save
+function deleteVideo() {
+  if (!confirm("Remove the featured video from this form?")) return;
+  removeVideo.value = true;
+  singlevideoYoutubeUrl.value = "";
+}
+
 async function fetchBand() {
   loading.value = true;
   const id = route.params.id;
-  console.log("🔍 fetchBand start, id=", id);
 
   try {
-    const res = await fetch(
+    const url =
       `${config.public.strapiUrl}/api/bands/${id}` +
-      `?populate=bandImg,members.image,singlesong.song,singlevideo`
-    );
+      `?populate=bandImg,members.image,singlesong.song,singlevideo`;
+    const res = await fetch(url);
     const j = await res.json();
-    console.log("📥 fetchBand response", j);
+    if (!j.data) throw new Error("No data");
 
     const attrs = j.data.attributes;
-    bandName.value        = attrs.name  || "";
-    genre.value           = attrs.genre || "";
-    bio.value             = attrs.bio   || "";
-    websitelink.value     = attrs.websitelink     || "";
+
+    // Basic fields
+    bandName.value = attrs.name || "";
+    genre.value = attrs.genre || "";
+    bio.value = attrs.bio || "";
+    websitelink.value = attrs.websitelink || "";
     websitelinktext.value = attrs.websitelinktext || "";
 
-    // remember existing image
-    const imgData = attrs.bandImg?.data;
-    bandImgId.value  = imgData?.id || null;
-    bandImgUrl.value = imgData?.attributes?.url || "";
+    // Existing image
+    const img = attrs.bandImg?.data;
+    bandImgId.value = img?.id || null;
+    bandImgUrl.value = img?.attributes?.url || "";
 
-    // members
-    members.value = (attrs.members?.data || []).map(m => ({
-      name:       m.attributes.name       || "",
-      instrument: m.attributes.instrument || "",
-      image:      null,
-      imageUrl:   m.attributes.image?.data?.attributes?.url || null
+    // Members
+    members.value = (attrs.members?.data || []).map((m) => ({
+      name: m.attributes.name,
+      instrument: m.attributes.instrument,
+      imageUrl: m.attributes.image?.data?.attributes?.url || null,
     }));
-    console.log("👥 members populated:", members.value);
 
-    // social links
-    Object.keys(social.value).forEach(key => {
-      social.value[key] = attrs[key] || "";
+    // Social
+    Object.keys(social.value).forEach((k) => {
+      social.value[k] = attrs[k] || "";
     });
 
-    // streaming links
-    Object.keys(streaming.value).forEach(key => {
-      streaming.value[key] = attrs[key] || "";
+    // Streaming
+    Object.keys(streaming.value).forEach((k) => {
+      streaming.value[k] = attrs[k] || "";
     });
 
-    // featured song
-    if (attrs.singlesong?.data) {
-      const ss = attrs.singlesong.data.attributes;
-      singlesongTitle.value   = ss.title || "";
-      if (ss.embedUrl) {
-        singlesongType.value     = "embed";
-        singlesongEmbedUrl.value = ss.embedUrl;
-      }
+    // Singlesong component + existing file
+    if (attrs.singlesong) {
+      const ss = attrs.singlesong;
+      singlesongTitle.value = ss.title || "";
+      singlesongEmbedUrl.value = ss.embedUrl || "";
+      singlesongType.value = ss.embedUrl ? "embed" : "upload";
+      const songData = ss.song?.data;
+      singlesongFileId.value = songData?.id || null;
     }
 
-    // featured video
-    singlevideoYoutubeUrl.value =
-      attrs.singlevideo?.data?.attributes?.youtubeid || "";
-
-  } catch(err) {
+    // Singlevideo component
+    if (attrs.singlevideo) {
+      singlevideoYoutubeUrl.value = attrs.singlevideo.youtubeid || "";
+    }
+  } catch (err) {
     console.error("❌ fetchBand failed:", err);
   } finally {
     loading.value = false;
@@ -466,116 +502,112 @@ onMounted(fetchBand);
 // Handlers
 function handleImageUpload(e) {
   bandImgFile.value = e.target.files[0];
-  bandImgUrl.value  = URL.createObjectURL(bandImgFile.value);
+  bandImgUrl.value = URL.createObjectURL(bandImgFile.value);
 }
 function handleSingleSongUpload(e) {
   singlesongFile.value = e.target.files[0];
 }
 
-// Submit: first JSON PUT, then separate upload if needed
 async function submitForm() {
   loading.value = true;
   const id = route.params.id;
-  let newImageId = null;
 
   try {
-    // 1) If user selected a new image, upload it & link it to this Band
+    // 1) Upload new image if chosen
+    let newImageId = null;
     if (bandImgFile.value) {
-      console.log("📤 uploading new bandImg file first…");
       const fm = new FormData();
       fm.append("files", bandImgFile.value, bandImgFile.value.name);
-      fm.append("ref",     "api::band.band");
-      fm.append("refId",   id);
-      fm.append("field",   "bandImg");
-
-      const upRes = await fetch(
-        `${config.public.strapiUrl}/api/upload`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token.value}`
-          },
-          body: fm
-        }
-      );
-      const upJson = await upRes.json();
-      console.log("📥 image upload response:", upJson);
-      if (!upRes.ok) throw upJson;
-      newImageId = upJson[0]?.id;
+      fm.append("ref", "api::band.band");
+      fm.append("refId", id);
+      fm.append("field", "bandImg");
+      const up = await fetch(`${config.public.strapiUrl}/api/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token.value}` },
+        body: fm,
+      });
+      const uj = await up.json();
+      if (!up.ok) throw uj;
+      newImageId = uj[0]?.id;
     }
 
-    // 2) Build the full payload, injecting newImageId if present,
-    //    or preserving the old one if not
+    // 2) Upload new song file if chosen
+    let newSongId = null;
+    if (singlesongFile.value) {
+      const fm2 = new FormData();
+      fm2.append("files", singlesongFile.value, singlesongFile.value.name);
+      fm2.append("ref", "api::band.band");
+      fm2.append("refId", id);
+      fm2.append("field", "singlesong.song");
+      const su = await fetch(`${config.public.strapiUrl}/api/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token.value}` },
+        body: fm2,
+      });
+      const suj = await su.json();
+      if (!su.ok) throw suj;
+      newSongId = suj[0]?.id;
+    }
+
+    // 3) Build payload, null out components if flagged
+    const singlesongPayload = removeSong.value
+      ? null
+      : {
+          title: singlesongTitle.value,
+          embedUrl:
+            singlesongType.value === "embed"
+              ? singlesongEmbedUrl.value
+              : "",
+          ...(newSongId
+            ? { song: newSongId }
+            : singlesongFileId.value && { song: singlesongFileId.value }),
+        };
+
+    const singlevideoPayload = removeVideo.value
+      ? null
+      : { youtubeid: singlevideoYoutubeUrl.value || "" };
+
     const payload = {
-      name:      bandName.value,
-      genre:     genre.value,
-      bio:       bio.value,
-      websitelink:     websitelink.value     || null,
+      name: bandName.value,
+      genre: genre.value,
+      bio: bio.value,
+      websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
-
-      // pick up whichever image relation we have
-      ...( newImageId
-          ? { bandImg: newImageId }
-          : !bandImgFile.value && bandImgId.value
-            ? { bandImg: bandImgId.value }
-            : {}
-      ),
-
-      members: members.value.map(m => ({
-        name:       m.name,
-        instrument: m.instrument
+      ...(newImageId
+        ? { bandImg: newImageId }
+        : bandImgId.value && { bandImg: bandImgId.value }),
+      members: members.value.map((m) => ({
+        name: m.name,
+        instrument: m.instrument,
       })),
       ...social.value,
       ...streaming.value,
-      singlesong: {
-        title:    singlesongTitle.value || "",
-        embedUrl: singlesongType.value === "embed"
-                    ? singlesongEmbedUrl.value
-                    : ""
-      },
-      singlevideo: {
-        youtubeid: singlevideoYoutubeUrl.value || ""
-      }
+      singlesong: singlesongPayload,
+      singlevideo: singlevideoPayload,
     };
 
-    console.log("⏳ submitForm attributes payload:", payload);
+    // 4) Send update
+    const put = await fetch(`${config.public.strapiUrl}/api/bands/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify({ data: payload }),
+    });
+    const pj = await put.json();
+    if (!put.ok) throw pj;
 
-    // 3) Now update everything in one JSON PUT
-    console.log("📤 JSON update with image relation…");
-    const putRes = await fetch(
-      `${config.public.strapiUrl}/api/bands/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:   `Bearer ${token.value}`
-        },
-        body: JSON.stringify({ data: payload })
-      }
-    );
-    const putJson = await putRes.json();
-    console.log("📥 JSON update response:", putJson);
-    if (!putRes.ok) throw putJson;
-
-    // 4) Redirect on success
     router.push("/dashboard");
-
-  } catch(err) {
+  } catch (err) {
     console.error("❌ submitForm error:", err);
-    alert(err.error?.message || "Update failed—check console for details");
+    alert(err.error?.message || "Update failed");
   } finally {
     loading.value = false;
   }
 }
-
 </script>
-
-
-
-
-
-
 
 
 

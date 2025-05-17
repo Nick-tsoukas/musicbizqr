@@ -54,39 +54,39 @@
         <div class="pt-0 sm:p-5">
           <!-- singlesong section -->
           <div
-  v-if="
-    band.data.singlesong &&
-    (
-      (band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl) ||
-      (!band.data.singlesong.isEmbeded && band.data.singlesong.song)
-    )
-  "
->
-  <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
-    Featured Song
-  </h1>
+            v-if="
+              band.data.singlesong &&
+              ((band.data.singlesong.isEmbeded &&
+                band.data.singlesong.embedUrl) ||
+                (!band.data.singlesong.isEmbeded && band.data.singlesong.song))
+            "
+          >
+            <h1 class="text-2xl mb-1 md:text-3xl font-bold text-white md:my-4">
+              Featured Song
+            </h1>
 
-  <!-- Embedded Player -->
-  <div
-    v-if="band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl"
-  >
-    <iframe
-      :src="band.data.singlesong.embedUrl"
-      frameborder="0"
-      allowfullscreen
-      class="w-full h-64 rounded-lg"
-    ></iframe>
-  </div>
+            <!-- Embedded Player -->
+            <div
+              v-if="
+                band.data.singlesong.isEmbeded && band.data.singlesong.embedUrl
+              "
+            >
+              <iframe
+                :src="band.data.singlesong.embedUrl"
+                frameborder="0"
+                allowfullscreen
+                class="w-full h-64 rounded-lg"
+              ></iframe>
+            </div>
 
-  <!-- Fallback AudioPlayer -->
-  <div v-else>
-    <AudioPlayer
-      :album="formatSingleSong(band.data.singlesong)"
-      placeholderImage="/placeholder-image.svg"
-    />
-  </div>
-</div>
-
+            <!-- Fallback AudioPlayer -->
+            <div v-else>
+              <AudioPlayer
+                :album="formatSingleSong(band.data.singlesong)"
+                placeholderImage="/placeholder-image.svg"
+              />
+            </div>
+          </div>
 
           <div
             v-if="band.data.singlevideo && band.data.singlevideo.youtubeid"
