@@ -11,63 +11,37 @@ import { onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
-const route  = useRoute();
+const route = useRoute();
 
 onMounted(async () => {
   try {
-    console.debug('[QR PAGE] Mounted, route params:', route.params, 'query:', route.query);
+    // Extract the UID from the query parameter "id"
+    const uid = String(route.query.id);
+    console.log('Extracted UID:', uid);
 
-    // 1) Extract the UID from the path param
-    const uid = String(route.params.id);
-    console.debug('[QR PAGE] Extracted UID:', uid);
     if (!uid) {
-      console.error('[QR PAGE] No UID provided in the URL.');
-      return router.push('/error');
+      console.error('No UID provided in the URL.');
+      router.push('/error');
+      return;
     }
 
-    // 2) Fetch the QR record by slugId
-    console.debug('[QR PAGE] Fetching QR record for slugId=', uid);
-    const qrResponse = await $fetch(
-      'https://qrserver-production.up.railway.app/api/qrs',
-      {
-        method: 'GET',
-        params: {
-          'filters[slugId][$eq]': uid,
-          populate: '*'  // make sure arEnabled, template, band, etc. are populated
-        }
+    // Fetch the QR record using a filter on slugId with bracket notation, using production URL
+    const qrResponse = await $fetch('https://qrserver-production.up.railway.app/api/qrs', {
+      method: 'GET',
+      params: {
+        'filters[slugId][$eq]': uid,
+        populate: '*'
       }
-    );
-    console.debug('[QR PAGE] Raw QR response:', qrResponse);
+    });
+    console.log('QR Response:', qrResponse);
 
     const qrData = qrResponse.data;
-    console.debug('[QR PAGE] qrData array length:', qrData?.length);
-    if (!qrData?.length) {
-      console.error('[QR PAGE] QR record not found for UID:', uid);
-      return router.push('/error');
-    }
+    if (qrData && qrData.length > 0) {
+      const qr = qrData[0];
+      const qrId = qr.id;
 
-    const qr    = qrData[0];
-    const qrId  = qr.id;
-    const attrs = qr.attributes;
-    console.debug('[QR PAGE] QR attributes:', attrs);
-
-    // ─── AR REDIRECT ───
-    console.debug('[QR PAGE] arEnabled flag is', attrs.arEnabled);
-    if (attrs.arEnabled) {
-      const tmpl = attrs.template || 'test';
-      console.debug(`[QR PAGE] Redirecting to AR page /ar/${qrId}?template=${tmpl}`);
-      return router.replace({
-        path: `/ar/${qrId}`,
-        query: { template: tmpl }
-      });
-    }
-    // ──────────────────
-
-    // 3) Record the scan
-    console.debug('[QR PAGE] Recording scan for QR ID:', qrId);
-    await $fetch(
-      'https://qrserver-production.up.railway.app/api/scans',
-      {
+      // Record the scan by creating a new scan record in Strapi on production
+      await $fetch('https://qrserver-production.up.railway.app/api/scans', {
         method: 'POST',
         body: {
           data: {
@@ -75,54 +49,42 @@ onMounted(async () => {
             qr: qrId
           }
         }
+      });
+      console.log('Scan recorded for QR ID:', qrId);
+
+      // Determine redirection based on QR type
+      const qType = qr.attributes.q_type;
+      const link = qr.attributes.link;
+
+      if (qType === 'bandProfile' && qr.attributes.band?.data) {
+        const bandSlug = qr.attributes.band.data.attributes.slug;
+        router.push({ path: `/${bandSlug}` });
+      } else if (qType === 'events' && qr.attributes.event?.data) {
+        const eventSlug = qr.attributes.event.data.attributes.slug;
+        router.push({ path: `/event/${eventSlug}` });
+      } else if (qType === 'tours' && qr.attributes.tour?.data) {
+        const tourSlug = qr.attributes.tour.data.attributes.slug;
+        router.push({ path: `/tour/${tourSlug}` });
+      } else if (qType === 'albums' && qr.attributes.album?.data) {
+        const albumSlug = qr.attributes.album.data.attributes.slug;
+        router.push({ path: `/album/${albumSlug}` });
+      } else if (qType === 'stream' && qr.attributes.stream?.data) {
+        const streamId = qr.attributes.stream.data.id;
+        router.push({ path: `/stream/${streamId}` });
+      } else if (qType === 'social') {
+        router.push({ path: `/social/${qrId}` });
+      } else if (qType === 'externalURL' && link) {
+        window.location.href = link;
+      } else {
+        console.log('No matching QR type found. Redirecting to dashboard.');
+        router.push('/dashboard');
       }
-    );
-
-    // 4) Redirect based on q_type
-    const qType = attrs.q_type;
-    console.debug('[QR PAGE] q_type is', qType);
-    const link  = attrs.link;
-
-    if (qType === 'bandProfile' && attrs.band?.data) {
-      const slug = attrs.band.data.attributes.slug;
-      console.debug('[QR PAGE] Redirecting to band catch-all at /' + slug);
-      return router.push(`/${slug}`);
+    } else {
+      console.error('QR record not found for UID:', uid);
+      router.push('/error');
     }
-    if (qType === 'events' && attrs.event?.data) {
-      const slug = attrs.event.data.attributes.slug;
-      console.debug('[QR PAGE] Redirecting to /event/' + slug);
-      return router.push(`/event/${slug}`);
-    }
-    if (qType === 'tours' && attrs.tour?.data) {
-      const slug = attrs.tour.data.attributes.slug;
-      console.debug('[QR PAGE] Redirecting to /tour/' + slug);
-      return router.push(`/tour/${slug}`);
-    }
-    if (qType === 'albums' && attrs.album?.data) {
-      const slug = attrs.album.data.attributes.slug;
-      console.debug('[QR PAGE] Redirecting to /album/' + slug);
-      return router.push(`/album/${slug}`);
-    }
-    if (qType === 'stream' && attrs.stream?.data) {
-      console.debug('[QR PAGE] Redirecting to /stream/' + attrs.stream.data.id);
-      return router.push(`/stream/${attrs.stream.data.id}`);
-    }
-    if (qType === 'social') {
-      console.debug('[QR PAGE] Redirecting to /social/' + qrId);
-      return router.push(`/social/${qrId}`);
-    }
-    if (qType === 'externalURL' && link) {
-      console.debug('[QR PAGE] Redirecting externally to', link);
-      window.location.href = link;
-      return;
-    }
-
-    // fallback
-    console.warn('[QR PAGE] No matching QR type—sending to /dashboard');
-    router.push('/dashboard');
-
   } catch (error) {
-    console.error('[QR PAGE] Error in QR redirect flow:', error);
+    console.error('Error fetching QR code data:', error);
     router.push('/error');
   }
 });
@@ -130,16 +92,29 @@ onMounted(async () => {
 
 <style scoped>
 .loading-container {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .spinner {
   border: 8px solid #f3f3f3;
   border-top: 8px solid #555;
   border-radius: 50%;
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   animation: spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
