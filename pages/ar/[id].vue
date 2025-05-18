@@ -8,7 +8,7 @@
     <!-- AR Scene -->
     <div v-else>
       <!-- Hidden iframe for video template -->
-      <div style="display:none">
+      <div style="display: none;">
         <iframe
           id="youtubeFrame"
           :src="`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1`"
@@ -28,7 +28,7 @@
           <!-- DEBUG: show which template is active -->
           <a-entity
             position="0 1 0"
-            text="value: Template={{template}}; align:center; color:#FFF; width:4"
+            :text="`value: Template = ${template}; align: center; color: #FFF; width: 4`"
           />
 
           <!-- VIDEO -->
@@ -46,10 +46,14 @@
             <a-box
               position="0 0.5 0"
               rotation="0 45 0"
-              depth="0.6" height="0.6" width="0.6"
+              depth="0.6"
+              height="0.6"
+              width="0.6"
               animation="property: rotation; to: 0 405 0; dur: 8000; loop: true"
             />
-            <a-entity sound="src: url(${songUrl}); autoplay: true; loop: true; positional: true" />
+            <a-entity
+              :sound="`src: url(${songUrl}); autoplay: true; loop: true; positional: true`"
+            />
           </template>
 
           <!-- EVENT -->
@@ -74,7 +78,7 @@
 
           <!-- Visit Band Page -->
           <a-entity
-            text="value: Visit Band Page; align:center; color:#FFF; width:2"
+            text="value: Visit Band Page; align: center; color: #FFF; width: 2"
             position="0 -0.3 0"
             rotation="-90 0 0"
             scale="1.5 1.5 1"
@@ -92,21 +96,21 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route        = useRoute();
-// read the param named “id” regardless of your file’s name
-const id           = String(route.params.id);
+// match your filename [qrid].vue — read from params.qrid
+const qrid         = String(route.params.qrid);
 const template     = String(route.query.template || 'test');
 const ready        = ref(false);
 
-const videoId      = ref('dQw4w9WgXcQ');  // default if none in DB
-const songUrl      = ref('');
+const videoId       = ref('dQw4w9WgXcQ');
+const songUrl       = ref('');
 const eventPosterUrl = ref('');
-const bandSlug     = ref('');
+const bandSlug      = ref('');
 
 // Marker events
 function onMarkerFound() { console.debug('[AR PAGE] Marker found'); }
 function onMarkerLost()  { console.warn('[AR PAGE] Marker lost'); }
 
-// Tap to go back to band page
+// Navigate back to band page
 function goToBand() {
   const url = `/${bandSlug.value}`;
   console.debug('[AR PAGE] goToBand →', url);
@@ -114,12 +118,11 @@ function goToBand() {
 }
 
 onMounted(async () => {
-  console.debug('[AR PAGE] Mounted', { id, template });
+  console.debug('[AR PAGE] Mounted', { qrid, template });
 
-  // Fetch QR entry to get slug and media fields
   try {
     const resp: any = await $fetch(
-      `https://qrserver-production.up.railway.app/api/qrs/${id}`,
+      `https://qrserver-production.up.railway.app/api/qrs/${qrid}`,
       { method: 'GET', params: { populate: ['band'] } }
     );
     const attrs = resp.data.attributes;
@@ -130,17 +133,16 @@ onMounted(async () => {
       videoId.value = attrs.videoId || videoId.value;
       console.debug('[AR PAGE] videoId =', videoId.value);
     } else if (template === 'song') {
-      songUrl.value = attrs.songUrl;
+      songUrl.value = attrs.songUrl || '';
       console.debug('[AR PAGE] songUrl =', songUrl.value);
     } else if (template === 'event') {
-      eventPosterUrl.value = attrs.eventPosterUrl;
+      eventPosterUrl.value = attrs.eventPosterUrl || '';
       console.debug('[AR PAGE] eventPosterUrl =', eventPosterUrl.value);
     }
   } catch (e) {
     console.error('[AR PAGE] Fetch error:', e);
   }
 
-  // Give AR.js a moment, then show the scene
   setTimeout(() => {
     ready.value = true;
     console.debug('[AR PAGE] AR scene ready');
@@ -150,7 +152,8 @@ onMounted(async () => {
 
 <style scoped>
 .loading-container {
-  position: fixed; top: 0; left: 0;
+  position: fixed;
+  top: 0; left: 0;
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
   background: #000; z-index: 9999;
