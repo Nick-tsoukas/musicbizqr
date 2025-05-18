@@ -12,11 +12,11 @@
         arjs="sourceType: webcam; debugUIEnabled: true;"
         vr-mode-ui="enabled: false"
         renderer="logarithmicDepthBuffer: true;"
-        style="position: fixed; top:0; left:0; width:100%; height:100%;"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%"
       >
         <!-- Preload our test video -->
         <a-assets>
-          <video
+          <!-- <video
             id="testVideo"
             src="https://www.w3schools.com/html/mov_bbb.mp4"
             autoplay
@@ -24,10 +24,23 @@
             muted
             playsinline
             crossorigin="anonymous"
+          ></video> -->
+          <video
+            id="testVideo"
+            src="/videos/test.mp4"
+            crossorigin="anonymous"
+            autoplay
+            loop
+            muted
+            playsinline
           ></video>
         </a-assets>
 
-        <a-marker preset="hiro" @markerFound="onMarkerFound" @markerLost="onMarkerLost">
+        <a-marker
+          preset="hiro"
+          @markerFound="onMarkerFound"
+          @markerLost="onMarkerLost"
+        >
           <!-- DEBUG: current template -->
           <a-entity
             position="0 1.2 0"
@@ -97,74 +110,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-const route    = useRoute();
-const qrid     = String(route.params.qrid);
-const template = String(route.query.template || 'test');
-const ready    = ref(false);
+const route = useRoute();
+const qrid = String(route.params.qrid);
+const template = String(route.query.template || "test");
+const ready = ref(false);
 
-const songUrl        = ref('');
-const eventPosterUrl = ref('');
-const bandSlug       = ref('');
+const songUrl = ref("");
+const eventPosterUrl = ref("");
+const bandSlug = ref("");
 
 // Marker events
-function onMarkerFound() { console.debug('[AR PAGE] Marker found'); }
-function onMarkerLost()  { console.warn('[AR PAGE] Marker lost'); }
+function onMarkerFound() {
+  console.debug("[AR PAGE] Marker found");
+}
+function onMarkerLost() {
+  console.warn("[AR PAGE] Marker lost");
+}
 
 // Navigate to band page
 function goToBand() {
   const url = `/${bandSlug.value}`;
-  console.debug('[AR PAGE] goToBand →', url);
+  console.debug("[AR PAGE] goToBand →", url);
   window.location.href = url;
 }
 
 onMounted(async () => {
-  console.debug('[AR PAGE] Mounted', { qrid, template });
+  console.debug("[AR PAGE] Mounted", { qrid, template });
 
   try {
     const resp: any = await $fetch(
       `https://qrserver-production.up.railway.app/api/qrs/${qrid}`,
-      { method: 'GET', params: { populate: ['band'] } }
+      { method: "GET", params: { populate: ["band"] } }
     );
     const attrs = resp.data.attributes;
 
-    bandSlug.value = attrs.band?.data?.attributes?.slug || '';
-    console.debug('[AR PAGE] bandSlug =', bandSlug.value);
+    bandSlug.value = attrs.band?.data?.attributes?.slug || "";
+    console.debug("[AR PAGE] bandSlug =", bandSlug.value);
 
-    if (template === 'song') {
-      songUrl.value = attrs.songUrl || '';
-      console.debug('[AR PAGE] songUrl =', songUrl.value);
-    } else if (template === 'event') {
-      eventPosterUrl.value = attrs.eventPosterUrl || '';
-      console.debug('[AR PAGE] eventPosterUrl =', eventPosterUrl.value);
+    if (template === "song") {
+      songUrl.value = attrs.songUrl || "";
+      console.debug("[AR PAGE] songUrl =", songUrl.value);
+    } else if (template === "event") {
+      eventPosterUrl.value = attrs.eventPosterUrl || "";
+      console.debug("[AR PAGE] eventPosterUrl =", eventPosterUrl.value);
     }
   } catch (e) {
-    console.error('[AR PAGE] Fetch error:', e);
+    console.error("[AR PAGE] Fetch error:", e);
   }
 
   // Wait briefly for AR.js to initialize
   setTimeout(() => {
     ready.value = true;
-    console.debug('[AR PAGE] AR scene ready');
+    console.debug("[AR PAGE] AR scene ready");
   }, 300);
 });
 </script>
 
 <style scoped>
 .loading-container {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  background: #000; z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  z-index: 9999;
 }
 .spinner {
   border: 8px solid #444;
   border-top: 8px solid #0f0;
   border-radius: 50%;
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   animation: spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
