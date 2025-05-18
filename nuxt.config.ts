@@ -21,6 +21,15 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      script: [
+        // 1) A-Frame itself
+        { src: 'https://aframe.io/releases/1.4.1/aframe.min.js' },
+        // 2) AR.js extension (must come after A-Frame)
+        {
+          src: 'https://raw.githack.com/AR-js-org/AR.js/3.4.2/aframe/build/aframe-ar.js',
+          defer: true
+        },
+      ],
       link: [
         {
           rel: 'stylesheet',
