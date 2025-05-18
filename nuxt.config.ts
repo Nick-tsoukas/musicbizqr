@@ -29,6 +29,10 @@ export default defineNuxtConfig({
           src: 'https://raw.githack.com/AR-js-org/AR.js/3.4.2/aframe/build/aframe-ar.js',
           defer: true
         },
+        {
+          src: 'https://unpkg.com/aframe-html-shader@^1.0.0/dist/aframe-html-shader.min.js',
+          defer: true,
+        },
       ],
       link: [
         {
