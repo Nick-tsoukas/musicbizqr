@@ -8,28 +8,28 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-
+import { useRouter, useRoute } from 'vue-router';    // ← MUST import
 
 const router = useRouter();
-const route = useRoute();
+const route  = useRoute();
 
 onMounted(async () => {
   try {
-    // 1) extract the slugId from ?id=…
+    // 1) Extract UID from ?id=
     const uid = String(route.query.id);
     if (!uid) {
       console.error('No UID provided in the URL.');
       return router.push('/error');
     }
 
-    // 2) fetch the QR record by slugId
+    // 2) Fetch the QR by slugId, including arEnabled & template
     const qrResponse = await $fetch(
       'https://qrserver-production.up.railway.app/api/qrs',
       {
         method: 'GET',
         params: {
           'filters[slugId][$eq]': uid,
-          populate: '*'        // ← make sure arEnabled & template are included here
+          populate: '*'      // ← ensures attrs.arEnabled, attrs.template, attrs.band, etc.
         }
       }
     );
@@ -38,12 +38,12 @@ onMounted(async () => {
       console.error('QR record not found for UID:', uid);
       return router.push('/error');
     }
-    const qr = qrData[0];
-    const qrId = qr.id;
+
+    const qr    = qrData[0];
+    const qrId  = qr.id;
     const attrs = qr.attributes;
 
-    // ──────── AR REDIRECT ────────
-    // 3) if arEnabled, send into your AR page
+    // ─── AR REDIRECT ───
     if (attrs.arEnabled) {
       const tmpl = attrs.template || 'test';
       return router.replace({
@@ -51,9 +51,9 @@ onMounted(async () => {
         query: { template: tmpl }
       });
     }
-    // ─────────────────────────────
+    // ──────────────────
 
-    // 4) record the scan
+    // 3) Record the scan
     await $fetch(
       'https://qrserver-production.up.railway.app/api/scans',
       {
@@ -67,12 +67,13 @@ onMounted(async () => {
       }
     );
 
-    // 5) now do your regular redirects
+    // 4) Redirect based on q_type
     const qType = attrs.q_type;
     const link  = attrs.link;
 
     if (qType === 'bandProfile' && attrs.band?.data) {
       const slug = attrs.band.data.attributes.slug;
+      // ← catch-all [[slug]] means your band page is at "/<slug>"
       return router.push({ path: `/${slug}` });
     }
     if (qType === 'events' && attrs.event?.data) {
@@ -94,12 +95,13 @@ onMounted(async () => {
       return router.push({ path: `/social/${qrId}` });
     }
     if (qType === 'externalURL' && link) {
-      return window.location.href = link;
+      window.location.href = link;
+      return;
     }
 
     // fallback
     console.log('No matching QR type—sending to dashboard');
-    router.push('/dashboard');
+    return router.push('/dashboard');
 
   } catch (error) {
     console.error('Error in QR redirect flow:', error);
@@ -110,13 +112,9 @@ onMounted(async () => {
 
 <style scoped>
 .loading-container {
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
 }
 .spinner {
   border: 8px solid #f3f3f3;
@@ -125,7 +123,5 @@ onMounted(async () => {
   width: 60px; height: 60px;
   animation: spin 1s linear infinite;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
