@@ -1,22 +1,12 @@
 <template>
   <div>
-    <!-- Spinner until ready -->
+    <!-- Loading spinner until ready -->
     <div v-if="!ready" class="loading-container">
       <div class="spinner"></div>
     </div>
 
     <!-- AR Scene -->
     <div v-else>
-      <!-- Hidden iframe for video template -->
-      <div style="display: none;">
-        <iframe
-          id="youtubeFrame"
-          :src="`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1`"
-          allow="autoplay; encrypted-media"
-          allowfullscreen
-        ></iframe>
-      </div>
-
       <a-scene
         embedded
         arjs="sourceType: webcam; debugUIEnabled: true;"
@@ -24,24 +14,38 @@
         renderer="logarithmicDepthBuffer: true;"
         style="position: fixed; top:0; left:0; width:100%; height:100%;"
       >
+        <!-- Preload our test video -->
+        <a-assets>
+          <video
+            id="testVideo"
+            src="https://www.w3schools.com/html/mov_bbb.mp4"
+            autoplay
+            loop
+            muted
+            playsinline
+            crossorigin="anonymous"
+          ></video>
+        </a-assets>
+
         <a-marker preset="hiro" @markerFound="onMarkerFound" @markerLost="onMarkerLost">
-          <!-- DEBUG: show which template is active -->
+          <!-- DEBUG: current template -->
           <a-entity
-            position="0 1 0"
-            :text="`value: Template = ${template}; align: center; color: #FFF; width: 4`"
+            position="0 1.2 0"
+            :text="`value: Template = ${template}; align:center; color:#FFF; width:4`"
           />
 
-          <!-- VIDEO -->
+          <!-- VIDEO TEMPLATE: play our testVideo -->
           <template v-if="template === 'video'">
-            <a-entity
-              html-shader="target: #youtubeFrame"
-              geometry="primitive: plane; width: 1.6; height: 0.9"
-              position="0 0.5 0"
+            <a-video
+              src="#testVideo"
+              width="1.6"
+              height="0.9"
               rotation="-90 0 0"
-            />
+              position="0 0.5 0"
+            ></a-video>
           </template>
 
-          <!-- SONG -->
+          <!-- SONG TEMPLATE -->
           <template v-else-if="template === 'song'">
             <a-box
               position="0 0.5 0"
@@ -56,18 +60,18 @@
             />
           </template>
 
-          <!-- EVENT -->
+          <!-- EVENT TEMPLATE -->
           <template v-else-if="template === 'event'">
             <a-plane
               :src="eventPosterUrl"
-              geometry="primitive: plane; width: 1; height: 1.4"
+              geometry="primitive: plane; width:1; height:1.4"
               position="0 0.7 0"
               rotation="-90 0 0"
             />
           </template>
 
-          <!-- TEST fallback -->
-          <template v-else-if="template === 'test'">
+          <!-- TEST FALLBACK -->
+          <template v-else>
             <a-box
               position="0 0.5 0"
               rotation="0 45 0"
@@ -78,13 +82,14 @@
 
           <!-- Visit Band Page -->
           <a-entity
-            text="value: Visit Band Page; align: center; color: #FFF; width: 2"
+            text="value: Visit Band Page; align:center; color:#FFF; width:2"
             position="0 -0.3 0"
             rotation="-90 0 0"
             scale="1.5 1.5 1"
             @click="goToBand"
           />
         </a-marker>
+
         <a-entity camera />
       </a-scene>
     </div>
@@ -95,22 +100,20 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-const route        = useRoute();
-// match your filename [qrid].vue — read from params.qrid
-const qrid         = String(route.params.qrid);
-const template     = String(route.query.template || 'test');
-const ready        = ref(false);
+const route    = useRoute();
+const qrid     = String(route.params.qrid);
+const template = String(route.query.template || 'test');
+const ready    = ref(false);
 
-const videoId       = ref('dQw4w9WgXcQ');
-const songUrl       = ref('');
+const songUrl        = ref('');
 const eventPosterUrl = ref('');
-const bandSlug      = ref('');
+const bandSlug       = ref('');
 
 // Marker events
 function onMarkerFound() { console.debug('[AR PAGE] Marker found'); }
 function onMarkerLost()  { console.warn('[AR PAGE] Marker lost'); }
 
-// Navigate back to band page
+// Navigate to band page
 function goToBand() {
   const url = `/${bandSlug.value}`;
   console.debug('[AR PAGE] goToBand →', url);
@@ -126,13 +129,11 @@ onMounted(async () => {
       { method: 'GET', params: { populate: ['band'] } }
     );
     const attrs = resp.data.attributes;
+
     bandSlug.value = attrs.band?.data?.attributes?.slug || '';
     console.debug('[AR PAGE] bandSlug =', bandSlug.value);
 
-    if (template === 'video') {
-      videoId.value = attrs.videoId || videoId.value;
-      console.debug('[AR PAGE] videoId =', videoId.value);
-    } else if (template === 'song') {
+    if (template === 'song') {
       songUrl.value = attrs.songUrl || '';
       console.debug('[AR PAGE] songUrl =', songUrl.value);
     } else if (template === 'event') {
@@ -143,6 +144,7 @@ onMounted(async () => {
     console.error('[AR PAGE] Fetch error:', e);
   }
 
+  // Wait briefly for AR.js to initialize
   setTimeout(() => {
     ready.value = true;
     console.debug('[AR PAGE] AR scene ready');
@@ -152,8 +154,7 @@ onMounted(async () => {
 
 <style scoped>
 .loading-container {
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
   background: #000; z-index: 9999;
