@@ -1,139 +1,131 @@
 <template>
-  <div
-    class="bg-black text-white min-h-screen mx-auto p-4 w-full sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-3xl"
-  >
-    <h1 class="text-2xl font-bold mb-4">QR Code Analytics</h1>
-
-    <div v-if="loading" class="loading-container">
+  <div>
+    <div class="loading-container">
       <div class="spinner"></div>
-    </div>
-
-    <div v-else>
-      <div class="my-8">
-        <h2 class="mb-2">Scans Over Time</h2>
-        <canvas id="lineChart"></canvas>
-      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted, computed, nextTick } from "vue";
-import { useRoute, useRuntimeConfig } from "#imports";
-import { Chart } from "chart.js/auto";
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
+const router = useRouter();
 const route = useRoute();
-const config = useRuntimeConfig();
-const qrId = route.params.id as string;
-
-const loading = ref(true);
-const scans = ref<any[]>([]);
-
-// 1) Record a new scan on page visit
-async function recordScan() {
-  try {
-    await fetch(
-      `${config.public.strapiUrl}/api/scans`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: { qr: qrId } })
-      }
-    );
-  } catch (err) {
-    console.error("Error recording scan:", err);
-  }
-}
-
-// 2) Fetch all scans for this QR
-async function fetchScans() {
-  try {
-    const res = await fetch(
-      `${config.public.strapiUrl}/api/scans?filters[qr][id][$eq]=${qrId}&pagination[pageSize]=1000`
-    );
-    const json = await res.json();
-    scans.value = json.data || [];
-  } catch (err) {
-    console.error("Error fetching scans:", err);
-  }
-}
-
-// 3) Group scans by day (YYYY-MM-DD)
-const scansByDate = computed(() => {
-  const counts: Record<string, number> = {};
-  scans.value.forEach((scan) => {
-    const day = new Date(scan.attributes.createdAt)
-                  .toISOString()
-                  .slice(0, 10);
-    counts[day] = (counts[day] || 0) + 1;
-  });
-  const labels = Object.keys(counts).sort();
-  const data = labels.map(d => counts[d]);
-  return { labels, data };
-});
 
 onMounted(async () => {
-  // record first, then re-fetch including the new one
-  await recordScan();
-  await fetchScans();
-  loading.value = false;
-
-  // wait for DOM & canvas
-  await nextTick();
-  const ctx = (document.getElementById("lineChart") as HTMLCanvasElement)
-                .getContext("2d");
-  if (!ctx) return;
-
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: scansByDate.value.labels,
-      datasets: [{
-        label: "Scans per Day",
-        data: scansByDate.value.data,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        fill: true,
-        tension: 0.3,
-      }]
-    },
-    options: {
-      scales: {
-        x: { ticks: { color: "#fff" } },
-        y: { beginAtZero: true, ticks: { color: "#fff" } },
-      },
-      plugins: {
-        legend: { labels: { color: "#fff" } }
-      }
+  try {
+    // 1) extract the slugId from ?id=…
+    const uid = String(route.query.id);
+    if (!uid) {
+      console.error('No UID provided in the URL.');
+      return router.push('/error');
     }
-  });
+
+    // 2) fetch the QR record by slugId
+    const qrResponse = await $fetch(
+      'https://qrserver-production.up.railway.app/api/qrs',
+      {
+        method: 'GET',
+        params: {
+          'filters[slugId][$eq]': uid,
+          populate: '*'        // ← make sure arEnabled & template are included here
+        }
+      }
+    );
+    const qrData = qrResponse.data;
+    if (!qrData?.length) {
+      console.error('QR record not found for UID:', uid);
+      return router.push('/error');
+    }
+    const qr = qrData[0];
+    const qrId = qr.id;
+    const attrs = qr.attributes;
+
+    // ──────── AR REDIRECT ────────
+    // 3) if arEnabled, send into your AR page
+    if (attrs.arEnabled) {
+      const tmpl = attrs.template || 'test';
+      return router.replace({
+        path: `/ar/${qrId}`,
+        query: { template: tmpl }
+      });
+    }
+    // ─────────────────────────────
+
+    // 4) record the scan
+    await $fetch(
+      'https://qrserver-production.up.railway.app/api/scans',
+      {
+        method: 'POST',
+        body: {
+          data: {
+            date: new Date().toISOString(),
+            qr: qrId
+          }
+        }
+      }
+    );
+
+    // 5) now do your regular redirects
+    const qType = attrs.q_type;
+    const link  = attrs.link;
+
+    if (qType === 'bandProfile' && attrs.band?.data) {
+      const slug = attrs.band.data.attributes.slug;
+      return router.push({ path: `/${slug}` });
+    }
+    if (qType === 'events' && attrs.event?.data) {
+      const slug = attrs.event.data.attributes.slug;
+      return router.push({ path: `/event/${slug}` });
+    }
+    if (qType === 'tours' && attrs.tour?.data) {
+      const slug = attrs.tour.data.attributes.slug;
+      return router.push({ path: `/tour/${slug}` });
+    }
+    if (qType === 'albums' && attrs.album?.data) {
+      const slug = attrs.album.data.attributes.slug;
+      return router.push({ path: `/album/${slug}` });
+    }
+    if (qType === 'stream' && attrs.stream?.data) {
+      return router.push({ path: `/stream/${attrs.stream.data.id}` });
+    }
+    if (qType === 'social') {
+      return router.push({ path: `/social/${qrId}` });
+    }
+    if (qType === 'externalURL' && link) {
+      return window.location.href = link;
+    }
+
+    // fallback
+    console.log('No matching QR type—sending to dashboard');
+    router.push('/dashboard');
+
+  } catch (error) {
+    console.error('Error in QR redirect flow:', error);
+    router.push('/error');
+  }
 });
 </script>
 
 <style scoped>
+.loading-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .spinner {
-  border: 8px solid #444;
-  border-top: 8px solid #00ff00;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #555;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  width: 60px; height: 60px;
   animation: spin 1s linear infinite;
-  margin: 2rem auto;
 }
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 40vh;
-}
-canvas {
-  background-color: #000;
-  border: 1px solid #444;
-  width: 100% !important;
-  height: auto !important;
-  margin-bottom: 1.5rem;
 }
 </style>

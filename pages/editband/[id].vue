@@ -406,6 +406,7 @@ const streaming = ref({
   youtube: "",
   deezer: "",
   bandcamp: "",
+  reverbnation: "" 
 });
 
 // Featured song/video
