@@ -5,9 +5,9 @@
       <div class="spinner"></div>
     </div>
 
-    <!-- AR scene -->
+    <!-- AR Scene -->
     <div v-else>
-      <!-- Hidden iframe for video -->
+      <!-- Hidden iframe for video template -->
       <div style="display:none">
         <iframe
           id="youtubeFrame"
@@ -24,19 +24,15 @@
         renderer="logarithmicDepthBuffer: true;"
         style="position: fixed; top:0; left:0; width:100%; height:100%;"
       >
-        <a-marker
-          preset="hiro"
-          @markerFound="onMarkerFound"
-          @markerLost="onMarkerLost"
-        >
-          <!-- Log template for debugging -->
-          <a-entity 
-            position="0 1 0" 
+        <a-marker preset="hiro" @markerFound="onMarkerFound" @markerLost="onMarkerLost">
+          <!-- DEBUG: show which template is active -->
+          <a-entity
+            position="0 1 0"
             text="value: Template={{template}}; align:center; color:#FFF; width:4"
           />
 
           <!-- VIDEO -->
-          <template v-if="template==='video'">
+          <template v-if="template === 'video'">
             <a-entity
               html-shader="target: #youtubeFrame"
               geometry="primitive: plane; width: 1.6; height: 0.9"
@@ -46,7 +42,7 @@
           </template>
 
           <!-- SONG -->
-          <template v-else-if="template==='song'">
+          <template v-else-if="template === 'song'">
             <a-box
               position="0 0.5 0"
               rotation="0 45 0"
@@ -57,17 +53,17 @@
           </template>
 
           <!-- EVENT -->
-          <template v-else-if="template==='event'">
+          <template v-else-if="template === 'event'">
             <a-plane
               :src="eventPosterUrl"
-              geometry="primitive: plane; width: 1.0; height: 1.4"
+              geometry="primitive: plane; width: 1; height: 1.4"
               position="0 0.7 0"
               rotation="-90 0 0"
             />
           </template>
 
-          <!-- TEST ONLY (explicit) -->
-          <template v-else-if="template==='test'">
+          <!-- TEST fallback -->
+          <template v-else-if="template === 'test'">
             <a-box
               position="0 0.5 0"
               rotation="0 45 0"
@@ -78,7 +74,7 @@
 
           <!-- Visit Band Page -->
           <a-entity
-            text="value: Visit Band Page; align: center; width: 2; color: #FFF"
+            text="value: Visit Band Page; align:center; color:#FFF; width:2"
             position="0 -0.3 0"
             rotation="-90 0 0"
             scale="1.5 1.5 1"
@@ -96,18 +92,21 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route        = useRoute();
-const qrid         = String(route.params.qrid);
+// read the param named “id” regardless of your file’s name
+const id           = String(route.params.id);
 const template     = String(route.query.template || 'test');
 const ready        = ref(false);
 
-const videoId      = ref('dQw4w9WgXcQ');
+const videoId      = ref('dQw4w9WgXcQ');  // default if none in DB
 const songUrl      = ref('');
 const eventPosterUrl = ref('');
 const bandSlug     = ref('');
 
+// Marker events
 function onMarkerFound() { console.debug('[AR PAGE] Marker found'); }
 function onMarkerLost()  { console.warn('[AR PAGE] Marker lost'); }
 
+// Tap to go back to band page
 function goToBand() {
   const url = `/${bandSlug.value}`;
   console.debug('[AR PAGE] goToBand →', url);
@@ -115,33 +114,33 @@ function goToBand() {
 }
 
 onMounted(async () => {
-  console.debug('[AR PAGE] Mounted', { qrid, template });
+  console.debug('[AR PAGE] Mounted', { id, template });
 
-  // Fetch the QR to get the actual media fields:
+  // Fetch QR entry to get slug and media fields
   try {
     const resp: any = await $fetch(
-      `https://qrserver-production.up.railway.app/api/qrs/${qrid}`,
-      { params: { populate: ['band'] } }
+      `https://qrserver-production.up.railway.app/api/qrs/${id}`,
+      { method: 'GET', params: { populate: ['band'] } }
     );
     const attrs = resp.data.attributes;
     bandSlug.value = attrs.band?.data?.attributes?.slug || '';
-    console.debug('[AR PAGE] bandSlug:', bandSlug.value);
+    console.debug('[AR PAGE] bandSlug =', bandSlug.value);
 
     if (template === 'video') {
       videoId.value = attrs.videoId || videoId.value;
-      console.debug('[AR PAGE] videoId:', videoId.value);
+      console.debug('[AR PAGE] videoId =', videoId.value);
     } else if (template === 'song') {
       songUrl.value = attrs.songUrl;
-      console.debug('[AR PAGE] songUrl:', songUrl.value);
+      console.debug('[AR PAGE] songUrl =', songUrl.value);
     } else if (template === 'event') {
       eventPosterUrl.value = attrs.eventPosterUrl;
-      console.debug('[AR PAGE] eventPosterUrl:', eventPosterUrl.value);
+      console.debug('[AR PAGE] eventPosterUrl =', eventPosterUrl.value);
     }
   } catch (e) {
-    console.error('[AR PAGE] fetch error:', e);
+    console.error('[AR PAGE] Fetch error:', e);
   }
 
-  // Let AR.js init
+  // Give AR.js a moment, then show the scene
   setTimeout(() => {
     ready.value = true;
     console.debug('[AR PAGE] AR scene ready');
@@ -156,6 +155,12 @@ onMounted(async () => {
   display: flex; align-items: center; justify-content: center;
   background: #000; z-index: 9999;
 }
-.spinner { border: 8px solid #444; border-top: 8px solid #0f0; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+.spinner {
+  border: 8px solid #444;
+  border-top: 8px solid #0f0;
+  border-radius: 50%;
+  width: 60px; height: 60px;
+  animation: spin 1s linear infinite;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
