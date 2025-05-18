@@ -21,13 +21,6 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      script: [
-        { src: 'https://aframe.io/releases/1.4.1/aframe.min.js' },
-        {
-          src: 'https://raw.githack.com/AR-js-org/AR.js/3.4.2/aframe/build/aframe-ar.js',
-          // AR.js requires aframe loaded first
-        },
-      ],
       link: [
         {
           rel: 'stylesheet',
