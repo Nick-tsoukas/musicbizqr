@@ -1,263 +1,285 @@
 <template>
-  <div
-    class="bg-black text-white min-h-screen mx-auto p-4 w-full sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-3xl"
-  >
-    <h1 class="text-2xl font-bold mb-4">Analytics Charts</h1>
+  <div class="bg-black text-white min-h-screen mx-auto p-4 max-w-5xl">
+    <h1 class="text-2xl font-bold mb-4">Analytics Dashboard</h1>
 
-    <!-- You can add buttons to switch grouping if desired:
-    <div class="mb-4">
-      <button @click="groupBy = 'daily'" class="mr-2 px-4 py-2 bg-gray-700 rounded">Daily</button>
-      <button @click="groupBy = 'monthly'" class="px-4 py-2 bg-gray-700 rounded">Monthly</button>
+    <!-- 1) Tab Bar -->
+    <div class="flex space-x-4 border-b border-gray-700 mb-6">
+      <button
+        @click="view = 'links'"
+        :class="{'border-b-2 border-white': view==='links'}"
+        class="px-4 py-2"
+      >Links</button>
+      <button
+        @click="view = 'songs'"
+        :class="{'border-b-2 border-white': view==='songs'}"
+        class="px-4 py-2"
+      >Songs</button>
+      <button
+        @click="view = 'videos'"
+        :class="{'border-b-2 border-white': view==='videos'}"
+        class="px-4 py-2"
+      >Videos</button>
     </div>
-    -->
 
-    <div class="my-20">
-      <h2 class="mb-2 mt-6">Clicks by Platform (Bar Chart)</h2>
-      <canvas id="barChart"></canvas>
+    <!-- 2) Filters (only for Songs/Videos) -->
+    <div v-if="view !== 'links'" class="flex items-center space-x-4 mb-8">
+      <label class="whitespace-nowrap">Media:</label>
+      <select v-model="selectedMedia" class="bg-gray-800 px-2 py-1 rounded">
+        <option value="all">All</option>
+        <option v-for="m in mediaList" :key="m.id" :value="m.id">
+          {{ m.title }}
+        </option>
+      </select>
+
+      <label class="whitespace-nowrap">Group by:</label>
+      <button
+        v-for="mode in ['daily','monthly','yearly']"
+        :key="mode"
+        @click="groupBy = mode"
+        :class="btnClass(mode)"
+        class="px-2 py-1 rounded"
+      >{{ mode.charAt(0).toUpperCase() + mode.slice(1) }}</button>
     </div>
 
-    <div class="my-20">
-      <h2 class="mb-2">Clicks Over Time (Line Chart)</h2>
-      <canvas id="lineChart"></canvas>
+    <!-- 3) Chart Canvases -->
+    <div v-if="view === 'links'">
+      <section class="mb-12">
+        <h2 class="text-xl mb-2">Clicks by Platform (Bar)</h2>
+        <canvas id="barChart"></canvas>
+      </section>
+      <section class="mb-12">
+        <h2 class="text-xl mb-2">Clicks Over Time (Line)</h2>
+        <canvas id="lineChart"></canvas>
+      </section>
+      <section>
+        <h2 class="text-xl mb-2">Clicks Distribution (Pie)</h2>
+        <canvas id="pieChart"></canvas>
+      </section>
     </div>
 
-    <div class="my-20">
-      <h2 class="mb-2 mt-6">Clicks Distribution (Pie Chart)</h2>
-      <canvas id="pieChart"></canvas>
+    <div v-else>
+      <section class="mb-12">
+        <h2 class="text-xl mb-2">
+          {{ view==='songs' ? 'Song' : 'Video' }} Plays Over Time (Line)
+        </h2>
+        <canvas id="mediaLineChart"></canvas>
+      </section>
+      <section class="mb-12">
+        <h2 class="text-xl mb-2">
+          {{ view==='songs' ? 'Song' : 'Video' }} Play Counts (Bar)
+        </h2>
+        <canvas id="mediaBarChart"></canvas>
+      </section>
+      <section>
+        <h2 class="text-xl mb-2">
+          {{ view==='songs' ? 'Song' : 'Video' }} Distribution (Pie)
+        </h2>
+        <canvas id="mediaPieChart"></canvas>
+      </section>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed, nextTick } from "vue";
-import { useRoute, useRuntimeConfig } from "#imports";
-import { Chart } from "chart.js/auto";
+import { ref, onMounted, watch, computed, nextTick } from 'vue'
+import { useRoute, useRuntimeConfig } from '#imports'
+import { Chart } from 'chart.js/auto'
 
-interface ClickEvent {
-  timestamp: string;
-  id: number;
-  platform: string;
-  clickCount: number;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
+type View = 'links' | 'songs' | 'videos'
+type GroupBy = 'daily' | 'monthly' | 'yearly'
+
+const route        = useRoute()
+const config       = useRuntimeConfig()
+const bandId       = route.params.id as string
+
+// --- STATE ---
+const view          = ref<View>('links')
+const groupBy       = ref<GroupBy>('daily')
+const selectedMedia = ref<'all' | number>('all')
+const mediaList     = ref<{ id: number; title: string }[]>([])
+const linkClicks    = ref<any[]>([])
+const mediaPlays    = ref<any[]>([])
+
+// --- FETCH FUNCTIONS ---
+async function fetchLinkClicks() {
+  const res  = await fetch(`${config.public.strapiUrl}/api/link-clicks/band/${bandId}`)
+  const json = await res.json()
+  linkClicks.value = json.data || []
 }
 
-const route = useRoute();
-const config = useRuntimeConfig();
-const bandId = route.params.id;
+// replace your existing fetchMediaList and fetchMediaPlays with these:
 
-// New: Reactive variable to choose grouping mode: "daily" or "monthly"
-const groupBy = ref<"daily" | "monthly">("daily");
+async function fetchMediaList() {
+  // pull all songs & videos so you can build your “mediaList” dropdown
+  const [songsRes, videosRes] = await Promise.all([
+    fetch(
+      `${config.public.strapiUrl}/api/media-plays?` +
+      `filters[band][id][$eq]=${bandId}&` +
+      `filters[mediaType][$eq]=song&` +
+      `pagination[pageSize]=1000`
+    ),
+    fetch(
+      `${config.public.strapiUrl}/api/media-plays?` +
+      `filters[band][id][$eq]=${bandId}&` +
+      `filters[mediaType][$eq]=video&` +
+      `pagination[pageSize]=1000`
+    )
+  ]);
 
-const analyticsData = ref<ClickEvent[]>([]);
-
-const fetchAnalyticsData = async () => {
-  try {
-    const res = await fetch(
-      `${config.public.strapiUrl}/api/link-clicks/band/${bandId}`
-    );
-    if (!res.ok) {
-      throw new Error("Failed to fetch analytics data");
-    }
-    const data = await res.json();
-    analyticsData.value = data;
-  } catch (error) {
-    console.error("Error fetching analytics data:", error);
+  if (!songsRes.ok || !videosRes.ok) {
+    console.error('Failed to load media list:', songsRes.status, videosRes.status);
+    return;
   }
-};
 
-// Updated: Group data by full date (YYYY-MM-DD) or by month (YYYY-MM)
+  const songsJson  = await songsRes.json();
+  const videosJson = await videosRes.json();
+
+  mediaList.value = [
+    ...songsJson.data.map((m: any) => ({ id: m.id, title: m.attributes.title })),
+    ...videosJson.data.map((m: any) => ({ id: m.id, title: m.attributes.title }))
+  ];
+}
+
+async function fetchMediaPlays() {
+  // now fetch plays for the currently selected media (or all)
+  const type     = view.value === 'songs' ? 'song' : 'video';
+  const filterId = selectedMedia.value === 'all'
+    ? ''
+    : `&filters[id][$eq]=${selectedMedia.value}`;
+  const res = await fetch(
+    `${config.public.strapiUrl}/api/media-plays?` +
+    `filters[band][id][$eq]=${bandId}&` +
+    `filters[mediaType][$eq]=${type}` +
+    filterId +
+    `&pagination[pageSize]=1000`
+  );
+
+  if (!res.ok) {
+    console.error('Failed to load media plays:', res.status);
+    mediaPlays.value = [];
+    return;
+  }
+
+  const json = await res.json();
+  mediaPlays.value = json.data;
+}
+
+
+// --- HELPERS ---
+function formatLabel(raw:string) {
+  // daily -> "Jan 25 2025", monthly -> "Jan 2025", yearly -> "2025"
+  if (groupBy.value === 'daily') {
+    const d = new Date(raw)
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+  }
+  if (groupBy.value === 'monthly') {
+    const [y,m] = raw.split('-')
+    const d = new Date(+y, +m-1)
+    return d.toLocaleDateString('en-US', { month:'short', year:'numeric' })
+  }
+  return raw
+}
+
 const timeSeriesData = computed(() => {
-  const groups: Record<string, number> = {};
-  analyticsData.value.forEach((event) => {
-    const date = new Date(event.timestamp);
-    let rawKey: string;
-    if (groupBy.value === "daily") {
-      rawKey = date.toISOString().slice(0, 10); // e.g., "2025-02-17"
-    } else {
-      rawKey = date.toISOString().slice(0, 7); // e.g., "2025-02"
-    }
-    groups[rawKey] = (groups[rawKey] || 0) + event.clickCount;
-  });
-  const rawKeys = Object.keys(groups).sort();
-  if (groupBy.value === "daily") {
-    const labels = rawKeys.map((key) => {
-      const date = new Date(key);
-      // Format as "Jan 25 2025" (remove the comma)
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }).replace(',', '');
-    });
-    return { labels, data: rawKeys.map(key => groups[key]) };
-  } else {
-    const labels = rawKeys.map((key) => {
-      const [year, month] = key.split("-");
-      const date = new Date(Number(year), Number(month) - 1);
-      // Format as "Jan 2025"
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      });
-    });
-    return { labels, data: rawKeys.map(key => groups[key]) };
+  const arr = view.value==='links' ? linkClicks.value : mediaPlays.value
+  const groups: Record<string, number> = {}
+  arr.forEach(evt => {
+    const ts = new Date(evt.attributes?.timestamp || evt.timestamp)
+    let key = ''
+    if (groupBy.value==='daily')   key = ts.toISOString().slice(0,10)
+    if (groupBy.value==='monthly') key = ts.toISOString().slice(0,7)
+    if (groupBy.value==='yearly')  key = String(ts.getFullYear())
+    groups[key] = (groups[key]||0) + (view.value==='links' ? evt.clickCount : 1)
+  })
+  const sorted = Object.keys(groups).sort()
+  return {
+    labels: sorted.map(formatLabel),
+    data:   sorted.map(k=>groups[k])
   }
-});
+})
 
-// Group data by platform for bar and pie charts (unchanged)
-const platformCounts = computed(() => {
-  const counts: Record<string, number> = {};
-  analyticsData.value.forEach((event) => {
-    const platform = event.platform;
-    counts[platform] = (counts[platform] || 0) + event.clickCount;
-  });
-  const labels = Object.keys(counts);
-  const data = labels.map((label) => counts[label]);
-  return { labels, data };
-});
+const distributionData = computed(() => {
+  const arr = view.value==='links' ? linkClicks.value : mediaPlays.value
+  const counts: Record<string, number> = {}
+  arr.forEach(evt => {
+    const key = view.value==='links' ? evt.platform : evt.attributes.title
+    counts[key] = (counts[key]||0) + (view.value==='links' ? evt.clickCount : 1)
+  })
+  const labels = Object.keys(counts)
+  return { labels, data: labels.map(l=>counts[l]) }
+})
 
+// --- CHART HELPERS ---
+let charts: Chart[] = []
+function destroyCharts() {
+  charts.forEach(c => c.destroy())
+  charts = []
+}
+function getCtx(id:string) {
+  const canvas = document.getElementById(id) as HTMLCanvasElement | null
+  return canvas?.getContext('2d') ?? null
+}
+function drawLine(ctx:any, series:any, label:string) {
+  return new Chart(ctx, { type:'line', data:{ labels:series.labels, datasets:[{ label, data:series.data, fill:true, borderWidth:2 }]}, options:{ scales:{ y:{ beginAtZero:true } } } })
+}
+function drawBar(ctx:any, dist:any, label:string) {
+  return new Chart(ctx, { type:'bar', data:{ labels:dist.labels, datasets:[{ label, data:dist.data, borderWidth:1 }]}, options:{ scales:{ y:{ beginAtZero:true } } } })
+}
+function drawPie(ctx:any, dist:any) {
+  return new Chart(ctx, { type:'pie', data:{ labels:dist.labels, datasets:[{ data:dist.data }] } })
+}
+
+function renderCharts() {
+  destroyCharts()
+  if (view.value === 'links') {
+    const barCtx  = getCtx('barChart')
+    const lineCtx = getCtx('lineChart')
+    const pieCtx  = getCtx('pieChart')
+    if (barCtx)  charts.push(drawBar(barCtx, distributionData.value, 'Clicks by Platform'))
+    if (lineCtx) charts.push(drawLine(lineCtx, timeSeriesData.value, 'Clicks Over Time'))
+    if (pieCtx)  charts.push(drawPie(pieCtx, distributionData.value))
+  } else {
+    const lineCtx = getCtx('mediaLineChart')
+    const barCtx  = getCtx('mediaBarChart')
+    const pieCtx  = getCtx('mediaPieChart')
+    const label   = view.value === 'songs' ? 'Song' : 'Video'
+    if (lineCtx) charts.push(drawLine(lineCtx, timeSeriesData.value, `${label} Plays Over Time`))
+    if (barCtx)  charts.push(drawBar(barCtx, distributionData.value, `${label} Play Counts`))
+    if (pieCtx)  charts.push(drawPie(pieCtx, distributionData.value))
+  }
+}
+
+// --- WATCHERS ---
+watch([view, groupBy, selectedMedia], async () => {
+  if (view.value !== 'links') {
+    await fetchMediaPlays()
+  }
+  await nextTick()
+  renderCharts()
+})
+
+// --- INITIAL MOUNT ---
 onMounted(async () => {
-  await fetchAnalyticsData();
+  await fetchLinkClicks()
+  await fetchMediaList()
+  await fetchMediaPlays()
+  await nextTick()
+  renderCharts()
+})
 
-  // LINE CHART: Clicks Over Time
-  const lineCtx = (document.getElementById("lineChart") as HTMLCanvasElement).getContext("2d");
-  new Chart(lineCtx, {
-    type: "line",
-    data: {
-      labels: timeSeriesData.value.labels,
-      datasets: [
-        {
-          label: "Clicks Over Time",
-          data: timeSeriesData.value.data,
-          borderColor: "rgba(75, 192, 192, 1)",
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      layout: {
-        padding: { top: 20, bottom: 50 }
-      },
-      scales: {
-        y: { beginAtZero: true, ticks: { color: "#fff" } },
-        x: { ticks: { color: "#fff" } },
-      },
-      plugins: { legend: { labels: { color: "#fff", padding: 50 } } },
-    },
-  });
-
-  // BAR CHART: Clicks by Platform
-  const barCtx = (document.getElementById("barChart") as HTMLCanvasElement).getContext("2d");
-  new Chart(barCtx, {
-    type: "bar",
-    data: {
-      labels: platformCounts.value.labels,
-      datasets: [
-        {
-          label: "Clicks by Platform",
-          data: platformCounts.value.data,
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.8)",
-            "rgba(54, 162, 235, 0.8)",
-            "rgba(255, 206, 86, 0.8)",
-            "rgba(75, 192, 192, 0.8)",
-            "rgba(153, 102, 255, 0.8)",
-            "rgba(255, 159, 64, 0.8)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)",
-          ],
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      scales: {
-        y: { beginAtZero: true, ticks: { color: "#fff" } },
-        x: { ticks: { color: "#fff" } },
-      },
-      plugins: { legend: { labels: { color: "#fff" } } },
-    },
-  });
-
-  // PIE CHART: Clicks Distribution by Platform
-  const pieCtx = (document.getElementById("pieChart") as HTMLCanvasElement).getContext("2d");
-  new Chart(pieCtx, {
-    type: "pie",
-    data: {
-      labels: platformCounts.value.labels,
-      datasets: [
-        {
-          label: "Clicks Distribution",
-          data: platformCounts.value.data,
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.8)",
-            "rgba(54, 162, 235, 0.8)",
-            "rgba(255, 206, 86, 0.8)",
-            "rgba(75, 192, 192, 0.8)",
-            "rgba(153, 102, 255, 0.8)",
-            "rgba(255, 159, 64, 0.8)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)",
-          ],
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      plugins: { legend: { labels: { color: "#fff" } } },
-      scales: undefined,
-    },
-  });
-});
+// --- UTILS FOR BUTTON CLASSES ---
+function btnClass(mode:GroupBy) {
+  return {
+    'bg-gray-700': groupBy.value !== mode,
+    'bg-white text-black':   groupBy.value === mode
+  }
+}
 </script>
 
 <style scoped>
 canvas {
-  background-color: #000;
-  border: 1px solid #444;
-  margin-bottom: 20px;
+  background: #000;
+  margin-bottom: 2rem;
   width: 100% !important;
-}
-
-.spinner {
-  border: 8px solid rgba(0, 255, 0, 0.2);
-  border-top: 8px solid #00ff00;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 99999999999999;
 }
 </style>

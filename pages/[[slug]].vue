@@ -45,37 +45,78 @@
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <!-- Featured Song -->
         <section v-if="band.data.singlesong" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Featured Song
-          </h2>
-          <div
-            v-if="band.data.singlesong.isEmbed && embedUrl"
-            class="relative embed-container"
-            :style="{ maxHeight: embedHeight }"
-          >
-            <div
-              ref="songOverlay"
-              v-show="!isSongStarted"
-              class="absolute inset-0 z-20 cursor-pointer"
-              @pointerdown="startSong"
-            />
-            <iframe
-              :src="embedUrl"
-              frameborder="0"
-              allow="autoplay; encrypted-media; fullscreen; clipboard-write"
-              allowfullscreen
-              class="w-full h-64 rounded-lg"
-              :style="{ maxHeight: embedHeight }"
-            />
-          </div>
-          <div v-else>
-            <AudioPlayer
-              v-if="band.data.singlesong.song"
-              :album="formatSingleSong(band.data.singlesong)"
-              placeholderImage="/placeholder-image.svg"
-            />
-          </div>
-        </section>
+  <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+    Featured Song
+  </h2>
+
+  <!-- Embedded Track -->
+  <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
+    <div class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black">
+      <!-- Play overlay before click -->
+      <div
+        v-if="!isSongStarted"
+        @click="startSong"
+        class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
+      >
+        <!-- Top-left info -->
+        <div class="absolute top-2 left-2">
+          <p class="text-white font-bold">{{ band.data.singlesong.title }}</p>
+          <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
+        </div>
+        <!-- Centered play icon -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 84 84">
+            <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
+            <polygon points="34,28 34,56 58,42" fill="white" />
+          </svg>
+        </div>
+      </div>
+      <!-- Iframe after click -->
+      <iframe
+        v-else
+        :src="embedUrl + '?autoplay=1'"
+        frameborder="0"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write"
+        allowfullscreen
+        class="absolute inset-0 w-full h-full"
+      />
+    </div>
+  </div>
+
+  <!-- Raw Audio Fallback -->
+  <div v-else-if="band.data.singlesong.song" class="w-full">
+    <div class="relative w-full h-[80px] rounded-lg overflow-hidden bg-black">
+      <!-- Play overlay before click -->
+      <div
+        v-if="!isSongStarted"
+        @click="startSong"
+        class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
+      >
+        <!-- Top-left info -->
+        <div class="absolute top-1 left-2">
+          <p class="text-white font-bold text-sm">{{ band.data.singlesong.title }}</p>
+          <p class="text-gray-300 text-xs">{{ band.data.name }}</p>
+        </div>
+        <!-- Centered play icon -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 84 84">
+            <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
+            <polygon points="34,28 34,56 58,42" fill="white" />
+          </svg>
+        </div>
+      </div>
+      <!-- Audio player after click -->
+      <audio
+        v-else
+        ref="audioPlayer"
+        controls
+        class="absolute inset-0 w-full h-full"
+        :src="band.data.singlesong.song.url"
+      ></audio>
+    </div>
+  </div>
+</section>
+
 
         <!-- Featured Video -->
         <section
@@ -113,7 +154,7 @@
             <YouTube
               :src="singleVideoEmbedUrl"
               :vars="playerOptions"
-               class="absolute inset-0 w-full h-full rounded-lg"
+              class="absolute inset-0 w-full h-full rounded-lg"
             />
           </div>
         </section>
@@ -174,8 +215,7 @@
                   class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
                 >
                   <img
-                    :src="platform.img"
-                    class="h-10 absolute left-2"
+                    :src="platform.img" class="h-10 absolute left-2"
                     :alt="platform.label"
                   />
                   {{ platform.label }}
@@ -191,9 +231,7 @@
             Events and Tours
           </h2>
           <div class="overflow-x-scroll md:overflow-hidden relative">
-            <table
-              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-            >
+            <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
               <thead>
                 <tr class="border-b border-purple-500 border-opacity-30">
                   <th class="px-2 py-2 text-left">Date</th>
@@ -203,21 +241,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="event in events"
-                  :key="event.id"
-                  class="border-b border-purple-500 border-opacity-20"
-                >
+                <tr v-for="event in events" :key="event.id" class="border-b border-purple-500 border-opacity-20">
                   <td class="px-2 py-1 whitespace-nowrap">{{ formatDate(event.date) }}</td>
                   <td class="px-2 py-1 whitespace-nowrap">{{ event.city || 'N/A' }}, {{ event.state }}</td>
                   <td class="px-2 py-1 whitespace-nowrap">{{ event.venue || 'N/A' }}</td>
                   <td class="px-2 py-1 whitespace-nowrap">
-                    <button
-                      @click="router.push(`/event/${event.id}`)"
-                      class="text-purple-400"
-                    >
-                      View Event
-                    </button>
+                    <button @click="router.push(`/event/${event.id}`)" class="text-purple-400">View Event</button>
                   </td>
                 </tr>
               </tbody>
@@ -256,6 +285,9 @@ import twitterIcon from '@/assets/twitter.png'
 import 'swiper/css'
 import 'swiper/css/thumbs'
 import 'swiper/css/effect-cards'
+
+
+const audioPlayer   = ref(null)   
 
 const config = useRuntimeConfig()
 const { trackClick, trackMediaPlay } = useBeacon()
@@ -331,13 +363,15 @@ function formatSingleSong(song) {
 }
 
 async function startSong() {
-  const el = songOverlay.value
-  if (el) {
-    el.style.pointerEvents = 'none'
-    el.style.display = 'none'
-  }
+  await trackMediaPlay(
+    band.value.data.id,
+    'song',
+    band.value.data.singlesong.title
+  )
   isSongStarted.value = true
-  await trackMediaPlay(band.value.data.id, 'song', band.value.data.singlesong.title)
+  if (audioPlayer.value) {
+    audioPlayer.value.play().catch(() => {})
+  }
 }
 
 async function playVideo() {
