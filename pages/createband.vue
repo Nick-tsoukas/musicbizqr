@@ -69,7 +69,6 @@
             </h2>
           </div>
           <div class="p-4">
-            <!-- websitelink -->
             <div class="mdc-text-field">
               <input
                 type="text"
@@ -108,7 +107,6 @@
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
-          
           <div v-if="bandImgUrl" class="flex justify-center items-center max-h-[400px] p-4 rounded-lg">
             <img
               :src="bandImgUrl"
@@ -118,95 +116,15 @@
           </div>
           <input
             type="file"
-           
             id="band-img"
-            class="styled-file-input  "
+            class="styled-file-input"
             @change="handleImageUpload"
             accept="image/*"
           />
-          <label for="band-img" class="styled-file-label w-full text-center my-10  ">
+          <label for="band-img" class="styled-file-label w-full text-center my-10">
             Choose Band Image
           </label>
         </div>
-
-        <!-- Band Members Section -->
-        <!-- <div class="bg-white rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Band Members</h2>
-          </div>
-          <div class="p-4">
-            <div
-              v-for="(member, index) in members"
-              :key="index"
-              class="member-container"
-            >
-              <div class="mdc-text-field mb-4">
-                <input
-                  type="text"
-                  :id="'member-name-' + index"
-                  class="mdc-text-field__input"
-                  v-model="member.name"
-                  placeholder=" "
-                />
-                <label class="mdc-floating-label" :for="'member-name-' + index">
-                  Member Name
-                </label>
-                <div class="mdc-line-ripple"></div>
-              </div>
-              <div class="mdc-text-field mb-4">
-                <input
-                  type="text"
-                  :id="'instrument-' + index"
-                  class="mdc-text-field__input"
-                  v-model="member.instrument"
-                  placeholder=" "
-                />
-                <label class="mdc-floating-label" :for="'instrument-' + index">
-                  Instrument
-                </label>
-                <div class="mdc-line-ripple"></div>
-              </div>
-              <div class="mb-4">
-                <input
-                  type="file"
-                  :id="'member-img-' + index"
-                  class="styled-file-input"
-                  @change="(event) => handleMemberImageUpload(event, index)"
-                  accept="image/*"
-                />
-                <label
-                  :for="'member-img-' + index"
-                  class="styled-file-label w-full text-center"
-                >
-                  Choose Member Image
-                </label>
-              </div>
-              <div v-if="member.imageUrl" class="mb-4">
-                <img
-                  :src="member.imageUrl"
-                  alt="Member Image"
-                  class="w-full h-auto rounded-lg shadow-md"
-                />
-              </div>
-              <button
-                type="button"
-                class="mdc-button mb-4 w-full"
-                @click="removeMember(index)"
-              >
-                Remove Member
-              </button>
-            </div>
-            <button
-              type="button"
-              class="mdc-button mb-8 w-full"
-              @click="addMember"
-            >
-              + Add Member
-            </button>
-          </div>
-        </div> -->
 
         <!-- Social Media Links Section -->
         <div class="bg-[#fff] rounded-md">
@@ -217,93 +135,20 @@
               Social Media Links
             </h2>
           </div>
-          <div class="p-4">
-            <!-- Facebook -->
-            <div class="mdc-text-field mb-4">
+          <div class="p-4 grid grid-cols-2 gap-4">
+            <div v-for="net in Object.keys(social)" :key="net" class="mdc-text-field">
               <input
+                :id="net"
                 type="url"
-                id="facebook"
                 class="mdc-text-field__input"
-                v-model="facebook"
+                v-model="social[net]"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="facebook">Facebook</label>
+              <label class="mdc-floating-label" :for="net">{{
+                net.charAt(0).toUpperCase() + net.slice(1)
+              }}</label>
               <div class="mdc-line-ripple"></div>
             </div>
-            <!-- Instagram -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="instagram"
-                class="mdc-text-field__input"
-                v-model="instagram"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="instagram"
-                >Instagram</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Twitch -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="twitch"
-                class="mdc-text-field__input"
-                v-model="twitch"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="twitch">Twitch</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Twitter -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="twitter"
-                class="mdc-text-field__input"
-                v-model="twitter"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="twitter">Twitter</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- WhatsApp -->
-            <!-- <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="whatsapp"
-                class="mdc-text-field__input"
-                v-model="whatsapp"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="whatsapp">WhatsApp</label>
-              <div class="mdc-line-ripple"></div>
-            </div> -->
-            <!-- TikTok -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="tiktok"
-                class="mdc-text-field__input"
-                v-model="tiktok"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="tiktok">TikTok</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Snapchat -->
-            <!-- <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="snapchat"
-                class="mdc-text-field__input"
-                v-model="snapchat"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="snapchat">Snapchat</label>
-              <div class="mdc-line-ripple"></div>
-            </div> -->
           </div>
         </div>
 
@@ -312,101 +157,25 @@
           <div
             class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="font-semibold text-2xl text-white">Streaming Links</h2>
+            <h2 class="font-semibold text-white text-2xl">Streaming Links</h2>
           </div>
-          <div class="p-4">
-            <!-- Apple Music -->
-            <div class="mdc-text-field mb-4">
+          <div class="p-4 grid grid-cols-2 gap-4">
+            <div v-for="stream in Object.keys(streaming)" :key="stream" class="mdc-text-field">
               <input
+                :id="stream"
                 type="url"
-                id="appleMusic"
                 class="mdc-text-field__input"
-                v-model="appleMusic"
+                v-model="streaming[stream]"
                 placeholder=" "
               />
-              <label class="mdc-floating-label" for="appleMusic"
-                >Apple Music</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Spotify -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="spotify"
-                class="mdc-text-field__input"
-                v-model="spotify"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="spotify">Spotify</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- SoundCloud -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="soundcloud"
-                class="mdc-text-field__input"
-                v-model="soundcloud"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="soundcloud"
-                >SoundCloud</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- YouTube -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="youtube"
-                class="mdc-text-field__input"
-                v-model="youtube"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="youtube">YouTube</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- reverbnation -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="reverbnation"
-                class="mdc-text-field__input"
-                v-model="reverbnation"
-                placeholder="reverbnation "
-              />
-              <label class="mdc-floating-label" for="reverbnation">Reverbnation</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Deezer -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="deezer"
-                class="mdc-text-field__input"
-                v-model="deezer"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="deezer">Deezer</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-            <!-- Bandcamp -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="bandcamp"
-                class="mdc-text-field__input"
-                v-model="bandcamp"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="bandcamp">Bandcamp</label>
+              <label class="mdc-floating-label" :for="stream">
+                {{ stream.charAt(0).toUpperCase() + stream.slice(1) }}
+              </label>
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
         </div>
 
-        <!-- Single Song Section (Embed or Upload) -->
         <!-- Single Song Section (Embed or Upload) -->
         <div class="bg-[#fff] rounded-md">
           <div
@@ -415,9 +184,9 @@
             <h2 class="font-semibold text-white text-2xl">Single Song</h2>
           </div>
           <div class="p-4">
-            <!-- Toggle: Upload File vs. Embed Content -->
+            <!-- Toggle: Upload vs Embed -->
             <div class="flex space-x-4 mb-4">
-              <label class="text-black style-file-lable">
+              <label class="text-black">
                 <input
                   type="radio"
                   value="upload"
@@ -436,6 +205,8 @@
                 Embed Content
               </label>
             </div>
+
+            <!-- Song Title -->
             <div class="mdc-text-field mb-4">
               <input
                 type="text"
@@ -443,12 +214,15 @@
                 class="mdc-text-field__input"
                 v-model="singlesongTitle"
                 placeholder=" "
+                required
               />
               <label class="mdc-floating-label" for="singlesong-title"
                 >Song Title</label
               >
               <div class="mdc-line-ripple"></div>
             </div>
+
+            <!-- Upload Mode -->
             <div v-if="singlesongType === 'upload'">
               <input
                 type="file"
@@ -464,22 +238,39 @@
                 Choose Single Song File
               </label>
               <div v-if="singlesongFileName" class="mt-4 text-white">
-                <p>
-                  Selected Song: {{ singlesongTitle || singlesongFileName }}
-                </p>
+                Selected Song: {{ singlesongTitle || singlesongFileName }}
               </div>
             </div>
+
+            <!-- Embed Mode -->
             <div v-else>
               <div class="mdc-text-field mb-4">
-                <input
-                  type="url"
-                  id="singlesong-embed"
+                <select
+                  id="singlesong-platform"
+                  v-model="singlesongPlatform"
                   class="mdc-text-field__input"
-                  v-model="singlesongEmbedUrl"
+                  required
+                >
+                  <option disabled value="">Select Platform</option>
+                  <option value="spotify">Spotify</option>
+                  <option value="appleMusic">Apple Music</option>
+                </select>
+                <label class="mdc-floating-label" for="singlesong-platform"
+                  >Platform</label
+                >
+                <div class="mdc-line-ripple"></div>
+              </div>
+              <div class="mdc-text-field mb-4">
+                <input
+                  type="text"
+                  id="singlesong-trackid"
+                  class="mdc-text-field__input"
+                  v-model="singlesongTrackId"
                   placeholder=" "
+                  required
                 />
-                <label class="mdc-floating-label" for="singlesong-embed"
-                  >Embed URL</label
+                <label class="mdc-floating-label" for="singlesong-trackid"
+                  >Track ID</label
                 >
                 <div class="mdc-line-ripple"></div>
               </div>
@@ -487,431 +278,249 @@
           </div>
         </div>
 
+        <!-- Single Video Section -->
+         <!-- Featured Video -->
+<div class="bg-white rounded-md my-10">
+  <div
+    class="flex bg-black p-6 border-b-2
+           bg-gradient-to-r from-pink-500 to-violet-500"
+  >
+    <h2 class="text-white text-2xl font-semibold">
+      Featured Video
+    </h2>
+  </div>
+  <div class="p-4 space-y-4">
+    <!-- Video Title -->
+    <div class="mdc-text-field">
+      <input
+        id="singlevideo-title"
+        v-model="singlevideoTitle"
+        type="text"
+        class="mdc-text-field__input"
+        placeholder=" "
+        required
+      />
+      <label class="mdc-floating-label" for="singlevideo-title">
+        Video Title
+      </label>
+      <div class="mdc-line-ripple"></div>
+    </div>
+
+    <!-- YouTube ID -->
+    <div class="mdc-text-field">
+      <input
+        id="singlevideo-youtube"
+        v-model="singlevideoYoutubeUrl"
+        type="text"
+        class="mdc-text-field__input"
+        placeholder="e.g. dQw4w9WgXcQ"
+        required
+      />
+      <label class="mdc-floating-label" for="singlevideo-youtube">
+        YouTube ID
+      </label>
+      <div class="mdc-line-ripple"></div>
+    </div>
+  </div>
+</div>
+
+
         <!-- Submit Button -->
         <button type="submit" class="mdc-button w-full mt-10">
           Create Profile
         </button>
       </form>
-      <!-- <button class="text-white bg-red-500" @click="submitForm">test post function </button>
-      <button class="text-white bg-red-500" @click="logUser">log User </button> -->
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-const config = useRuntimeConfig()
+import { useRouter, useRoute } from "vue-router";
+import { useStrapiClient, useStrapiUser, useStrapiToken, useStrapi } from "#imports";
 
-const router = useRouter();
-const route = useRoute();
-const client = useStrapiClient();
-const { update } = useStrapi();
-const user = useStrapiUser();
-import { useStrapiToken } from '#imports'
+const config  = useRuntimeConfig();
+const router  = useRouter();
+const route   = useRoute();
+const client  = useStrapiClient();
+const user    = useStrapiUser();
+const token   = useStrapiToken();
 
 const loading = ref(false);
-const bandName = ref("");
-const genre = ref("");
-const bio = ref("");
-const bandImg = ref(null);
-const bandImgUrl = ref(null);
-const websitelink = ref("");
+
+// Band basics
+const bandName        = ref("");
+const genre           = ref("");
+const bio             = ref("");
+const bandImg         = ref(null);
+const bandImgUrl      = ref(null);
+const websitelink     = ref("");
 const websitelinktext = ref("");
-const bands = ref([]);
-
-
-// Band Members
-const members = ref([
-  { name: "", instrument: "", image: null, imageUrl: null },
-]);
-const addMember = () => {
-  members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
-};
-const removeMember = (index) => {
-  members.value.splice(index, 1);
-};
-const handleMemberImageUpload = (event, index) => {
-  const file = event.target.files[0];
-  members.value[index].image = file;
-  members.value[index].imageUrl = URL.createObjectURL(file);
-};
-
-// Social media
-const facebook = ref("");
-const instagram = ref("");
-const twitch = ref("");
-const twitter = ref("");
-const whatsapp = ref("");
-const tiktok = ref(""); // fixed spelling
-const snapchat = ref("");
-const reverbnation = ref("");
-
-
-// Streaming
-const appleMusic = ref("");
-const spotify = ref("");
-const soundcloud = ref("");
-const deezer = ref(""); // fixed spelling
-const youtube = ref("");
-const bandcamp = ref("");
-
-// Single Song
-const singlesongType = ref("upload"); // "upload" or "embed"
-const singlesongTitle = ref("");
-const singlesongFile = ref(null);
-const singlesongFileName = ref("");
-const singlesongEmbedUrl = ref("");
-
-// Single Video
-const singlevideoYoutubeUrl = ref("");
-
-// Handle band cover image
-const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  bandImg.value = file;
-  bandImgUrl.value = URL.createObjectURL(file);
-};
-
-// Handle single song file upload
-const handleSingleSongUpload = (event) => {
-  const file = event.target.files[0];
-  singlesongFile.value = file;
-  singlesongFileName.value = singlesongTitle.value || file.name;
-};
-
-// test post 
 
 
 
-
-
-const logUser = () => {
-  console.log(user, ' user is here ')
+// Members
+const members = ref([{ name: "", instrument: "", image: null, imageUrl: null }]);
+function addMember() { members.value.push({ name:"", instrument:"", image:null, imageUrl:null }); }
+function removeMember(idx) { members.value.splice(idx,1); }
+function handleMemberImageUpload(e, idx) {
+  const f = e.target.files[0];
+  members.value[idx].image    = f;
+  members.value[idx].imageUrl = URL.createObjectURL(f);
 }
-// Submit form
-const submitForm = async () => {
+
+// Social + Streaming
+const social = ref({
+  facebook: "", instagram: "", twitch: "",
+  twitter: "", whatsapp: "", tiktok: "",
+  snapchat:"", reverbnation:""
+});
+const streaming = ref({
+  appleMusic:"", spotify:"", soundcloud:"",
+  youtube:"", deezer:"", bandcamp:""
+});
+
+// Featured song/video
+const singlesongType     = ref("upload");
+const singlesongTitle    = ref("");
+const singlesongPlatform = ref("");
+const singlesongTrackId  = ref("");
+const singlesongFile     = ref(null);
+const singlesongFileName = ref("");
+const singlevideoYoutubeUrl = ref("");
+const singlevideoTitle      = ref("");
+
+
+function handleImageUpload(e){
+  bandImg.value = e.target.files[0];
+  bandImgUrl.value = URL.createObjectURL(bandImg.value);
+}
+function handleSingleSongUpload(e){
+  const f = e.target.files[0];
+  singlesongFile.value = f;
+  singlesongFileName.value = singlesongTitle.value||f.name;
+}
+
+// Fetch existing bands for user (optional)
+onMounted(async ()=>{
+  try{
+    const r = await client("/bands", {
+      params:{
+        filters:{ users_permissions_user:{ id:user.value.id }},
+        populate:["users_permissions_user"]
+      }
+    });
+  }catch(e){ console.error(e) }
+});
+
+async function submitForm() {
   loading.value = true;
   try {
-    // 1) Build the payload object
+    // 1) Build plain‐JS payload
     const payload = {
       name: bandName.value,
       genre: genre.value,
       bio: bio.value,
-      facebook: facebook.value || null,
-      instagram: instagram.value || null,
-      twitch: twitch.value || null,
-      twitter: twitter.value || null,
-      // whatsapp: whatsapp.value || null,
-      tiktok: tiktok.value || null,
-      // snapchat: snapchat.value || null,
-      reverbnation: reverbnation.value || null,
-
-      appleMusic: appleMusic.value || null,
-      spotify: spotify.value || null,
-      soundcloud: soundcloud.value || null,
-      deezer: deezer.value || null,
-      youtube: youtube.value || null,
-      bandcamp: bandcamp.value || null,
       websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
+
+      // members
       members: members.value.map(m => ({
-        name: m.name || '',
-        instrument: m.instrument || '',
+        name: m.name,
+        instrument: m.instrument
       })),
+
+      // social
+      ...social.value,
+
+      // streaming
+      ...streaming.value,
+
+      // featured song
       singlesong: {
-        title: singlesongTitle.value || '',
-        ...(singlesongType.value === 'embed' && { embedUrl: singlesongEmbedUrl.value }),
+        title: singlesongTitle.value,
+        isEmbed: singlesongType.value === 'embed',
+        platform: singlesongType.value === 'embed'
+          ? singlesongPlatform.value
+          : null,
+        trackId: singlesongType.value === 'embed'
+          ? singlesongTrackId.value
+          : null
       },
+
+      // featured video
       singlevideo: {
-        youtubeid: singlevideoYoutubeUrl.value || '',
-      },
+        youtubeid: singlevideoYoutubeUrl.value || '', title: singlevideoTitle.value,
+      }
     };
 
-    // 2) Wrap in FormData for media uploads
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(payload));
+    // 2) Wrap in FormData...
+    const fd = new FormData();
+    fd.append('data', JSON.stringify(payload));
     if (bandImg.value) {
-      formData.append('files.bandImg', bandImg.value);
+      fd.append('files.bandImg', bandImg.value);
     }
-    members.value.forEach((m, idx) => {
+    members.value.forEach((m, i) => {
       if (m.image) {
-        formData.append(`files.members.${idx}.image`, m.image);
+        fd.append(`files.members.${i}.image`, m.image);
       }
     });
     if (singlesongType.value === 'upload' && singlesongFile.value) {
-      formData.append('files.singlesong.song', singlesongFile.value);
+      fd.append('files.singlesong.song', singlesongFile.value);
     }
 
-    // 3) POST to Strapi
-    const endpoint = `${config.public.strapiUrl}/api/bands`;
-    const res = await fetch(endpoint, {
+    // 3) POST...
+    const res = await fetch(`${config.public.strapiUrl}/api/bands`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${useStrapiToken().value}`,
-      },
-      body: formData,
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: fd
     });
+    const json = await res.json();
+    if (!res.ok) throw json;
 
-    const result = await res.json();
-    if (!res.ok) {
-      throw result;
-    }
-
-    // 4) Pull the newly-created slug and navigate
-    const newSlug = result.data?.attributes?.slug;
-    if (newSlug) {
-      // this will hit your root [[slug]].vue page
-      await navigateTo({ name: 'slug', params: { slug: newSlug } })
-    } else {
-      console.warn('Created band has no slug, falling back home');
-      await router.push('/dashboard');
-    }
+    // 4) Redirect
+    const slug = json.data?.attributes?.slug;
+    await router.push(slug ? { name: 'slug', params: { slug } } : '/dashboard');
   } catch (err) {
-    console.error('Failed to create band:', err);
+    console.error('❌ createBand error:', err);
+    alert(err.error?.message || 'Creation failed');
   } finally {
     loading.value = false;
   }
-};
-
-
-
-
-const normalizeStreamingUrl = (url) => {
-  if (!url) return null;
-
-  // Spotify URL check
-  if (url.includes("spotify.com")) {
-    const match = url.match(/(?:spotify\.com\/(track|album|playlist)\/)([^?]+)/);
-    if (match) {
-      const [_, type, id] = match;
-      return `https://open.spotify.com/embed/${type}/${id}`;
-    }
-  }
-
-  // Apple Music URL check
-  if (url.includes("music.apple.com")) {
-    const match = url.match(/(?:music\.apple\.com\/[a-z]{2}\/album\/)([^?]+)/);
-    if (match) {
-      const id = match[1];
-      return `https://embed.music.apple.com/us/album/${id}`;
-    }
-  }
-
-  // YouTube URL check
-  if (url.includes("youtube.com")) {
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/))([^&?]+)/);
-    if (match) {
-      const videoId = match[1];
-      return `https://www.youtube.com/embed/${videoId}`;
-    }
-  }
-
-  // SoundCloud URL check
-  if (url.includes("soundcloud.com")) {
-    const match = url.match(/(?:soundcloud\.com\/)([^?\/]+\/[^?\/]+)/);
-    if (match) {
-      const trackPath = match[1];
-      return `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${trackPath}`;
-    }
-  }
-
-  // Deezer URL check
-  if (url.includes("deezer.com")) {
-    const match = url.match(/(?:deezer\.com\/[^?]+\/track\/)(\d+)/);
-    if (match) {
-      const trackId = match[1];
-      return `https://www.deezer.com/widgets/player?trackid=${trackId}`;
-    }
-  }
-
-  // Return null if the URL is invalid or unsupported
-  return null;
-};
-
-// Fetch bands associated with the user
-onMounted(async () => {
-  try {
-    const response = await client("/bands", {
-      params: {
-        filters: {
-          users_permissions_user: {
-            id: user.value.id,
-          },
-        },
-        populate: ["users_permissions_user"],
-      },
-    });
-    bands.value = response.data;
-  } catch (error) {
-    console.error("Error fetching bands associated with the user:", error);
-  }
-});
+}
 </script>
 
 <style scoped>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@tailwind base; @tailwind components; @tailwind utilities;
 
-.btn {
-  @apply bg-neon-green hover:bg-neon-purple text-black font-bold py-2 px-4 rounded shadow-lg;
-}
-
-.container-mdc {
-  margin: 1rem auto;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-}
-
-.mdc-text-field {
-  position: relative;
-  margin-bottom: 1.5rem;
-  display: inline-block;
-  width: 100%;
-}
-
-.mdc-text-field__input::placeholder {
-  color: transparent;
-}
-
-.mdc-text-field__input:focus::placeholder {
-  color: #aaa;
-}
-
-.mdc-text-field__input {
-  font-size: 1rem;
-  line-height: 1.5;
-  padding: 0.75rem 0.5rem;
-  border: 1px solid #000;
-  border-radius: 10px;
-  outline: none;
-  width: 100%;
-}
-
-.mdc-floating-label {
-  position: absolute;
-  z-index: 99999;
-  top: 0.75rem;
-  left: 0.5rem;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  font-size: 1rem;
-  background: white;
-  line-height: 1;
-  color: #aaa;
-  pointer-events: none;
-  transition: transform 0.2s, color 0.2s;
-}
-
+.container-mdc { margin:1rem auto; padding:1rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+.title { font-size:1.5rem; font-weight:bold; margin-bottom:1.5rem; }
+.mdc-text-field { position:relative; margin-bottom:1rem; width:100%; }
+.mdc-text-field__input { width:100%; padding:.75rem .5rem; border:1px solid #000; border-radius:10px; outline:none; }
+.mdc-floating-label { position:absolute; top:.75rem; left:.5rem; background:#fff; padding:0 .2em; transition:transform .2s,color .2s; }
 .mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
-  transform: translateY(-1.5rem);
-  color: #6200ee;
-}
+.mdc-text-field__input:not(:placeholder-shown)+.mdc-floating-label { transform:translateY(-1.5rem); color:#6200ee; }
+.mdc-line-ripple { position:absolute; bottom:0; left:0; right:0; height:2px; background:#6200ee; transform:scaleX(0); transition:transform .2s; }
+.mdc-text-field__input:focus ~ .mdc-line-ripple { transform:scaleX(1); }
 
-.mdc-line-ripple {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #6200ee;
-  transform: scaleX(0);
-  transition: transform 0.2s;
+.mdc-button, .styled-file-label {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.75rem 1.5rem; font-size:.875rem; font-weight:500;
+  text-transform:uppercase; border-radius:4px; cursor:pointer;
+  transition:background-color .2s;
 }
+.mdc-button { background:#2c2c2c; color:#fff; border:none; margin-top:1rem; }
+.mdc-button:hover { background:#3700b3; }
+.styled-file-input { display:none; }
+.styled-file-label { background:#7c3aed; color:#fff; }
+.styled-file-label:hover { background:#3700b3; }
 
-.mdc-text-field__input:focus ~ .mdc-line-ripple {
-  transform: scaleX(1);
-}
-
-.mdc-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #2c2c2c;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.mdc-button:hover {
-  background-color: #3700b3;
-}
-
-.mdc-button:focus {
-  outline: none;
-}
-
-.styled-file-input {
-  display: none;
-}
-
-.styled-file-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #7c3aed;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.styled-file-label:hover {
-  background-color: #3700b3;
-}
-
-.member-container {
-  margin: 0;
-}
-
-.mdc-text-field.mb-4 {
-  margin-bottom: 1rem;
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
+.loading-container { display:flex; justify-content:center; align-items:center; height:100%; }
 .spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #6200ee;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-  margin-top: 2rem;
+  border:8px solid #f3f3f3; border-top:8px solid #6200ee;
+  border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite;
+  margin-top:2rem;
 }
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+@keyframes spin { to{ transform:rotate(360deg); } }
 </style>

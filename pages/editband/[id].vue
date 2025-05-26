@@ -243,7 +243,9 @@
           >
             <h2 class="font-semibold text-white text-2xl">Featured Song</h2>
           </div>
+
           <div class="p-4">
+            <!-- Upload vs. Embed toggle -->
             <div class="flex space-x-4 mb-4">
               <label class="text-black">
                 <input
@@ -264,6 +266,8 @@
                 Use Embed
               </label>
             </div>
+
+            <!-- Title always -->
             <div class="mdc-text-field mb-4">
               <input
                 type="text"
@@ -277,6 +281,8 @@
               >
               <div class="mdc-line-ripple"></div>
             </div>
+
+            <!-- Upload mode -->
             <div v-if="singlesongType === 'upload'">
               <input
                 type="file"
@@ -292,25 +298,57 @@
               >
               <button
                 type="button"
-                v-if="singlesongTitle || singlesongEmbedUrl || singlesongFileId"
+                v-if="singlesongFileId"
                 @click="deleteSong"
                 class="mdc-button mdc-button--danger mt-4 w-full"
               >
                 Delete Song
               </button>
             </div>
-            <div v-else class="mdc-text-field mb-4">
-              <input
-                type="url"
-                id="singlesong-embed"
-                class="mdc-text-field__input"
-                v-model="singlesongEmbedUrl"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="singlesong-embed"
-                >Embed URL</label
+
+            <!-- Embed mode -->
+            <div v-else class="space-y-4">
+              <!-- Platform selector -->
+              <div class="mdc-text-field w-full">
+                <select
+                  id="singlesong-platform"
+                  class="mdc-text-field__input"
+                  v-model="singlesongPlatform"
+                >
+                  <option disabled value="">Select Platform</option>
+                  <option value="spotify">Spotify</option>
+                  <option value="appleMusic">Apple Music</option>
+                </select>
+                <label class="mdc-floating-label" for="singlesong-platform"
+                  >Platform</label
+                >
+                <div class="mdc-line-ripple"></div>
+              </div>
+
+              <!-- Track ID input -->
+              <div class="mdc-text-field">
+                <input
+                  type="text"
+                  id="singlesong-trackid"
+                  class="mdc-text-field__input"
+                  v-model="singlesongTrackId"
+                  placeholder="e.g. 6ILpnOUHollfHp4xWH7nqV"
+                />
+                <label class="mdc-floating-label" for="singlesong-trackid"
+                  >Track ID</label
+                >
+                <div class="mdc-line-ripple"></div>
+              </div>
+
+              <!-- Delete button -->
+              <button
+                type="button"
+                v-if="singlesongTrackId"
+                @click="deleteSong"
+                class="mdc-button mdc-button--danger w-full"
               >
-              <div class="mdc-line-ripple"></div>
+                Delete Embed
+              </button>
             </div>
           </div>
         </div>
@@ -322,7 +360,23 @@
           >
             <h2 class="font-semibold text-white text-2xl">Featured Video</h2>
           </div>
+
           <div class="p-4">
+            <div class="mdc-text-field mb-4">
+              <input
+                id="singlevideo-title"
+                v-model="singlevideoTitle"
+                type="text"
+                class="mdc-text-field__input"
+                placeholder=" "
+                required
+              />
+              <label class="mdc-floating-label" for="singlevideo-title">
+                Video Title
+              </label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+
             <div class="mdc-text-field mb-4">
               <input
                 type="url"
@@ -358,7 +412,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
+
+const singlevideoTitle = ref("");
 
 const config = useRuntimeConfig();
 const router = useRouter();
@@ -406,13 +461,14 @@ const streaming = ref({
   youtube: "",
   deezer: "",
   bandcamp: "",
-  reverbnation: "" 
+  reverbnation: "",
 });
 
 // Featured song/video
-const singlesongType = ref("upload");
+const singlesongType = ref("upload"); // 'upload' or 'embed'
 const singlesongTitle = ref("");
-const singlesongEmbedUrl = ref("");
+const singlesongPlatform = ref(""); // new
+const singlesongTrackId = ref(""); // new
 const singlesongFile = ref(null);
 const singlesongFileId = ref(null); // preserve existing file relation
 
@@ -423,7 +479,8 @@ function deleteSong() {
   if (!confirm("Remove the featured song from this form?")) return;
   removeSong.value = true;
   singlesongTitle.value = "";
-  singlesongEmbedUrl.value = "";
+  singlesongPlatform.value = "";
+  singlesongTrackId.value = "";
   singlesongFile.value = null;
   singlesongFileId.value = null;
 }
@@ -468,22 +525,25 @@ async function fetchBand() {
       imageUrl: m.attributes.image?.data?.attributes?.url || null,
     }));
 
-    // Social
-    Object.keys(social.value).forEach((k) => {
-      social.value[k] = attrs[k] || "";
-    });
-
-    // Streaming
-    Object.keys(streaming.value).forEach((k) => {
-      streaming.value[k] = attrs[k] || "";
-    });
+    // Social & Streaming
+    Object.keys(social.value).forEach(
+      (k) => (social.value[k] = attrs[k] || "")
+    );
+    Object.keys(streaming.value).forEach(
+      (k) => (streaming.value[k] = attrs[k] || "")
+    );
 
     // Singlesong component + existing file
     if (attrs.singlesong) {
       const ss = attrs.singlesong;
       singlesongTitle.value = ss.title || "";
-      singlesongEmbedUrl.value = ss.embedUrl || "";
-      singlesongType.value = ss.embedUrl ? "embed" : "upload";
+      if (ss.isEmbed) {
+        singlesongType.value = "embed";
+        singlesongPlatform.value = ss.platform || "";
+        singlesongTrackId.value = ss.trackId || "";
+      } else {
+        singlesongType.value = "upload";
+      }
       const songData = ss.song?.data;
       singlesongFileId.value = songData?.id || null;
     }
@@ -491,6 +551,7 @@ async function fetchBand() {
     // Singlevideo component
     if (attrs.singlevideo) {
       singlevideoYoutubeUrl.value = attrs.singlevideo.youtubeid || "";
+      singlevideoTitle.value = attrs.singlevideo?.title || "";
     }
   } catch (err) {
     console.error("❌ fetchBand failed:", err);
@@ -555,10 +616,11 @@ async function submitForm() {
       ? null
       : {
           title: singlesongTitle.value,
-          embedUrl:
-            singlesongType.value === "embed"
-              ? singlesongEmbedUrl.value
-              : "",
+          isEmbed: singlesongType.value === "embed",
+          platform:
+            singlesongType.value === "embed" ? singlesongPlatform.value : null,
+          trackId:
+            singlesongType.value === "embed" ? singlesongTrackId.value : null,
           ...(newSongId
             ? { song: newSongId }
             : singlesongFileId.value && { song: singlesongFileId.value }),
@@ -566,7 +628,10 @@ async function submitForm() {
 
     const singlevideoPayload = removeVideo.value
       ? null
-      : { youtubeid: singlevideoYoutubeUrl.value || "" };
+      : {
+          youtubeid: singlevideoYoutubeUrl.value || "",
+          title: singlevideoTitle.value,
+        };
 
     const payload = {
       name: bandName.value,
@@ -609,8 +674,6 @@ async function submitForm() {
   }
 }
 </script>
-
-
 
 <style scoped>
 @tailwind base;
