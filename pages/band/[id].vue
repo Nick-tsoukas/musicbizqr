@@ -159,22 +159,88 @@ const playVideo = () => { isVideoPlaying.value = true; };
 const { find } = useStrapi();
 const route = useRoute();
 
-const fetchBandData = async () => {
-  const apiUrl = useRuntimeConfig().public.strapiUrl;
-  const res = await fetch(
-    `${apiUrl}/api/bands/${route.params.id}` +
-      '?populate[singlesong][populate]=song,cover' +
-      '&populate[singlevideo]=*' +
-      '&populate=bandImg'
-  );
-  const json = await res.json();
-  band.value = json;
-};
+// const fetchBandData = async () => {
+//   const apiUrl = useRuntimeConfig().public.strapiUrl;
+//   const res = await fetch(
+//     `${apiUrl}/api/bands/${route.params.id}` +
+//       '?populate[singlesong][populate]=song,cover' +
+//       '&populate[singlevideo]=*' +
+//       '&populate=bandImg'
+//   );
+//   const json = await res.json();
+//   band.value = json;
+// };
+/**
+ * Fetch the band either by a hyphenated slug (“the-danny-nova-band”)
+ * or by a hyphenless slug (“thedannynovaband”).
+ */
+ const fetchBandData = async () => {
+  const apiUrl = useRuntimeConfig().public.strapiUrl
+  let incomingSlug = (route.params.id as string).trim()
+  let actualSlug = incomingSlug
+
+  // If there are no hyphens, attempt to find the real slug from Strapi’s list
+  if (!incomingSlug.includes('-')) {
+    try {
+      // Fetch only the `slug` field for all bands
+      const slugsRes = await fetch(
+        `${apiUrl}/api/bands?fields[0]=slug`
+      )
+      const slugsJson = await slugsRes.json()
+      // slugsJson.data is an array of { id, attributes: { slug } }
+      const list = slugsJson.data as Array<{
+        attributes: { slug: string }
+      }>
+
+      // Find one whose slug, with hyphens stripped, matches incomingSlug
+      const match = list.find(b => {
+        const hyphenless = b.attributes.slug.replace(/-/g, '')
+        return hyphenless.toLowerCase() === incomingSlug.toLowerCase()
+      })
+
+      if (match) {
+        actualSlug = match.attributes.slug
+      } else {
+        // No matching slug found → bail out
+        band.value = null
+        return
+      }
+    } catch (err) {
+      console.error('Error fetching band slugs:', err)
+      band.value = null
+      return
+    }
+  }
+
+  // Now fetch the band by the resolved hyphenated slug
+  try {
+    const res = await fetch(
+      `${apiUrl}/api/bands/slug/${encodeURIComponent(actualSlug)}` +
+        '?populate[bandImg]=*' +
+        '&populate[events]=*' +
+        '&populate[tours]=*' +
+        '&populate[albums]=*' +
+        '&populate[singlesong][populate]=song,cover' +
+        '&populate[singlevideo]=*'
+    )
+    if (res.status === 404) {
+      // Band not found under that slug
+      band.value = null
+      return
+    }
+    const json = await res.json()
+    band.value = json
+  } catch (err) {
+    console.error('Error fetching band by slug:', err)
+    band.value = null
+  }
+}
 
 onMounted(async () => {
-  document.body.classList.add('custom-page-body');
-  await fetchBandData();
-});
+  document.body.classList.add('custom-page-body')
+  await fetchBandData()
+})
+
 
 onBeforeUnmount(() => {
   document.body.classList.remove('custom-page-body');
