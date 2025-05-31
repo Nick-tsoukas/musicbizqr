@@ -1,403 +1,385 @@
 <template>
-  <div class="bg-black text-white min-h-screen mx-auto p-4 max-w-5xl">
-    <h1 class="text-2xl font-bold mb-4">Analytics Dashboard</h1>
+  <div class="px-6 py-8 bg-black min-h-screen">
+    <h2 class="text-2xl font-bold mb-6 text-white">
+      Analytics Dashboard
+    </h2>
 
-    <!-- 1) Tab Bar -->
-    <div class="flex space-x-4 border-b border-gray-700 mb-6">
+    <!-- Tabs: Link Clicks / Songs / Videos -->
+    <div class="flex space-x-4 mb-6">
       <button
-        @click="view = 'links'"
-        :class="{ 'border-b-2 border-white': view === 'links' }"
-        class="px-4 py-2"
-      >Links</button>
-      <button
-        @click="view = 'songs'"
-        :class="{ 'border-b-2 border-white': view === 'songs' }"
-        class="px-4 py-2"
-      >Songs</button>
-      <button
-        @click="view = 'videos'"
-        :class="{ 'border-b-2 border-white': view === 'videos' }"
-        class="px-4 py-2"
-      >Videos</button>
+        v-for="tab in tabs"
+        :key="tab"
+        @click="selectedTab = tab"
+        :class="[
+          'px-4 py-2 font-medium rounded',
+          selectedTab === tab
+            ? 'bg-purple-600 text-white'
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+        ]"
+      >
+        {{ tab }}
+      </button>
     </div>
 
-    <!-- 1.5) Time Range Selector -->
-    <div class="flex items-center space-x-4 mb-6">
-      <label class="font-medium">Range:</label>
-      <select v-model="selectedRange" class="bg-gray-800 px-2 py-1 rounded">
-        <option v-for="r in ranges" :key="r.key" :value="r.key">
-          {{ r.label }}
-        </option>
-      </select>
+    <!-- Range Selector: 7 days / 30 days / 90 days / 1 year -->
+    <div class="flex space-x-2 mb-8">
+      <button
+        v-for="(label, days) in rangeOptions"
+        :key="days"
+        @click="selectedRange = Number(days)"
+        :class="[
+          'px-3 py-1 text-sm rounded',
+          selectedRange === Number(days)
+            ? 'bg-purple-500 text-white'
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+        ]"
+      >
+        {{ label }}
+      </button>
     </div>
 
-    <!-- 2) Filters for Songs/Videos -->
-    <div v-if="view !== 'links'" class="flex items-center space-x-4 mb-8">
-      <label>Media:</label>
-      <select v-model="selectedMedia" class="bg-gray-800 px-2 py-1 rounded">
-        <option value="all">All</option>
-        <option v-for="m in mediaList" :key="m.id" :value="m.id">
-          {{ m.title }}
-        </option>
-      </select>
-
-      <label>Group by:</label>
-      <button
-        @click="groupBy = 'daily'"
-        :class="btnClass('daily')"
-        class="px-2 py-1 rounded"
-      >Daily</button>
-      <button
-        @click="groupBy = 'weekly'"
-        :class="btnClass('weekly')"
-        class="px-2 py-1 rounded"
-      >Weekly</button>
-      <button
-        @click="groupBy = 'monthly'"
-        :class="btnClass('monthly')"
-        class="px-2 py-1 rounded"
-      >Monthly</button>
-      <button
-        @click="groupBy = 'yearly'"
-        :class="btnClass('yearly')"
-        class="px-2 py-1 rounded"
-      >Yearly</button>
+    <!-- Chart Container -->
+    <div v-if="isLoading" class="text-white">
+      🔄 Loading data… (check console for details)
     </div>
 
-    <!-- 3) Chart Canvases -->
-    <div v-if="view === 'links'">
-      <section class="mb-12">
-        <h2 class="text-xl mb-2">Clicks by Platform (Bar)</h2>
-        <canvas id="barChart"></canvas>
-      </section>
-      <section class="mb-12">
-        <h2 class="text-xl mb-2">Clicks Over Time (Line)</h2>
-        <canvas id="lineChart"></canvas>
-      </section>
-      <section>
-        <h2 class="text-xl mb-2">Clicks Distribution (Pie)</h2>
-        <canvas id="pieChart"></canvas>
-      </section>
-    </div>
-
-    <div v-else>
-      <section class="mb-12">
-        <h2 class="text-xl mb-2">
-          {{ view === 'songs' ? 'Song' : 'Video' }} Plays Over Time (Line)
-        </h2>
-        <canvas id="mediaLineChart"></canvas>
-      </section>
-      <section class="mb-12">
-        <h2 class="text-xl mb-2">
-          {{ view === 'songs' ? 'Song' : 'Video' }} Play Counts (Bar)
-        </h2>
-        <canvas id="mediaBarChart"></canvas>
-      </section>
-      <section>
-        <h2 class="text-xl mb-2">
-          {{ view === 'songs' ? 'Song' : 'Video' }} Distribution (Pie)
-        </h2>
-        <canvas id="mediaPieChart"></canvas>
-      </section>
+    <div v-else class="bg-gray-900 rounded-lg p-4 shadow-lg">
+      <canvas ref="chartCanvas" class="w-full h-64"></canvas>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted, watch, computed, nextTick } from 'vue'
-import { useRoute, useRuntimeConfig } from '#imports'
-import dayjs from 'dayjs'
-import isoWeek from 'dayjs/plugin/isoWeek'
-dayjs.extend(isoWeek)
+<script setup lang="ts">
+import { ref, watch, onMounted, nextTick } from 'vue'
+import { useRoute } from '#imports'
+import { useStrapiClient } from '#imports'
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
+import {
+  parseISO,
+  format,
+  subDays
+} from 'date-fns'
 
-// --- TYPES ---
-type View = 'links' | 'songs' | 'videos'
-type GroupBy = 'daily' | 'weekly' | 'monthly' | 'yearly'
-type RangeKey = 'd1' | 'd7' | 'd30' | 'm3' | 'm6' | 'y1' | 'all'
+// 1) Register Chart.js components:
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
 
-// --- ROUTE & CONFIG ---
+const client = useStrapiClient()
 const route = useRoute()
-const config = useRuntimeConfig()
-const bandId = route.params.id as string
 
-// --- RANGES ---
-const ranges = [
-  { label: '24h', key: 'd1',  amount: 1, unit: 'day' },
-  { label: '7d',  key: 'd7',  amount: 7, unit: 'day' },
-  { label: '30d', key: 'd30', amount: 30, unit: 'day' },
-  { label: '3mo', key: 'm3',  amount: 3, unit: 'month' },
-  { label: '6mo', key: 'm6',  amount: 6, unit: 'month' },
-  { label: '1y',  key: 'y1',  amount: 1, unit: 'year' },
-  { label: 'All', key: 'all', amount: 0, unit: 'day' },
-] as const
+/** Tabs to switch between datasets */
+const tabs = ['Link Clicks', 'Songs', 'Videos']
+const selectedTab = ref<string>(tabs[0])
 
-const selectedRange = ref<RangeKey>('all')
-const startDate = computed(() => {
-  const spec = ranges.find(r => r.key === selectedRange.value)!
-  return spec.key === 'all'
-    ? null
-    : dayjs().subtract(spec.amount, spec.unit as any)
-})
-
-// --- STATE ---
-const view = ref<View>('links')
-const groupBy = ref<GroupBy>('daily')
-const selectedMedia = ref<'all' | number>('all')
-const mediaList = ref<{ id: number; title: string }[]>([])
-const linkClicks = ref<{ timestamp: string; clickCount: number; platform: string }[]>([])
-const mediaPlays = ref<{ id: number; title: string; timestamp: string; clickCount: number }[]>([])
-
-// Chart.js reference - client-only import
-let ChartRef: any = null
-
-// Map your groupBy into valid time units for the X-axis
-const unitMap: Record<GroupBy, string> = {
-  daily:   'hour',
-  weekly:  'week',
-  monthly: 'month',
-  yearly:  'year'
+/** Time‐range options in days */
+const rangeOptions: Record<number, string> = {
+  7: 'Last 7 Days',
+  30: 'Last 30 Days',
+  90: 'Last 90 Days',
+  365: 'Last 1 Year'
 }
+const selectedRange = ref<number>(7) // default to 7 days
 
-// --- FETCH FUNCTIONS ---
-async function fetchLinkClicks() {
-  const url = `${config.public.strapiUrl}/api/link-clicks/band/${bandId}`
-  try {
-    const res = await fetch(url)
-    if (!res.ok) {
-      console.error('fetchLinkClicks failed:', res.status, await res.text())
-      linkClicks.value = []
-      return
-    }
-    const json = await res.json()
-    const items: any[] = Array.isArray(json)
-      ? json
-      : Array.isArray(json.data)
-      ? json.data
-      : []
-    linkClicks.value = items.map(item => ({
-      timestamp:  item.timestamp   ?? item.attributes?.createdAt   ?? '',
-      clickCount: item.clickCount  ?? item.attributes?.clickCount  ?? item.count ?? 0,
-      platform:   item.platform    ?? item.attributes?.platform    ?? 'Unknown'
-    }))
-  } catch (err) {
-    console.error('fetchLinkClicks error:', err)
-    linkClicks.value = []
-  }
-}
+/** Loading indicator */
+const isLoading = ref<boolean>(true)
 
-async function fetchMediaList() {
-  try {
-    const songUrl  = `${config.public.strapiUrl}/api/media-plays?filters[band]=${bandId}&filters[mediaType]=song&pagination[pageSize]=1000`
-    const videoUrl = `${config.public.strapiUrl}/api/media-plays?filters[band]=${bandId}&filters[mediaType]=video&pagination[pageSize]=1000`
-    const [sRes, vRes] = await Promise.all([fetch(songUrl), fetch(videoUrl)])
-    if (!sRes.ok || !vRes.ok) throw new Error(`Songs ${sRes.status}, Videos ${vRes.status}`)
-    const [{ data: sData }, { data: vData }] = await Promise.all([sRes.json(), vRes.json()])
-    // dedupe by title
-    const combined = [
-      ...sData.map((m: any) => ({ id: m.id, title: m.attributes?.title ?? m.title })),
-      ...vData.map((m: any) => ({ id: m.id, title: m.attributes?.title ?? m.title }))
-    ]
-    const seen = new Set<string>()
-    mediaList.value = combined.filter(item => {
-      if (seen.has(item.title)) return false
-      seen.add(item.title)
-      return true
-    })
-  } catch (err) {
-    console.error('fetchMediaList failed:', err)
-    mediaList.value = []
-  }
-}
+/** Raw fetched data from Strapi */
+const rawLinkClicks = ref<any[]>([])
+const rawMediaPlays = ref<any[]>([])
 
-async function fetchMediaPlays() {
-  try {
-    const type  = view.value === 'songs' ? 'song' : 'video'
-    const extra = selectedMedia.value === 'all' ? '' : `&filters[id]=${selectedMedia.value}`
-    const url   = `${config.public.strapiUrl}/api/media-plays?filters[band]=${bandId}&filters[mediaType]=${type}${extra}&pagination[pageSize]=1000`
-    const res   = await fetch(url)
-    if (!res.ok) throw new Error(`Status ${res.status}`)
-    const { data } = await res.json()
-    mediaPlays.value = Array.isArray(data)
-      ? data.map((m: any) => ({
-          id:         m.id,
-          title:      m.attributes?.title   ?? m.title,
-          timestamp:  m.attributes?.timestamp ?? m.timestamp,
-          clickCount: 1
-        }))
-      : []
-  } catch (err) {
-    console.error('fetchMediaPlays failed:', err)
-    mediaPlays.value = []
-  }
-}
+/** Reference to the <canvas> element */
+const chartCanvas = ref<HTMLCanvasElement | null>(null)
+let chartInstance: Chart | null = null
 
-// --- HELPERS ---
-function filterByRange(arr: any[]) {
-  if (!startDate.value) return arr
-  return arr.filter(evt => dayjs(evt.timestamp).isAfter(startDate.value!))
-}
-
-function aggregateByPeriod(arr: any[], keyFn: (d: dayjs.Dayjs) => string) {
-  const map: Record<string, number> = {}
-  arr.forEach(evt => {
-    const dt = dayjs(evt.timestamp)
-    if (!dt.isValid()) return
-    const key = keyFn(dt)
-    map[key] = (map[key] || 0) + evt.clickCount
+/** Utility: build an array of date‐strings (yyyy-MM-dd) for the last N days */
+function getLastNDates(n: number): string[] {
+  const today = new Date()
+  return Array.from({ length: n }, (_, i) => {
+    const d = subDays(today, n - 1 - i)
+    return format(d, 'yyyy-MM-dd')
   })
-  const keys = Object.keys(map).sort()
-  return { labels: keys, data: keys.map(k => map[k]) }
 }
 
-// --- COMPUTED FOR LINKS: MULTI-SERIES LINE ---
-const timeSeriesByPlatform = computed(() => {
-  const arr = filterByRange(linkClicks.value)
-  const bucket = (dt: dayjs.Dayjs) => {
-    if (groupBy.value === 'daily')   return dt.format('YYYY-MM-DD HH:mm')
-    if (groupBy.value === 'weekly')  return dt.isoWeekYear() + '-W' + String(dt.isoWeek()).padStart(2,'0')
-    if (groupBy.value === 'monthly') return dt.format('YYYY-MM')
-    return dt.format('YYYY')
-  }
-  const allKeys = Array.from(new Set(arr.map(e => bucket(dayjs(e.timestamp))))).sort()
-  const platforms = Array.from(new Set(arr.map(e => e.platform)))
-  const datasets = platforms.map(platform => {
-    const counts: Record<string, number> = {}
-    arr.filter(e => e.platform === platform).forEach(e => {
-      const k = bucket(dayjs(e.timestamp))
-      counts[k] = (counts[k] || 0) + e.clickCount
+/** Utility: build an array of date‐strings for the last N calendar days */
+function getDateRangeArray(rangeDays: number): string[] {
+  return getLastNDates(rangeDays)
+}
+
+/** Tally link clicks by platform and date */
+function tallyLinkClicks(
+  clicks: Array<{ timestamp: string; platform: string; clickCount?: number }>,
+  lastDates: string[]
+) {
+  const platforms = Array.from(
+    new Set(clicks.map((e) => e.platform).filter(Boolean))
+  )
+
+  const counts: Record<string, Record<string, number>> = {}
+  platforms.forEach((plat) => {
+    counts[plat] = {}
+    lastDates.forEach((day) => {
+      counts[plat][day] = 0
     })
+  })
+
+  for (const entry of clicks) {
+    const { platform, timestamp, clickCount = 1 } = entry
+    if (!platform || !timestamp) continue
+    const day = format(parseISO(timestamp), 'yyyy-MM-dd')
+    if (lastDates.includes(day)) {
+      counts[platform][day] += clickCount
+    }
+  }
+
+  return { platforms, counts }
+}
+
+/**
+ * Tally media plays by mediaType (“song” or “video”) AND by title, for each date.
+ * Returns an object:
+ *    { titles: string[], countsByTitle: { [title]: { [date]: number } } }
+ */
+function tallyMediaPlaysByTitle(
+  plays: Array<{ timestamp: string; mediaType: 'song' | 'video'; title: string }>,
+  lastDates: string[],
+  mediaType: 'song' | 'video'
+) {
+  const filtered = plays.filter((p) => p.mediaType === mediaType)
+  const titles = Array.from(new Set(filtered.map((p) => p.title).filter(Boolean)))
+  const countsByTitle: Record<string, Record<string, number>> = {}
+  for (const t of titles) {
+    countsByTitle[t] = {}
+    lastDates.forEach((d) => {
+      countsByTitle[t][d] = 0
+    })
+  }
+
+  for (const entry of filtered) {
+    const day = format(parseISO(entry.timestamp), 'yyyy-MM-dd')
+    const t = entry.title
+    if (titles.includes(t) && lastDates.includes(day)) {
+      countsByTitle[t][day] += 1
+    }
+  }
+
+  return { titles, countsByTitle }
+}
+
+/** Build a Chart.js dataset for link‐clicks (one line per platform) */
+function buildLinkClicksDataset(
+  platforms: string[],
+  counts: Record<string, Record<string, number>>,
+  lastDates: string[]
+) {
+  const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444']
+  return platforms.map((plat, idx) => ({
+    label: plat,
+    data: lastDates.map((d) => counts[plat][d] || 0),
+    borderColor: colors[idx % colors.length],
+    backgroundColor: colors[idx % colors.length],
+    fill: false,
+    tension: 0.3,
+    pointRadius: 3
+  }))
+}
+
+/** Build a Chart.js dataset for media plays by title (one line per title) */
+function buildMediaPlaysDatasetByTitle(
+  titles: string[],
+  countsByTitle: Record<string, Record<string, number>>,
+  lastDates: string[]
+) {
+  const palette = [
+    '#3B82F6', '#EC4899', '#10B981', '#F59E0B',
+    '#8B5CF6', '#EF4444', '#3F51B5', '#795548'
+  ]
+
+  return titles.map((t, idx) => {
+    const color = palette[idx % palette.length]
     return {
-      label:    platform,
-      data:     allKeys.map(k => counts[k] || 0),
-      fill:     false,
-      tension:  0.2
+      label: t.length > 20 ? t.slice(0, 20) + '…' : t,
+      data: lastDates.map((d) => countsByTitle[t][d] || 0),
+      borderColor: color,
+      backgroundColor: color,
+      fill: true,
+      tension: 0.3,
+      pointRadius: 3
     }
   })
-  return { labels: allKeys, datasets }
-})
+}
 
-// --- COMPUTED FOR SONGS/VIDEOS: SINGLE SERIES LINE DATA + DISTRIBUTION ---
-const timeSeriesData = computed(() => {
-  const raw = view.value === 'links' ? linkClicks.value : mediaPlays.value
-  const arr = filterByRange(raw)
-  switch (groupBy.value) {
-    case 'daily':   return aggregateByPeriod(arr, dt => dt.format('YYYY-MM-DD'))
-    case 'weekly':  return aggregateByPeriod(arr, dt => dt.isoWeekYear() + '-W' + String(dt.isoWeek()).padStart(2,'0'))
-    case 'monthly': return aggregateByPeriod(arr, dt => dt.format('YYYY-MM'))
-    case 'yearly':  return aggregateByPeriod(arr, dt => dt.format('YYYY'))
-  }
-})
-const distributionData = computed(() => {
-  const raw = view.value === 'links' ? linkClicks.value : mediaPlays.value
-  const arr = filterByRange(raw)
-  const map: Record<string, number> = {}
-  arr.forEach(evt => {
-    const cat = view.value === 'links' ? evt.platform : evt.title
-    map[cat] = (map[cat] || 0) + evt.clickCount
-  })
-  const labels = Object.keys(map)
-  return { labels, data: labels.map(l => map[l]) }
-})
-
-// --- DRAW & RENDER ---
-import 'chartjs-adapter-luxon'
-
-function drawTimeChart(id: string, series: any, title: string) {
-  const ctx = (document.getElementById(id) as HTMLCanvasElement).getContext('2d')!
-  return new ChartRef(ctx, {
-    type: 'line',
-    data: { labels: series.labels, datasets: series.datasets },
-    options: {
-      plugins: {
-        title:  { display: true, text: title, color: '#fff' },
-        legend: { labels: { color: '#fff' } }
-      },
-      scales: {
-        x: {
-          type: 'time',
-          time: { unit: unitMap[groupBy.value] },
-          ticks: { color: '#fff' },
-          grid:  { color: '#333' }
+/** Build chart options (common across all three charts) */
+function buildChartOptions(xLabels: string[]) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          color: 'white',
+          callback: (val: any) => {
+            const iso = xLabels[val] + 'T00:00:00'
+            return format(parseISO(iso), 'MM/dd')
+          }
         },
-        y: {
-          beginAtZero: true,
-          ticks:        { color: '#fff' },
-          grid:         { color: '#333' }
+        grid: { color: '#444' }
+      },
+      y: {
+        ticks: { color: 'white' },
+        grid: { color: '#444' }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: 'white'
+        },
+        position: 'top' as const
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false as const,
+        callbacks: {
+          label: (context: any) => {
+            return `${context.dataset.label}: ${context.formattedValue}`
+          }
+        }
+      }
+    }
+  }
+}
+
+/** Primary method: rebuild (or create) Chart.js instance whenever tab/range/data changes */
+function renderChart() {
+  if (!chartCanvas.value) return
+  const ctx = chartCanvas.value.getContext('2d')
+  if (!ctx) return
+
+  const dateLabels = getDateRangeArray(selectedRange.value)
+  let datasets: any[] = []
+  let chartTitle = ''
+
+  if (selectedTab.value === 'Link Clicks') {
+    const { platforms, counts } = tallyLinkClicks(rawLinkClicks.value, dateLabels)
+    datasets = buildLinkClicksDataset(platforms, counts, dateLabels)
+    chartTitle = `Link Clicks (Last ${selectedRange.value} Days)`
+  } 
+  else if (selectedTab.value === 'Songs') {
+    const { titles, countsByTitle } = tallyMediaPlaysByTitle(
+      rawMediaPlays.value,
+      dateLabels,
+      'song'
+    )
+    datasets = buildMediaPlaysDatasetByTitle(titles, countsByTitle, dateLabels)
+    chartTitle = `Song Plays (Last ${selectedRange.value} Days)`
+  } 
+  else if (selectedTab.value === 'Videos') {
+    const { titles, countsByTitle } = tallyMediaPlaysByTitle(
+      rawMediaPlays.value,
+      dateLabels,
+      'video'
+    )
+    datasets = buildMediaPlaysDatasetByTitle(titles, countsByTitle, dateLabels)
+    chartTitle = `Video Plays (Last ${selectedRange.value} Days)`
+  }
+
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dateLabels,
+      datasets
+    },
+    options: {
+      ...buildChartOptions(dateLabels),
+      plugins: {
+        ...buildChartOptions(dateLabels).plugins,
+        title: {
+          display: true,
+          text: chartTitle,
+          color: 'white',
+          font: { size: 18 }
         }
       }
     }
   })
 }
 
-function drawChart(id: string, type: string, series: any, label: string) {
-  const ctx = (document.getElementById(id) as HTMLCanvasElement).getContext('2d')!
-  return new ChartRef(ctx, {
-    type,
-    data: { labels: series.labels, datasets: [{ label, data: series.data }] },
-    options: {
-      scales: {
-        x: { ticks: { color: '#fff' }, grid: { color: '#333' } },
-        y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: '#333' } }
-      },
-      plugins: {
-        legend: { labels: { color: '#fff' } }
-      }
-    }
-  })
-}
-
-let charts: any[] = []
-async function renderCharts() {
-  await nextTick()
-  charts.forEach(c => c.destroy())
-  charts = []
-
-  if (view.value === 'links') {
-    charts.push(drawChart  ('barChart', 'bar', timeSeriesByPlatform.value, 'Clicks by Platform'))
-    charts.push(drawTimeChart('lineChart', timeSeriesByPlatform.value, 'Clicks Over Time by Platform'))
-    charts.push(drawChart  ('pieChart','pie', distributionData.value, 'Clicks Distribution'))
-  } else {
-    const lbl = view.value === 'songs' ? 'Song Plays' : 'Video Plays'
-    charts.push(drawTimeChart('mediaLineChart', {
-      labels:   timeSeriesData.value.labels,
-      datasets: [{ label: lbl, data: timeSeriesData.value.labels.map((l,i) => ({ x: l, y: timeSeriesData.value.data[i] })), fill:false, tension:0.2 }]
-    }, lbl + ' Over Time'))
-    charts.push(drawChart('mediaBarChart','bar', distributionData.value, lbl + ' Counts'))
-    charts.push(drawChart('mediaPieChart','pie', distributionData.value, lbl + ' Distribution'))
+/** WATCH both selectedTab and selectedRange; whenever they change, rerender the chart */
+watch([selectedTab, selectedRange], () => {
+  if (!isLoading.value) {
+    renderChart()
   }
-}
-
-// --- WATCH & MOUNT ---
-watch([view, groupBy, selectedMedia, selectedRange], async () => {
-  if (view.value !== 'links') await fetchMediaPlays()
-  await renderCharts()
 })
 
+/** On mount, fetch both link‐clicks and media‐plays for this band */
 onMounted(async () => {
-  const chartMod   = await import('chart.js/auto')
-  await import('chartjs-adapter-luxon')
-  ChartRef = chartMod.Chart
+  console.log('▶️ Mounted Analytics Dashboard, params =', route.params)
+  const bandId = route.params.id as string
 
-  await fetchLinkClicks()
-  await fetchMediaList()
-  await fetchMediaPlays()
-  await renderCharts()
+  try {
+    // 1) Fetch link‐clicks for this band
+    const { data: clicks } = await client(
+      `/link-clicks/band/${encodeURIComponent(bandId)}`,
+      {
+        params: {
+          populate: ['band'],
+          sort: ['timestamp:desc']
+        }
+      }
+    )
+    rawLinkClicks.value = clicks
+    console.log('🔗 Link Clicks:', rawLinkClicks.value)
+
+    // 2) Fetch media‐plays for this band
+    console.log(`🔍 Fetching media-plays for band/${bandId}…`)
+    const { data: playsResponse } = await client('/media-plays', {
+      params: {
+        filters: { band: { id: bandId } },
+        populate: ['band'],
+        sort: ['timestamp:desc']
+      }
+    })
+    rawMediaPlays.value = playsResponse
+    console.log('🎥 Media Plays:', rawMediaPlays.value)
+
+    // 3) Mark loading as false and wait for DOM to update before rendering
+    isLoading.value = false
+    await nextTick()
+    renderChart()
+  } catch (e) {
+    console.error('❌ Error fetching analytics data:', e)
+    isLoading.value = false
+  }
 })
 
-function btnClass(mode: GroupBy) {
-  return {
-    'bg-gray-700':         groupBy.value !== mode,
-    'bg-white text-black': groupBy.value === mode
-  }
-}
 </script>
 
-
-
 <style scoped>
+/* Chart container must have a fixed height for Chart.js to render correctly */
 canvas {
-  background:   #000;
-  margin-bottom: 2rem;
-  width:         100% !important;
+  width: 100% !important;
+  height: 300px !important;
 }
 </style>

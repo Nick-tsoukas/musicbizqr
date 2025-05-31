@@ -128,6 +128,7 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/chart.js',
     '~/plugins/fontawesome.js',
+     '~/plugins/vue-echarts.client.ts'
    
   ],
 
