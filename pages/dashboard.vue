@@ -63,11 +63,12 @@
                 <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
               <div class="flex gap-4 p-2 border-2 rounded-md border-solid">
-                <p class="text-white">Analytics</p>
                 <button
                   @click="router.push(`/analyticsqr/${qr.id}`)"
-                  class="text-green-600 hover:text-green-900"
+                  class="text-green-600 flex gap-4 hover:text-green-900 w-full h-full"
                 >
+                <p class="text-white">Analytics</p>
+               
                   <img src="@/assets/analytics-icon.svg" class="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
@@ -137,11 +138,12 @@
                 <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
               <div class="flex gap-4 p-2 border-2 rounded-md border-solid">
-                <p class="text-white">Analytics</p>
                 <button
                   @click="router.push(`/analytics/${band.id}`)"
-                  class="text-green-600 hover:text-green-900"
+                  class="text-green-600 flex gap-4 hover:text-green-900"
                 >
+                <p class="text-white">Analytics</p>
+               
                   <img src="@/assets/analytics-icon.svg" class="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
