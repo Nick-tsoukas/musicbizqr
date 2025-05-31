@@ -273,12 +273,11 @@
                 </tr>
               </thead>
               <tbody>
-                <router-link
+                <tr
                   v-for="event in events"
                   :key="event.id"
-                  :to="`/event/${event.id}`"
-                  tag="tr"
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
+                  @click="router.push(`/event/${event.id}`)"
                 >
                   <td class="px-2 py-1 whitespace-nowrap">
                     {{ formatDate(event.date) }}
@@ -297,7 +296,7 @@
                       View Event
                     </button>
                   </td>
-                </router-link>
+                </tr>
               </tbody>
             </table>
           </div>
