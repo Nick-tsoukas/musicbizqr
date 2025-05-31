@@ -1,5 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+
+  vite: {
+    optimizeDeps: {
+      include: ['chart.js', 'chartjs-adapter-luxon',    '@tiptap/vue-3',
+        '@tiptap/starter-kit',]
+    }
+  },
+  build: {
+    transpile: ['chart.js', 'chartjs-adapter-luxon',   '@tiptap/vue-3',
+      '@tiptap/starter-kit',]
+  },
   css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css', '@fortawesome/fontawesome-free/css/all.css'],
 
   runtimeConfig: {
@@ -54,11 +65,14 @@ export default defineNuxtConfig({
     'nuxt-headlessui',
     "@nuxtjs/tailwindcss",
     "@nuxtjs/strapi",
+    'nuxt-tiptap-editor',
     '@vee-validate/nuxt',
     "@nuxt/image",
     "nuxt-particles",
     "@unlok-co/nuxt-stripe"
   ],
+
+
 
   aos: {
     // Global settings:

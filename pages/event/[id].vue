@@ -1,17 +1,18 @@
 <template>
   <div class="container  mx-auto my-10 px-4">
-    <!-- Event Hero Section -->
-    <div v-if="eventData" class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-8 shadow-lg">
-      <img
-        v-if="eventData.image && eventData.image.data"
-        :src="eventData.image.data.attributes.url"
-        alt="Event Hero Image"
-        class="w-full h-full object-cover"
-      />
-      <!-- <div class="absolute inset-0 bg-black bg-opacity-50 flex items-end p-4">
-        <h1 class="text-4xl md:text-6xl text-white font-bold">{{ eventData.title }}</h1>
-      </div> -->
-    </div>
+<!-- Event Hero Section -->
+<div
+  v-if="eventData"
+  class="relative w-full max-w-4xl mx-auto bg-gray-200 rounded-lg overflow-hidden mb-8 shadow-lg"
+>
+  <img
+    v-if="eventData.image && eventData.image.data"
+    :src="eventData.image.data.attributes.url"
+    alt="Event Hero Image"
+    class="w-full h-auto object-contain"
+  />
+</div>
+
     <!-- Event Details Section -->
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
