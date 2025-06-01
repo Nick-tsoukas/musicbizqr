@@ -111,7 +111,7 @@
 
             <!-- Preview Button -->
             <NuxtLink
-              to="/"
+              to="/buringthunder"
               class="block font-bold cta-button-full my-16 mx-auto text-center text-white"
             >
               Preview Page
@@ -262,7 +262,39 @@
           </div>
         </section>
       </section>
+   <!-- pricing  -->
+   <section class="py-10 md:py-20 bg-black text-white">
+        <div class="max-w-7xl mx-auto text-center">
+   
+          
+        </div>
 
+        <div
+          class="grid gap-8 mt-12 max-w-5xl mx-auto grid-cols-1 md:grid-cols-1"
+        >
+          <!-- Starter Plan -->
+          <div class="pricing-card text-center">
+            <h2
+            class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
+          >
+         Simple Pricing
+          </h2>
+            <p class="text-white"></p>
+            <p class="text-4xl font-extrabold mt-6">
+              $7<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ Advanced analytics</li>
+              <li>✔ 3 QR Codes</li>
+              <li>✔ 1 Artist Profile</li>
+            </ul>
+            <button class="pricing-button">Sign Up for a 30 day free trial</button>
+          </div>
+
+         
+         
+        </div>
+      </section>
     
       <!-- cta   -->
       <div
@@ -293,72 +325,14 @@
           </div>
         </div>
       </div>
-        <!-- pricing  -->
-        <section class="py-10 md:py-20 bg-black text-white">
-        <div class="max-w-7xl mx-auto text-center">
-          <!-- <h2
-            class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
-          >
-          Pricing
-          </h2> -->
-          
-        </div>
+     
+      <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
+    <h1 class="text-3xl font-bold text-center md:text-left   text-white mb-8">
+      Frequently Asked Questions
+    </h1>
 
-        <div
-          class="grid gap-8 mt-12 max-w-xl mx-auto grid-cols-1 md:grid-cols-1"
-        >
-          <!-- Starter Plan -->
-          <div class="pricing-card text-center">
-            <h2
-            class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
-          >
-         Simple Pricing
-          </h2>
-            <p class="text-white"></p>
-            <p class="text-4xl font-extrabold mt-6">
-              $7<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ Advanced analytics</li>
-              <li>✔ 3 QR Codes</li>
-              <li>✔ 1 Artist Profile</li>
-            </ul>
-            <button class="pricing-button">Sign Up for a 30 day free trial</button>
-          </div>
-
-          <!-- Pro Plan -->
-          <!-- <div class="pricing-card premium">
-            <h3 class="text-2xl font-bold">Pro</h3>
-            <p class="text-gray-300">For small teams</p>
-            <p class="text-4xl font-extrabold mt-6">
-              $29<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ Advanced analytics</li>
-              <li>✔ Unlimited QR Codes</li>
-              <li>✔ Custom Branding & Themes</li>
-              <li>✔ API Access</li>
-            </ul>
-            <button class="pricing-button">Upgrade</button>
-          </div> -->
-
-          <!-- Premium Plan -->
-          <!-- <div class="pricing-card">
-            <h3 class="text-2xl font-bold">Premium</h3>
-            <p class="text-gray-300">For enterprises</p>
-            <p class="text-4xl font-extrabold mt-6">
-              $59<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ All Pro Features</li>
-              <li>✔ Custom Integrations</li>
-              <li>✔ Dedicated Support</li>
-              <li>✔ White Labeling</li>
-            </ul>
-            <button class="pricing-button">Get Premium</button>
-          </div> -->
-        </div>
-      </section>
+    <FaqAccordion :faqs="faqItems" />
+  </div>
     </main>
     <!-- <Footer /> -->
     <div class="h-40 flex justify-center items-center">
@@ -378,7 +352,48 @@ import { Icon } from "@iconify/vue";
 import deezer from "@/assets/dezzer.svg";
 
 const parallaxBg = ref(null);
-
+const faqItems = ref([
+  {
+    question: '❓ What is a “dynamic QR code”?',
+    answer:
+      'A dynamic QR code points to a short redirect URL on our server. You can update its destination at any time without reprinting the QR. All scans are tracked, and you can edit or delete it from your dashboard.',
+  },
+  {
+    question: '🔄 Can I create and delete QR codes as I like?',
+    answer:
+      'Yes. You can generate unlimited dynamic QR codes. At any point, delete any existing QR and create a fresh one. Old scans remain in analytics, but new scans use the new QR link.',
+  },
+  {
+    question: '📈 How many scans can a dynamic QR code handle?',
+    answer:
+      'Unlimited. Every scan (regardless of volume) gets logged. You’ll see real-time counts of total scans, location data, and device types on your analytics page.',
+  },
+  {
+    question: '📊 What analytics are provided?',
+    answer:
+      'Our analytics dashboard shows total scan count, top locations (city, country), scan timestamps, device type breakdown, and referrer sources. This helps you optimize distribution of your QR codes.',
+  },
+  {
+    question: '🔒 Is my data private?',
+    answer:
+      'Absolutely. Only you (and team members you invite) can view your QR code analytics. We do not share your scan data with third parties, and all connections are encrypted.',
+  },
+  {
+    question: '💳 How do I cancel my subscription?',
+    answer:
+      'You can cancel at any time by visiting your Account page > Subscription > Cancel. Once canceled, you retain dashboard access until the end of your billing cycle. No additional charges apply.',
+  },
+  {
+    question: '🆓 Is there a free plan?',
+    answer:
+      'Yes! Our Free plan includes one active dynamic QR code with up to 500 scans/month and basic analytics. Upgrade anytime for unlimited QR codes and advanced insights.',
+  },
+  {
+    question: '🔧 How do I update the destination URL of a QR code?',
+    answer:
+      'Go to Dashboard > My QR Codes, click “Edit” beside the QR you want to change, enter the new destination URL, and save. The code’s design stays the same—only the redirect target updates.',
+  },
+]);
 const handleScroll = () => {
   const scrollPosition = window.scrollY;
   if (parallaxBg.value) {
@@ -392,7 +407,7 @@ const thumbnail = "https://img.youtube.com/vi/NU9JoFKlaZ0/maxresdefault.jpg"; //
 
 //  mockups
 import videoMobilePage from "@/assets/mainbainwithvideo.webp";
-import streamLinksPage from "@/assets/mainbainwithvideo.webp";
+import streamLinksPage from "@/assets/demoband.png";
 import albumDeskPage from "@/assets/mainbainwithvideo.webp";
 import socialDeskPage from "@/assets/mainbainwithvideo.webp";
 import bandDeskPage from "@/assets/dannydemo.png";
@@ -822,12 +837,12 @@ const testimonials = [
 
 /* General Pricing Card Style */
 .pricing-card {
-  @apply bg-gray-900 border border-gray-800 rounded-lg p-8 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50;
+  @apply bg-black border py-24  rounded-lg p-8  transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50;
 }
 
 /* Premium Plan Highlight */
 .premium {
-  @apply bg-gradient-to-br from-indigo-700 to-purple-700 border-purple-500 shadow-lg shadow-purple-500/50;
+  @apply bg-gradient-to-br from-indigo-700 to-purple-700 border-purple-500  shadow-purple-500/50;
 }
 
 /* Pricing Features List */

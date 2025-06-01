@@ -247,16 +247,16 @@
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
                   @click="router.push(`/event/${event.id}`)"
                 >
-                  <td class="px-2 py-1 whitespace-nowrap">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400 ">
                     {{ formatDate(event.date) }}
                   </td>
-                  <td class="px-2 py-1 whitespace-nowrap">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400 underline-offset-2 ">
                     {{ event.city || "N/A" }}, {{ event.state }}
                   </td>
-                  <td class="px-2 py-1 whitespace-nowrap">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ event.venue || "N/A" }}
                   </td>
-                  <td class="px-2 py-1 whitespace-nowrap">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
                       @click="router.push(`/event/${event.id}`)"
                       class="text-purple-400"
