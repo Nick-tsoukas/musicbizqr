@@ -1,6 +1,5 @@
 <template>
   <div class="player-container">
-   <!-- <pre class="text-white" >{{ props }}</pre> -->
     <!-- Now Playing Section -->
     <div class="now-playing">
       <img
@@ -81,7 +80,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick } from "vue";
+
+// Allow parent to listen for “play”:
+const emit = defineEmits(["play"])
 
 // Props
 const props = defineProps({
@@ -91,7 +93,7 @@ const props = defineProps({
   },
   placeholderImage: {
     type: String,
-    default: '@/assets/placeholder-image.svg',
+    default: "@/assets/placeholder-image.svg",
   },
 });
 
@@ -102,46 +104,41 @@ const audioPlayer = ref(null);
 const currentTime = ref(0);
 const duration = ref(0);
 const volume = ref(1);
-const isMuted = ref(false);
 const shuffle = ref(false);
 const repeat = ref(false);
 
-// Computed: Song Data
+// Computed: build a “songs” array out of either album.attributes.songs or single-song data
 const songs = computed(() => {
- 
   try {
-    console.log('why ', props.album)
-    // If album has multiple songs
+    // If album.attributes.songs exists, use that array directly
     if (props.album?.attributes?.songs) {
       const songsList = props.album.attributes.songs;
       return Array.isArray(songsList) ? songsList : [songsList];
     }
-    // If album is just a single song
+    // Otherwise, treat this as a single‐song album
     if (props.album?.attributes) {
-      console.log('ffffffffffff', props.album)
       return [
-      {
-      id: props.album.id || Date.now(),
-      title: props.album.attributes.title || 'Unknown Title',
-      file: props.album.attributes.file,
-      song: props.album.attributes.song,
-      embedUrl: props.album.attributes.embedUrl || "",
-      isEmbeded: false,
-      duration: props.album.attributes.duration || 0,
-      cover: props.album.attributes.cover,
-    },
+        {
+          id: props.album.id || Date.now(),
+          title: props.album.attributes.title || "Unknown Title",
+          file: props.album.attributes.file, // (may be undefined for single‐song format)
+          song: props.album.attributes.song, // expected shape: { data: { attributes: { url } } }
+          embedUrl: props.album.attributes.embedUrl || "",
+          isEmbeded: !!props.album.attributes.embedUrl,
+          duration: props.album.attributes.duration || 0,
+          cover: props.album.attributes.cover, // expected shape: { data: { attributes: { url } } }
+        },
       ];
     }
-    // Otherwise, no valid songs
-    console.warn('No valid song data found in album:', props.album);
+    console.warn("No valid song data found in album:", props.album);
     return [];
   } catch (error) {
-    console.error('Error processing songs:', error);
+    console.error("Error processing songs:", error);
     return [];
   }
 });
 
-// Computed: UI for album cover & song title
+// Computed: album cover URL or placeholder
 const albumCoverUrl = computed(() => {
   try {
     if (currentSong.value?.cover?.data?.attributes?.url) {
@@ -151,18 +148,18 @@ const albumCoverUrl = computed(() => {
     }
     return props.placeholderImage;
   } catch (error) {
-    console.error('Error getting album cover:', error);
+    console.error("Error getting album cover:", error);
     return props.placeholderImage;
   }
 });
 const currentSongTitle = computed(() =>
-  currentSong.value?.title || 'Select a song'
+  currentSong.value?.title || "Select a song"
 );
 const artistName = computed(() =>
-  props.album.attributes?.artist || 'Unknown Artist'
+  props.album.attributes?.artist || "Unknown Artist"
 );
 
-// onMounted: Init volume
+// Initialize volume on mount
 onMounted(async () => {
   await nextTick();
   if (audioPlayer.value) {
@@ -170,57 +167,58 @@ onMounted(async () => {
   }
 });
 
-// Always reset time to zero on click
-// Single-click loads the file and plays from 0
+// Play a given song object
 const playSong = async (song) => {
   if (!audioPlayer.value) return;
 
-  // Set the new or same currentSong
   currentSong.value = song;
+  let fileUrl = "";
+
+  // Determine the correct URL field:
+  if (song.file?.data?.attributes?.url) {
+    fileUrl = song.file.data.attributes.url;
+  } else if (song.song?.data?.attributes?.url) {
+    fileUrl = song.song.data.attributes.url;
+  } else if (typeof song.file === "string") {
+    fileUrl = song.file;
+  }
+
+  if (!fileUrl) {
+    console.error("No valid file URL found:", song);
+    return;
+  }
 
   try {
-    let fileUrl = '';
-    if (song.file?.data?.attributes?.url) {
-      fileUrl = song.file.data.attributes.url;
-    } else if (song.song?.data?.attributes?.url) {
-      fileUrl = song.song.data.attributes.url;
-    } else if (typeof song.file === 'string') {
-      fileUrl = song.file;
-    }
-
-    if (!fileUrl) {
-      console.error('No valid file URL found:', song);
-      return;
-    }
-
-    // Load the new URL
     audioPlayer.value.src = fileUrl;
     audioPlayer.value.load();
 
-    // Wait for metadata
+    // Wait for metadata (so duration is populated)
     await new Promise((resolve) => {
       audioPlayer.value.onloadedmetadata = resolve;
     });
 
-    // **Reset time to 0** and play
     audioPlayer.value.currentTime = 0;
     await audioPlayer.value.play();
     playing.value = true;
+
+    // Notify parent that play has started:
+    emit("play");
   } catch (error) {
-    console.error('Error playing audio:', error);
+    console.error("Error playing audio:", error);
     playing.value = false;
   }
 };
 
-// Is this the current song?
+// Check if a song is the “currentSong”
 const isCurrentSong = (song) =>
   currentSong.value && currentSong.value.id === song.id;
 
-// Play/Pause toggle
+// Toggle play/pause
 const togglePlay = async () => {
   if (!audioPlayer.value) return;
+
   if (!currentSong.value) {
-    // If no song is selected, pick the first one
+    // If nothing is selected yet, pick the first track
     if (songs.value.length) {
       await playSong(songs.value[0]);
     }
@@ -234,14 +232,15 @@ const togglePlay = async () => {
     try {
       await audioPlayer.value.play();
       playing.value = true;
+      emit("play");
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error("Error playing audio:", error);
       playing.value = false;
     }
   }
 };
 
-// Next/Previous
+// Next / Previous logic
 const nextSong = async () => {
   if (shuffle.value) {
     playRandomSong();
@@ -254,14 +253,12 @@ const nextSong = async () => {
 };
 
 const previousSong = async () => {
-  // If only one song => reset same track
   if (songs.value.length === 1) {
     if (audioPlayer.value) {
       audioPlayer.value.currentTime = 0;
     }
     return;
   }
-  // Otherwise normal logic
   const idx = songs.value.findIndex((s) => s.id === currentSong.value?.id);
   let prevIndex = idx - 1;
   if (prevIndex < 0) prevIndex = songs.value.length - 1;
@@ -273,40 +270,41 @@ const playRandomSong = async () => {
   await playSong(songs.value[randomIndex]);
 };
 
-// When song ends
+// When a song naturally ends
 const onSongEnded = () => {
   if (repeat.value) {
     audioPlayer.value.currentTime = 0;
     audioPlayer.value.play();
+    emit("play");
   } else {
     nextSong();
   }
 };
 
-// Metadata loaded => set duration
+// Once metadata loads, record duration
 const onAudioLoaded = () => {
   duration.value = audioPlayer.value?.duration || 0;
 };
 
-// Update time
+// Update currentTime as audio plays
 const updateTime = () => {
   currentTime.value = audioPlayer.value?.currentTime || 0;
 };
 
-// Seek
+// Seek handler
 const seekAudio = () => {
   if (audioPlayer.value) {
     audioPlayer.value.currentTime = currentTime.value;
   }
 };
 
-// Format mm:ss
+// Format seconds → mm:ss
 const formatTime = (time) => {
-  if (!time && time !== 0) return '0:00';
+  if (!time && time !== 0) return "0:00";
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60)
     .toString()
-    .padStart(2, '0');
+    .padStart(2, "0");
   return `${minutes}:${seconds}`;
 };
 </script>

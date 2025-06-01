@@ -3,6 +3,7 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
+
     <div v-else class="bg-black w-screen mx-auto">
       <!-- Hero Section -->
       <div class="relative w-full h-[35vh] md:h-[60vh]">
@@ -49,25 +50,25 @@
             Featured Song
           </h2>
 
-          <!-- Embedded Track -->
-          <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
+          <!-- 1) Embedded Track (same as before) -->
+          <div
+            v-if="band.data.singlesong.isEmbed && embedUrl"
+            class="w-full"
+          >
             <div
               class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
             >
-              <!-- Play overlay before click -->
               <div
-                v-if="!isSongStarted"
-                @click="startSong"
+                v-if="!isEmbeddedPlaying"
+                @click="startEmbedded()"
                 class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
               >
-                <!-- Top-left info -->
                 <div class="absolute top-2 left-2">
                   <p class="text-white font-bold">
                     {{ band.data.singlesong.title }}
                   </p>
                   <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
                 </div>
-                <!-- Centered play icon -->
                 <div class="absolute inset-0 flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +81,6 @@
                   </svg>
                 </div>
               </div>
-              <!-- Iframe after click -->
               <iframe
                 v-else
                 :src="embedUrl + '?autoplay=1'"
@@ -92,50 +92,18 @@
             </div>
           </div>
 
-          <!-- Raw Audio Fallback -->
-          <div v-else-if="band.data.singlesong.song" class="w-full">
-            <div
-              class="relative w-full h-[80px] rounded-lg overflow-hidden bg-black"
-            >
-              <!-- Play overlay before click -->
-              <div
-                v-if="!isSongStarted"
-                @click="startSong"
-                class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
-              >
-                <!-- Top-left info -->
-                <div class="absolute top-1 left-2">
-                  <p class="text-white font-bold text-sm">
-                    {{ band.data.singlesong.title }}
-                  </p>
-                  <p class="text-gray-300 text-xs">{{ band.data.name }}</p>
-                </div>
-                <!-- Centered play icon -->
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-12 h-12 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 84 84"
-                  >
-                    <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
-                    <polygon points="34,28 34,56 58,42" fill="white" />
-                  </svg>
-                </div>
-              </div>
-              <!-- Audio player after click -->
-              <audio
-                v-else
-                ref="audioPlayer"
-                controls
-                class="absolute inset-0 w-full h-full"
-                :src="band.data.singlesong.song.url"
-              ></audio>
-            </div>
+          <!-- 2) Raw Audio: ALWAYS show <AudioPlayer> -->
+          <div v-else class="w-full">
+            <AudioPlayer
+              :album="formatSingleSong(band.data.singlesong)"
+              :placeholderImage="'/placeholder-image.svg'"
+              @play="onSongPlay"
+              class="rounded-lg"
+            />
           </div>
         </section>
 
-        <!-- Featured Video -->
+        <!-- Featured Video (unchanged) -->
         <section
           v-if="band.data.singlevideo?.youtubeid"
           class="relative w-full max-w-[600px] mr-auto mt-10"
@@ -162,7 +130,7 @@
                 fill="currentColor"
                 viewBox="0 0 84 84"
               >
-                <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
+                <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
                 <polygon points="33,24 33,60 60,42" fill="white" />
               </svg>
             </div>
@@ -304,7 +272,11 @@
       </div>
 
       <footer class="h-40 flex justify-center items-center">
-        <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
+        <img
+          src="@/assets/musicbizlogo.png"
+          alt="MusicBiz Logo"
+          class="h-12"
+        />
       </footer>
     </div>
   </div>
@@ -317,6 +289,7 @@ import { useBeacon } from "@/composables/useBeacon";
 import YouTube from "vue3-youtube";
 import { useRoute, useRouter } from "vue-router";
 import AudioPlayer from "@/components/AudioPlayer.vue";
+
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
 import twitchIcon from "@/assets/twitchfree.png";
@@ -330,21 +303,23 @@ import spotifyIcon from "@/assets/spotify.svg";
 import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
+
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
 
-const audioPlayer = ref(null);
-
-const config = useRuntimeConfig();
 const { trackClick, trackMediaPlay } = useBeacon();
+const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 
-const band = ref(null);
 const loading = ref(true);
+const band = ref(null);
 const events = ref([]);
 
+const isEmbeddedPlaying = ref(false);
+
+// Streaming + social platform definitions:
 const streamingPlatforms = [
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
   { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
@@ -364,26 +339,21 @@ const socialPlatforms = [
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
 
-const isSongStarted = ref(false);
-const isVideoPlaying = ref(false);
-
-// compute embed URL & height for song
-const embedUrl = computed(() => {
-  const song = band.value?.data?.singlesong;
-  if (!song?.isEmbed || !song.trackId || !song.platform) return "";
-  return song.platform === "spotify"
-    ? `https://open.spotify.com/embed/track/${song.trackId}`
-    : `https://embed.music.apple.com/us/song/${song.trackId}`;
-});
-const embedHeight = computed(() =>
-  band.value?.data?.singlesong.platform === "appleMusic" ? "200px" : "360px"
-);
-
-// compute thumbnail & embed URL for video
+// ─── Compute embed URL for an embedded track (Spotify / Apple Music) ───────────────────────────────────────────────────────────────────
 function extractYouTubeId(url) {
   const m = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   return m ? m[1] : "";
 }
+
+const embedUrl = computed(() => {
+  const s = band.value?.data?.singlesong;
+  if (!s?.isEmbed || !s.trackId || !s.platform) return "";
+  return s.platform === "spotify"
+    ? `https://open.spotify.com/embed/track/${s.trackId}`
+    : `https://embed.music.apple.com/us/song/${s.trackId}`;
+});
+
+// ─── Compute YouTube thumbnail and embed for video ─────────────────────────────────────────────────────────────────────────────
 const singleVideoThumbnail = computed(() => {
   const id = extractYouTubeId(band.value?.data?.singlevideo?.youtubeid || "");
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
@@ -394,52 +364,72 @@ const singleVideoEmbedUrl = computed(() => {
 });
 const playerOptions = { autoplay: 1, rel: 0, modestbranding: 1 };
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 function formatDate(dateStr) {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US");
 }
 
-function formatSingleSong(song) {
+// Build a “single-song” object that matches AudioPlayer.vue’s expected shape
+function formatSingleSong(single) {
   return {
-    id: song.id,
+    id: single.id,
     attributes: {
-      title: song.title,
-      file: { data: { attributes: { url: song.song.url } } },
+      title: single.title,
+      // AudioPlayer.vue expects props.album.attributes.song.data.attributes.url
+      song: { data: { attributes: { url: single.song.url } } },
+      duration: single.duration || 0,
+      cover: single.cover || null, // shape: { data: { attributes: { url } } }
       artist: band.value.data.name,
     },
   };
 }
 
-async function startSong() {
-  await trackMediaPlay(
-    band.value.data.id,
-    "song",
-    band.value.data.singlesong.title
-  );
-  isSongStarted.value = true;
-  if (audioPlayer.value) {
-    audioPlayer.value.play().catch(() => {});
-  }
-}
+// ─── Analytics for “play” ───────────────────────────────────────────────────────────────────────────────────────────────────────
+async function onSongPlay() {
+  // Only fire once we have a valid band & singlesong
+  if (!band.value?.data?.singlesong) return;
 
-async function playVideo() {
-  console.log("▶️ playVideo fired");
-  isVideoPlaying.value = true;
+  const bandId = band.value.data.id;
+  const title = band.value.data.singlesong.title;
   try {
-    const res = await trackMediaPlay(
-      band.value.data.id,
-      "video",
-      band.value.data.singlevideo.title || band.value.data.name
-    );
-    console.log("← media-play response", res.status);
+    await trackMediaPlay(bandId, "song", title);
   } catch (err) {
-    console.error("❌ video track error", err);
+    console.error("❌ trackMediaPlay error:", err);
   }
 }
 
+// Embedded track “play” overlay → flip to true & track analytics
+async function startEmbedded() {
+  isEmbeddedPlaying.value = true;
+  const bandId = band.value.data.id;
+  const title = band.value.data.singlesong.title;
+  try {
+    await trackMediaPlay(bandId, "song", title);
+  } catch (err) {
+    console.error("❌ trackMediaPlay (embedded) error:", err);
+  }
+}
+
+// ─── Video analytics ────────────────────────────────────────────────────────────────────────────────────────────────────────
+const isVideoPlaying = ref(false);
+async function playVideo() {
+  isVideoPlaying.value = true;
+  const bandId = band.value.data.id;
+  const title =
+    band.value.data.singlevideo.title || band.value.data.singlesong.title;
+  try {
+    await trackMediaPlay(bandId, "video", title);
+  } catch (err) {
+    console.error("❌ video track error:", err);
+  }
+}
+
+// ─── Outbound link click tracking ─────────────────────────────────────────────────────────────────────────────────────────────
 function handleClick(bandId, platform, url) {
   trackClick(bandId, platform, url);
 }
 
+// ─── Fetch band by slug ───────────────────────────────────────────────────────────────────────────────────────────────────────
 async function fetchBandData() {
   const apiUrl = config.public.strapiUrl;
   const res = await fetch(
@@ -466,9 +456,11 @@ onMounted(fetchBandData);
   width: 100%;
   height: 100%;
 }
+
 .custom-border {
   border: 0.1px solid white;
 }
+
 .loading-container {
   display: flex;
   justify-content: center;

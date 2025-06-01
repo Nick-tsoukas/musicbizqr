@@ -380,6 +380,6 @@ onMounted(async () => {
 /* Chart container must have a fixed height for Chart.js to render correctly */
 canvas {
   width: 100% !important;
-  height: 300px !important;
+  height: 600px !important;
 }
 </style>

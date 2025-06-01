@@ -263,68 +263,7 @@
         </section>
       </section>
 
-      <!-- pricing  -->
-      <section class="py-10 md:py-20 bg-black text-white">
-        <div class="max-w-7xl mx-auto text-center">
-          <h2
-            class="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
-          >
-            Choose Your Plan
-          </h2>
-          <p class="text-lg text-gray-400 mt-4">Simple, transparent pricing.</p>
-        </div>
-
-        <div
-          class="grid gap-8 mt-12 max-w-6xl mx-auto grid-cols-1 md:grid-cols-3"
-        >
-          <!-- Starter Plan -->
-          <div class="pricing-card">
-            <h3 class="text-2xl font-bold">Starter</h3>
-            <p class="text-gray-300">For individuals</p>
-            <p class="text-4xl font-extrabold mt-6">
-              $9<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ Basic analytics</li>
-              <li>✔ 10 QR Codes</li>
-              <li>✔ Custom Branding</li>
-            </ul>
-            <button class="pricing-button">Get Started</button>
-          </div>
-
-          <!-- Pro Plan -->
-          <div class="pricing-card premium">
-            <h3 class="text-2xl font-bold">Pro</h3>
-            <p class="text-gray-300">For small teams</p>
-            <p class="text-4xl font-extrabold mt-6">
-              $29<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ Advanced analytics</li>
-              <li>✔ Unlimited QR Codes</li>
-              <li>✔ Custom Branding & Themes</li>
-              <li>✔ API Access</li>
-            </ul>
-            <button class="pricing-button">Upgrade</button>
-          </div>
-
-          <!-- Premium Plan -->
-          <div class="pricing-card">
-            <h3 class="text-2xl font-bold">Premium</h3>
-            <p class="text-gray-300">For enterprises</p>
-            <p class="text-4xl font-extrabold mt-6">
-              $59<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ All Pro Features</li>
-              <li>✔ Custom Integrations</li>
-              <li>✔ Dedicated Support</li>
-              <li>✔ White Labeling</li>
-            </ul>
-            <button class="pricing-button">Get Premium</button>
-          </div>
-        </div>
-      </section>
+    
       <!-- cta   -->
       <div
         ref="parallaxRef"
@@ -348,12 +287,78 @@
               class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
             >
               <button class="cta-button-no w-auto mx-auto">
-                Sign Up For A Free Trial
+                Sign Up For A Free 30 day Trial
               </button>
             </div>
           </div>
         </div>
       </div>
+        <!-- pricing  -->
+        <section class="py-10 md:py-20 bg-black text-white">
+        <div class="max-w-7xl mx-auto text-center">
+          <!-- <h2
+            class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
+          >
+          Pricing
+          </h2> -->
+          
+        </div>
+
+        <div
+          class="grid gap-8 mt-12 max-w-xl mx-auto grid-cols-1 md:grid-cols-1"
+        >
+          <!-- Starter Plan -->
+          <div class="pricing-card text-center">
+            <h2
+            class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
+          >
+         Simple Pricing
+          </h2>
+            <p class="text-white"></p>
+            <p class="text-4xl font-extrabold mt-6">
+              $7<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ Advanced analytics</li>
+              <li>✔ 3 QR Codes</li>
+              <li>✔ 1 Artist Profile</li>
+            </ul>
+            <button class="pricing-button">Sign Up for a 30 day free trial</button>
+          </div>
+
+          <!-- Pro Plan -->
+          <!-- <div class="pricing-card premium">
+            <h3 class="text-2xl font-bold">Pro</h3>
+            <p class="text-gray-300">For small teams</p>
+            <p class="text-4xl font-extrabold mt-6">
+              $29<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ Advanced analytics</li>
+              <li>✔ Unlimited QR Codes</li>
+              <li>✔ Custom Branding & Themes</li>
+              <li>✔ API Access</li>
+            </ul>
+            <button class="pricing-button">Upgrade</button>
+          </div> -->
+
+          <!-- Premium Plan -->
+          <!-- <div class="pricing-card">
+            <h3 class="text-2xl font-bold">Premium</h3>
+            <p class="text-gray-300">For enterprises</p>
+            <p class="text-4xl font-extrabold mt-6">
+              $59<span class="text-lg">/mo</span>
+            </p>
+            <ul class="pricing-features">
+              <li>✔ All Pro Features</li>
+              <li>✔ Custom Integrations</li>
+              <li>✔ Dedicated Support</li>
+              <li>✔ White Labeling</li>
+            </ul>
+            <button class="pricing-button">Get Premium</button>
+          </div> -->
+        </div>
+      </section>
     </main>
     <!-- <Footer /> -->
     <div class="h-40 flex justify-center items-center">
