@@ -7,8 +7,8 @@
 - [x] add link to demo band for the preview button 
 - [x] add faq 
   - [] change the questions and answers to faq
-- [] change text color on event list tab data 
-- [] move button to add image below preview button 
+- [x] change text color on event list tab data 
+- [x] move button to add image below preview button 
 - [] change policy and allow users to have 3 qr code 
 - [] explore 3d models for AR 
 - [] add bar chart to analytics 

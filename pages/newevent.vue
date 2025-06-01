@@ -239,6 +239,13 @@
           <h3 class="font-semibold text-white text-2xl">Upload Event Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-6">
+          <div v-if="newEvent.imageUrl" class="mb-4">
+            <img
+              :src="newEvent.imageUrl"
+              alt="Event Image"
+              class="w-full h-auto max-w-[300px] mx-auto rounded-lg shadow-md"
+            />
+          </div>
           <input
             type="file"
             required
@@ -250,13 +257,7 @@
           <label for="new-event-image" class="styled-file-label w-full text-center">
             Choose Event Image
           </label>
-          <div v-if="newEvent.imageUrl" class="mb-4">
-            <img
-              :src="newEvent.imageUrl"
-              alt="Event Image"
-              class="w-full h-auto rounded-lg shadow-md"
-            />
-          </div>
+         
         </div>
 
         <!-- Event Link Section -->

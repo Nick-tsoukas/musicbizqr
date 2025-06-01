@@ -10,7 +10,7 @@
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
-          alt="Band Image"
+          :alt="`${band.data.name} image`"
           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
         />
         <div class="absolute inset-0 bg-black bg-opacity-0"></div>
@@ -50,7 +50,7 @@
             Featured Song
           </h2>
 
-          <!-- 1) Embedded Track (same as before) -->
+          <!-- Embedded Track -->
           <div
             v-if="band.data.singlesong.isEmbed && embedUrl"
             class="w-full"
@@ -92,7 +92,7 @@
             </div>
           </div>
 
-          <!-- 2) Raw Audio: ALWAYS show <AudioPlayer> -->
+          <!-- Raw Audio: always show AudioPlayer -->
           <div v-else class="w-full">
             <AudioPlayer
               :album="formatSingleSong(band.data.singlesong)"
@@ -103,7 +103,7 @@
           </div>
         </section>
 
-        <!-- Featured Video (unchanged) -->
+        <!-- Featured Video -->
         <section
           v-if="band.data.singlevideo?.youtubeid"
           class="relative w-full max-w-[600px] mr-auto mt-10"
@@ -118,7 +118,7 @@
           >
             <img
               :src="singleVideoThumbnail"
-              alt="Video Thumbnail"
+              :alt="`${band.data.name} video thumbnail`"
               class="w-full max-h-[300px] object-cover rounded-lg"
             />
             <div
@@ -247,10 +247,10 @@
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
                   @click="router.push(`/event/${event.id}`)"
                 >
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400 ">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ formatDate(event.date) }}
                   </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400 underline-offset-2 ">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400 underline-offset-2">
                     {{ event.city || "N/A" }}, {{ event.state }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
@@ -289,6 +289,7 @@ import { useBeacon } from "@/composables/useBeacon";
 import YouTube from "vue3-youtube";
 import { useRoute, useRouter } from "vue-router";
 import AudioPlayer from "@/components/AudioPlayer.vue";
+import { useHead } from "#imports";
 
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
@@ -339,7 +340,7 @@ const socialPlatforms = [
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
 
-// ─── Compute embed URL for an embedded track (Spotify / Apple Music) ───────────────────────────────────────────────────────────────────
+// Compute embed URL for an embedded track (Spotify / Apple Music)
 function extractYouTubeId(url) {
   const m = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   return m ? m[1] : "";
@@ -353,7 +354,7 @@ const embedUrl = computed(() => {
     : `https://embed.music.apple.com/us/song/${s.trackId}`;
 });
 
-// ─── Compute YouTube thumbnail and embed for video ─────────────────────────────────────────────────────────────────────────────
+// Compute YouTube thumbnail and embed for video
 const singleVideoThumbnail = computed(() => {
   const id = extractYouTubeId(band.value?.data?.singlevideo?.youtubeid || "");
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
@@ -364,7 +365,7 @@ const singleVideoEmbedUrl = computed(() => {
 });
 const playerOptions = { autoplay: 1, rel: 0, modestbranding: 1 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// Helpers
 function formatDate(dateStr) {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US");
 }
@@ -375,7 +376,6 @@ function formatSingleSong(single) {
     id: single.id,
     attributes: {
       title: single.title,
-      // AudioPlayer.vue expects props.album.attributes.song.data.attributes.url
       song: { data: { attributes: { url: single.song.url } } },
       duration: single.duration || 0,
       cover: single.cover || null, // shape: { data: { attributes: { url } } }
@@ -384,11 +384,9 @@ function formatSingleSong(single) {
   };
 }
 
-// ─── Analytics for “play” ───────────────────────────────────────────────────────────────────────────────────────────────────────
+// Analytics for “play”
 async function onSongPlay() {
-  // Only fire once we have a valid band & singlesong
   if (!band.value?.data?.singlesong) return;
-
   const bandId = band.value.data.id;
   const title = band.value.data.singlesong.title;
   try {
@@ -398,7 +396,7 @@ async function onSongPlay() {
   }
 }
 
-// Embedded track “play” overlay → flip to true & track analytics
+// Embedded track “play”
 async function startEmbedded() {
   isEmbeddedPlaying.value = true;
   const bandId = band.value.data.id;
@@ -410,7 +408,7 @@ async function startEmbedded() {
   }
 }
 
-// ─── Video analytics ────────────────────────────────────────────────────────────────────────────────────────────────────────
+// Video analytics
 const isVideoPlaying = ref(false);
 async function playVideo() {
   isVideoPlaying.value = true;
@@ -424,12 +422,12 @@ async function playVideo() {
   }
 }
 
-// ─── Outbound link click tracking ─────────────────────────────────────────────────────────────────────────────────────────────
+// Outbound link click tracking
 function handleClick(bandId, platform, url) {
   trackClick(bandId, platform, url);
 }
 
-// ─── Fetch band by slug ───────────────────────────────────────────────────────────────────────────────────────────────────────
+// Fetch band by slug
 async function fetchBandData() {
   const apiUrl = config.public.strapiUrl;
   const res = await fetch(
@@ -440,6 +438,50 @@ async function fetchBandData() {
   events.value = data.data.events || [];
   loading.value = false;
 }
+
+// SEO: dynamic <head> tags using band data
+const bandName = computed(() => band.value?.data?.name || "");
+const bandBio = computed(() =>
+  band.value?.data?.bio ? band.value.data.bio.slice(0, 155) : ""
+);
+const bandImage = computed(
+  () => band.value?.data?.bandImg?.url || "/default-og-image.png"
+);
+const bandUrl = computed(() =>
+  band.value
+    ? `https://yourdomain.com/band/${route.params.slug?.toLowerCase()}`
+    : ""
+);
+
+useHead({
+  title: bandName,
+  meta: [
+    {
+      hid: "description",
+      name: "description",
+      content:
+        bandBio.value ||
+        "Discover this artist on musicbizqr—dynamic QR link tree with analytics."
+    },
+    { hid: "og:title", property: "og:title", content: bandName },
+    {
+      hid: "og:description",
+      property: "og:description",
+      content: bandBio
+    },
+    {
+      hid: "og:image",
+      property: "og:image",
+      content: bandImage
+    },
+    {
+      hid: "og:url",
+      property: "og:url",
+      content: bandUrl
+    },
+    { hid: "twitter:card", name: "twitter:card", content: "summary_large_image" }
+  ]
+});
 
 onMounted(fetchBandData);
 </script>

@@ -38,13 +38,24 @@
       </button>
     </div>
 
-    <!-- Chart Container -->
+    <!-- Loading Indicator -->
     <div v-if="isLoading" class="text-white">
       🔄 Loading data… (check console for details)
     </div>
 
-    <div v-else class="bg-gray-900 rounded-lg p-4 shadow-lg">
-      <canvas ref="chartCanvas" class="w-full h-64"></canvas>
+    <div v-else class="space-y-8">
+      <!-- Time-series Line Chart -->
+      <div class="bg-gray-900 rounded-lg p-4 shadow-lg">
+        <canvas ref="lineChartCanvas" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Bar Chart: Total Clicks by Platform -->
+      <div class="bg-gray-900 rounded-lg p-4 shadow-lg">
+        <h3 class="text-lg font-medium text-white mb-2">
+          Total Clicks by Platform
+        </h3>
+        <canvas ref="barChartCanvas" class="w-full h-64"></canvas>
+      </div>
     </div>
   </div>
 </template>
@@ -59,6 +70,8 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
+  BarController,
   Title,
   Tooltip,
   Legend,
@@ -70,12 +83,14 @@ import {
   subDays
 } from 'date-fns'
 
-// 1) Register Chart.js components:
+// Register Chart.js components (both Line and Bar)
 Chart.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
+  BarController,
   Title,
   Tooltip,
   Legend,
@@ -89,27 +104,29 @@ const route = useRoute()
 const tabs = ['Link Clicks', 'Songs', 'Videos']
 const selectedTab = ref<string>(tabs[0])
 
-/** Time‐range options in days */
+/** Time-range options in days */
 const rangeOptions: Record<number, string> = {
   7: 'Last 7 Days',
   30: 'Last 30 Days',
   90: 'Last 90 Days',
   365: 'Last 1 Year'
 }
-const selectedRange = ref<number>(7) // default to 7 days
+const selectedRange = ref<number>(7)
 
 /** Loading indicator */
 const isLoading = ref<boolean>(true)
 
-/** Raw fetched data from Strapi */
+/** Raw fetched data */
 const rawLinkClicks = ref<any[]>([])
 const rawMediaPlays = ref<any[]>([])
 
-/** Reference to the <canvas> element */
-const chartCanvas = ref<HTMLCanvasElement | null>(null)
-let chartInstance: Chart | null = null
+/** Canvas refs and Chart instances */
+const lineChartCanvas = ref<HTMLCanvasElement | null>(null)
+const barChartCanvas = ref<HTMLCanvasElement | null>(null)
+let lineChartInstance: Chart | null = null
+let barChartInstance: Chart | null = null
 
-/** Utility: build an array of date‐strings (yyyy-MM-dd) for the last N days */
+/** Build an array of date-strings (yyyy-MM-dd) for the last N days */
 function getLastNDates(n: number): string[] {
   const today = new Date()
   return Array.from({ length: n }, (_, i) => {
@@ -118,7 +135,7 @@ function getLastNDates(n: number): string[] {
   })
 }
 
-/** Utility: build an array of date‐strings for the last N calendar days */
+/** Utility: date range for last N days */
 function getDateRangeArray(rangeDays: number): string[] {
   return getLastNDates(rangeDays)
 }
@@ -152,11 +169,7 @@ function tallyLinkClicks(
   return { platforms, counts }
 }
 
-/**
- * Tally media plays by mediaType (“song” or “video”) AND by title, for each date.
- * Returns an object:
- *    { titles: string[], countsByTitle: { [title]: { [date]: number } } }
- */
+/** Tally media plays by title (song or video) per date */
 function tallyMediaPlaysByTitle(
   plays: Array<{ timestamp: string; mediaType: 'song' | 'video'; title: string }>,
   lastDates: string[],
@@ -183,7 +196,7 @@ function tallyMediaPlaysByTitle(
   return { titles, countsByTitle }
 }
 
-/** Build a Chart.js dataset for link‐clicks (one line per platform) */
+/** Build dataset for link-clicks (one line per platform) */
 function buildLinkClicksDataset(
   platforms: string[],
   counts: Record<string, Record<string, number>>,
@@ -201,7 +214,7 @@ function buildLinkClicksDataset(
   }))
 }
 
-/** Build a Chart.js dataset for media plays by title (one line per title) */
+/** Build dataset for media plays by title (one line per title) */
 function buildMediaPlaysDatasetByTitle(
   titles: string[],
   countsByTitle: Record<string, Record<string, number>>,
@@ -226,20 +239,14 @@ function buildMediaPlaysDatasetByTitle(
   })
 }
 
-/** Build chart options (common across all three charts) */
+/** Shared chart options */
 function buildChartOptions(xLabels: string[]) {
   return {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       x: {
-        ticks: {
-          color: 'white',
-          callback: (val: any) => {
-            const iso = xLabels[val] + 'T00:00:00'
-            return format(parseISO(iso), 'MM/dd')
-          }
-        },
+        ticks: { color: 'white' },
         grid: { color: '#444' }
       },
       y: {
@@ -249,14 +256,10 @@ function buildChartOptions(xLabels: string[]) {
     },
     plugins: {
       legend: {
-        labels: {
-          color: 'white'
-        },
+        labels: { color: 'white' },
         position: 'top' as const
       },
       tooltip: {
-        mode: 'index' as const,
-        intersect: false as const,
         callbacks: {
           label: (context: any) => {
             return `${context.dataset.label}: ${context.formattedValue}`
@@ -267,10 +270,25 @@ function buildChartOptions(xLabels: string[]) {
   }
 }
 
-/** Primary method: rebuild (or create) Chart.js instance whenever tab/range/data changes */
-function renderChart() {
-  if (!chartCanvas.value) return
-  const ctx = chartCanvas.value.getContext('2d')
+/** Aggregate rawLinkClicks into totals per platform */
+function computePlatformTotals(
+  clicks: Array<{ platform: string; clickCount?: number }>
+): { labels: string[]; data: number[] } {
+  const totals: Record<string, number> = {}
+  for (const entry of clicks) {
+    const plat = entry.platform ?? 'Unknown'
+    const count = entry.clickCount ?? 1
+    totals[plat] = (totals[plat] || 0) + count
+  }
+  const labels = Object.keys(totals)
+  const data = labels.map((l) => totals[l])
+  return { labels, data }
+}
+
+/** Render the time-series line chart */
+function renderLineChart() {
+  if (!lineChartCanvas.value) return
+  const ctx = lineChartCanvas.value.getContext('2d')
   if (!ctx) return
 
   const dateLabels = getDateRangeArray(selectedRange.value)
@@ -281,8 +299,7 @@ function renderChart() {
     const { platforms, counts } = tallyLinkClicks(rawLinkClicks.value, dateLabels)
     datasets = buildLinkClicksDataset(platforms, counts, dateLabels)
     chartTitle = `Link Clicks (Last ${selectedRange.value} Days)`
-  } 
-  else if (selectedTab.value === 'Songs') {
+  } else if (selectedTab.value === 'Songs') {
     const { titles, countsByTitle } = tallyMediaPlaysByTitle(
       rawMediaPlays.value,
       dateLabels,
@@ -290,8 +307,7 @@ function renderChart() {
     )
     datasets = buildMediaPlaysDatasetByTitle(titles, countsByTitle, dateLabels)
     chartTitle = `Song Plays (Last ${selectedRange.value} Days)`
-  } 
-  else if (selectedTab.value === 'Videos') {
+  } else if (selectedTab.value === 'Videos') {
     const { titles, countsByTitle } = tallyMediaPlaysByTitle(
       rawMediaPlays.value,
       dateLabels,
@@ -301,16 +317,13 @@ function renderChart() {
     chartTitle = `Video Plays (Last ${selectedRange.value} Days)`
   }
 
-  if (chartInstance) {
-    chartInstance.destroy()
+  if (lineChartInstance) {
+    lineChartInstance.destroy()
   }
 
-  chartInstance = new Chart(ctx, {
+  lineChartInstance = new Chart(ctx, {
     type: 'line',
-    data: {
-      labels: dateLabels,
-      datasets
-    },
+    data: { labels: dateLabels, datasets },
     options: {
       ...buildChartOptions(dateLabels),
       plugins: {
@@ -326,20 +339,90 @@ function renderChart() {
   })
 }
 
-/** WATCH both selectedTab and selectedRange; whenever they change, rerender the chart */
+/** Render the bar chart: total clicks per platform */
+function renderBarChart() {
+  if (!barChartCanvas.value) return
+  const ctx = barChartCanvas.value.getContext('2d')
+  if (!ctx) return
+
+  const { labels, data } = computePlatformTotals(rawLinkClicks.value)
+
+  if (barChartInstance) {
+    barChartInstance.destroy()
+  }
+
+  barChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Total Clicks',
+          data,
+          backgroundColor: [
+            '#8B5CF6',
+            '#EC4899',
+            '#10B981',
+            '#F59E0B',
+            '#3B82F6',
+            '#EF4444'
+          ].slice(0, labels.length),
+          borderColor: 'transparent',
+          borderWidth: 0
+        }
+      ]
+    },
+    options: {
+      ...buildChartOptions(labels),
+      plugins: {
+        ...buildChartOptions(labels).plugins,
+        title: {
+          display: true,
+          text: 'Total Link Clicks by Platform',
+          color: 'white',
+          font: { size: 18 }
+        }
+      },
+      scales: {
+        x: {
+          ...buildChartOptions(labels).scales.x,
+          ticks: {
+            ...buildChartOptions(labels).scales.x.ticks,
+            callback: (val: any) => labels[val],
+            maxRotation: 45,
+            minRotation: 45
+          }
+        },
+        y: {
+          ...buildChartOptions(labels).scales.y,
+          beginAtZero: true
+        }
+      }
+    }
+  })
+}
+
+/** Watch for tab or range changes, re-render line chart */
 watch([selectedTab, selectedRange], () => {
   if (!isLoading.value) {
-    renderChart()
+    renderLineChart()
   }
 })
 
-/** On mount, fetch both link‐clicks and media‐plays for this band */
+/** Watch rawLinkClicks changes, re-render bar chart */
+watch(rawLinkClicks, () => {
+  if (!isLoading.value) {
+    renderBarChart()
+  }
+})
+
+/** On mount: fetch data and render both charts */
 onMounted(async () => {
   console.log('▶️ Mounted Analytics Dashboard, params =', route.params)
   const bandId = route.params.id as string
 
   try {
-    // 1) Fetch link‐clicks for this band
+    // Fetch link-clicks
     const { data: clicks } = await client(
       `/link-clicks/band/${encodeURIComponent(bandId)}`,
       {
@@ -352,8 +435,7 @@ onMounted(async () => {
     rawLinkClicks.value = clicks
     console.log('🔗 Link Clicks:', rawLinkClicks.value)
 
-    // 2) Fetch media‐plays for this band
-    console.log(`🔍 Fetching media-plays for band/${bandId}…`)
+    // Fetch media-plays
     const { data: playsResponse } = await client('/media-plays', {
       params: {
         filters: { band: { id: bandId } },
@@ -364,16 +446,18 @@ onMounted(async () => {
     rawMediaPlays.value = playsResponse
     console.log('🎥 Media Plays:', rawMediaPlays.value)
 
-    // 3) Mark loading as false and wait for DOM to update before rendering
+    // Done loading
     isLoading.value = false
     await nextTick()
-    renderChart()
+
+    // Render both charts
+    renderLineChart()
+    renderBarChart()
   } catch (e) {
     console.error('❌ Error fetching analytics data:', e)
     isLoading.value = false
   }
 })
-
 </script>
 
 <style scoped>
