@@ -23,9 +23,9 @@
         <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
       </h2>
       <div
-        class="prose max-w-none text-lg leading-snug text-black"
-        v-html="descriptionHTML"
-      ></div>
+   class="prose max-w-none text-lg leading-snug text-black space-y-4"
+   v-html="descriptionHTML"
+ ></div>
     </section>
         <!-- Date & Time -->
         <section v-if="eventData.date || eventData.time" class="mb-6">
@@ -267,7 +267,10 @@ const hasSocialLinks = computed(() => {
   margin-bottom: 1rem;
 
 }
-
+.prose p:empty::before {
+  content: "\00a0"; /* a single non‑breaking space */
+  display: block;   /* ensure it occupies its own line */
+}
 
 .prose strong {
   font-weight: 600;
