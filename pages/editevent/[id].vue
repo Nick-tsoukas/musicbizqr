@@ -259,7 +259,7 @@ import Underline from '@tiptap/extension-underline'
 
 const event = ref({
   title: "",
-  description: "",
+  description: {} as any,  // ← use `any` so it can hold ProseMirror JSON
   date: "",
   time: "",
   state: "",
@@ -361,11 +361,11 @@ const submitEditEvent = async () => {
     const eventForm = new FormData()
 
     // — Always pull from Tiptap, not from event.value.description —
-    const descriptionHtml = editor.value?.getHTML() || ""
+    const descriptionJson = editor.value?.getJSON() || { type: 'doc', content: [] }
 
     const eventData: Record<string, unknown> = {
       title: event.value.title || undefined,
-      description: descriptionHtml || undefined,
+      description: descriptionJson,    // ← now sending JSON
       date: event.value.date || undefined,
       time: formatTime(event.value.time) || undefined,
       city: event.value.city || undefined,

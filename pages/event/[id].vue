@@ -262,8 +262,13 @@ const hasSocialLinks = computed(() => {
 }
 
 .prose p {
+  margin-block-start: 1em;
+  margin-block-end:   1em;
   margin-bottom: 1rem;
+
 }
+
+
 .prose strong {
   font-weight: 600;
 }
