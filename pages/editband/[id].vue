@@ -369,7 +369,7 @@
                 type="text"
                 class="mdc-text-field__input"
                 placeholder=" "
-                required
+                
               />
               <label class="mdc-floating-label" for="singlevideo-title">
                 Video Title

@@ -29,6 +29,19 @@
               >
               <div class="mdc-line-ripple"></div>
             </div>
+            
+            <!-- New: Band name is in logo -->
+            <div class="flex items-center mb-4">
+              <input
+                id="isBandNameInLogo"
+                type="checkbox"
+                v-model="isBandNameInLogo"
+                class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded"
+              />
+              <label for="isBandNameInLogo" class="text-black select-none">
+                Band name is already in logo
+              </label>
+            </div>
 
             <!-- Genre -->
             <div class="mdc-text-field">
@@ -107,11 +120,14 @@
           <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
         </div>
         <div class="mb-4 py-10 bg-white p-4">
-          <div v-if="bandImgUrl" class="flex justify-center items-center max-h-[400px] p-4 rounded-lg">
+          <div
+            v-if="bandImgUrl"
+            class="flex justify-center items-center max-h-[400px] p-4 rounded-lg"
+          >
             <img
               :src="bandImgUrl"
               alt="Band Image"
-              class="max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-md "
+              class="max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-md"
             />
           </div>
           <input
@@ -121,7 +137,10 @@
             @change="handleImageUpload"
             accept="image/*"
           />
-          <label for="band-img" class="styled-file-label w-full text-center my-10">
+          <label
+            for="band-img"
+            class="styled-file-label w-full text-center my-10"
+          >
             Choose Band Image
           </label>
         </div>
@@ -136,7 +155,11 @@
             </h2>
           </div>
           <div class="p-4 grid grid-cols-2 gap-4">
-            <div v-for="net in Object.keys(social)" :key="net" class="mdc-text-field">
+            <div
+              v-for="net in Object.keys(social)"
+              :key="net"
+              class="mdc-text-field"
+            >
               <input
                 :id="net"
                 type="url"
@@ -160,7 +183,11 @@
             <h2 class="font-semibold text-white text-2xl">Streaming Links</h2>
           </div>
           <div class="p-4 grid grid-cols-2 gap-4">
-            <div v-for="stream in Object.keys(streaming)" :key="stream" class="mdc-text-field">
+            <div
+              v-for="stream in Object.keys(streaming)"
+              :key="stream"
+              class="mdc-text-field"
+            >
               <input
                 :id="stream"
                 type="url"
@@ -214,7 +241,7 @@
                 class="mdc-text-field__input"
                 v-model="singlesongTitle"
                 placeholder=" "
-                required
+              
               />
               <label class="mdc-floating-label" for="singlesong-title"
                 >Song Title</label
@@ -249,7 +276,7 @@
                   id="singlesong-platform"
                   v-model="singlesongPlatform"
                   class="mdc-text-field__input"
-                  required
+                  
                 >
                   <option disabled value="">Select Platform</option>
                   <option value="spotify">Spotify</option>
@@ -267,7 +294,7 @@
                   class="mdc-text-field__input"
                   v-model="singlesongTrackId"
                   placeholder=" "
-                  required
+                  
                 />
                 <label class="mdc-floating-label" for="singlesong-trackid"
                   >Track ID</label
@@ -279,51 +306,46 @@
         </div>
 
         <!-- Single Video Section -->
-         <!-- Featured Video -->
-<div class="bg-white rounded-md my-10">
-  <div
-    class="flex bg-black p-6 border-b-2
-           bg-gradient-to-r from-pink-500 to-violet-500"
-  >
-    <h2 class="text-white text-2xl font-semibold">
-      Featured Video
-    </h2>
-  </div>
-  <div class="p-4 space-y-4">
-    <!-- Video Title -->
-    <div class="mdc-text-field">
-      <input
-        id="singlevideo-title"
-        v-model="singlevideoTitle"
-        type="text"
-        class="mdc-text-field__input"
-        placeholder=" "
-        required
-      />
-      <label class="mdc-floating-label" for="singlevideo-title">
-        Video Title
-      </label>
-      <div class="mdc-line-ripple"></div>
-    </div>
+        <!-- Featured Video -->
+        <div class="bg-white rounded-md my-10">
+          <div
+            class="flex bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500"
+          >
+            <h2 class="text-white text-2xl font-semibold">Featured Video</h2>
+          </div>
+          <div class="p-4 space-y-4">
+            <!-- Video Title -->
+            <div class="mdc-text-field">
+              <input
+                id="singlevideo-title"
+                v-model="singlevideoTitle"
+                type="text"
+                class="mdc-text-field__input"
+                placeholder=" "
+                
+              />
+              <label class="mdc-floating-label" for="singlevideo-title">
+                Video Title
+              </label>
+              <div class="mdc-line-ripple"></div>
+            </div>
 
-    <!-- YouTube ID -->
-    <div class="mdc-text-field">
-      <input
-        id="singlevideo-youtube"
-        v-model="singlevideoYoutubeUrl"
-        type="text"
-        class="mdc-text-field__input"
-        placeholder="e.g. dQw4w9WgXcQ"
-        required
-      />
-      <label class="mdc-floating-label" for="singlevideo-youtube">
-        YouTube ID
-      </label>
-      <div class="mdc-line-ripple"></div>
-    </div>
-  </div>
-</div>
-
+            <!-- YouTube ID -->
+            <div class="mdc-text-field">
+              <input
+                id="singlevideo-youtube"
+                v-model="singlevideoYoutubeUrl"
+                type="text"
+                class="mdc-text-field__input"
+                placeholder="e.g. dQw4w9WgXcQ"
+                           />
+              <label class="mdc-floating-label" for="singlevideo-youtube">
+                YouTube ID
+              </label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+          </div>
+        </div>
 
         <!-- Submit Button -->
         <button type="submit" class="mdc-button w-full mt-10">
@@ -337,80 +359,100 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useStrapiClient, useStrapiUser, useStrapiToken, useStrapi } from "#imports";
+import {
+  useStrapiClient,
+  useStrapiUser,
+  useStrapiToken,
+  useStrapi,
+} from "#imports";
 
-const config  = useRuntimeConfig();
-const router  = useRouter();
-const route   = useRoute();
-const client  = useStrapiClient();
-const user    = useStrapiUser();
-const token   = useStrapiToken();
+const config = useRuntimeConfig();
+const router = useRouter();
+const route = useRoute();
+const client = useStrapiClient();
+const user = useStrapiUser();
+const token = useStrapiToken();
 
 const loading = ref(false);
+const isBandNameInLogo = ref(false);
 
 // Band basics
-const bandName        = ref("");
-const genre           = ref("");
-const bio             = ref("");
-const bandImg         = ref(null);
-const bandImgUrl      = ref(null);
-const websitelink     = ref("");
+const bandName = ref("");
+const genre = ref("");
+const bio = ref("");
+const bandImg = ref(null);
+const bandImgUrl = ref(null);
+const websitelink = ref("");
 const websitelinktext = ref("");
 
-
-
 // Members
-const members = ref([{ name: "", instrument: "", image: null, imageUrl: null }]);
-function addMember() { members.value.push({ name:"", instrument:"", image:null, imageUrl:null }); }
-function removeMember(idx) { members.value.splice(idx,1); }
+const members = ref([
+  { name: "", instrument: "", image: null, imageUrl: null },
+]);
+function addMember() {
+  members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
+}
+function removeMember(idx) {
+  members.value.splice(idx, 1);
+}
 function handleMemberImageUpload(e, idx) {
   const f = e.target.files[0];
-  members.value[idx].image    = f;
+  members.value[idx].image = f;
   members.value[idx].imageUrl = URL.createObjectURL(f);
 }
 
 // Social + Streaming
 const social = ref({
-  facebook: "", instagram: "", twitch: "",
-  twitter: "", whatsapp: "", tiktok: "",
-  snapchat:"", reverbnation:""
+  facebook: "",
+  instagram: "",
+  twitch: "",
+  twitter: "",
+  whatsapp: "",
+  tiktok: "",
+  snapchat: "",
+  reverbnation: "",
 });
 const streaming = ref({
-  appleMusic:"", spotify:"", soundcloud:"",
-  youtube:"", deezer:"", bandcamp:""
+  appleMusic: "",
+  spotify: "",
+  soundcloud: "",
+  youtube: "",
+  deezer: "",
+  bandcamp: "",
 });
 
 // Featured song/video
-const singlesongType     = ref("upload");
-const singlesongTitle    = ref("");
+const singlesongType = ref("upload");
+const singlesongTitle = ref("");
 const singlesongPlatform = ref("");
-const singlesongTrackId  = ref("");
-const singlesongFile     = ref(null);
+const singlesongTrackId = ref("");
+const singlesongFile = ref(null);
 const singlesongFileName = ref("");
 const singlevideoYoutubeUrl = ref("");
-const singlevideoTitle      = ref("");
+const singlevideoTitle = ref("");
 
-
-function handleImageUpload(e){
+function handleImageUpload(e) {
   bandImg.value = e.target.files[0];
   bandImgUrl.value = URL.createObjectURL(bandImg.value);
 }
-function handleSingleSongUpload(e){
+function handleSingleSongUpload(e) {
   const f = e.target.files[0];
   singlesongFile.value = f;
-  singlesongFileName.value = singlesongTitle.value||f.name;
+  singlesongFileName.value = singlesongTitle.value || f.name;
 }
 
 // Fetch existing bands for user (optional)
-onMounted(async ()=>{
-  try{
+onMounted(async () => {
+  try {
     const r = await client("/bands", {
-      params:{
-        filters:{ users_permissions_user:{ id:user.value.id }},
-        populate:["users_permissions_user"]
-      }
+      params: {
+        filters: { users_permissions_user: { id: user.value.id } },
+        populate: ["users_permissions_user"],
+      },
     });
-  }catch(e){ console.error(e) }
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 async function submitForm() {
@@ -419,6 +461,7 @@ async function submitForm() {
     // 1) Build plain‐JS payload
     const payload = {
       name: bandName.value,
+      isBandNameInLogo: isBandNameInLogo.value,
       genre: genre.value,
       bio: bio.value,
       websitelink: websitelink.value || null,
@@ -426,9 +469,9 @@ async function submitForm() {
       users_permissions_user: user.value.id,
 
       // members
-      members: members.value.map(m => ({
+      members: members.value.map((m) => ({
         name: m.name,
-        instrument: m.instrument
+        instrument: m.instrument,
       })),
 
       // social
@@ -440,51 +483,50 @@ async function submitForm() {
       // featured song
       singlesong: {
         title: singlesongTitle.value,
-        isEmbed: singlesongType.value === 'embed',
-        platform: singlesongType.value === 'embed'
-          ? singlesongPlatform.value
-          : null,
-        trackId: singlesongType.value === 'embed'
-          ? singlesongTrackId.value
-          : null
+        isEmbed: singlesongType.value === "embed",
+        platform:
+          singlesongType.value === "embed" ? singlesongPlatform.value : null,
+        trackId:
+          singlesongType.value === "embed" ? singlesongTrackId.value : null,
       },
 
       // featured video
       singlevideo: {
-        youtubeid: singlevideoYoutubeUrl.value || '', title: singlevideoTitle.value,
-      }
+        youtubeid: singlevideoYoutubeUrl.value || "",
+        title: singlevideoTitle.value,
+      },
     };
 
     // 2) Wrap in FormData...
     const fd = new FormData();
-    fd.append('data', JSON.stringify(payload));
+    fd.append("data", JSON.stringify(payload));
     if (bandImg.value) {
-      fd.append('files.bandImg', bandImg.value);
+      fd.append("files.bandImg", bandImg.value);
     }
     members.value.forEach((m, i) => {
       if (m.image) {
         fd.append(`files.members.${i}.image`, m.image);
       }
     });
-    if (singlesongType.value === 'upload' && singlesongFile.value) {
-      fd.append('files.singlesong.song', singlesongFile.value);
+    if (singlesongType.value === "upload" && singlesongFile.value) {
+      fd.append("files.singlesong.song", singlesongFile.value);
     }
 
     // 3) POST...
     const res = await fetch(`${config.public.strapiUrl}/api/bands`, {
-      method: 'POST',
+      method: "POST",
       headers: { Authorization: `Bearer ${token.value}` },
-      body: fd
+      body: fd,
     });
     const json = await res.json();
     if (!res.ok) throw json;
 
     // 4) Redirect
     const slug = json.data?.attributes?.slug;
-    await router.push(slug ? { name: 'slug', params: { slug } } : '/dashboard');
+    await router.push(slug ? { name: "slug", params: { slug } } : "/dashboard");
   } catch (err) {
-    console.error('❌ createBand error:', err);
-    alert(err.error?.message || 'Creation failed');
+    console.error("❌ createBand error:", err);
+    alert(err.error?.message || "Creation failed");
   } finally {
     loading.value = false;
   }
@@ -492,35 +534,113 @@ async function submitForm() {
 </script>
 
 <style scoped>
-@tailwind base; @tailwind components; @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.container-mdc { margin:1rem auto; padding:1rem; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-.title { font-size:1.5rem; font-weight:bold; margin-bottom:1.5rem; }
-.mdc-text-field { position:relative; margin-bottom:1rem; width:100%; }
-.mdc-text-field__input { width:100%; padding:.75rem .5rem; border:1px solid #000; border-radius:10px; outline:none; }
-.mdc-floating-label { position:absolute; top:.75rem; left:.5rem; background:#fff; padding:0 .2em; transition:transform .2s,color .2s; }
+.container-mdc {
+  margin: 1rem auto;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+.mdc-text-field {
+  position: relative;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+.mdc-text-field__input {
+  width: 100%;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid #000;
+  border-radius: 10px;
+  outline: none;
+}
+.mdc-floating-label {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.5rem;
+  background: #fff;
+  padding: 0 0.2em;
+  transition:
+    transform 0.2s,
+    color 0.2s;
+}
 .mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown)+.mdc-floating-label { transform:translateY(-1.5rem); color:#6200ee; }
-.mdc-line-ripple { position:absolute; bottom:0; left:0; right:0; height:2px; background:#6200ee; transform:scaleX(0); transition:transform .2s; }
-.mdc-text-field__input:focus ~ .mdc-line-ripple { transform:scaleX(1); }
-
-.mdc-button, .styled-file-label {
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:.75rem 1.5rem; font-size:.875rem; font-weight:500;
-  text-transform:uppercase; border-radius:4px; cursor:pointer;
-  transition:background-color .2s;
+.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
+  transform: translateY(-1.5rem);
+  color: #6200ee;
 }
-.mdc-button { background:#2c2c2c; color:#fff; border:none; margin-top:1rem; }
-.mdc-button:hover { background:#3700b3; }
-.styled-file-input { display:none; }
-.styled-file-label { background:#7c3aed; color:#fff; }
-.styled-file-label:hover { background:#3700b3; }
+.mdc-line-ripple {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #6200ee;
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.mdc-text-field__input:focus ~ .mdc-line-ripple {
+  transform: scaleX(1);
+}
 
-.loading-container { display:flex; justify-content:center; align-items:center; height:100%; }
+.mdc-button,
+.styled-file-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.mdc-button {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  margin-top: 1rem;
+}
+.mdc-button:hover {
+  background: #3700b3;
+}
+.styled-file-input {
+  display: none;
+}
+.styled-file-label {
+  background: #7c3aed;
+  color: #fff;
+}
+.styled-file-label:hover {
+  background: #3700b3;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
 .spinner {
-  border:8px solid #f3f3f3; border-top:8px solid #6200ee;
-  border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite;
-  margin-top:2rem;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #6200ee;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-top: 2rem;
 }
-@keyframes spin { to{ transform:rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>

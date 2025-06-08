@@ -93,7 +93,7 @@
           </div>
 
           <!-- Raw Audio: always show AudioPlayer -->
-          <div v-else class="w-full">
+          <div v-else  class="w-full">
             <AudioPlayer
               :album="formatSingleSong(band.data.singlesong)"
               :placeholderImage="'/placeholder-image.svg'"
@@ -372,17 +372,28 @@ function formatDate(dateStr) {
 
 // Build a “single-song” object that matches AudioPlayer.vue’s expected shape
 function formatSingleSong(single) {
+  // try to grab the upload URL
+  const fileUrl = single.song?.data?.attributes?.url || null;
+
   return {
     id: single.id,
     attributes: {
       title: single.title,
-      song: { data: { attributes: { url: single.song.url } } },
+      // always give AudioPlayer a well‑formed shape, even if url is null
+      song: {
+        data: {
+          attributes: {
+            url: fileUrl,
+          },
+        },
+      },
       duration: single.duration || 0,
-      cover: single.cover || null, // shape: { data: { attributes: { url } } }
+      cover: single.cover || null,
       artist: band.value.data.name,
     },
   };
 }
+
 
 // Analytics for “play”
 async function onSongPlay() {

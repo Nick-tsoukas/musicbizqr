@@ -410,6 +410,8 @@ import { useStrapiClient, useStrapiUser, useStrapi } from '#imports'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
+
 
 // 2) Reactive form state
 const newEvent = ref({
