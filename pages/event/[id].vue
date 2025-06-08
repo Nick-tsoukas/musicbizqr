@@ -1,37 +1,43 @@
 <template>
-  <div class="container  mx-auto my-10 px-4">
-<!-- Event Hero Section -->
-<div
-  v-if="eventData"
-  class="relative w-full max-w-4xl mx-auto bg-gray-200 rounded-lg overflow-hidden mb-8 shadow-lg"
->
-  <img
-    v-if="eventData.image && eventData.image.data"
-    :src="eventData.image.data.attributes.url"
-    alt="Event Hero Image"
-    class="w-full h-auto object-contain"
-  />
-</div>
+  <div class="container mx-auto my-10 px-4">
+    <!-- Event Hero Section -->
+    <div
+      v-if="eventData"
+      class="relative w-full max-w-4xl mx-auto bg-gray-200 rounded-lg overflow-hidden mb-8 shadow-lg"
+    >
+      <img
+        v-if="eventData.image && eventData.image.data"
+        :src="eventData.image.data.attributes.url"
+        alt="Event Hero Image"
+        class="w-full h-auto object-contain"
+      />
+    </div>
 
-    <!-- Event Details Section -->
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Left Column -->
       <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6">
-        <!-- Description -->
-        <section v-if="eventData.description" class="mb-6">
-          <h2 class="text-2xl font-semibold flex items-center mb-4">
-            <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
-          </h2>
-          <p class="text-lg leading-snug" v-html="formattedDescription"></p>
-        </section>
+      <!-- Event Details Section -->
+    <section v-if="descriptionHTML" class="mb-6 text-black">
+      <h2 class="text-2xl font-semibold flex items-center mb-4 text-black">
+        <i class="fas fa-info-circle gradient-icon mr-2"></i> Description
+      </h2>
+      <div
+        class="prose max-w-none text-lg leading-snug text-black"
+        v-html="descriptionHTML"
+      ></div>
+    </section>
         <!-- Date & Time -->
         <section v-if="eventData.date || eventData.time" class="mb-6">
           <h2 class="text-2xl font-semibold flex items-center mb-4">
             <i class="far fa-calendar-alt gradient-icon mr-2"></i> Date & Time
           </h2>
-          <p v-if="eventData.date" class="text-lg">{{ formatDate(eventData.date) }}</p>
-          <p v-if="eventData.time" class="text-lg">{{ formatTime(eventData.time) }}</p>
+          <p v-if="eventData.date" class="text-lg">
+            {{ formatDate(eventData.date) }}
+          </p>
+          <p v-if="eventData.time" class="text-lg">
+            {{ formatTime(eventData.time) }}
+          </p>
         </section>
 
         <!-- Description -->
@@ -43,20 +49,36 @@
         </section> -->
 
         <!-- Location -->
-        <section v-if="eventData.venue || eventData.address || eventData.city || eventData.state" class="mb-6">
+        <section
+          v-if="
+            eventData.venue ||
+            eventData.address ||
+            eventData.city ||
+            eventData.state
+          "
+          class="mb-6"
+        >
           <h2 class="text-2xl font-semibold flex items-center mb-4">
             <i class="fas fa-map-marker-alt gradient-icon mr-2"></i> Location
           </h2>
           <p v-if="eventData.venue" class="text-lg">{{ eventData.venue }}</p>
-          <p v-if="eventData.address" class="text-lg">{{ eventData.address }}</p>
+          <p v-if="eventData.address" class="text-lg">
+            {{ eventData.address }}
+          </p>
           <p v-if="eventData.city || eventData.state" class="text-lg">
-            {{ eventData.city }}<span v-if="eventData.city && eventData.state">, </span>{{ eventData.state }}
+            {{ eventData.city
+            }}<span v-if="eventData.city && eventData.state">, </span
+            >{{ eventData.state }}
           </p>
         </section>
 
         <!-- Ticket Link -->
         <div v-if="eventData.link" class="mt-8">
-          <a :href="eventData.link" target="_blank" class="mdc-button inline-flex items-center">
+          <a
+            :href="eventData.link"
+            target="_blank"
+            class="mdc-button inline-flex items-center"
+          >
             <i class="fas fa-ticket-alt gradient-icon mr-2"></i> Buy Tickets
           </a>
         </div>
@@ -65,15 +87,24 @@
       <!-- Right Column -->
       <div class="bg-white shadow-lg rounded-lg p-6">
         <!-- Contact Information -->
-        <section v-if="eventData.contactEmail || eventData.contactPhone" class="mb-6">
+        <section
+          v-if="eventData.contactEmail || eventData.contactPhone"
+          class="mb-6"
+        >
           <h2 class="text-2xl font-semibold flex items-center mb-4">
             <i class="fas fa-address-book gradient-icon mr-2"></i> Contact
           </h2>
           <p v-if="eventData.contactEmail" class="text-lg flex items-center">
-            <i class="fas fa-envelope gradient-icon mr-2"></i> <a :href="`mailto:${eventData.contactEmail}`">{{ eventData.contactEmail }}</a>
+            <i class="fas fa-envelope gradient-icon mr-2"></i>
+            <a :href="`mailto:${eventData.contactEmail}`">{{
+              eventData.contactEmail
+            }}</a>
           </p>
           <p v-if="eventData.contactPhone" class="text-lg flex items-center">
-            <i class="fas fa-phone mr-2 gradient-icon"></i> <a :href="`tel:${eventData.contactPhone}`">{{ eventData.contactPhone }}</a>
+            <i class="fas fa-phone mr-2 gradient-icon"></i>
+            <a :href="`tel:${eventData.contactPhone}`">{{
+              eventData.contactPhone
+            }}</a>
           </p>
         </section>
 
@@ -91,23 +122,43 @@
             <i class="fas fa-share-alt gradient-icon mr-2"></i> Follow Us
           </h2>
           <div class="flex space-x-4">
-            <a v-if="eventData.facebook" :href="eventData.facebook" target="_blank">
-              <i class="fab fa-facebook-square  text-2xl"></i>
+            <a
+              v-if="eventData.facebook"
+              :href="eventData.facebook"
+              target="_blank"
+            >
+              <i class="fab fa-facebook-square text-2xl"></i>
             </a>
-            <a v-if="eventData.twitter" :href="eventData.twitter" target="_blank">
-              <i class="fab fa-twitter-square  text-2xl"></i>
+            <a
+              v-if="eventData.twitter"
+              :href="eventData.twitter"
+              target="_blank"
+            >
+              <i class="fab fa-twitter-square text-2xl"></i>
             </a>
-            <a v-if="eventData.instagram" :href="eventData.instagram" target="_blank">
-              <i class="fab fa-instagram-square  text-2xl"></i>
+            <a
+              v-if="eventData.instagram"
+              :href="eventData.instagram"
+              target="_blank"
+            >
+              <i class="fab fa-instagram-square text-2xl"></i>
             </a>
-            <a v-if="eventData.youtube" :href="eventData.youtube" target="_blank">
-              <i class="fab fa-youtube-square  text-2xl"></i>
+            <a
+              v-if="eventData.youtube"
+              :href="eventData.youtube"
+              target="_blank"
+            >
+              <i class="fab fa-youtube-square text-2xl"></i>
             </a>
             <a v-if="eventData.tiktok" :href="eventData.tiktok" target="_blank">
-              <i class="fab fa-tiktok  text-2xl"></i>
+              <i class="fab fa-tiktok text-2xl"></i>
             </a>
-            <a v-if="eventData.website" :href="eventData.website" target="_blank">
-              <i class="fas fa-globe  text-2xl"></i>
+            <a
+              v-if="eventData.website"
+              :href="eventData.website"
+              target="_blank"
+            >
+              <i class="fas fa-globe text-2xl"></i>
             </a>
           </div>
         </section>
@@ -124,20 +175,32 @@
   </div>
 </template>
 
-
 <script setup>
-
-import { format, parseISO, parse } from 'date-fns';
+import { format, parseISO, parse } from "date-fns";
 
 const route = useRoute();
 const { findOne } = useStrapi();
+import { generateHTML } from "@tiptap/html";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
 
 const eventData = ref({});
 
+const descriptionHTML = computed(() => {
+  // if no JSON yet, return empty
+  if (!eventData.value?.description) return "";
+  return generateHTML(
+    // pass the ProseMirror JSON
+    eventData.value.description,
+    // same extensions you used when saving
+    [StarterKit, Underline]
+  );
+});
+
 onMounted(async () => {
   try {
-    const { data } = await findOne('events', route.params.id, {
-      populate: ['image', 'band'],
+    const { data } = await findOne("events", route.params.id, {
+      populate: ["image", "band"],
     });
     eventData.value = data.attributes;
     // Include the band relation with attributes
@@ -145,36 +208,38 @@ onMounted(async () => {
       eventData.value.band = data.attributes.band;
     }
   } catch (error) {
-    console.error('Error fetching event data:', error);
+    console.error("Error fetching event data:", error);
   }
 });
 
 const formattedDescription = computed(() => {
-  return eventData.value?.description ? eventData.value.description.replace(/\n/g, '<br>') : '';
+  return eventData.value?.description
+    ? eventData.value.description.replace(/\n/g, "<br>")
+    : "";
 });
 const formatDate = (dateStr) => {
   if (!dateStr) {
-    return '';
+    return "";
   }
   try {
-    return format(parseISO(dateStr), 'MMMM d, yyyy');
+    return format(parseISO(dateStr), "MMMM d, yyyy");
   } catch (error) {
-    console.error('Error parsing date:', error);
+    console.error("Error parsing date:", error);
     return dateStr;
   }
 };
 
 function formatTime(timeStr) {
-  if (!timeStr) return '';
+  if (!timeStr) return "";
   try {
     // Detect whether there's a '.' in there
-    const hasMilliseconds = timeStr.includes('.');
+    const hasMilliseconds = timeStr.includes(".");
     // Choose the appropriate format
-    const parsePattern = hasMilliseconds ? 'HH:mm:ss.SSS' : 'HH:mm:ss';
+    const parsePattern = hasMilliseconds ? "HH:mm:ss.SSS" : "HH:mm:ss";
     const parsedTime = parse(timeStr, parsePattern, new Date());
-    return format(parsedTime, 'h:mm a'); // => "5:00 PM" or "5:30 PM", etc.
+    return format(parsedTime, "h:mm a"); // => "5:00 PM" or "5:30 PM", etc.
   } catch (error) {
-    console.error('Error parsing time:', error);
+    console.error("Error parsing time:", error);
     return timeStr;
   }
 }
@@ -191,17 +256,22 @@ const hasSocialLinks = computed(() => {
 });
 </script>
 
-
-
 <style scoped>
 .container {
   max-width: 1200px;
 }
 
+.prose p {
+  margin-bottom: 1rem;
+}
+.prose strong {
+  font-weight: 600;
+}
+
 .gradient-icon {
   /* Set the icon size */
   font-size: 1rem;
-  
+
   /* Gradient background */
   background: linear-gradient(to right, #ec4899, #8b5cf6);
 
@@ -244,4 +314,3 @@ const hasSocialLinks = computed(() => {
 
 /* Additional styling for icons and layout */
 </style>
-

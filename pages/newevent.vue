@@ -33,7 +33,7 @@
               <div class="mdc-line-ripple"></div>
             </div>
 
-            <!-- Description (Rich Text via Tiptap) -->
+            <!-- Description (Rich Text via Tiptap JSON) -->
             <div class="mb-4">
               <label for="new-event-description" class="block text-white mb-1">
                 Event Description
@@ -44,30 +44,21 @@
                   <div class="flex space-x-2 mb-2">
                     <button
                       type="button"
-                      :class="[
-                        'px-2 py-1 border rounded',
-                        editor.isActive('bold') ? 'bg-gray-200' : 'bg-white'
-                      ]"
+                      :class="[ 'px-2 py-1 border rounded', editor.isActive('bold') ? 'bg-gray-200' : 'bg-white' ]"
                       @click="toggleBold"
                     >
                       <strong>B</strong>
                     </button>
                     <button
                       type="button"
-                      :class="[
-                        'px-2 py-1 border rounded',
-                        editor.isActive('italic') ? 'bg-gray-200' : 'bg-white'
-                      ]"
+                      :class="[ 'px-2 py-1 border rounded', editor.isActive('italic') ? 'bg-gray-200' : 'bg-white' ]"
                       @click="toggleItalic"
                     >
                       <em>I</em>
                     </button>
                     <button
                       type="button"
-                      :class="[
-                        'px-2 py-1 border rounded',
-                        editor.isActive('underline') ? 'bg-gray-200' : 'bg-white'
-                      ]"
+                      :class="[ 'px-2 py-1 border rounded', editor.isActive('underline') ? 'bg-gray-200' : 'bg-white' ]"
                       @click="toggleUnderline"
                     >
                       <u>U</u>
@@ -257,7 +248,6 @@
           <label for="new-event-image" class="styled-file-label w-full text-center">
             Choose Event Image
           </label>
-         
         </div>
 
         <!-- Event Link Section -->
@@ -445,13 +435,13 @@ const newEvent = ref({
   link: ''
 })
 
-// 3) Create the Tiptap editor instance
+// 3) Create the Tiptap editor instance (JSON‐ready)
 const editor = useEditor({
-  extensions: [
-    StarterKit,
-    Underline
-  ],
-  content: '',
+  extensions: [StarterKit, Underline],
+  content: {
+    type: 'doc',
+    content: []
+  },
   autofocus: false,
   editorProps: {
     attributes: {
@@ -508,12 +498,12 @@ const submitNewEvent = async () => {
     loading.value = true
     const eventForm = new FormData()
 
-    // Grab HTML from Tiptap
-    const descriptionHtml = editor.value.getHTML()
+    // ▶ Grab JSON from Tiptap for Strapi’s JSON field
+    const descriptionJson = editor.value.getJSON()
 
     const eventData: Record<string, unknown> = {
       title: newEvent.value.title,
-      description: descriptionHtml,
+      description: descriptionJson,   // <— send JSON, not HTML
       date: newEvent.value.date,
       city: newEvent.value.city,
       state: newEvent.value.state,

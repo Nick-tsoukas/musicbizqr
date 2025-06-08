@@ -25,6 +25,7 @@
     "@nuxtjs/strapi": "^1.12.0",
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@tiptap/extension-underline": "^2.12.0",
+    "@tiptap/html": "^2.14.0",
     "@tiptap/starter-kit": "^2.12.0",
     "@tiptap/vue-3": "^2.12.0",
     "@unlok-co/nuxt-stripe": "^4.0.1",
