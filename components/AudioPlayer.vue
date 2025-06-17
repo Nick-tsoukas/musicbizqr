@@ -53,7 +53,7 @@
     </div>
 
     <!-- Song List -->
-    <ul class="song-list" v-if="songs.length > 0">
+    <ul class="song-list" v-if="songs.length > 1">
       <li
         v-for="(song, index) in songs"
         :key="song.id || index"
@@ -161,11 +161,33 @@ const artistName = computed(() =>
 
 // Initialize volume on mount
 onMounted(async () => {
+  // wait for DOM to settle
   await nextTick();
+  // set initial volume
   if (audioPlayer.value) {
     audioPlayer.value.volume = volume.value;
   }
+
+  // if there's exactly one song, select it (but don't auto-play)
+  if (songs.value.length === 1) {
+    // 1) mark it as current
+    currentSong.value = songs.value[0];
+
+    // 2) figure out its URL the same way playSong does
+    const fileUrl =
+      currentSong.value.file?.data?.attributes?.url ||
+      currentSong.value.song?.data?.attributes?.url ||
+      "";
+
+    // 3) load metadata so duration is set
+    if (audioPlayer.value && fileUrl) {
+      audioPlayer.value.src = fileUrl;
+      audioPlayer.value.load();
+      // onloadedmetadata will fire and update `duration`
+    }
+  }
 });
+
 
 // Play a given song object
 const playSong = async (song) => {

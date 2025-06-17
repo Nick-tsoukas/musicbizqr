@@ -51,10 +51,7 @@
           </h2>
 
           <!-- Embedded Track -->
-          <div
-            v-if="band.data.singlesong.isEmbed && embedUrl"
-            class="w-full"
-          >
+          <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
             <div
               class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
             >
@@ -93,7 +90,7 @@
           </div>
 
           <!-- Raw Audio: always show AudioPlayer -->
-          <div v-else  class="w-full">
+          <div v-else class="w-full">
             <AudioPlayer
               :album="formatSingleSong(band.data.singlesong)"
               :placeholderImage="'/placeholder-image.svg'"
@@ -224,11 +221,14 @@
         </section>
 
         <!-- Events & Tours -->
-        <section v-if="events.length" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">
-            Events and Tours
+        <!-- Upcoming Events -->
+        <section v-if="upcomingEvents.length" class="mt-10">
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+            Upcoming Events
           </h2>
-          <div class="overflow-x-scroll md:overflow-hidden relative">
+          <div
+            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
+          >
             <table
               class="w-full table-auto bg-black text-white rounded-md shadow-lg"
             >
@@ -242,7 +242,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="event in events"
+                  v-for="event in upcomingEvents"
                   :key="event.id"
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
                   @click="router.push(`/event/${event.id}`)"
@@ -250,7 +250,7 @@
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ formatDate(event.date) }}
                   </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400 underline-offset-2">
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ event.city || "N/A" }}, {{ event.state }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
@@ -258,7 +258,56 @@
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
-                      @click="router.push(`/event/${event.id}`)"
+                      @click.stop="router.push(`/event/${event.id}`)"
+                      class="text-purple-400"
+                    >
+                      View Event
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Past Events -->
+        <section v-if="pastEvents.length" class="mt-10">
+          <h2 class="text-2xl md:text-3xl font-bold text-gray-400 mb-4">
+            Past Events
+          </h2>
+          <div
+            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
+          >
+            <table
+              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
+            >
+              <thead>
+                <tr class="border-b border-purple-500 border-opacity-30">
+                  <th class="px-2 py-2 text-left">Date</th>
+                  <th class="px-2 py-2 text-left">City</th>
+                  <th class="px-2 py-2 text-left">Venue</th>
+                  <th class="px-2 py-2 text-left">Tickets</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="event in pastEvents"
+                  :key="event.id"
+                  class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
+                  @click="router.push(`/event/${event.id}`)"
+                >
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+                    {{ formatDate(event.date) }}
+                  </td>
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+                    {{ event.city || "N/A" }}, {{ event.state }}
+                  </td>
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+                    {{ event.venue || "N/A" }}
+                  </td>
+                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+                    <button
+                      @click.stop="router.push(`/event/${event.id}`)"
                       class="text-purple-400"
                     >
                       View Event
@@ -272,11 +321,7 @@
       </div>
 
       <footer class="h-40 flex justify-center items-center">
-        <img
-          src="@/assets/musicbizlogo.png"
-          alt="MusicBiz Logo"
-          class="h-12"
-        />
+        <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
       </footer>
     </div>
   </div>
@@ -372,28 +417,24 @@ function formatDate(dateStr) {
 
 // Build a “single-song” object that matches AudioPlayer.vue’s expected shape
 function formatSingleSong(single) {
-  // try to grab the upload URL
-  const fileUrl = single.song?.data?.attributes?.url || null;
+  // first try the nested Strapi v4-media shape
+  const nestedUrl = single.song?.data?.attributes?.url;
+  // then fall back to the flat media object’s url
+  const directUrl = single.song?.url;
+  const fileUrl = nestedUrl || directUrl || null;
 
   return {
     id: single.id,
     attributes: {
       title: single.title,
-      // always give AudioPlayer a well‑formed shape, even if url is null
-      song: {
-        data: {
-          attributes: {
-            url: fileUrl,
-          },
-        },
-      },
+      // re-wrap it into the shape AudioPlayer expects:
+      song: { data: { attributes: { url: fileUrl } } },
       duration: single.duration || 0,
       cover: single.cover || null,
       artist: band.value.data.name,
     },
   };
 }
-
 
 // Analytics for “play”
 async function onSongPlay() {
@@ -446,9 +487,24 @@ async function fetchBandData() {
   );
   const data = await res.json();
   band.value = data;
+  const evts = data.data.events || [];
   events.value = data.data.events || [];
   loading.value = false;
 }
+
+const today = new Date();
+
+const upcomingEvents = computed(() =>
+  events.value
+    .filter((e) => new Date(e.date + "T00:00:00") >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+);
+
+const pastEvents = computed(() =>
+  events.value
+    .filter((e) => new Date(e.date + "T00:00:00") < today)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+);
 
 // SEO: dynamic <head> tags using band data
 const bandName = computed(() => band.value?.data?.name || "");
@@ -472,26 +528,30 @@ useHead({
       name: "description",
       content:
         bandBio.value ||
-        "Discover this artist on musicbizqr—dynamic QR link tree with analytics."
+        "Discover this artist on musicbizqr—dynamic QR link tree with analytics.",
     },
     { hid: "og:title", property: "og:title", content: bandName },
     {
       hid: "og:description",
       property: "og:description",
-      content: bandBio
+      content: bandBio,
     },
     {
       hid: "og:image",
       property: "og:image",
-      content: bandImage
+      content: bandImage,
     },
     {
       hid: "og:url",
       property: "og:url",
-      content: bandUrl
+      content: bandUrl,
     },
-    { hid: "twitter:card", name: "twitter:card", content: "summary_large_image" }
-  ]
+    {
+      hid: "twitter:card",
+      name: "twitter:card",
+      content: "summary_large_image",
+    },
+  ],
 });
 
 onMounted(fetchBandData);
