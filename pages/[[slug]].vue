@@ -272,7 +272,7 @@
 
         <!-- Past Events -->
         <section v-if="pastEvents.length" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-gray-400 mb-4">
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Past Events
           </h2>
           <div
