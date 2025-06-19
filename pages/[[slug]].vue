@@ -349,7 +349,7 @@ import spotifyIcon from "@/assets/spotify.svg";
 import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
-
+// redploy coment 
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
