@@ -6,7 +6,7 @@
 
     <div v-else class="bg-black w-screen mx-auto">
       <!-- Hero Section -->
-      <div class="relative w-full h-[35vh] md:h-[60vh]">
+      <div class="relative w-full h-[30vh] md:h-[60vh]">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -42,9 +42,8 @@
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <!-- Featured Song -->
+      <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <section v-if="band.data.singlesong" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
@@ -99,6 +98,11 @@
             />
           </div>
         </section>
+      </div>
+
+      <!-- Main Content -->
+      <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+      
 
         <!-- Featured Video -->
         <section
@@ -222,7 +226,11 @@
 
         <!-- Events & Tours -->
         <!-- Upcoming Events -->
-        <section v-if="upcomingEvents.length" class="mt-10">
+        <section
+          id="upcoming-events"
+          v-if="upcomingEvents.length"
+          class="mt-10"
+        >
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Upcoming Events
           </h2>
@@ -307,7 +315,12 @@
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
-                      @click.stop="router.push(`/event/${event.id}`)"
+                      @click.stop="
+                        router.push({
+                          path: `/event/${event.id}`,
+                          query: { slug: route.params.slug },
+                        })
+                      "
                       class="text-purple-400"
                     >
                       View Event
@@ -328,7 +341,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch, nextTick } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import YouTube from "vue3-youtube";
@@ -349,7 +362,7 @@ import spotifyIcon from "@/assets/spotify.svg";
 import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
-// redploy coment 
+// redploy coment
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
@@ -362,6 +375,13 @@ const router = useRouter();
 const loading = ref(true);
 const band = ref(null);
 const events = ref([]);
+
+function scrollToUpcoming() {
+  nextTick(() => {
+    const el = document.getElementById("upcoming-events");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  });
+}
 
 const isEmbeddedPlaying = ref(false);
 

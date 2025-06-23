@@ -1,5 +1,11 @@
 <template>
   <header class="bg-[#000] text-white shadow-lg z-50">
+    <BackButton
+     v-if="showBack"
+      defaultRoute="/dashboard"
+      class="absolute top-14 left-4 z-50"
+    />
+   
     <div class=" p-5 mx-auto flex items-center justify-between px-4 py-4">
       <img src="@/assets/musicbizlogo.png" class="h-8" />
       <!-- <div class="text-xl font-bold">MusicBizQR</div> -->
@@ -13,6 +19,7 @@
         <NuxtLink v-if="user" to="/account" class="nav-link">Account</NuxtLink>
 
       </nav>
+     
       <button @click="toggleMenu" class="animated__animate__slideInDown md:hidden focus:outline-none">
         <svg
           class="w-6 h-6 transition-transform transform"
@@ -55,7 +62,7 @@
       </div>
     </nav>
   </header>
-</template>
+  </template>
 
 <script setup>
 
@@ -63,8 +70,10 @@
 const user = useStrapiUser();
 const { logout } = useStrapiAuth();
 const router = useRouter();
+const route = useRoute()
 
 const isMenuOpen = ref(false);
+const showBack = computed(() => route.path !== '/')
 
 const toggleMenu = () => {
   if (!isMenuOpen.value) {
