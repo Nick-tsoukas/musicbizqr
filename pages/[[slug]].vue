@@ -11,7 +11,7 @@
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
           :alt="`${band.data.name} image`"
-          class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
+          class="absolute inset-0 w-auto m-auto h-[30vh]  object-cover"
         />
         <div class="absolute inset-0 bg-black bg-opacity-0"></div>
       </div>
