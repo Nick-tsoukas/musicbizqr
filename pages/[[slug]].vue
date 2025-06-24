@@ -3,10 +3,10 @@
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
-
-    <div v-else class="bg-black w-screen mx-auto">
-      <!-- Hero Section -->
-      <div class="relative w-full h-[30vh] md:h-[60vh]">
+    <!-- container for the first main section -->
+     <setion v-if="!loading" class="h-[100vh] max-h-[100vh]">
+     <!-- Hero Section -->
+      <div class="relative w-full h-[30vh] md:h-[30vh]">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -15,11 +15,13 @@
         />
         <div class="absolute inset-0 bg-black bg-opacity-0"></div>
       </div>
+      <section class="h-[30vh] flex flex-col justify-center ">
 
+     
       <!-- Band Name -->
       <div
         v-if="!band.data.isBandNameInLogo"
-        class="text-center text-white text-4xl font-bold mt-4"
+        class="text-center text-white text-2xl font-bold mt-4"
       >
         {{ band.data.name }}
       </div>
@@ -41,9 +43,10 @@
           </p>
         </div>
       </div>
+    </section>
 
         <!-- Featured Song -->
-      <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <div class="w-full px-6 mt-4 h-[30vh] md:max-w-[80vw] md:mx-auto">
         <section v-if="band.data.singlesong" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
@@ -98,7 +101,13 @@
             />
           </div>
         </section>
-      </div>
+        </div>
+      </setion>
+
+    <div v-if="!loading" class="bg-black w-screen mx-auto">
+     
+
+      
 
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
