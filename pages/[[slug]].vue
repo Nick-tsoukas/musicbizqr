@@ -4,50 +4,56 @@
       <div class="spinner"></div>
     </div>
     <!-- container for the first main section -->
-     <setion v-if="!loading" class="h-[100vh] max-h-[100vh]">
-     <!-- Hero Section -->
-      <div class="relative w-full h-[30vh] md:h-[30vh]">
-        <img
-          v-if="band.data.bandImg"
-          :src="band.data.bandImg.url"
-          :alt="`${band.data.name} image`"
-          class="absolute inset-0 w-auto m-auto h-[30vh]  object-cover"
-        />
-        <div class="absolute inset-0 bg-black bg-opacity-0"></div>
-      </div>
-      <section class="h-[30vh] flex flex-col justify-center ">
-
-     
-      <!-- Band Name -->
-      <div
-        v-if="!band.data.isBandNameInLogo"
-        class="text-center text-white text-2xl font-bold mt-4"
-      >
-        {{ band.data.name }}
-      </div>
-
-      <!-- Bio & Tagline -->
-      <div class="flex justify-center mt-4">
-        <div class="text-center text-white max-w-5xl">
-          <p
-            v-if="band.data.bio"
-            class="md:text-2xl leading-tight whitespace-pre-line"
-          >
-            {{ band.data.bio }}
-          </p>
-          <p
-            v-if="band.data.biotagline"
-            class="md:text-2xl leading-tight whitespace-pre-line mt-2"
-          >
-            {{ band.data.biotagline }}
-          </p>
+    <!-- Main content when not loading -->
+    <main v-else class="flex flex-col h-[calc(100vh-90px)]">
+      <!-- Hero + Bio wrapper -->
+      <div class="flex flex-col">
+        <!-- Hero Section -->
+        <div class="relative w-full h-[38vh] ">
+          <img
+            v-if="band.data.bandImg"
+            :src="band.data.bandImg.url"
+            :alt="`${band.data.name} image`"
+            class="absolute inset-0 w-auto m-auto h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-black bg-opacity-0"></div>
         </div>
-      </div>
-    </section>
 
-        <!-- Featured Song -->
-        <div class="w-full px-6 mt-4 h-[30vh] md:max-w-[80vw] md:mx-auto">
-        <section v-if="band.data.singlesong" class="mt-10">
+        <!-- Bio & Band Name Section -->
+        <section class="h-[20vh] flex flex-col justify-center ">
+          <!-- Band Name -->
+          <div
+            v-if="!band.data.isBandNameInLogo"
+            class="text-center text-white text-2xl font-bold"
+          >
+            {{ band.data.name }}
+          </div>
+
+          <!-- Bio & Tagline -->
+          <div class="flex justify-center mt-2">
+            <div class="text-center text-white max-w-5xl">
+              <p
+                v-if="band.data.bio"
+                class="md:text-2xl leading-tight whitespace-pre-line"
+              >
+                {{ band.data.bio }}
+              </p>
+              <p
+                v-if="band.data.biotagline"
+                class="md:text-2xl leading-tight whitespace-pre-line mt-2"
+              >
+                {{ band.data.biotagline }}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Featured Song pinned to bottom -->
+      <div
+        class="mt-auto w-full px-6 h-[30vh]  md:max-w-[80vw] md:mx-auto"
+      >
+        <section v-if="band.data.singlesong">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
           </h2>
@@ -91,7 +97,7 @@
             </div>
           </div>
 
-          <!-- Raw Audio: always show AudioPlayer -->
+          <!-- Raw Audio Player Fallback -->
           <div v-else class="w-full">
             <AudioPlayer
               :album="formatSingleSong(band.data.singlesong)"
@@ -101,18 +107,11 @@
             />
           </div>
         </section>
-        </div>
-      </setion>
-
+      </div>
+    </main>
     <div v-if="!loading" class="bg-black w-screen mx-auto">
-     
-
-      
-
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
-      
-
         <!-- Featured Video -->
         <section
           v-if="band.data.singlevideo?.youtubeid"

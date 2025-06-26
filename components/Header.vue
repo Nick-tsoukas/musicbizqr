@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-[#000] text-white shadow-lg z-50">
+  <header class="bg-[#000] text-white shadow-lg z-50 ">
     <BackButton
      v-if="showBack"
       defaultRoute="/dashboard"
