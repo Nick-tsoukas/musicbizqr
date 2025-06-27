@@ -3,13 +3,13 @@
     <!-- Event Hero Section -->
     <div
       v-if="eventData"
-      class="relative w-full max-w-4xl mx-auto bg-gray-200 rounded-lg overflow-hidden mb-8 shadow-lg"
+      class="relative w-full max-w-4xl mx-auto rounded-lg overflow-hidden mb-8 shadow-lg"
     >
       <img
         v-if="eventData.image && eventData.image.data"
         :src="eventData.image.data.attributes.url"
         alt="Event Hero Image"
-        class="w-full h-auto object-contain"
+        class="w-full object-contain max-h-[calc(100vh-90px)]"
       />
     </div>
 
@@ -26,6 +26,7 @@
    class="prose max-w-none text-lg leading-snug text-black space-y-4"
    v-html="descriptionHTML"
  ></div>
+
     </section>
         <!-- Date & Time -->
         <section v-if="eventData.date || eventData.time" class="mb-6">

@@ -5,79 +5,67 @@
     </div>
     <!-- container for the first main section -->
     <!-- Main content when not loading -->
-    <main v-else class="flex flex-col h-[calc(100vh-90px)]">
-      <!-- Hero + Bio wrapper -->
-      <div class="flex flex-col">
-        <!-- Hero Section -->
-        <div class="relative w-full h-[38vh] ">
-          <img
-            v-if="band.data.bandImg"
-            :src="band.data.bandImg.url"
-            :alt="`${band.data.name} image`"
-            class="absolute inset-0 w-auto m-auto h-full object-cover"
-          />
-          <div class="absolute inset-0 bg-black bg-opacity-0"></div>
-        </div>
-
-        <!-- Bio & Band Name Section -->
-        <section class="h-[20vh] flex flex-col justify-center ">
-          <!-- Band Name -->
-          <div
-            v-if="!band.data.isBandNameInLogo"
-            class="text-center text-white text-2xl font-bold"
-          >
-            {{ band.data.name }}
-          </div>
-
-          <!-- Bio & Tagline -->
-          <div class="flex justify-center mt-2">
-            <div class="text-center text-white max-w-5xl">
-              <p
-                v-if="band.data.bio"
-                class="md:text-2xl leading-tight whitespace-pre-line"
-              >
-                {{ band.data.bio }}
-              </p>
-              <p
-                v-if="band.data.biotagline"
-                class="md:text-2xl leading-tight whitespace-pre-line mt-2"
-              >
-                {{ band.data.biotagline }}
-              </p>
-            </div>
-          </div>
-        </section>
+    <main
+      v-else
+      class="flex flex-col h-[calc(100vh-90px)] min-h-0 md:max-w-[80vw] md:mx-auto"
+    >
+      <!-- 1/3: Hero -->
+      <div class="flex-1 relative">
+        <img
+          v-if="band.data.bandImg"
+          :src="band.data.bandImg.url"
+          :alt="`${band.data.name} image`"
+          class="absolute inset-0 w-auto m-auto h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- Featured Song pinned to bottom -->
-      <div
-        class="mt-auto w-full px-6 h-[30vh]  md:max-w-[80vw] md:mx-auto"
-      >
+      <!-- 2/3: Bio, centered -->
+      <section class="flex-1 flex flex-col justify-center px-6">
+        <div
+          v-if="!band.data.isBandNameInLogo"
+          class="text-center text-white text-2xl font-bold"
+        >
+          {{ band.data.name }}
+        </div>
+        <div
+          class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line"
+        >
+          <p v-if="band.data.bio">{{ band.data.bio }}</p>
+          <p v-if="band.data.biotagline" class="mt-2">
+            {{ band.data.biotagline }}
+          </p>
+        </div>
+      </section>
+
+      <!-- 3/3: Featured song, with play/control pinned to bottom -->
+      <div class="flex-1 flex flex-col justify-end px-6 pb-6">
         <section v-if="band.data.singlesong">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
           </h2>
 
-          <!-- Embedded Track -->
           <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
             <div
               class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
             >
+              <!-- overlay or iframe as before -->
               <div
                 v-if="!isEmbeddedPlaying"
                 @click="startEmbedded()"
-                class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
+                class="absolute inset-0 bg-black bg-opacity-75 flex flex-col"
               >
-                <div class="absolute top-2 left-2">
+                <div class="p-2">
                   <p class="text-white font-bold">
                     {{ band.data.singlesong.title }}
                   </p>
                   <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
                 </div>
-                <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex-1 flex items-center justify-center">
+                  <!-- play icon -->
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-16 h-16 text-white"
+                    class="w-16 h-16"
                     fill="currentColor"
                     viewBox="0 0 84 84"
                   >
@@ -97,7 +85,6 @@
             </div>
           </div>
 
-          <!-- Raw Audio Player Fallback -->
           <div v-else class="w-full">
             <AudioPlayer
               :album="formatSingleSong(band.data.singlesong)"
@@ -234,57 +221,68 @@
 
         <!-- Events & Tours -->
         <!-- Upcoming Events -->
-        <section
-          id="upcoming-events"
-          v-if="upcomingEvents.length"
-          class="mt-10"
+        <!-- Upcoming Events -->
+      <!-- Upcoming Events -->
+<section id="upcoming-events" class="mt-10">
+  <!-- Section Title -->
+  <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+    Upcoming Events
+  </h2>
+
+  <!-- 1) Loading Spinner -->
+  <div v-if="loading" class="py-10 flex justify-center">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- 2) Events Table -->
+  <div
+    v-else-if="upcomingEvents.length"
+    class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
+  >
+    <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
+      <thead>
+        <tr class="border-b border-purple-500 border-opacity-30">
+          <th class="px-2 py-2 text-left">Date</th>
+          <th class="px-2 py-2 text-left">City</th>
+          <th class="px-2 py-2 text-left">Venue</th>
+          <th class="px-2 py-2 text-left">Tickets</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="event in upcomingEvents"
+          :key="event.id"
+          class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
+          @click="router.push({ path: `/event/${event.id}`, query: { slug: route.params.slug } })"
         >
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Upcoming Events
-          </h2>
-          <div
-            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
-          >
-            <table
-              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
+          <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+            {{ formatDate(event.date) }}
+          </td>
+          <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+            {{ event.city || 'N/A' }}, {{ event.state }}
+          </td>
+          <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+            {{ event.venue || 'N/A' }}
+          </td>
+          <td class="px-2 py-1 whitespace-nowrap text-purple-400">
+            <button
+              @click.stop="router.push({ path: `/event/${event.id}`, query: { slug: route.params.slug } })"
+              class="text-purple-400"
             >
-              <thead>
-                <tr class="border-b border-purple-500 border-opacity-30">
-                  <th class="px-2 py-2 text-left">Date</th>
-                  <th class="px-2 py-2 text-left">City</th>
-                  <th class="px-2 py-2 text-left">Venue</th>
-                  <th class="px-2 py-2 text-left">Tickets</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="event in upcomingEvents"
-                  :key="event.id"
-                  class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click="router.push(`/event/${event.id}`)"
-                >
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ formatDate(event.date) }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.city || "N/A" }}, {{ event.state }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.venue || "N/A" }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    <button
-                      @click.stop="router.push(`/event/${event.id}`)"
-                      class="text-purple-400"
-                    >
-                      View Event
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+              View Event
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3) No Events Message -->
+  <div v-else class="py-10 text-center text-white">
+    No upcoming events.
+  </div>
+</section>
+
 
         <!-- Past Events -->
         <section v-if="pastEvents.length" class="mt-10">
@@ -350,7 +348,8 @@
 
 <script setup>
 import { ref, onMounted, computed, watch, nextTick } from "vue";
-import { useRuntimeConfig } from "#imports";
+import { useRuntimeConfig, useAsyncData, useFetch } from "#imports";
+
 import { useBeacon } from "@/composables/useBeacon";
 import YouTube from "vue3-youtube";
 import { useRoute, useRouter } from "vue-router";
@@ -375,6 +374,8 @@ import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
 
+const HEADER_OFFSET = 90; // height of your fixed header in px
+
 const { trackClick, trackMediaPlay } = useBeacon();
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -384,12 +385,18 @@ const loading = ref(true);
 const band = ref(null);
 const events = ref([]);
 
-function scrollToUpcoming() {
-  nextTick(() => {
-    const el = document.getElementById("upcoming-events");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  });
+async function scrollToUpcoming() {
+  if (route.hash !== "#upcoming-events") return;
+  // wait for the DOM to render the section
+  await nextTick();
+  const el = document.getElementById("upcoming-events");
+  if (!el) return;
+  // compute top position minus header
+  const top =
+    el.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
+  window.scrollTo({ top, behavior: "smooth" });
 }
+
 
 const isEmbeddedPlaying = ref(false);
 
@@ -518,6 +525,16 @@ async function fetchBandData() {
   const evts = data.data.events || [];
   events.value = data.data.events || [];
   loading.value = false;
+
+  await nextTick(); // wait for the template to render that <section>
+  if (window.location.hash === "#upcoming-events") {
+    const el = document.getElementById("upcoming-events");
+    if (el) {
+      const offset =
+        el.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
+      window.scrollTo({ top: offset, behavior: "smooth" });
+    }
+  }
 }
 
 const today = new Date();
@@ -548,6 +565,18 @@ const bandUrl = computed(() =>
     : ""
 );
 
+watch(
+  () => [route.hash, upcomingEvents.value.length],
+  async ([hash, count]) => {
+    if (hash === '#upcoming-events' && count > 0) {
+      // wait until Vue has rendered the table
+      await nextTick()
+      const el = document.getElementById('upcoming-events')
+      if (el) scrollIntoViewWithOffset(el)
+    }
+  },
+  { immediate: true }
+)
 useHead({
   title: bandName,
   meta: [
@@ -582,7 +611,19 @@ useHead({
   ],
 });
 
-onMounted(fetchBandData);
+onMounted(async () => {
+  // 1) First fetch the band & events as you already do
+  await fetchBandData()
+
+  // 2) Wait for Vue to render the <section id="upcoming-events">
+  await nextTick()
+
+  // 3) If the URL has “#upcoming-events”, scroll it into view
+  if (window.location.hash === '#upcoming-events') {
+    const el = document.getElementById('upcoming-events')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+})
 </script>
 
 <style scoped>

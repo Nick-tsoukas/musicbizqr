@@ -2,16 +2,14 @@
   <button
     @click="goBack"
     aria-label="Go back"
-    class="flex items-center justify-center
-           w-10 h-10 absolute
-           text-gray-600 hover:text-gray-800
+    class="absolute top-16 left-16 flex items-center justify-center
+           w-10 h-10 text-gray-200 hover:text-gray-800
            focus:outline-none focus:ring-2 focus:ring-gray-500
            rounded transition"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="w-6 h-6"
-      :class="{ 'scale-x-[-1]': rtl }"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -24,31 +22,29 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { nextTick } from 'vue'
 
 const router = useRouter()
 const route  = useRoute()
-const rtl    = computed(() => document?.dir?.toLowerCase() === 'rtl')
+
+function scrollToUpcoming() {
+  nextTick(() => {
+    const el = document.getElementById('upcoming-events')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  })
+}
 
 function goBack() {
-  // 1) If we’re on an event page, send to /bandSlug#upcoming-events and then scroll
+  // 1) If we’re on an event page, route to /{slug}#upcoming-events
   if (route.path.startsWith('/event/') && route.query.slug) {
-    const slug = String(route.query.slug)
+    const raw  = route.query.slug
+    const slug = Array.isArray(raw) ? raw[0] : (raw as string)
     router.push({ path: `/${slug}`, hash: '#upcoming-events' })
-      .then(() => {
-        // give Nuxt a tick to render, then scroll
-        const el = document.getElementById('upcoming-events')
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      })
+      .then(scrollToUpcoming)
     return
   }
 
-  // 2) Otherwise, normal history back
-  if (window.history.length > 1) {
-    return router.back()
-  }
-
-  // 3) Fallback
-  return router.push('/dashboard')
+  // 2) Otherwise, always go to dashboard
+  router.push('/dashboard')
 }
 </script>
