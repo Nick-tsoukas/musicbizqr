@@ -5,7 +5,7 @@
       <div class="spinner"></div>
     </div>
 
-    <div v-else class="bg-black w-screen mx-auto">
+    <div v-else class="bg-black w-screen mx-auto  pt-[var(--header-height)]">
       <!-- Hero Section -->
       <div class="relative w-full h-[35vh] md:h-[60vh]">
         <img
