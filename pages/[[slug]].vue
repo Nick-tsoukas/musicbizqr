@@ -7,11 +7,11 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="flex flex-col min-h-0 md:max-w-[80vw] md:mx-auto"
-       style="height: calc(100vh - 110px) !important;"
+      class="mx-auto md:max-w-[80vw] grid grid-rows-[35vh_auto_30vh]"
+      style="height: calc(100vh - 105px) !important"
     >
-      <!-- 1/3: Hero (35vh) -->
-      <div class="h-[35vh] relative">
+      <!-- 1) Hero (35vh) -->
+      <div class="relative row-start-1 row-end-2">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -21,8 +21,8 @@
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- 2/3: Bio (flexible) -->
-      <section class="flex-1 flex flex-col justify-center px-6">
+      <!-- 2) Bio (auto height) -->
+      <section class="row-start-2 row-end-3 flex flex-col justify-center px-6">
         <div
           v-if="!band.data.isBandNameInLogo"
           class="text-center text-white text-2xl font-bold"
@@ -32,26 +32,27 @@
         <div
           class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line"
         >
-          <p v-if="band.data.bio">{{ band.data.bio }}</p>
+          <p v-if="band.data.bio" class="sm:text-sm ">{{ band.data.bio }}</p>
           <p v-if="band.data.biotagline" class="mt-2">
             {{ band.data.biotagline }}
           </p>
         </div>
       </section>
 
-      <!-- 3/3: Featured Song (max-height 30vh) -->
-      <div
-        class="max-h-[30vh] flex flex-col justify-end px-6 pb-6 overflow-visible"
-      >
-        <section v-if="band.data.singlesong">
-          <!-- <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+      <!-- 3) Featured Song (30vh) -->
+      <div class="row-start-3 row-end-4 px-6 pb-6 flex flex-col">
+        <section v-if="band.data.singlesong" class="flex-1 flex flex-col">
+          <!-- Title -->
+          <!-- <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
             Featured Song
           </h2> -->
 
-          <!-- Embedded Track -->
-          <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
+          <!-- Content fills the rest -->
+          <div class="flex-1 flex flex-col">
+            <!-- Embedded -->
             <div
-              class="relative w-full aspect-video rounded-lg overflow-hidden bg-black"
+              v-if="band.data.singlesong.isEmbed && embedUrl"
+              class="relative w-full h-full rounded-lg overflow-hidden bg-black"
             >
               <div
                 v-if="!isEmbeddedPlaying"
@@ -85,16 +86,16 @@
                 class="absolute inset-0 w-full h-full"
               />
             </div>
-          </div>
 
-          <!-- AudioPlayer Fallback -->
-          <div v-else class="w-full flex-1">
-            <AudioPlayer
-              :album="formatSingleSong(band.data.singlesong)"
-              :placeholderImage="'/placeholder-image.svg'"
-              @play="onSongPlay"
-              class="rounded-lg h-full"
-            />
+            <!-- AudioPlayer fallback -->
+            <div v-else class="w-full h-full">
+              <AudioPlayer
+                :album="formatSingleSong(band.data.singlesong)"
+                :placeholderImage="'/placeholder-image.svg'"
+                @play="onSongPlay"
+                class="h-full rounded-lg"
+              />
+            </div>
           </div>
         </section>
       </div>
@@ -628,7 +629,6 @@ useHead({
 onMounted(async () => {
   // 1) First fetch the band & events as you already do
   await fetchBandData();
-  
 
   // 2) Wait for Vue to render the <section id="upcoming-events">
   await nextTick();
