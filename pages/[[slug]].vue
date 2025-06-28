@@ -7,11 +7,10 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="mx-auto md:max-w-[80vw] grid grid-rows-[35vh_auto_30vh]"
-      style="height: calc(100vh - 90px) !important"
+      class="flex flex-col h-[calc(100vh-90px)] pb-[env(safe-area-inset-bottom)] mx-auto md:max-w-[80vw] md:mx-auto"
     >
-      <!-- 1) Hero (35vh) -->
-      <div class="relative row-start-1 row-end-2">
+      <!-- 1) Hero: always 35vh -->
+      <div class="flex-none h-[35vh] relative">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -21,8 +20,8 @@
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- 2) Bio (auto height) -->
-      <section class="row-start-2 row-end-3 flex flex-col justify-center px-6">
+      <!-- 2) Bio: stretches to fill leftover space -->
+      <section class="flex-1 flex flex-col justify-center px-6">
         <div
           v-if="!band.data.isBandNameInLogo"
           class="text-center text-white text-2xl font-bold"
@@ -32,27 +31,28 @@
         <div
           class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line"
         >
-          <p v-if="band.data.bio" class="sm:text-sm ">{{ band.data.bio }}</p>
-          <p v-if="band.data.biotagline" class="mt-2">
+          <p v-if="band.data.bio" class="text-sm md:text-base">
+            {{ band.data.bio }}
+          </p>
+          <p v-if="band.data.biotagline" class="mt-2 text-sm md:text-base">
             {{ band.data.biotagline }}
           </p>
         </div>
       </section>
 
-      <!-- 3) Featured Song (30vh) -->
-      <div class="row-start-3 row-end-4 px-6 pb-6 flex flex-col">
-        <section v-if="band.data.singlesong" class="flex-1 flex flex-col">
-          <!-- Title -->
-          <h2 class="hidden sm:block  text-xl md:text-3xl font-bold text-white mb-2">
+      <!-- 3) Featured Song: always 30vh, controls pinned at bottom -->
+      <div class="flex-none h-[30vh] flex flex-col justify-end px-6">
+        <section v-if="band.data.singlesong">
+          <h2
+            class="hidden sm:block text-xl md:text-3xl font-bold text-white mb-2"
+          >
             Featured Song
           </h2>
-
-          <!-- Content fills the rest -->
-          <div class="flex-1 flex flex-col">
-            <!-- Embedded -->
+          <div class="flex-1 flex items-stretch">
+            <!-- If embedded -->
             <div
               v-if="band.data.singlesong.isEmbed && embedUrl"
-              class="relative w-full h-full rounded-lg overflow-hidden bg-black"
+              class="relative w-full rounded-lg overflow-hidden bg-black"
             >
               <div
                 v-if="!isEmbeddedPlaying"
@@ -87,7 +87,7 @@
               />
             </div>
 
-            <!-- AudioPlayer fallback -->
+            <!-- Fallback audio player -->
             <div v-else class="w-full h-full">
               <AudioPlayer
                 :album="formatSingleSong(band.data.singlesong)"
