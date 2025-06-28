@@ -14,17 +14,20 @@
       </div>
     </div>
 
-    <!-- 2) Controls + Progress (single row) -->
-    <div class="controls-progress flex-none">
+    <!-- 2) Controls + Progress (single pinned row) -->
+    <div class="controls-progress flex-none flex items-center px-4 py-2">
+      <!-- Previous -->
       <button @click="previousSong" class="control-button">
         <img src="@/assets/previous-icon.svg" alt="Previous" />
       </button>
 
+      <!-- Play/Pause -->
       <button @click="togglePlay" class="control-button mx-2">
         <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
         <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
       </button>
 
+      <!-- Next (if multiple) -->
       <button
         v-if="songs.length > 1"
         @click="nextSong"
@@ -33,8 +36,10 @@
         <img src="@/assets/next-icon.svg" alt="Next" />
       </button>
 
+      <!-- Current Time -->
       <span class="current-time">{{ formatTime(currentTime) }}</span>
 
+      <!-- Seek Bar -->
       <input
         type="range"
         min="0"
@@ -42,14 +47,15 @@
         step="0.1"
         v-model="currentTime"
         @input="seekAudio"
-        class="progress-bar mx-2"
+        class="progress-bar flex-1 mx-2"
       />
 
+      <!-- Total Time -->
       <span class="total-time">{{ formatTime(duration) }}</span>
     </div>
 
-    <!-- 3) Song List -->
-    <ul class="song-list flex-1 overflow-auto" v-if="songs.length > 1">
+    <!-- 3) Song List (fills the rest) -->
+    <ul v-if="songs.length > 1" class="song-list flex-1 overflow-auto">
       <li
         v-for="(song, idx) in songs"
         :key="song.id || idx"
@@ -65,6 +71,7 @@
       </li>
     </ul>
 
+    <!-- Hidden audio element -->
     <audio
       ref="audioPlayer"
       @timeupdate="updateTime"
@@ -73,6 +80,7 @@
     ></audio>
   </div>
 </template>
+
 
 
 
@@ -332,9 +340,10 @@ const formatTime = (time) => {
 .player-container {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   background: black;
   color: #fff;
-  border-radius: 0.5rem;
+  border-radius: .5rem;
   height: 100%;
   width: 100%;
 }
