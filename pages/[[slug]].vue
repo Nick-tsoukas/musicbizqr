@@ -43,9 +43,9 @@
       <div class="row-start-3 row-end-4 px-6 pb-6 flex flex-col">
         <section v-if="band.data.singlesong" class="flex-1 flex flex-col">
           <!-- Title -->
-          <!-- <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
             Featured Song
-          </h2> -->
+          </h2>
 
           <!-- Content fills the rest -->
           <div class="flex-1 flex flex-col">
