@@ -340,7 +340,7 @@ const formatTime = (time) => {
 .player-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   background: black;
   color: #fff;
   border-radius: .5rem;

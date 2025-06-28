@@ -7,8 +7,9 @@
     <!-- Main content when not loading -->
     <main
       v-else
+       style="height: calc(100dvh - var(--header-height));"
       class="mx-auto md:max-w-[80vw]
-             h-[calc(100dvh-90px)]
+           
              pb-[env(safe-area-inset-bottom)]
              grid grid-rows-[35vh_auto_30vh]"
     >
