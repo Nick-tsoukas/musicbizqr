@@ -5,7 +5,7 @@
     </div>
     <!-- container for the first main section -->
     <!-- Main content when not loading -->
-    <main
+  <main
   v-else
   class="
     flex flex-col
