@@ -8,7 +8,7 @@
     <main
       v-else
       class="mx-auto md:max-w-[80vw] grid grid-rows-[35vh_auto_30vh]"
-      style="height: calc(100vh - 95px) !important"
+      style="height: calc(100vh - 90px) !important"
     >
       <!-- 1) Hero (35vh) -->
       <div class="relative row-start-1 row-end-2">
