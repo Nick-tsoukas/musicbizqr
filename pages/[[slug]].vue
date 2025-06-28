@@ -10,7 +10,7 @@
       class="flex flex-col mx-auto md:max-w-[80vw] pt-[var(--header-height)] h-[calc(100vh-var(--header-height))] pb-[env(safe-area-inset-bottom)] overflow-y-auto"
     >
       <!-- 1) Hero (35vh) -->
-      <div class="flex-shrink-0 h-[35vh] relative">
+      <div class="flex-shrink-0 h-[33vh] relative">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -33,7 +33,7 @@
         <div
           class="mt-2 max-w-3xl text-white whitespace-pre-line leading-tight"
         >
-          <p v-if="band.data.bio" class="text-sm md:text-base">
+          <p v-if="band.data.bio" class="text-xs md:text-base">
             {{ band.data.bio }}
           </p>
           <p v-if="band.data.biotagline" class="mt-2 text-sm md:text-base">
@@ -43,7 +43,7 @@
       </section>
 
       <!-- 3) Player (30vh pinned) -->
-      <div class="flex-shrink-0 h-[20vh] flex flex-col justify-end px-6">
+      <div class="flex-shrink-0 h-[18vh] flex flex-col justify-end px-6">
         <section v-if="band.data.singlesong" class="flex-1 flex items-stretch">
           <!-- Embedded -->
           <div
