@@ -7,7 +7,7 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="flex flex-col h-[calc(100vh-90px)] pb-[env(safe-area-inset-bottom)] mx-auto md:max-w-[80vw] md:mx-auto"
+      class="flex flex-col h-[calc(100dvh-90px)] pb-[env(safe-area-inset-bottom)] mx-auto md:max-w-[80vw] md:mx-auto"
     >
       <!-- 1) Hero: always 35vh -->
       <div class="flex-none h-[35vh] relative">
