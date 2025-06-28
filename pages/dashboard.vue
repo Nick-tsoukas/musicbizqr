@@ -42,7 +42,7 @@
             <div class="flex-grow">
               <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ qr.title }}</span>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex  items-center gap-4">
               <!-- <p class="text-white">Scans: {{ qr.scans.data.length ? qr.scans.data.length : 0 }}</p> -->
               <button
                 @click="viewQr(qr.imageUrl)"
@@ -62,7 +62,9 @@
               >
                 <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
-              <div class="flex gap-4 p-2 border-2 rounded-md border-solid">
+              
+            </div>
+            <div class="flex gap-4 p-2 ml-2 border-2 rounded-md border-solid">
                 <button
                   @click="router.push(`/analyticsqr/${qr.id}`)"
                   class="text-green-600 flex gap-4 hover:text-green-900 w-full h-full"
@@ -72,7 +74,6 @@
                   <img src="@/assets/analytics-icon.svg" class="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
-            </div>
           </li>
         </ul>
 
@@ -137,7 +138,9 @@
               >
                 <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
               </button>
-              <div class="flex gap-4 p-2 border-2 rounded-md border-solid">
+            
+            </div>
+            <div class="flex gap-4 p-2 ml-2 border-2 rounded-md border-solid">
                 <button
                   @click="router.push(`/analytics/${band.id}`)"
                   class="text-green-600 flex gap-4 hover:text-green-900"
@@ -147,7 +150,6 @@
                   <img src="@/assets/analytics-icon.svg" class="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
-            </div>
           </li>
         </ul>
 
