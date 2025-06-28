@@ -129,25 +129,32 @@
   </header>
 </template>
 
-<script setup >
-import { ref, computed, onMounted, watch } from 'vue'
-import { useStrapiUser, useStrapiAuth, useAsyncData, useRuntimeConfig, useStrapiClient } from '#imports'
+<script  setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import {
+  useStrapiUser,
+  useStrapiAuth,
+  useAsyncData,
+  useRuntimeConfig,
+} from "#imports";
+import { useRouter, useRoute } from "vue-router";
 
+const user = useStrapiUser();
+const { logout } = useStrapiAuth();
+const router = useRouter();
+const route = useRoute();
+import { watch } from 'vue'
 
-const user = useStrapiUser()
-const { logout } = useStrapiAuth()
-const router = useRouter()
-const route = useRoute()
-const strapi = useStrapiClient()
-const config = useRuntimeConfig()
-
-// fetch only the slug for the current user’s band, but don't run until we have user.id
+// fetch only the slug for the current user’s band
+const config = useRuntimeConfig();
 const { data: bandRes, error, refresh } = useAsyncData(
   'user-band',
   () =>
-    strapi.find('bands', {
-      filters: { users_permissions_user: { id: { $eq: user.value!.id } } },
-      fields: ['slug'],
+    $fetch(`${config.public.strapiUrl}/api/bands`, {
+      params: {
+        'filters[users_permissions_user][id][$eq]': user.value!.id,
+        'fields[0]': 'slug',
+      },
     }),
   { immediate: false }
 )
@@ -167,33 +174,34 @@ if (error.value) {
   console.error('Error fetching user band:', error.value)
 }
 
-// compute just the slug string
-const userSlug = computed(() => bandRes.value?.data?.[0]?.attributes.slug ?? null)
 
-// debug logs
-console.log("raw bandRes:", bandRes.value, "userId:", user.value.id)
+// this should print something like: { data: [ { id: 67, slug: "thedannynovaband" } ] }
+console.log("raw bandRes:", bandRes.value, user.value.id);
+
+const userSlug = computed(() => bandRes.value?.data?.[0]?.slug ?? null);
+
+// now wait until client‐side mount to print
 onMounted(() => {
-  console.log("[Header] Strapi response:", bandRes.value)
-  console.log("[Header] My band slug:", userSlug.value)
-})
+  console.log("[Header] Strapi response:", bandRes.value);
+  console.log("[Header] My band slug:", userSlug.value);
+});
 
-// rest of your header/menu logic
-const isMenuOpen = ref(false)
+// the rest of your header logic…
+const isMenuOpen = ref(false);
 const toggleMenu = () => {
-  document.body.style.overflow = isMenuOpen.value ? '' : 'hidden'
-  isMenuOpen.value = !isMenuOpen.value
-}
+  document.body.style.overflow = isMenuOpen.value ? "" : "hidden";
+  isMenuOpen.value = !isMenuOpen.value;
+};
 const logoutUser = () => {
-  logout()
-  router.push('/')
-}
+  logout();
+  router.push("/");
+};
 const logoutUserMobile = () => {
-  logout()
-  toggleMenu()
-  router.push('/')
-}
+  logout();
+  toggleMenu();
+  router.push("/");
+};
 </script>
-
 
 <style scoped>
 .nav-link {
