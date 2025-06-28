@@ -7,7 +7,8 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="flex flex-col h-[calc(100vh-90px)] min-h-0 md:max-w-[80vw] md:mx-auto"
+      class="flex flex-col min-h-0 md:max-w-[80vw] md:mx-auto"
+       style="height: calc(200vh - 90px) !important;"
     >
       <!-- 1/3: Hero (35vh) -->
       <div class="h-[35vh] relative">
