@@ -130,63 +130,89 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import {
-  useStrapiUser,
-  useStrapiAuth,
-  useAsyncData,
-  useRuntimeConfig,
-} from "#imports";
-import { useRouter, useRoute } from "vue-router";
+import { ref, watch } from 'vue'
+import { useStrapiUser, useStrapiAuth, useFetch, useRuntimeConfig } from '#imports'
+import { useRouter } from 'vue-router'
 
-const user = useStrapiUser();
-const { logout } = useStrapiAuth();
-const router = useRouter();
-const route = useRoute();
+const user = useStrapiUser()
+const { logout } = useStrapiAuth()
+const router = useRouter()
+const config = useRuntimeConfig()
 
-// fetch only the slug for the current user’s band
-const config = useRuntimeConfig();
-const { data: bandRes, error } = await useAsyncData('user-band', () =>
-  $fetch(`${config.public.strapiUrl}/api/bands`, {
-    params: {
-      // use the real relation name here:
-      'filters[users_permissions_user][id][$eq]': user.value?.id,
-      'fields[0]': 'slug',
-    },
-  })
+// will hold the current user’s band slug
+const userSlug = ref(null)
+
+watch(
+  () => user.value?.id,
+  async (id) => {
+    if (!id) return
+
+    try {
+      const { data, error } = await useFetch(
+        `${config.public.strapiUrl}/api/bands`,
+        {
+          params: {
+            'filters[users_permissions_user][id][$eq]': id,
+            'fields[0]': 'slug',
+          },
+        }
+      )
+
+      if (error.value) {
+        console.error('Error fetching user band:', error.value)
+        return
+      }
+
+      const list = data.value?.data
+      if (list?.length) {
+        const item = list[0]
+        // handle both shapes: flatten or attributes wrapper
+        const slug =
+          item.attributes?.slug != null
+            ? item.attributes.slug
+            : item.slug
+
+        if (slug) {
+          userSlug.value = slug
+          console.log('✅ My band slug:', slug)
+        } else {
+          console.warn('⚠️ Fetched band had no slug field:', item)
+          userSlug.value = null
+        }
+      } else {
+        console.warn('⚠️ No band found for user', id)
+        userSlug.value = null
+      }
+    } catch (e) {
+      console.error('Unexpected error fetching band:', e)
+      userSlug.value = null
+    }
+  },
+  { immediate: true }
 )
 
-if (error.value) {
-  console.error('Error fetching user band:', error.value)
-}
+// computed link
+const slugLink = ref(null)
+watch(userSlug, s => slugLink.value = s ? `/${s}` : null)
 
-// this should print something like: { data: [ { id: 67, slug: "thedannynovaband" } ] }
-console.log("raw bandRes:", bandRes.value);
-
-const userSlug = computed(() => bandRes.value?.data?.[0]?.slug ?? null);
-
-// now wait until client‐side mount to print
-onMounted(() => {
-  console.log("[Header] Strapi response:", bandRes.value);
-  console.log("[Header] My band slug:", userSlug.value);
-});
-
-// the rest of your header logic…
-const isMenuOpen = ref(false);
+// header/menu state & actions
+const isMenuOpen = ref(false)
 const toggleMenu = () => {
-  document.body.style.overflow = isMenuOpen.value ? "" : "hidden";
-  isMenuOpen.value = !isMenuOpen.value;
-};
+  document.body.style.overflow = isMenuOpen.value ? '' : 'hidden'
+  isMenuOpen.value = !isMenuOpen.value
+}
 const logoutUser = () => {
-  logout();
-  router.push("/");
-};
+  logout()
+  router.push('/')
+}
 const logoutUserMobile = () => {
-  logout();
-  toggleMenu();
-  router.push("/");
-};
+  logout()
+  toggleMenu()
+  router.push('/')
+}
 </script>
+
+
 
 <style scoped>
 .nav-link {
