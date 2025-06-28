@@ -2,8 +2,8 @@
   <button
     @click="goBack"
     aria-label="Go back"
-    class="absolute top-16 left-16 flex items-center justify-center
-           w-10 h-10 text-gray-200 hover:text-gray-800
+    class="absolute top-4 left-4 flex items-center justify-center
+           w-10 h-10 text-gray-200 hover:text-white
            focus:outline-none focus:ring-2 focus:ring-gray-500
            rounded transition"
   >
@@ -22,14 +22,12 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick } from 'vue'
-// replace with your actual auth composable
-import { useAuth } from '@/composables/useAuth'
+import { nextTick } from 'vue'
+import { useStrapiUser } from '#imports'   // auto-imported by @nuxtjs/strapi
 
 const router = useRouter()
 const route  = useRoute()
-const { user } = useAuth()
-const isLoggedIn = computed(() => !!user.value)
+const user   = useStrapiUser()
 
 function scrollToUpcoming() {
   nextTick(() => {
@@ -39,26 +37,23 @@ function scrollToUpcoming() {
 }
 
 function goBack() {
-  // 1) If on an event page with ?slug=... → go /{slug}#upcoming-events
+  // 1) If we’re on an event page with a slug → back to /{slug}#upcoming-events
   if (route.path.startsWith('/event/') && route.query.slug) {
     const raw  = route.query.slug
     const slug = Array.isArray(raw) ? raw[0] : (raw as string)
-    router.push({ path: `/${slug}`, hash: '#upcoming-events' })
-      .then(scrollToUpcoming)
-    return
+    return router.push({ path: `/${slug}`, hash: '#upcoming-events' })
+                 .then(scrollToUpcoming)
   }
 
-  // 2) Logged-in users → dashboard
-  if (isLoggedIn.value) {
-    router.push('/dashboard')
-    return
+  // 2) If logged in (Strapi user exists) → dashboard
+  if (user.value) {
+    return router.push('/dashboard')
   }
 
-  // 3) Not logged in → back if possible, else home
+  // 3) Not logged in → pop history or send to home
   if (window.history.length > 1) {
-    router.back()
-  } else {
-    router.push('/')
+    return router.back()
   }
+  return router.push('/')
 }
 </script>
