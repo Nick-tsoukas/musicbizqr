@@ -7,7 +7,7 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="flex flex-col mx-auto md:max-w-[80vw] mt-[var(--header-height)] h-[calc(100vh-var(--header-height))] pb-[env(safe-area-inset-bottom)]"
+      class="flex flex-col mx-auto md:max-w-[80vw] pt-[var(--header-height)] h-[calc(100vh-var(--header-height))] pb-[env(safe-area-inset-bottom)] overflow-y-auto"
     >
       <!-- 1) Hero (35vh) -->
       <div class="flex-shrink-0 h-[35vh] relative">
