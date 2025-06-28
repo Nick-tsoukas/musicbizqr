@@ -7,10 +7,13 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="flex flex-col h-[calc(100dvh-90px)] pb-[env(safe-area-inset-bottom)] mx-auto md:max-w-[80vw] md:mx-auto"
+      class="mx-auto md:max-w-[80vw]
+             h-[calc(100dvh-90px)]
+             pb-[env(safe-area-inset-bottom)]
+             grid grid-rows-[35vh_auto_30vh]"
     >
-      <!-- 1) Hero: always 35vh -->
-      <div class="flex-none h-[35vh] relative">
+      <!-- 1) Hero (35vh) -->
+      <div class="relative row-start-1 row-end-2">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -20,17 +23,15 @@
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- 2) Bio: stretches to fill leftover space -->
-      <section class="flex-1 flex flex-col justify-center px-6">
+      <!-- 2) Bio (auto) -->
+      <section class="row-start-2 row-end-3 flex flex-col justify-center px-6">
         <div
           v-if="!band.data.isBandNameInLogo"
           class="text-center text-white text-2xl font-bold"
         >
           {{ band.data.name }}
         </div>
-        <div
-          class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line"
-        >
+        <div class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line">
           <p v-if="band.data.bio" class="text-sm md:text-base">
             {{ band.data.bio }}
           </p>
@@ -40,65 +41,57 @@
         </div>
       </section>
 
-      <!-- 3) Featured Song: always 30vh, controls pinned at bottom -->
-      <div class="flex-none h-[30vh] flex flex-col justify-end px-6">
-        <section v-if="band.data.singlesong">
-          <!-- <h2
-            class="hidden sm:block text-xl md:text-3xl font-bold text-white mb-2"
+      <!-- 3) Featured Song (30vh) -->
+      <section class="row-start-3 row-end-4 flex flex-col justify-end px-6">
+        <div v-if="band.data.singlesong" class="flex-1 flex items-stretch">
+          
+          <!-- Embedded Player -->
+          <div
+            v-if="band.data.singlesong.isEmbed && embedUrl"
+            class="relative w-full rounded-lg overflow-hidden bg-black"
           >
-            Featured Song
-          </h2> -->
-          <div class="flex-1 flex items-stretch">
-            <!-- If embedded -->
             <div
-              v-if="band.data.singlesong.isEmbed && embedUrl"
-              class="relative w-full rounded-lg overflow-hidden bg-black"
+              v-if="!isEmbeddedPlaying"
+              @click="startEmbedded()"
+              class="absolute inset-0 bg-black bg-opacity-75 flex flex-col"
             >
-              <div
-                v-if="!isEmbeddedPlaying"
-                @click="startEmbedded()"
-                class="absolute inset-0 bg-black bg-opacity-75 flex flex-col"
-              >
-                <div class="p-2">
-                  <p class="text-white font-bold">
-                    {{ band.data.singlesong.title }}
-                  </p>
-                  <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
-                </div>
-                <div class="flex-1 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-16 h-16"
-                    fill="currentColor"
-                    viewBox="0 0 84 84"
-                  >
-                    <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
-                    <polygon points="34,28 34,56 58,42" fill="white" />
-                  </svg>
-                </div>
+              <div class="p-2">
+                <p class="text-white font-bold">
+                  {{ band.data.singlesong.title }}
+                </p>
+                <p class="text-gray-300 text-sm">
+                  {{ band.data.name }}
+                </p>
               </div>
-              <iframe
-                v-else
-                :src="embedUrl + '?autoplay=1'"
-                frameborder="0"
-                allow="autoplay; encrypted-media; fullscreen; clipboard-write"
-                allowfullscreen
-                class="absolute inset-0 w-full h-full"
-              />
+              <div class="flex-1 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16" fill="currentColor" viewBox="0 0 84 84">
+                  <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
+                  <polygon points="34,28 34,56 58,42" fill="white" />
+                </svg>
+              </div>
             </div>
-
-            <!-- Fallback audio player -->
-            <div v-else class="w-full h-full">
-              <AudioPlayer
-                :album="formatSingleSong(band.data.singlesong)"
-                :placeholderImage="'/placeholder-image.svg'"
-                @play="onSongPlay"
-                class="h-full rounded-lg"
-              />
-            </div>
+            <iframe
+              v-else
+              :src="embedUrl + '?autoplay=1'"
+              frameborder="0"
+              allow="autoplay; encrypted-media; fullscreen; clipboard-write"
+              allowfullscreen
+              class="absolute inset-0 w-full h-full"
+            />
           </div>
-        </section>
-      </div>
+
+          <!-- Fallback AudioPlayer -->
+          <div v-else class="w-full h-full">
+            <AudioPlayer
+              :album="formatSingleSong(band.data.singlesong)"
+              placeholder-image="/placeholder-image.svg"
+              @play="onSongPlay"
+              class="h-full rounded-lg"
+            />
+          </div>
+
+        </div>
+      </section>
     </main>
 
     <div v-if="!loading" class="bg-black w-screen mx-auto">
