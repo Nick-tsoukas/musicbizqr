@@ -215,7 +215,7 @@
 
         <!-- Events & Tours -->
         <!-- Upcoming Events -->
-        <section v-if="upcomingEvents.length" class="mt-10">
+        <section v-if="upcomingEvents.length" id="upcoming-events" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Upcoming Events
           </h2>
@@ -321,7 +321,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import YouTube from "vue3-youtube";
@@ -382,7 +382,15 @@ const socialPlatforms = [
 function extractYouTubeId(url) {
   const m = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   return m ? m[1] : "";
+} 
+
+function scrollToUpcoming() {
+  if (route.hash === '#upcoming-events') {
+    const el = document.getElementById('upcoming-events')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
 }
+
 
 const embedUrl = computed(() => {
   const s = band.value?.data?.singlesong;
@@ -547,7 +555,20 @@ useHead({
   ],
 });
 
-onMounted(fetchBandData);
+onMounted(async () => {
+  // 1) fetch everything (including events list + markup)
+  await fetchBandData()
+
+  // 2) wait until DOM has rendered the upcoming-events section
+  await nextTick()
+
+  // 3) then scroll
+  scrollToUpcoming()
+})
+
+// 2) If someone navigates client-side to a new hash
+watch(() => route.hash, scrollToUpcoming)
+
 </script>
 
 <style scoped>

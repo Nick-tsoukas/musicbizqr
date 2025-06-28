@@ -177,85 +177,100 @@
 </template>
 
 <script setup>
-import { format, parseISO, parse } from "date-fns";
+import { ref, computed, onMounted, onUnmounted, nextTick  } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
-const { findOne } = useStrapi();
-import { generateHTML } from "@tiptap/html";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
+import { format, parseISO, parse } from 'date-fns'
+import { generateHTML } from '@tiptap/html'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
 
-const eventData = ref({});
+const route = useRoute()
+const { findOne } = useStrapi()
+const eventData = ref({})
 
+// Convert ProseMirror JSON to HTML
 const descriptionHTML = computed(() => {
-  // if no JSON yet, return empty
-  if (!eventData.value?.description) return "";
-  return generateHTML(
-    // pass the ProseMirror JSON
-    eventData.value.description,
-    // same extensions you used when saving
-    [StarterKit, Underline]
-  );
-});
+  if (!eventData.value?.description) return ''
+  return generateHTML(eventData.value.description, [StarterKit, Underline])
+})
 
-onMounted(async () => {
-  try {
-    const { data } = await findOne("events", route.params.id, {
-      populate: ["image", "band"],
-    });
-    eventData.value = data.attributes;
-    // Include the band relation with attributes
-    if (data.attributes.band && data.attributes.band.data) {
-      eventData.value.band = data.attributes.band;
-    }
-  } catch (error) {
-    console.error("Error fetching event data:", error);
-  }
-});
-
-const formattedDescription = computed(() => {
-  return eventData.value?.description
-    ? eventData.value.description.replace(/\n/g, "<br>")
-    : "";
-});
-const formatDate = (dateStr) => {
-  if (!dateStr) {
-    return "";
-  }
-  try {
-    return format(parseISO(dateStr), "MMMM d, yyyy");
-  } catch (error) {
-    console.error("Error parsing date:", error);
-    return dateStr;
-  }
-};
-
-function formatTime(timeStr) {
-  if (!timeStr) return "";
-  try {
-    // Detect whether there's a '.' in there
-    const hasMilliseconds = timeStr.includes(".");
-    // Choose the appropriate format
-    const parsePattern = hasMilliseconds ? "HH:mm:ss.SSS" : "HH:mm:ss";
-    const parsedTime = parse(timeStr, parsePattern, new Date());
-    return format(parsedTime, "h:mm a"); // => "5:00 PM" or "5:30 PM", etc.
-  } catch (error) {
-    console.error("Error parsing time:", error);
-    return timeStr;
+// Scroll handler for `#upcoming-events`
+function onPop() {
+  if (window.location.hash === '#upcoming-events') {
+    const el = document.getElementById('upcoming-events')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
 }
 
-const hasSocialLinks = computed(() => {
-  return (
-    eventData.value.facebook ||
-    eventData.value.twitter ||
-    eventData.value.instagram ||
-    eventData.value.youtube ||
-    eventData.value.tiktok ||
-    eventData.value.website
-  );
-});
+onMounted(async () => {
+  // 1) Fetch the event so we know the band slug
+  try {
+    const { data } = await findOne('events', route.params.id, {
+      populate: ['image', 'band'],
+    })
+    eventData.value = data.attributes
+    if (data.attributes.band?.data) {
+      eventData.value.band = data.attributes.band
+    }
+  } catch (err) {
+    console.error('Error fetching event data:', err)
+    return
+  }
+
+  // 2) Insert a history entry so Back → /bandslug#upcoming-events
+  const bandSlug = eventData.value.band.data.attributes.slug
+  const artistURL = `/${bandSlug}`  // e.g. "/thedannynovaband"
+
+  // Replace the *current* entry (/event/28) with artistURL#upcoming-events
+  window.history.replaceState({}, '', `${artistURL}#upcoming-events`)
+
+  // Then push the real event URL back on top so we're still on /event/28
+  window.history.pushState({}, '', window.location.pathname)
+
+  // 3) Listen for the pop back to the hash entry
+  window.addEventListener('popstate', onPop)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('popstate', onPop)
+})
+
+// The rest of your utility functions...
+
+const formattedDescription = computed(() =>
+  eventData.value?.description
+    ? eventData.value.description.replace(/\n/g, '<br>')
+    : ''
+)
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  try {
+    return format(parseISO(dateStr), 'MMMM d, yyyy')
+  } catch {
+    return dateStr
+  }
+}
+
+function formatTime(timeStr) {
+  if (!timeStr) return ''
+  try {
+    const pattern = timeStr.includes('.') ? 'HH:mm:ss.SSS' : 'HH:mm:ss'
+    return format(parse(timeStr, pattern, new Date()), 'h:mm a')
+  } catch {
+    return timeStr
+  }
+}
+
+const hasSocialLinks = computed(() =>
+  ['facebook', 'twitter', 'instagram', 'youtube', 'tiktok', 'website'].some(
+    key => eventData.value[key]
+  )
+)
 </script>
+
+
 
 <style scoped>
 .container {
