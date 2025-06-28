@@ -146,17 +146,18 @@ const route = useRoute();
 
 // fetch only the slug for the current user’s band
 const config = useRuntimeConfig();
-const { data: bandRes, error } = await useAsyncData("user-band", () =>
+const { data: bandRes, error } = await useAsyncData('user-band', () =>
   $fetch(`${config.public.strapiUrl}/api/bands`, {
     params: {
-      "filters[user][id][$eq]": user.value?.id,
-      "fields[0]": "slug",
+      // use the real relation name here:
+      'filters[users_permissions_user][id][$eq]': user.value?.id,
+      'fields[0]': 'slug',
     },
   })
-);
+)
 
 if (error.value) {
-  console.error("Error fetching user band:", error.value);
+  console.error('Error fetching user band:', error.value)
 }
 
 // this should print something like: { data: [ { id: 67, slug: "thedannynovaband" } ] }
