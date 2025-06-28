@@ -2,7 +2,7 @@
   <button
     @click="goBack"
     aria-label="Go back"
-    class="absolute top-4 left-4 flex items-center justify-center
+    class="absolute top-20 left-4 flex items-center justify-center
            w-10 h-10 text-gray-200 hover:text-white
            focus:outline-none focus:ring-2 focus:ring-gray-500
            rounded transition"

@@ -7,10 +7,10 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="mx-auto md:max-w-[80vw] h-[calc(100vh-var(--header-height))] pt-[var(--header-height)] pb-[env(safe-area-inset-bottom)] flex flex-col"
+      class="flex flex-col mx-auto md:max-w-[80vw] min-h-screen pt-[var(--header-height)] pb-[env(safe-area-inset-bottom)]"
     >
       <!-- 1) Hero (35vh) -->
-      <div class="flex-none h-[35vh] relative">
+      <div class="flex-shrink-0 h-[35vh] relative">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
@@ -20,9 +20,9 @@
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- 2) Bio (fills the “middle” calc) -->
+      <!-- 2) Bio (fills remaining, centered) -->
       <section
-        class="flex-none h-[calc(100vh - var(--header-height) - 35vh - 30vh)] flex flex-col justify-center items-center px-6 text-center"
+        class="flex-1 min-h-0 flex flex-col justify-center items-center px-6 text-center"
       >
         <div
           v-if="!band.data.isBandNameInLogo"
@@ -42,8 +42,8 @@
         </div>
       </section>
 
-      <!-- 3) Player (30vh pinned at bottom) -->
-      <div class="flex-none h-[30vh] flex flex-col justify-end px-6">
+      <!-- 3) Player (30vh pinned) -->
+      <div class="flex-shrink-0 h-[30vh] flex flex-col justify-end px-6">
         <section v-if="band.data.singlesong" class="flex-1 flex items-stretch">
           <!-- Embedded -->
           <div
@@ -82,6 +82,7 @@
               class="absolute inset-0 w-full h-full"
             />
           </div>
+
           <!-- Fallback AudioPlayer -->
           <div v-else class="w-full h-full">
             <AudioPlayer
