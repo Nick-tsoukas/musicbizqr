@@ -7,32 +7,32 @@
     <!-- Main content when not loading -->
     <main
       v-else
-       style="height: calc(100dvh - var(--header-height));"
-      class="mx-auto md:max-w-[80vw]
-           
-             pb-[env(safe-area-inset-bottom)]
-             grid grid-rows-[35vh_auto_30vh]"
+      class="mx-auto md:max-w-[80vw] h-[calc(100vh-var(--header-height))] pt-[var(--header-height)] pb-[env(safe-area-inset-bottom)] flex flex-col"
     >
       <!-- 1) Hero (35vh) -->
-      <div class="relative row-start-1 row-end-2">
+      <div class="flex-none h-[35vh] relative">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
           :alt="`${band.data.name} image`"
-          class="absolute inset-0 w-auto m-auto h-full object-cover"
+          class="absolute inset-0 m-auto h-full w-auto object-cover"
         />
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- 2) Bio (auto) -->
-      <section class="row-start-2 row-end-3 flex flex-col justify-center px-6">
+      <!-- 2) Bio (fills the “middle” calc) -->
+      <section
+        class="flex-none h-[calc(100vh - var(--header-height) - 35vh - 30vh)] flex flex-col justify-center items-center px-6 text-center"
+      >
         <div
           v-if="!band.data.isBandNameInLogo"
-          class="text-center text-white text-2xl font-bold"
+          class="text-white text-2xl font-bold"
         >
           {{ band.data.name }}
         </div>
-        <div class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line">
+        <div
+          class="mt-2 max-w-3xl text-white whitespace-pre-line leading-tight"
+        >
           <p v-if="band.data.bio" class="text-sm md:text-base">
             {{ band.data.bio }}
           </p>
@@ -42,11 +42,10 @@
         </div>
       </section>
 
-      <!-- 3) Featured Song (30vh) -->
-      <section class="row-start-3 row-end-4 flex flex-col justify-end px-6">
-        <div v-if="band.data.singlesong" class="flex-1 flex items-stretch">
-          
-          <!-- Embedded Player -->
+      <!-- 3) Player (30vh pinned at bottom) -->
+      <div class="flex-none h-[30vh] flex flex-col justify-end px-6">
+        <section v-if="band.data.singlesong" class="flex-1 flex items-stretch">
+          <!-- Embedded -->
           <div
             v-if="band.data.singlesong.isEmbed && embedUrl"
             class="relative w-full rounded-lg overflow-hidden bg-black"
@@ -60,12 +59,15 @@
                 <p class="text-white font-bold">
                   {{ band.data.singlesong.title }}
                 </p>
-                <p class="text-gray-300 text-sm">
-                  {{ band.data.name }}
-                </p>
+                <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
               </div>
               <div class="flex-1 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16" fill="currentColor" viewBox="0 0 84 84">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-16 h-16"
+                  fill="currentColor"
+                  viewBox="0 0 84 84"
+                >
                   <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
                   <polygon points="34,28 34,56 58,42" fill="white" />
                 </svg>
@@ -80,7 +82,6 @@
               class="absolute inset-0 w-full h-full"
             />
           </div>
-
           <!-- Fallback AudioPlayer -->
           <div v-else class="w-full h-full">
             <AudioPlayer
@@ -90,9 +91,8 @@
               class="h-full rounded-lg"
             />
           </div>
-
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <div v-if="!loading" class="bg-black w-screen mx-auto">
