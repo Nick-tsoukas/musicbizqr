@@ -8,7 +8,7 @@
     <main
       v-else
       class="flex flex-col min-h-0 md:max-w-[80vw] md:mx-auto"
-       style="height: calc(200vh - 90px) !important;"
+       style="height: calc(100vh - 90px) !important;"
     >
       <!-- 1/3: Hero (35vh) -->
       <div class="h-[35vh] relative">
