@@ -43,7 +43,7 @@
       <div class="row-start-3 row-end-4 px-6 pb-6 flex flex-col">
         <section v-if="band.data.singlesong" class="flex-1 flex flex-col">
           <!-- Title -->
-          <h2 class="sm:hidden text-xl md:text-3xl font-bold text-white mb-2">
+          <h2 class="hidden sm:block  text-xl md:text-3xl font-bold text-white mb-2">
             Featured Song
           </h2>
 
