@@ -19,6 +19,7 @@
         <NuxtLink v-if="user" to="/dashboard" class="nav-link"
           >Dashboard</NuxtLink
         >
+      <client-only>
         <NuxtLink
           v-if="user && userSlug"
           :to="`/${userSlug}`"
@@ -27,6 +28,7 @@
         >
           Artist Link Page
         </NuxtLink>
+      </client-only>
         <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
         <p v-if="user" @click="logoutUser" class="nav-link cursor-pointer">
@@ -78,14 +80,17 @@
           class="mobile-nav-link"
           >Home</NuxtLink
         >
+        <client-only>
         <NuxtLink
           v-if="user && userSlug"
           :to="`${userSlug}`"
           @click="toggleMenu"
           class="mobile-nav-link"
         >
+        
           Artist Link Page
         </NuxtLink>
+      </client-only>
         <NuxtLink
           v-if="user"
           to="/dashboard"
