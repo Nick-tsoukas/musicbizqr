@@ -7,7 +7,7 @@
     <!-- Main content when not loading -->
     <main
       v-else
-      class="flex flex-col mx-auto md:max-w-[80vw] min-h-screen pt-[var(--header-height)] pb-[env(safe-area-inset-bottom)]"
+      class="flex flex-col mx-auto md:max-w-[80vw] mt-[var(--header-height)] h-[calc(100vh-var(--header-height))] pb-[env(safe-area-inset-bottom)]"
     >
       <!-- 1) Hero (35vh) -->
       <div class="flex-shrink-0 h-[35vh] relative">
@@ -20,7 +20,7 @@
         <div class="absolute inset-0 bg-black bg-opacity-20"></div>
       </div>
 
-      <!-- 2) Bio (fills remaining, centered) -->
+      <!-- 2) Bio (flex-1, centered) -->
       <section
         class="flex-1 min-h-0 flex flex-col justify-center items-center px-6 text-center"
       >
@@ -50,6 +50,7 @@
             v-if="band.data.singlesong.isEmbed && embedUrl"
             class="relative w-full rounded-lg overflow-hidden bg-black"
           >
+            <!-- overlay/play button -->
             <div
               v-if="!isEmbeddedPlaying"
               @click="startEmbedded()"
@@ -73,6 +74,7 @@
                 </svg>
               </div>
             </div>
+            <!-- actual embed -->
             <iframe
               v-else
               :src="embedUrl + '?autoplay=1'"
