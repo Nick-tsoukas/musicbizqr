@@ -1,7 +1,7 @@
 <template>
-  <div class="player-container">
+  <div class="player-container h-full flex flex-col">
     <!-- Now Playing Section -->
-    <div class="now-playing">
+    <div class="now-playing flex-none">
       <img
         v-if="albumCoverUrl !== props.placeholderImage"
         :src="albumCoverUrl"
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Progress Bar -->
-    <div class="progress-bar-container">
+    <div class="progress-bar-container flex-none">
       <span class="current-time">{{ formatTime(currentTime) }}</span>
       <input
         type="range"
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Playback Controls -->
-    <div class="controls">
+    <div class="controls flex-none">
       <!-- Previous Button -->
       <button @click="previousSong" class="control-button">
         <img src="@/assets/previous-icon.svg" alt="Previous" />
@@ -53,7 +53,7 @@
     </div>
 
     <!-- Song List -->
-    <ul class="song-list" v-if="songs.length > 1">
+    <ul class="song-list flex-1 overflow-auto" v-if="songs.length > 1">
       <li
         v-for="(song, index) in songs"
         :key="song.id || index"
@@ -338,8 +338,9 @@ const formatTime = (time) => {
   background-color: black;
   color: #fff;
   border-radius: 0.5rem;
-  max-width: auto;
   margin: auto;
+  width: 100%;
+
 }
 
 /* Now Playing Section */
