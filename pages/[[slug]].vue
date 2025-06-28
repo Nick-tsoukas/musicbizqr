@@ -17,7 +17,7 @@
   "
 >
   <!-- 1) Hero (35vh) -->
-  <div class="flex-shrink-0 h-[35vh] relative">
+  <div class="flex-shrink-0 h-[34vh] relative">
     <img
       v-if="band.data.bandImg"
       :src="band.data.bandImg.url"
@@ -52,7 +52,7 @@
   </section>
 
   <!-- 3) Player (20vh, pinned) -->
-  <div class="flex-shrink-0 h-[20vh] flex flex-col justify-end px-6">
+  <div class="flex-shrink-0 h-[18vh] flex flex-col justify-end px-6">
     <section v-if="band.data.singlesong" class="flex-1 flex items-stretch">
       <!-- Embedded -->
       <div
