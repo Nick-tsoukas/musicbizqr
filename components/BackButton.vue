@@ -22,10 +22,14 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { nextTick } from 'vue'
+import { computed, nextTick } from 'vue'
+// replace with your actual auth composable
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
 const route  = useRoute()
+const { user } = useAuth()
+const isLoggedIn = computed(() => !!user.value)
 
 function scrollToUpcoming() {
   nextTick(() => {
@@ -35,7 +39,7 @@ function scrollToUpcoming() {
 }
 
 function goBack() {
-  // 1) If we’re on an event page, route to /{slug}#upcoming-events
+  // 1) If on an event page with ?slug=... → go /{slug}#upcoming-events
   if (route.path.startsWith('/event/') && route.query.slug) {
     const raw  = route.query.slug
     const slug = Array.isArray(raw) ? raw[0] : (raw as string)
@@ -44,7 +48,17 @@ function goBack() {
     return
   }
 
-  // 2) Otherwise, always go to dashboard
-  router.push('/dashboard')
+  // 2) Logged-in users → dashboard
+  if (isLoggedIn.value) {
+    router.push('/dashboard')
+    return
+  }
+
+  // 3) Not logged in → back if possible, else home
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/')
+  }
 }
 </script>
