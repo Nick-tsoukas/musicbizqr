@@ -129,7 +129,7 @@
   </header>
 </template>
 
-<script setup>
+<script  setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import {
   useStrapiUser,
@@ -143,25 +143,40 @@ const user = useStrapiUser();
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const route = useRoute();
+import { watch } from 'vue'
 
 // fetch only the slug for the current user’s band
 const config = useRuntimeConfig();
-const { data: bandRes, error } = await useAsyncData('user-band', () =>
-  $fetch(`${config.public.strapiUrl}/api/bands`, {
-    params: {
-      // use the real relation name here:
-      'filters[users_permissions_user][id][$eq]': user.value?.id,
-      'fields[0]': 'slug',
-    },
-  })
+const { data: bandRes, error, refresh } = useAsyncData(
+  'user-band',
+  () =>
+    $fetch(`${config.public.strapiUrl}/api/bands`, {
+      params: {
+        'filters[users_permissions_user][id][$eq]': user.value!.id,
+        'fields[0]': 'slug',
+      },
+    }),
+  { immediate: false }
+)
+
+// watch for when user.id becomes available, then fire the fetch
+watch(
+  () => user.value?.id,
+  (id) => {
+    if (id) {
+      refresh()
+    }
+  },
+  { immediate: true }
 )
 
 if (error.value) {
   console.error('Error fetching user band:', error.value)
 }
 
+
 // this should print something like: { data: [ { id: 67, slug: "thedannynovaband" } ] }
-console.log("raw bandRes:", bandRes.value);
+console.log("raw bandRes:", bandRes.value, user.value.id);
 
 const userSlug = computed(() => bandRes.value?.data?.[0]?.slug ?? null);
 
