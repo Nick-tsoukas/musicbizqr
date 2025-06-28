@@ -6,96 +6,97 @@
     <!-- container for the first main section -->
     <!-- Main content when not loading -->
     <main
-      v-else
-      class="flex flex-col h-[calc(100vh-90px)] min-h-0 md:max-w-[80vw] md:mx-auto"
+  v-else
+  class="flex flex-col h-[calc(100vh-90px)] min-h-0 md:max-w-[80vw] md:mx-auto"
+>
+  <!-- 1/3: Hero (35vh) -->
+  <div class="h-[35vh] relative">
+    <img
+      v-if="band.data.bandImg"
+      :src="band.data.bandImg.url"
+      :alt="`${band.data.name} image`"
+      class="absolute inset-0 w-auto m-auto h-full object-cover"
+    />
+    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+  </div>
+
+  <!-- 2/3: Bio (flexible) -->
+  <section class="flex-1 flex flex-col justify-center px-6">
+    <div
+      v-if="!band.data.isBandNameInLogo"
+      class="text-center text-white text-2xl font-bold"
     >
-      <!-- 1/3: Hero (35vh) -->
-      <div class="h-[35vh] relative">
-        <img
-          v-if="band.data.bandImg"
-          :src="band.data.bandImg.url"
-          :alt="`${band.data.name} image`"
-          class="absolute inset-0 w-auto m-auto h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-      </div>
+      {{ band.data.name }}
+    </div>
+    <div
+      class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line"
+    >
+      <p v-if="band.data.bio">{{ band.data.bio }}</p>
+      <p v-if="band.data.biotagline" class="mt-2">
+        {{ band.data.biotagline }}
+      </p>
+    </div>
+  </section>
 
-      <!-- 2/3: Bio (flexible) -->
-      <section class="flex-1 flex flex-col justify-center px-6">
+  <!-- 3/3: Featured Song (30vh) -->
+  <div class="h-[30vh] flex flex-col justify-end px-6 pb-6">
+    <section v-if="band.data.singlesong">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+        Featured Song
+      </h2>
+
+      <!-- Embedded Track -->
+      <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
         <div
-          v-if="!band.data.isBandNameInLogo"
-          class="text-center text-white text-2xl font-bold"
+          class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
         >
-          {{ band.data.name }}
-        </div>
-        <div
-          class="mt-2 text-center text-white max-w-3xl mx-auto leading-tight whitespace-pre-line"
-        >
-          <p v-if="band.data.bio">{{ band.data.bio }}</p>
-          <p v-if="band.data.biotagline" class="mt-2">
-            {{ band.data.biotagline }}
-          </p>
-        </div>
-      </section>
-
-      <!-- 3/3: Featured Song (30vh) -->
-      <div class="h-[30vh] flex flex-col justify-end px-6 pb-6">
-        <section v-if="band.data.singlesong">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Featured Song
-          </h2>
-
-          <!-- Embedded Track -->
-          <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
-            <div
-              class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
-            >
-              <div
-                v-if="!isEmbeddedPlaying"
-                @click="startEmbedded()"
-                class="absolute inset-0 bg-black bg-opacity-75 flex flex-col"
+          <div
+            v-if="!isEmbeddedPlaying"
+            @click="startEmbedded()"
+            class="absolute inset-0 bg-black bg-opacity-75 flex flex-col"
+          >
+            <div class="p-2">
+              <p class="text-white font-bold">
+                {{ band.data.singlesong.title }}
+              </p>
+              <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-16 h-16"
+                fill="currentColor"
+                viewBox="0 0 84 84"
               >
-                <div class="p-2">
-                  <p class="text-white font-bold">
-                    {{ band.data.singlesong.title }}
-                  </p>
-                  <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
-                </div>
-                <div class="flex-1 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-16 h-16"
-                    fill="currentColor"
-                    viewBox="0 0 84 84"
-                  >
-                    <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
-                    <polygon points="34,28 34,56 58,42" fill="white" />
-                  </svg>
-                </div>
-              </div>
-              <iframe
-                v-else
-                :src="embedUrl + '?autoplay=1'"
-                frameborder="0"
-                allow="autoplay; encrypted-media; fullscreen; clipboard-write"
-                allowfullscreen
-                class="absolute inset-0 w-full h-full"
-              />
+                <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
+                <polygon points="34,28 34,56 58,42" fill="white" />
+              </svg>
             </div>
           </div>
-
-          <!-- AudioPlayer Fallback -->
-          <div v-else class="w-full">
-            <AudioPlayer
-              :album="formatSingleSong(band.data.singlesong)"
-              :placeholderImage="'/placeholder-image.svg'"
-              @play="onSongPlay"
-              class="rounded-lg"
-            />
-          </div>
-        </section>
+          <iframe
+            v-else
+            :src="embedUrl + '?autoplay=1'"
+            frameborder="0"
+            allow="autoplay; encrypted-media; fullscreen; clipboard-write"
+            allowfullscreen
+            class="absolute inset-0 w-full h-full"
+          />
+        </div>
       </div>
-    </main>
+
+      <!-- AudioPlayer Fallback -->
+      <div v-else class="w-full">
+        <AudioPlayer
+          :album="formatSingleSong(band.data.singlesong)"
+          :placeholderImage="'/placeholder-image.svg'"
+          @play="onSongPlay"
+          class="rounded-lg"
+        />
+      </div>
+    </section>
+  </div>
+</main>
+
 
     <div v-if="!loading" class="bg-black w-screen mx-auto">
       <!-- Main Content -->
