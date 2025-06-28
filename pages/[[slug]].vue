@@ -1,11 +1,10 @@
-
 <template>
   <div>
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
 
-    <div v-else class="bg-black w-screen mx-auto  pt-[var(--header-height)]">
+    <div v-else class="bg-black w-screen mx-auto pt-[var(--header-height)]">
       <!-- Hero Section -->
       <div class="relative w-full h-[35vh] md:h-[60vh]">
         <img
@@ -104,40 +103,45 @@
         <!-- Featured Video -->
         <section
           v-if="band.data.singlevideo?.youtubeid"
-          class="relative w-full max-w-[600px] mr-auto mt-10"
+          class="relative w-full max-w-[600px] mx-auto mt-10"
         >
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Video
           </h2>
+
+          <!-- thumbnail / play button overlay -->
           <div
             v-if="!isVideoPlaying"
-            class="relative cursor-pointer mb-10"
             @click="playVideo"
+            class="relative cursor-pointer overflow-hidden rounded-lg"
+            style="padding-top: 56.25%"
+            {{--
+            16:9
+            ratio
+            --}}
           >
             <img
               :src="singleVideoThumbnail"
               :alt="`${band.data.name} video thumbnail`"
-              class="w-full max-h-[300px] object-cover rounded-lg"
+              class="absolute inset-0 w-full h-full object-cover"
             />
             <div
-              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg"
+              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
             >
-              <svg
-                class="w-16 h-16 text-white opacity-75"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 84 84"
-              >
-                <circle cx="42" cy="42" r="42" fill="rgba(0, 0, 0, 0.6)" />
-                <polygon points="33,24 33,60 60,42" fill="white" />
-              </svg>
+              <!-- your play icon -->
             </div>
           </div>
-          <div v-else class="relative h-[360px] w-full">
+
+          <!-- responsive iframe -->
+          <div
+            v-else
+            class="relative overflow-hidden rounded-lg"
+            style="padding-top: 56.25%"
+          >
             <YouTube
               :src="singleVideoEmbedUrl"
               :vars="playerOptions"
-              class="absolute inset-0 w-full h-full rounded-lg"
+              class="absolute inset-0 w-full h-full"
             />
           </div>
         </section>
@@ -350,7 +354,7 @@ import spotifyIcon from "@/assets/spotify.svg";
 import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
-// redploy coment 
+// redploy coment
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";

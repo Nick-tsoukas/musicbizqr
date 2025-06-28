@@ -79,7 +79,7 @@
           >Home</NuxtLink
         >
         <NuxtLink
-          v-if="userSlug"
+          v-if="user && userSlug"
           :to="`${userSlug}`"
           @click="toggleMenu"
           class="mobile-nav-link"
