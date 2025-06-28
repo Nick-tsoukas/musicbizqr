@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000] overflow-x-hidden">
+  <div class="bg-[#000] overflow-x-hidden pt-[var(--header-height)]">
     <div class="relative min-h-screen">
     <NuxtParticles id="tsparticles" :options="options"    class="fixed inset-0 -z-10 pointer-events-none"  />
     <!-- Main content -->

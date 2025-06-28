@@ -115,10 +115,7 @@
             @click="playVideo"
             class="relative cursor-pointer overflow-hidden rounded-lg"
             style="padding-top: 56.25%"
-            {{--
-            16:9
-            ratio
-            --}}
+           
           >
             <img
               :src="singleVideoThumbnail"
