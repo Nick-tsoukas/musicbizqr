@@ -43,7 +43,7 @@
       </section>
 
       <!-- 3) Player (30vh pinned) -->
-      <div class="flex-shrink-0 h-[30vh] flex flex-col justify-end px-6">
+      <div class="flex-shrink-0 h-[20vh] flex flex-col justify-end px-6">
         <section v-if="band.data.singlesong" class="flex-1 flex items-stretch">
           <!-- Embedded -->
           <div
