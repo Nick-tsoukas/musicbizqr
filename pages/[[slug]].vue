@@ -43,9 +43,9 @@
         class="max-h-[30vh] flex flex-col justify-end px-6 pb-6 overflow-visible"
       >
         <section v-if="band.data.singlesong">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+          <!-- <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
-          </h2>
+          </h2> -->
 
           <!-- Embedded Track -->
           <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
