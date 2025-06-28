@@ -129,7 +129,7 @@
   </header>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStrapiUser, useStrapiAuth, useAsyncData, useRuntimeConfig, useStrapiClient } from '#imports'
 
