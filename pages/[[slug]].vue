@@ -43,11 +43,11 @@
       <!-- 3) Featured Song: always 30vh, controls pinned at bottom -->
       <div class="flex-none h-[30vh] flex flex-col justify-end px-6">
         <section v-if="band.data.singlesong">
-          <h2
+          <!-- <h2
             class="hidden sm:block text-xl md:text-3xl font-bold text-white mb-2"
           >
             Featured Song
-          </h2>
+          </h2> -->
           <div class="flex-1 flex items-stretch">
             <!-- If embedded -->
             <div

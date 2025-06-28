@@ -14,9 +14,28 @@
       </div>
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-bar-container flex-none">
-      <span class="current-time">{{ formatTime(currentTime) }}</span>
+    <!-- Combined Controls + Progress Bar -->
+    <div class="controls-progress flex items-center flex-none px-4 py-2">
+      <!-- Previous -->
+      <button @click="previousSong" class="control-button">
+        <img src="@/assets/previous-icon.svg" alt="Previous" />
+      </button>
+
+      <!-- Play/Pause -->
+      <button @click="togglePlay" class="control-button mx-2">
+        <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
+        <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
+      </button>
+
+      <!-- Next -->
+      <button v-if="songs.length > 1" @click="nextSong" class="control-button">
+        <img src="@/assets/next-icon.svg" alt="Next" />
+      </button>
+
+      <!-- Current Time -->
+      <span class="current-time ml-4">{{ formatTime(currentTime) }}</span>
+
+      <!-- Progress Slider -->
       <input
         type="range"
         min="0"
@@ -24,32 +43,11 @@
         step="0.1"
         v-model="currentTime"
         @input="seekAudio"
-        class="progress-bar"
+        class="progress-bar flex-1 mx-2"
       />
+
+      <!-- Total Time -->
       <span class="total-time">{{ formatTime(duration) }}</span>
-    </div>
-
-    <!-- Playback Controls -->
-    <div class="controls flex-none">
-      <!-- Previous Button -->
-      <button @click="previousSong" class="control-button">
-        <img src="@/assets/previous-icon.svg" alt="Previous" />
-      </button>
-
-      <!-- Play/Pause Button -->
-      <button @click="togglePlay" class="control-button play-pause">
-        <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
-        <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
-      </button>
-
-      <!-- Next Button (Hidden if only one song) -->
-      <button
-        v-if="songs.length > 1"
-        @click="nextSong"
-        class="control-button"
-      >
-        <img src="@/assets/next-icon.svg" alt="Next" />
-      </button>
     </div>
 
     <!-- Song List -->
@@ -78,6 +76,7 @@
     ></audio>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from "vue";
@@ -340,7 +339,7 @@ const formatTime = (time) => {
   border-radius: 0.5rem;
   margin: auto;
   width: 100%;
-
+  height: 100%;
 }
 
 /* Now Playing Section */
@@ -355,7 +354,6 @@ const formatTime = (time) => {
   height: 80px;
   object-fit: cover;
   border-radius: 0.25rem;
-  margin-right: 1rem;
 }
 .song-info {
   flex-grow: 1;
@@ -371,18 +369,22 @@ const formatTime = (time) => {
   margin: 0;
 }
 
-/* Controls */
-.controls {
+/* Combined Controls + Progress Row */
+.controls-progress {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  padding: 0.5rem;
+  gap: 0.5rem;
   margin-bottom: 1rem;
 }
+
+/* Playback Buttons */
 .control-button {
   background: none;
   border: none;
-  margin: 0 0.5rem;
+  padding: 0;
   cursor: pointer;
+  flex-shrink: 0;
 }
 .control-button img {
   width: 24px;
@@ -393,25 +395,22 @@ const formatTime = (time) => {
   height: 32px;
 }
 
-/* Progress Bar */
-.progress-bar-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
+/* Time Labels */
 .current-time,
 .total-time {
-  width: 40px;
+  width: 2.5rem;
   text-align: center;
   font-size: 0.75rem;
+  flex-shrink: 0;
 }
+
+/* Progress Bar */
 .progress-bar {
   flex-grow: 1;
-  margin: 0 0.5rem;
-  appearance: none;
   height: 4px;
   background: #404040;
   border-radius: 2px;
+  appearance: none;
   cursor: pointer;
 }
 .progress-bar::-webkit-slider-thumb {
@@ -433,6 +432,8 @@ const formatTime = (time) => {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 .song-list li {
   display: flex;
@@ -459,3 +460,4 @@ const formatTime = (time) => {
   color: #b3b3b3;
 }
 </style>
+
