@@ -361,7 +361,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from "vue";
+import { ref, onMounted, computed, watch, nextTick, onUnmounted } from "vue";
 import { useRuntimeConfig, useAsyncData, useFetch } from "#imports";
 
 import { useBeacon } from "@/composables/useBeacon";
@@ -623,20 +623,35 @@ useHead({
     },
   ],
 });
+// 1) viewport‐height CSS variable hack
+function setVh() {
+  document.documentElement.style.setProperty(
+    '--vh',
+    `${window.innerHeight * 0.01}px`
+  )
+}
 
 onMounted(async () => {
-  // 1) First fetch the band & events as you already do
-  await fetchBandData();
+  // install the --vh variable
+  setVh()
+  window.addEventListener('resize', setVh)
 
-  // 2) Wait for Vue to render the <section id="upcoming-events">
-  await nextTick();
+  // 2) fetch your band & events
+  await fetchBandData()
 
-  // 3) If the URL has “#upcoming-events”, scroll it into view
-  if (window.location.hash === "#upcoming-events") {
-    const el = document.getElementById("upcoming-events");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+  // 3) wait for the DOM to render the upcoming-events section
+  await nextTick()
+
+  // 4) if URL has "#upcoming-events", scroll into view
+  if (window.location.hash === '#upcoming-events') {
+    const el = document.getElementById('upcoming-events')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
-});
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', setVh)
+})
 </script>
 
 <style scoped>
