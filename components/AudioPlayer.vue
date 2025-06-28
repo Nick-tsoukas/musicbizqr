@@ -1,6 +1,6 @@
 <template>
   <div class="player-container h-full flex flex-col">
-    <!-- Now Playing Section -->
+    <!-- 1) Now Playing (fixed height) -->
     <div class="now-playing flex-none">
       <img
         v-if="albumCoverUrl !== props.placeholderImage"
@@ -14,28 +14,27 @@
       </div>
     </div>
 
-    <!-- Combined Controls + Progress Bar -->
-    <div class="controls-progress flex items-center flex-none px-4 py-2">
-      <!-- Previous -->
+    <!-- 2) Controls + Progress (single row) -->
+    <div class="controls-progress flex-none">
       <button @click="previousSong" class="control-button">
         <img src="@/assets/previous-icon.svg" alt="Previous" />
       </button>
 
-      <!-- Play/Pause -->
       <button @click="togglePlay" class="control-button mx-2">
         <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
         <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
       </button>
 
-      <!-- Next -->
-      <button v-if="songs.length > 1" @click="nextSong" class="control-button">
+      <button
+        v-if="songs.length > 1"
+        @click="nextSong"
+        class="control-button mr-4"
+      >
         <img src="@/assets/next-icon.svg" alt="Next" />
       </button>
 
-      <!-- Current Time -->
-      <span class="current-time ml-4">{{ formatTime(currentTime) }}</span>
+      <span class="current-time">{{ formatTime(currentTime) }}</span>
 
-      <!-- Progress Slider -->
       <input
         type="range"
         min="0"
@@ -43,22 +42,21 @@
         step="0.1"
         v-model="currentTime"
         @input="seekAudio"
-        class="progress-bar flex-1 mx-2"
+        class="progress-bar mx-2"
       />
 
-      <!-- Total Time -->
       <span class="total-time">{{ formatTime(duration) }}</span>
     </div>
 
-    <!-- Song List -->
+    <!-- 3) Song List -->
     <ul class="song-list flex-1 overflow-auto" v-if="songs.length > 1">
       <li
-        v-for="(song, index) in songs"
-        :key="song.id || index"
+        v-for="(song, idx) in songs"
+        :key="song.id || idx"
         :class="{ 'active-song': isCurrentSong(song) }"
         @click="playSong(song)"
       >
-        <div class="song-index">{{ index + 1 }}</div>
+        <div class="song-index">{{ idx + 1 }}</div>
         <div class="song-details">
           <p class="song-title">{{ song.title }}</p>
           <p class="artist-name">{{ artistName }}</p>
@@ -67,7 +65,6 @@
       </li>
     </ul>
 
-    <!-- Hidden Audio Element -->
     <audio
       ref="audioPlayer"
       @timeupdate="updateTime"
@@ -76,6 +73,7 @@
     ></audio>
   </div>
 </template>
+
 
 
 <script setup>
@@ -334,51 +332,39 @@ const formatTime = (time) => {
 .player-container {
   display: flex;
   flex-direction: column;
-  background-color: black;
+  background: black;
   color: #fff;
   border-radius: 0.5rem;
-  margin: auto;
-  width: 100%;
   height: 100%;
+  width: 100%;
 }
 
-/* Now Playing Section */
+/* Now Playing */
 .now-playing {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
-  gap: 1rem;
+  padding: 0.75rem;
+  gap: 0.75rem;
 }
 .album-cover {
-  width: 80px;
-  height: 80px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
   border-radius: 0.25rem;
 }
-.song-info {
-  flex-grow: 1;
-}
-.song-title {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 0;
-}
-.artist-name {
-  font-size: 1rem;
-  color: #b3b3b3;
-  margin: 0;
-}
+.song-info { flex: 1; }
+.song-title { font-size: 1rem; font-weight: bold; margin: 0; }
+.artist-name { font-size: 0.875rem; color: #bbb; margin: 0; }
 
-/* Combined Controls + Progress Row */
+/* Controls + Progress Row */
 .controls-progress {
   display: flex;
   align-items: center;
   padding: 0.5rem;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  /* ensure it's always visible */
 }
-
-/* Playback Buttons */
 .control-button {
   background: none;
   border: none;
@@ -395,7 +381,7 @@ const formatTime = (time) => {
   height: 32px;
 }
 
-/* Time Labels */
+/* Time labels */
 .current-time,
 .total-time {
   width: 2.5rem;
@@ -404,17 +390,18 @@ const formatTime = (time) => {
   flex-shrink: 0;
 }
 
-/* Progress Bar */
+/* Slider */
 .progress-bar {
-  flex-grow: 1;
+  flex: 1;
   height: 4px;
   background: #404040;
   border-radius: 2px;
-  appearance: none;
+  -webkit-appearance: none;
+  margin: 0 0.5rem;
   cursor: pointer;
 }
 .progress-bar::-webkit-slider-thumb {
-  appearance: none;
+  -webkit-appearance: none;
   width: 12px;
   height: 12px;
   background: #1db954;
@@ -430,10 +417,9 @@ const formatTime = (time) => {
 /* Song List */
 .song-list {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
   overflow-y: auto;
-  flex-grow: 1;
 }
 .song-list li {
   display: flex;
@@ -441,23 +427,18 @@ const formatTime = (time) => {
   padding: 0.5rem;
   cursor: pointer;
 }
-.song-list li:hover,
-.song-list li.active-song {
-  background-color: #282828;
+.song-list li.active-song,
+.song-list li:hover {
+  background: #282828;
 }
-.song-index {
-  width: 24px;
-  text-align: center;
-}
-.song-details {
-  flex-grow: 1;
-  padding-left: 0.5rem;
-}
+.song-index { width: 1.5rem; text-align: center; }
+.song-details { flex: 1; padding: 0 0.5rem; }
 .song-duration {
-  width: 50px;
+  width: 2.5rem;
   text-align: right;
   font-size: 0.75rem;
-  color: #b3b3b3;
+  color: #bbb;
 }
 </style>
+
 
