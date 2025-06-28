@@ -101,21 +101,16 @@
         </section>
 
         <!-- Featured Video -->
-        <section
-          v-if="band.data.singlevideo?.youtubeid"
-          class="relative w-full max-w-[600px] mx-auto mt-10"
-        >
+        <section v-if="band.data.singlevideo?.youtubeid" class="w-full mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Video
           </h2>
 
-          <!-- thumbnail / play button overlay -->
+          <!-- thumbnail + play overlay -->
           <div
             v-if="!isVideoPlaying"
             @click="playVideo"
-            class="relative cursor-pointer overflow-hidden rounded-lg"
-            style="padding-top: 56.25%"
-           
+            class="relative w-full overflow-hidden bg-black cursor-pointer rounded-lg embed-container"
           >
             <img
               :src="singleVideoThumbnail"
@@ -125,21 +120,17 @@
             <div
               class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
             >
-              <!-- your play icon -->
+              <!-- your play icon here -->
             </div>
           </div>
 
-          <!-- responsive iframe -->
-          <div
-            v-else
-            class="relative overflow-hidden rounded-lg"
-            style="padding-top: 56.25%"
-          >
-            <YouTube
-              :src="singleVideoEmbedUrl"
-              :vars="playerOptions"
-              class="absolute inset-0 w-full h-full"
-            />
+          <!-- actual YouTube iframe -->
+          <div v-else class="embed-container rounded-lg overflow-hidden">
+            <iframe
+              :src="singleVideoEmbedUrl + '?autoplay=1'"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowfullscreen
+            ></iframe>
           </div>
         </section>
 
