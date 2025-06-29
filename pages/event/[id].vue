@@ -225,16 +225,12 @@ onMounted(async () => {
   // Replace the *current* entry (/event/28) with artistURL#upcoming-events
   window.history.replaceState({}, '', `${artistURL}#upcoming-events`)
 
-  // Then push the real event URL back on top so we're still on /event/28
-  window.history.pushState({}, '', window.location.pathname)
 
   // 3) Listen for the pop back to the hash entry
   window.addEventListener('popstate', onPop)
 })
 
-onUnmounted(() => {
-  window.removeEventListener('popstate', onPop)
-})
+
 
 // The rest of your utility functions...
 
