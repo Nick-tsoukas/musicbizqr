@@ -321,11 +321,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from "vue";
+import { ref, onMounted, computed, nextTick, inject } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import YouTube from "vue3-youtube";
 import { useRoute, useRouter } from "vue-router";
+import { useNuxtApp } from '#app'
+
 import AudioPlayer from "@/components/AudioPlayer.vue";
 import { useHead } from "#imports";
 
@@ -347,6 +349,8 @@ import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
 
+const nuxtApp = useNuxtApp()
+const historyStack = nuxtApp.$historyStack   // <— here!
 const { trackClick, trackMediaPlay } = useBeacon();
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -378,18 +382,19 @@ const socialPlatforms = [
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
 
+// reactive “previous route” (or undefined if none)
+const previousRoute = computed(() => {
+  const arr = historyStack.value
+  return arr.length ? arr[arr.length - 1] : null
+})
+
 // Compute embed URL for an embedded track (Spotify / Apple Music)
 function extractYouTubeId(url) {
   const m = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
   return m ? m[1] : "";
 } 
 
-function scrollToUpcoming() {
-  if (route.hash === '#upcoming-events') {
-    const el = document.getElementById('upcoming-events')
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
-  }
-}
+
 
 
 const embedUrl = computed(() => {
@@ -555,19 +560,31 @@ useHead({
   ],
 });
 
+async function scrollToUpcoming() {
+  console.log('this is scroll to upcoming function ')
+  // DOM needs to be rendered
+  await nextTick()
+  const el = document.getElementById('upcoming-events')
+  if (el) {
+    console.log('this is the element condition of scroll function ')
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
 onMounted(async () => {
   // 1) fetch everything (including events list + markup)
   await fetchBandData()
-
+  console.log('🌿 Clean history stack:', historyStack.value.map(r => r.fullPath))
+  console.log('⏮️ Previous route:', previousRoute.value?.fullPath)
   // 2) wait until DOM has rendered the upcoming-events section
   await nextTick()
-
-  // 3) then scroll
-  scrollToUpcoming()
+  if (previousRoute.value?.path.startsWith('/event/')) {
+    scrollToUpcoming()
+  }
 })
 
 // 2) If someone navigates client-side to a new hash
-watch(() => route.hash, scrollToUpcoming)
+// watch(() => route.hash, scrollToUpcoming)
 
 </script>
 

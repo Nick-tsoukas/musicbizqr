@@ -195,13 +195,7 @@ const descriptionHTML = computed(() => {
   return generateHTML(eventData.value.description, [StarterKit, Underline])
 })
 
-// Scroll handler for `#upcoming-events`
-function onPop() {
-  if (window.location.hash === '#upcoming-events') {
-    const el = document.getElementById('upcoming-events')
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
-  }
-}
+
 
 onMounted(async () => {
   // 1) Fetch the event so we know the band slug
@@ -218,16 +212,7 @@ onMounted(async () => {
     return
   }
 
-  // 2) Insert a history entry so Back → /bandslug#upcoming-events
-  const bandSlug = eventData.value.band.data.attributes.slug
-  const artistURL = `/${bandSlug}`  // e.g. "/thedannynovaband"
 
-  // Replace the *current* entry (/event/28) with artistURL#upcoming-events
-  window.history.replaceState({}, '', `${artistURL}#upcoming-events`)
-
-
-  // 3) Listen for the pop back to the hash entry
-  window.addEventListener('popstate', onPop)
 })
 
 
