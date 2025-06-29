@@ -567,7 +567,7 @@ async function scrollToUpcoming() {
   const el = document.getElementById('upcoming-events')
   if (el) {
     console.log('this is the element condition of scroll function ')
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.scrollIntoView({ behavior: 'auto', block: 'start' })
   }
 }
 
