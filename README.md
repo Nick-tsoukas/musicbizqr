@@ -9,9 +9,9 @@
 - [] on demo page put real links in the social buttons 
 - [] on mobile devices when clicking links maybe dont open in a new tab 
 
-- [] wrap and test artist link button 
-  - [] seems to not work on certain pages 
-  - [] use asyncdata ... because the link is not showing on page load 
+- [x] wrap and test artist link button 
+  - [x] seems to not work on certain pages 
+  - [x] use asyncdata ... because the link is not showing on page load 
 
 - [x] make sure band slug is always generated on create band 
 

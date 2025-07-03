@@ -87,8 +87,12 @@ onMounted(async () => {
       console.debug('[QR PAGE] Redirecting to /social/' + qrId);
       return router.push(`/social/${qrId}`);
     } else if (q_type === 'externalURL' && link) {
-      console.debug('[QR PAGE] Redirecting externally to:', link);
-      window.location.href = link;
+
+  // ensure we have a valid absolute URL
+  const raw = link.trim();
+  const target = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  console.debug('[QR PAGE] Redirecting externally to:', target);
+  window.location.href = target;
       return;
     } else {
       console.warn('[QR PAGE] No matching QR type—sending to /dashboard');
