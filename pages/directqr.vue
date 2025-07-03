@@ -88,7 +88,7 @@ onMounted(async () => {
       return router.push(`/social/${qrId}`);
     } else if (q_type === 'externalURL' && link) {
 
-  // ensure we have a valid absolute URL
+  // ensure we have a valid absolute URL some deploy 
   const raw = link.trim();
   const target = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
   console.debug('[QR PAGE] Redirecting externally to:', target);
