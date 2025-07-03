@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-black text-white min-h-screen mx-auto p-4 w-full sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-3xl"
+    class="bg-black pt-[var(--header-height)] text-white min-h-screen mx-auto p-4 w-full sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-3xl"
   >
     <h1 class="text-2xl font-bold mb-4">QR Scans Over Time</h1>
 

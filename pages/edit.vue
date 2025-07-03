@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pt-[var(--header-height)]">
     
     <component :is="currentComponent" v-bind="props"></component>
 

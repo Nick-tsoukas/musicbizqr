@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto max-w-5xl" >
+  <div class="mx-auto max-w-5xl pt-[var(--header-height)]" >
     <ClientOnly>
       <EditQrCode />
     </ClientOnly>

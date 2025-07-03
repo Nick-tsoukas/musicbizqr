@@ -7,7 +7,8 @@
       <!-- QR Code Wrapper -->
       <div
         ref="qrcodeWrapper"
-        class="p-4 sticky top-0 z-50 rounded-lg shadow-md"
+        class="p-4 sticky top-0 rounded-lg shadow-md"
+        style="z-index : 999999 !important"
       >
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
@@ -48,7 +49,7 @@
               <div
                 @click="selectType('bandProfile')"
                 :class="{
-                  'border-green': route.query.type == 'bandProfile',
+                  'border-green border-4': route.query.type == 'bandProfile',
                   'border-black': route.query.type !== 'bandProfile',
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
@@ -114,7 +115,7 @@
               <div
                 @click="selectType('externalURL')"
                 :class="{
-                  'border-green': route.query.type == 'externalURL',
+                  'border-green border-4': route.query.type == 'externalURL',
                   'border-black': route.query.type !== 'externalURL',
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
@@ -180,14 +181,22 @@
             <div>
               <label class="flex items-center">
                 <span class="mr-2 text-gray-700">Background:</span>
-                <ColorSwatchPicker v-model="bgColor" />
+                <div class="color-picker">
+                  <!-- <ColorSwatchPicker v-model="bgColor" /> -->
+                  <input v-model="bgColor" type="text" class="color-text-input" />
+                  <input v-model="bgColor" type="color" class="color-input" />
+                </div>
               </label>
             </div>
             <!-- Foreground -->
             <div>
               <label class="flex items-center">
                 <span class="mr-2 text-gray-700">Foreground:</span>
-                <ColorSwatchPicker v-model="dotsColor" />
+                <div class="color-picker">
+                <!-- <ColorSwatchPicker v-model="dotsColor" /> -->
+                  <input v-model="dotsColor" type="text" class="color-text-input" />
+                <input v-model="dotsColor" type="color" class="color-input" />
+              </div>
               </label>
             </div>
           </div>
@@ -826,6 +835,8 @@ const saveQrCode = async () => {
 /* Color Picker Styling */
 .color-picker {
   position: relative;
+  overflow: visible;    /* allow the popup to show outside the box */
+  z-index: 99999 !important;        /* ensure it’s above other siblings */
 }
 
 .color-input {

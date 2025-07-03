@@ -1,6 +1,6 @@
 <template>
   <header
-    class="bg-black text-white shadow-lg fixed top-0 left-0 right-0 z-50"
+    class="bg-black text-white shadow-lg fixed top-0 left-0 right-0"
     style="height: var(--header-height)"
   >
     <!-- <BackButton
@@ -14,7 +14,7 @@
     >
       <img src="@/assets/musicbizlogo.png" class="h-8" />
 
-      <nav class="hidden md:flex space-x-4">
+      <nav class=" z-50 hidden md:flex space-x-4">
         <NuxtLink v-if="!user" to="/" class="nav-link">Home</NuxtLink>
         <NuxtLink v-if="user" to="/dashboard" class="nav-link"
           >Dashboard</NuxtLink
@@ -65,7 +65,7 @@
     </div>
 
     <nav
-      class="fixed left-0 w-full bg-black text-white md:hidden transition-transform z-40"
+      class="fixed left-0 w-full bg-black text-white md:hidden transition-transform z-50 "
       :class="isMenuOpen ? 'block' : 'hidden'"
       style="
         top: var(--header-height);
@@ -220,6 +220,9 @@ const logoutUserMobile = () => {
 
 
 <style scoped>
+header {
+  z-index: 99999999 !important;
+}
 .nav-link {
   @apply text-white hover:bg-purple-700 rounded px-4 py-2 transition-colors;
 }

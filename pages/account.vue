@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-black text-white px-6 py-10">
+  <div class="min-h-screen bg-black text-white px-6 py-10 pt-[var(--header-height)]">
     <div class="max-w-2xl mx-auto bg-[#121212] p-8 rounded-2xl shadow-xl">
       <h1 class="text-3xl font-semibold mb-8">Account Settings</h1>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000] container mx-auto max-w-5xl px-6">
+  <div class="bg-[#000] container mx-auto max-w-5xl px-6 pt-[var(--header-height)]">
     <!-- Loading Spinner -->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>

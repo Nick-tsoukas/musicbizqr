@@ -5,7 +5,7 @@
         <div class="spinner"></div>
       </div>
       <!-- QR Code Wrapper -->
-      <div ref="qrcodeWrapper" class="p-4 border border-gray-300 rounded-lg shadow-md">
+      <div ref="qrcodeWrapper" class="p-4 border sticky top-0 z-50 border-gray-300 rounded-lg shadow-md">
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
       <div class="mt-4 flex flex-col space-y-4 w-full">
@@ -37,15 +37,15 @@
               <div
                 @click="selectType('bandProfile')"
                 :class="{
-                  'border-green': q_type == 'bandProfile',
+                  'border-green border-4': q_type == 'bandProfile',
                   'border-black': q_type !== 'bandProfile'
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
-                <span>Band</span>
+                <span>Artist Link Tree Page</span>
               </div>
               <!-- Event -->
-              <div
+              <!-- <div
                 @click="selectType('events')"
                 :class="{
                   'border-green': q_type == 'events',
@@ -54,9 +54,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Event</span>
-              </div>
+              </div> -->
               <!-- Tour -->
-              <div
+              <!-- <div
                 @click="selectType('tours')"
                 :class="{
                   'border-green': q_type == 'tours',
@@ -65,9 +65,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Tour</span>
-              </div>
+              </div> -->
               <!-- Album -->
-              <div
+              <!-- <div
                 @click="selectType('albums')"
                 :class="{
                   'border-green': q_type == 'albums',
@@ -76,9 +76,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Album</span>
-              </div>
+              </div> -->
               <!-- Social Links -->
-              <div
+              <!-- <div
                 @click="selectType('social')"
                 :class="{
                   'border-green': q_type == 'social',
@@ -87,9 +87,9 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Social Links</span>
-              </div>
+              </div> -->
               <!-- Stream -->
-              <div
+              <!-- <div
                 @click="selectType('stream')"
                 :class="{
                   'border-green': q_type == 'stream',
@@ -98,17 +98,17 @@
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
                 <span>Stream</span>
-              </div>
+              </div> -->
               <!-- External URL -->
               <div
                 @click="selectType('externalURL')"
                 :class="{
-                  'border-green': q_type == 'externalURL',
-                  'border-black': q_type !== 'externalURL'
+                  'border-green border-4': q_type == 'externalURL',
+                  'border-black ': q_type !== 'externalURL'
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
-                <span>Link URL</span>
+                <span>External Link URL</span>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000] w-[90vw] mx-auto z-0">
+  <div class="bg-[#000] w-[90vw] mx-auto z-0 pt-[var(--header-height)]">
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
@@ -29,7 +29,7 @@
               >
               <div class="mdc-line-ripple"></div>
             </div>
-            
+
             <!-- New: Band name is in logo -->
             <div class="flex items-center mb-4">
               <input
@@ -39,7 +39,7 @@
                 class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded"
               />
               <label for="isBandNameInLogo" class="text-black select-none">
-                Band name is already in logo
+                Show artist name in page or is it in the logo
               </label>
             </div>
 
@@ -51,7 +51,6 @@
                 class="mdc-text-field__input"
                 v-model="genre"
                 placeholder=" "
-                required
               />
               <label class="mdc-floating-label" for="genre">Genre</label>
               <div class="mdc-line-ripple"></div>
@@ -64,10 +63,18 @@
                 class="mdc-text-field__input"
                 v-model="bio"
                 placeholder=" "
+                maxlength="247"
                 required
               ></textarea>
               <label class="mdc-floating-label" for="bio">Bio</label>
               <div class="mdc-line-ripple"></div>
+            </div>
+
+            <div
+              class="mdc-text-field-helper"
+              :class="{ 'mdc-text-field-helper--error': bio.length > max }"
+            >
+              {{ bio.length }} / {{ max }} characters
             </div>
           </div>
         </div>
@@ -154,7 +161,7 @@
               Social Media Links
             </h2>
           </div>
-          <div class="p-4 grid grid-cols-2 gap-4">
+          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
               v-for="net in Object.keys(social)"
               :key="net"
@@ -182,7 +189,7 @@
           >
             <h2 class="font-semibold text-white text-2xl">Streaming Links</h2>
           </div>
-          <div class="p-4 grid grid-cols-2 gap-4">
+          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
               v-for="stream in Object.keys(streaming)"
               :key="stream"
@@ -241,7 +248,6 @@
                 class="mdc-text-field__input"
                 v-model="singlesongTitle"
                 placeholder=" "
-              
               />
               <label class="mdc-floating-label" for="singlesong-title"
                 >Song Title</label
@@ -264,8 +270,8 @@
               >
                 Choose Single Song File
               </label>
-              <div v-if="singlesongFileName" class="mt-4 text-white">
-                Selected Song: {{ singlesongTitle || singlesongFileName }}
+              <div v-if="singlesongFile" class="mt-4 text-black">
+                Selected Song: {{  singlesongFile.name }}
               </div>
             </div>
 
@@ -276,7 +282,6 @@
                   id="singlesong-platform"
                   v-model="singlesongPlatform"
                   class="mdc-text-field__input"
-                  
                 >
                   <option disabled value="">Select Platform</option>
                   <option value="spotify">Spotify</option>
@@ -294,7 +299,6 @@
                   class="mdc-text-field__input"
                   v-model="singlesongTrackId"
                   placeholder=" "
-                  
                 />
                 <label class="mdc-floating-label" for="singlesong-trackid"
                   >Track ID</label
@@ -322,7 +326,6 @@
                 type="text"
                 class="mdc-text-field__input"
                 placeholder=" "
-                
               />
               <label class="mdc-floating-label" for="singlevideo-title">
                 Video Title
@@ -338,7 +341,7 @@
                 type="text"
                 class="mdc-text-field__input"
                 placeholder="e.g. dQw4w9WgXcQ"
-                           />
+              />
               <label class="mdc-floating-label" for="singlevideo-youtube">
                 YouTube ID
               </label>
@@ -377,6 +380,7 @@ const loading = ref(false);
 const isBandNameInLogo = ref(false);
 
 // Band basics
+
 const bandName = ref("");
 const genre = ref("");
 const bio = ref("");
@@ -384,6 +388,7 @@ const bandImg = ref(null);
 const bandImgUrl = ref(null);
 const websitelink = ref("");
 const websitelinktext = ref("");
+const max = 247;
 
 // Members
 const members = ref([
@@ -438,7 +443,8 @@ function handleImageUpload(e) {
 function handleSingleSongUpload(e) {
   const f = e.target.files[0];
   singlesongFile.value = f;
-  singlesongFileName.value = singlesongTitle.value || f.name;
+  console.log(f.name, 'this is the file ')
+  singlesongFileName.value =  f.name;
 }
 
 // Fetch existing bands for user (optional)
@@ -544,6 +550,16 @@ async function submitForm() {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.mdc-text-field-helper {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+  line-height: 1;
+}
+.mdc-text-field-helper--error {
+  color: #b00020;   /* a red for over-limit */
+}
 .title {
   font-size: 1.5rem;
   font-weight: bold;
@@ -561,6 +577,18 @@ async function submitForm() {
   border-radius: 10px;
   outline: none;
 }
+
+/* hide all placeholders by default */
+.mdc-text-field__input::placeholder {
+  color: transparent;
+  transition: color 0.2s;
+}
+
+/* reveal placeholder only when the input is focused */
+.mdc-text-field__input:focus::placeholder {
+  color: #888;  /* or whatever light gray matches your theme */
+}
+
 .mdc-floating-label {
   position: absolute;
   top: 0.75rem;

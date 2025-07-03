@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-5xl">
+  <div class="container mx-auto max-w-5xl pt-[var(--header-height)]">
     <h1 class="text-white text-3xl font-bold mb-10">Edit Event</h1>
     <form @submit.prevent="submitEditEvent">
       <!-- Event Details Section -->

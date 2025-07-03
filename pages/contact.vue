@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#121212] text-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-[#121212] pt-[var(--header-height)] text-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
         <h2 class="text-3xl font-bold">Contact Us</h2>

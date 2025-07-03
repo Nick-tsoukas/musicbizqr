@@ -45,7 +45,7 @@ const loginWithProvider = (provider) => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center w-screen custom_height">
+  <div class="flex justify-center items-center w-screen pt-[var(--header-height)] custom_height">
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>

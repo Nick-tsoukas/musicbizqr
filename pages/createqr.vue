@@ -7,7 +7,7 @@ const type = route.query.type
 
 <template >
 
-<div>
+<div class="pt-[var(--header-height)]">
   
     <ClientOnly  >
       <QrCode />

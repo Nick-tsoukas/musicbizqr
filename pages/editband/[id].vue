@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000] w-[90vw] mx-auto z-0">
+  <div class="bg-[#000] w-[90vw] mx-auto z-0 pt-[var(--header-height)]">
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>

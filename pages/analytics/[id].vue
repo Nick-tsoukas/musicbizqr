@@ -1,5 +1,5 @@
 <template>
-  <div class="px-6 py-8 bg-black min-h-screen">
+  <div class="px-6 py-8 bg-black min-h-screen pt-[var(--header-height)]">
     <h2 class="text-2xl font-bold mb-6 text-white">
       Analytics Dashboard
     </h2>

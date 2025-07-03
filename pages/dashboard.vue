@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#000]">
+  <div class="bg-[#000] pt-[var(--header-height)]">
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
       <PastDueBanner />
@@ -238,12 +238,23 @@
 </template>
 
 <script setup>
+import { useNuxtApp } from '#app'
+import { ref, onMounted, computed, inject } from 'vue'
 const user = useStrapiUser();
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
 const { find } = useStrapi();
 const { setToken, fetchUser } = useStrapiAuth();
+
+const nuxtApp = useNuxtApp()
+const historyStack = nuxtApp.$historyStack   // ← grab the real one
+const previousRoute = computed(() =>
+  historyStack.value.length
+    ? historyStack.value[historyStack.value.length - 1]
+    : null
+)
+
 
 const loading = ref(true);
 const qrs = ref([]);
@@ -356,6 +367,9 @@ const eventItems = computed(() =>
   }))
 );
 
+
+
+
 const viewQr = img => {
   imageURL.value = img;
   qrView.value = true;
@@ -374,6 +388,18 @@ const imageURL = ref("");
 const qrView = ref(false);
 
 onMounted(async () => {
+  console.log('Full history stack:', historyStack.value)
+  console.log('Previous route:', previousRoute.value)
+
+  if (
+    previousRoute.value?.path === '/createband' 
+  ) {
+    // do the full reload
+    window.location.reload()
+    return
+  }
+
+
   const tok = route.query.token;
   if (typeof tok === "string") {
     setToken(tok);

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto my-10 px-4">
+  <div class="container mx-auto my-10 px-4 pt-[var(--header-height)]">
     <!-- Event Hero Section -->
     <div
       v-if="eventData"
