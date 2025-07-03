@@ -5,6 +5,7 @@
         <div class="spinner"></div>
       </div>
       <!-- QR Code Wrapper -->
+      <transition name="fade">
       <div
         ref="qrcodeWrapper"
         class="p-4 sticky top-0 rounded-lg shadow-md"
@@ -12,6 +13,7 @@
       >
         <!-- QR code will be rendered here by qr-code-styling -->
       </div>
+      </transition>
       <div></div>
       <div class="mt-4 flex flex-col space-y-4 w-full">
         <!-- Name Input -->
@@ -386,12 +388,23 @@ import { ref, reactive, watch, onMounted, computed } from "vue";
 import { useAsyncData } from "#app";
 import { v4 as uuidv4 } from "uuid";
 
+import { useDebounceFn } from "@vueuse/core";
+
+
+
 // References for the QR code wrapper
 const qrcodeWrapper = ref(null);
 
 // Access runtime config if needed
 const config = useRuntimeConfig();
 const apiUrl = config.public.strapiUrl;
+
+// 1) Debounced updater: wait 150ms after last change before rebuilding QR
+const updateQRCodeDebounced = useDebounceFn(() => {
+  if (qrCode.value) {
+    qrCode.value.update(getQRCodeOptions());
+  }
+}, 150);
 
 // Strapi composables & routing
 const props = defineProps({ type: String });
@@ -451,6 +464,7 @@ onMounted(async () => {
     const { default: QRCodeStyling } = await import("qr-code-styling");
     qrCode.value = new QRCodeStyling(getQRCodeOptions());
     qrCode.value.append(qrcodeWrapper.value);
+    qrCode.value.update(getQRCodeOptions());
     initializeWatcher();
   }
 
@@ -565,30 +579,27 @@ function getQRCodeOptions() {
  */
 function initializeWatcher() {
   watch(
-    [
-      qrValue,
-      qrSize,
-      bgColor,
-      dotsColor,
-      dotsType,
-      cornersSquareColor,
-      cornersSquareType,
-      cornersDotColor,
-      cornersDotType,
-      gradient,
-      gradientType,
-      gradientRotation,
-      gradientStartColor,
-      gradientEndColor,
-      () => imageSettings.src,
-    ],
-    () => {
-      if (qrCode.value) {
-        qrCode.value.update(getQRCodeOptions());
-      }
-    },
-    { deep: true }
-  );
+  [
+    qrValue,
+    qrSize,
+    bgColor,
+    dotsColor,
+    dotsType,
+    cornersSquareColor,
+    cornersSquareType,
+    cornersDotColor,
+    cornersDotType,
+    gradient,
+    gradientType,
+    gradientRotation,
+    gradientStartColor,
+    gradientEndColor,
+    () => imageSettings.src,
+  ],
+  updateQRCodeDebounced,
+  { deep: true }
+);
+
 }
 
 /**
@@ -741,6 +752,16 @@ const saveQrCode = async () => {
 /* Container Styling */
 .container {
   margin-top: 2rem;
+}
+
+/* Fade transition for the QR container */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 /* Spinner Styling */

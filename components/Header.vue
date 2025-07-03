@@ -12,7 +12,9 @@
     <div
       class="flex items-center justify-between h-full px-4 mx-auto max-w-5xl"
     >
+    <NuxtLink to="/">
       <img src="@/assets/musicbizlogo.png" class="h-8" />
+    </NuxtLink>
 
       <nav class=" z-50 hidden md:flex space-x-4">
         <NuxtLink v-if="!user" to="/" class="nav-link">Home</NuxtLink>
@@ -23,7 +25,6 @@
         <NuxtLink
           v-if="user && userSlug"
           :to="`/${userSlug}`"
-
           class="nav-link"
         >
           Artist Link Page
@@ -87,10 +88,9 @@
           @click="toggleMenu"
           class="mobile-nav-link"
         >
-        
           Artist Link Page
         </NuxtLink>
-      </client-only>
+        </client-only>
         <NuxtLink
           v-if="user"
           to="/dashboard"
@@ -135,72 +135,42 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useStrapiUser, useStrapiAuth, useFetch, useRuntimeConfig } from '#imports'
 import { useRouter } from 'vue-router'
+import { useAsyncData } from '#app'
 
 const user = useStrapiUser()
 const { logout } = useStrapiAuth()
 const router = useRouter()
 const config = useRuntimeConfig()
 
-// will hold the current user’s band slug
-const userSlug = ref(null)
-
-watch(
-  () => user.value?.id,
-  async (id) => {
-    if (!id) return
-
-    try {
-      const { data, error } = await useFetch(
-        `${config.public.strapiUrl}/api/bands`,
-        {
-          params: {
-            'filters[users_permissions_user][id][$eq]': id,
-            'fields[0]': 'slug',
-          },
-        }
-      )
-
-      if (error.value) {
-        console.error('Error fetching user band:', error.value)
-        return
-      }
-
-      const list = data.value?.data
-      if (list?.length) {
-        const item = list[0]
-        // handle both shapes: flatten or attributes wrapper
-        const slug =
-          item.attributes?.slug != null
-            ? item.attributes.slug
-            : item.slug
-
-        if (slug) {
-          userSlug.value = slug
-          console.log('✅ My band slug:', slug)
-        } else {
-          console.warn('⚠️ Fetched band had no slug field:', item)
-          userSlug.value = null
-        }
-      } else {
-        console.warn('⚠️ No band found for user', id)
-        userSlug.value = null
-      }
-    } catch (e) {
-      console.error('Unexpected error fetching band:', e)
-      userSlug.value = null
-    }
-  },
-  { immediate: true }
+// 1) Fetch the user's band slug via SSR + client
+const { data: bandData, pending: bandLoading, error: bandError } = await useAsyncData(
+  'user-band',
+  () => $fetch(`${config.public.strapiUrl}/api/bands`, {
+    params: {
+      'filters[users_permissions_user][id][$eq]': user.value?.id,
+      'fields[0]': 'slug',
+    },
+  }),
+  {
+    server: true,
+    immediate: true,
+    watch: () => user.value?.id,
+  }
 )
 
-// computed link
-const slugLink = ref(null)
-watch(userSlug, s => slugLink.value = s ? `/${s}` : null)
+// 2) Compute a simple slug or null
+const userSlug = computed(() => {
+  if (bandLoading.value || bandError.value) return null
+  const list = bandData.value?.data || []
+  if (!list.length) return null
+  const item = list[0]
+  return item.attributes?.slug ?? item.slug ?? null
+})
 
-// header/menu state & actions
+// Menu state & actions
 const isMenuOpen = ref(false)
 const toggleMenu = () => {
   document.body.style.overflow = isMenuOpen.value ? '' : 'hidden'
@@ -216,8 +186,6 @@ const logoutUserMobile = () => {
   router.push('/')
 }
 </script>
-
-
 
 <style scoped>
 header {

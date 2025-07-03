@@ -5,9 +5,14 @@
         <div class="spinner"></div>
       </div>
       <!-- QR Code Wrapper -->
-      <div ref="qrcodeWrapper" class="p-4 border sticky top-0 z-50 border-gray-300 rounded-lg shadow-md">
-        <!-- QR code will be rendered here by qr-code-styling -->
-      </div>
+      <transition name="fade">
+        <div
+          ref="qrcodeWrapper"
+          class="p-4 border sticky top-0 z-50 border-gray-300 rounded-lg shadow-md"
+        >
+          <!-- QR code will be rendered here by qr-code-styling -->
+        </div>
+      </transition>
       <div class="mt-4 flex flex-col space-y-4 w-full">
         <!-- Name Input -->
         <div class="bg-white rounded-md">
@@ -18,7 +23,12 @@
           </div>
           <div class="p-4">
             <label class="mdc-text-field mb-4">
-              <input v-model="name" type="text" class="mdc-text-field__input" placeholder="Enter Name" />
+              <input
+                v-model="name"
+                type="text"
+                class="mdc-text-field__input"
+                placeholder="Enter Name"
+              />
               <span class="mdc-line-ripple"></span>
             </label>
           </div>
@@ -29,7 +39,9 @@
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <span class="mb-1 text-white text-xl font-semibold">Choose QR Type</span>
+            <span class="mb-1 text-white text-xl font-semibold"
+              >Choose QR Type</span
+            >
           </div>
           <div class="p-4">
             <div class="flex flex-wrap gap-4">
@@ -38,7 +50,7 @@
                 @click="selectType('bandProfile')"
                 :class="{
                   'border-green border-4': q_type == 'bandProfile',
-                  'border-black': q_type !== 'bandProfile'
+                  'border-black': q_type !== 'bandProfile',
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
@@ -104,7 +116,7 @@
                 @click="selectType('externalURL')"
                 :class="{
                   'border-green border-4': q_type == 'externalURL',
-                  'border-black ': q_type !== 'externalURL'
+                  'border-black ': q_type !== 'externalURL',
                 }"
                 class="cursor-pointer border-2 flex justify-center items-center px-6 py-2 rounded-sm shadow-lg"
               >
@@ -123,11 +135,7 @@
               <!-- "None" option if they don't want to associate this QR with a band -->
               <option :value="null">None</option>
               <!-- Render each band from bands.value -->
-              <option
-                v-for="band in bands"
-                :key="band.id"
-                :value="band.id"
-              >
+              <option v-for="band in bands" :key="band.id" :value="band.id">
                 {{ band.name }}
               </option>
               <!-- Create new band option -->
@@ -141,7 +149,12 @@
         <div v-if="q_type === 'externalURL'" class="bg-white rounded-md p-4">
           <label class="mdc-text-field mb-4">
             <span class="mb-1 text-gray-700">External Link:</span>
-            <input v-model="link" type="text" class="mdc-text-field__input" placeholder="Enter URL" />
+            <input
+              v-model="link"
+              type="text"
+              class="mdc-text-field__input"
+              placeholder="Enter URL"
+            />
             <span class="mdc-line-ripple"></span>
           </label>
         </div>
@@ -175,7 +188,11 @@
             <label class="color-picker-label mb-4">
               <span class="mb-1 text-gray-700">Foreground Color:</span>
               <div class="color-picker">
-                <input v-model="dotsColor" type="text" class="color-text-input" />
+                <input
+                  v-model="dotsColor"
+                  type="text"
+                  class="color-text-input"
+                />
                 <input v-model="dotsColor" type="color" class="color-input" />
               </div>
             </label>
@@ -204,7 +221,9 @@
                 <span class="mdc-line-ripple"></span>
               </label>
               <label class="mdc-text-field mb-4">
-                <span class="mb-1 text-gray-700">Gradient Rotation (degrees):</span>
+                <span class="mb-1 text-gray-700"
+                  >Gradient Rotation (degrees):</span
+                >
                 <input
                   v-model.number="gradientRotation"
                   type="number"
@@ -217,15 +236,31 @@
               <label class="color-picker-label mb-4">
                 <span class="mb-1 text-gray-700">Gradient Start Color:</span>
                 <div class="color-picker">
-                  <input v-model="gradientStartColor" type="text" class="color-text-input" />
-                  <input v-model="gradientStartColor" type="color" class="color-input" />
+                  <input
+                    v-model="gradientStartColor"
+                    type="text"
+                    class="color-text-input"
+                  />
+                  <input
+                    v-model="gradientStartColor"
+                    type="color"
+                    class="color-input"
+                  />
                 </div>
               </label>
               <label class="color-picker-label mb-4">
                 <span class="mb-1 text-gray-700">Gradient End Color:</span>
                 <div class="color-picker">
-                  <input v-model="gradientEndColor" type="text" class="color-text-input" />
-                  <input v-model="gradientEndColor" type="color" class="color-input" />
+                  <input
+                    v-model="gradientEndColor"
+                    type="text"
+                    class="color-text-input"
+                  />
+                  <input
+                    v-model="gradientEndColor"
+                    type="color"
+                    class="color-input"
+                  />
                 </div>
               </label>
             </div>
@@ -242,7 +277,11 @@
           <div class="p-4">
             <label class="mdc-text-field mb-4">
               <span class="mb-1 text-gray-700">Upload Logo:</span>
-              <input type="file" @change="handleImageUpload" class="mdc-text-field__input" />
+              <input
+                type="file"
+                @change="handleImageUpload"
+                class="mdc-text-field__input"
+              />
               <span class="mdc-line-ripple"></span>
             </label>
           </div>
@@ -277,15 +316,25 @@
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="font-semibold text-white text-xl">Corners Square Options</h2>
+            <h2 class="font-semibold text-white text-xl">
+              Corners Square Options
+            </h2>
           </div>
           <div class="p-4">
             <!-- Corners Square Color -->
             <label class="color-picker-label mb-4">
               <span class="mb-1 text-gray-700">Corners Square Color:</span>
               <div class="color-picker">
-                <input v-model="cornersSquareColor" type="text" class="color-text-input" />
-                <input v-model="cornersSquareColor" type="color" class="color-input" />
+                <input
+                  v-model="cornersSquareColor"
+                  type="text"
+                  class="color-text-input"
+                />
+                <input
+                  v-model="cornersSquareColor"
+                  type="color"
+                  class="color-input"
+                />
               </div>
             </label>
             <!-- Corners Square Type -->
@@ -306,15 +355,25 @@
           <div
             class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="font-semibold text-white text-xl">Corners Dot Options</h2>
+            <h2 class="font-semibold text-white text-xl">
+              Corners Dot Options
+            </h2>
           </div>
           <div class="p-4">
             <!-- Corners Dot Color -->
             <label class="color-picker-label mb-4">
               <span class="mb-1 text-gray-700">Corners Dot Color:</span>
               <div class="color-picker">
-                <input v-model="cornersDotColor" type="text" class="color-text-input" />
-                <input v-model="cornersDotColor" type="color" class="color-input" />
+                <input
+                  v-model="cornersDotColor"
+                  type="text"
+                  class="color-text-input"
+                />
+                <input
+                  v-model="cornersDotColor"
+                  type="color"
+                  class="color-input"
+                />
               </div>
             </label>
             <!-- Corners Dot Type -->
@@ -339,8 +398,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
+import { ref, reactive, watch, onMounted } from "vue";
+import { v4 as uuidv4 } from "uuid";
+import { useDebounceFn } from "@vueuse/core";
 
 const qrcodeWrapper = ref(null);
 
@@ -361,15 +421,22 @@ const qrCode = ref(null);
 // Fetch QR code data from backend
 const qrData = ref(null);
 
+// Debounced updater: waits 150 ms after last change before calling .update()
+const updateQRCodeDebounced = useDebounceFn(() => {
+  if (qrCode.value) {
+    qrCode.value.update(getQRCodeOptions());
+  }
+}, 150);
+
 onMounted(async () => {
   loading.value = true;
   try {
-    const response = await findOne('qrs', route.params.id, {
+    const response = await findOne("qrs", route.params.id, {
       populate: {
-        event: { populate: '*' },
-        tour: { populate: '*' },
-        album: { populate: '*' },
-        band: { populate: '*' },
+        event: { populate: "*" },
+        tour: { populate: "*" },
+        album: { populate: "*" },
+        band: { populate: "*" },
       },
     });
     qrData.value = response.data;
@@ -378,15 +445,17 @@ onMounted(async () => {
     initializeVariables();
 
     if (process.client) {
-      const { default: QRCodeStyling } = await import('qr-code-styling');
+      const { default: QRCodeStyling } = await import("qr-code-styling");
       qrCode.value = new QRCodeStyling(getQRCodeOptions());
       qrCode.value.append(qrcodeWrapper.value);
+
+      qrCode.value.update(getQRCodeOptions());
 
       // Initialize the watcher after qrCode.value is set
       initializeWatcher();
     }
   } catch (error) {
-    console.error('Error fetching QR code data:', error);
+    console.error("Error fetching QR code data:", error);
   } finally {
     loading.value = false;
   }
@@ -397,35 +466,37 @@ function initializeVariables() {
 
   q_type.value = data.q_type || null;
   link.value = data.link || null;
-  name.value = data.name || 'add name';
-  qrValue.value = data.url || '';
+  name.value = data.name || "add name";
+  qrValue.value = data.url || "";
   qrSize.value = data.options?.size || 300;
 
-  bgColor.value = data.options?.backgroundOptions?.color || '#FFFFFF';
+  bgColor.value = data.options?.backgroundOptions?.color || "#FFFFFF";
 
   gradient.value = !!data.options?.dotsOptions?.gradient;
-  gradientType.value = data.options?.dotsOptions?.gradient?.type || 'linear';
+  gradientType.value = data.options?.dotsOptions?.gradient?.type || "linear";
   gradientRotation.value = data.options?.dotsOptions?.gradient?.rotation
     ? (data.options.dotsOptions.gradient.rotation * 180) / Math.PI
     : 0;
   gradientStartColor.value =
-    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || '#e6289d';
+    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || "#e6289d";
   gradientEndColor.value =
-    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || '#40353c';
+    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || "#40353c";
 
-  imageSettings.src = data.options?.imageOptions?.src || '';
+  imageSettings.src = data.options?.imageOptions?.src || "";
   imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.4;
   imageSettings.margin = data.options?.imageOptions?.margin || 0;
-  imageSettings.crossOrigin = 'anonymous';
+  imageSettings.crossOrigin = "anonymous";
 
-  dotsColor.value = data.options?.dotsOptions?.color || '#000000';
-  dotsType.value = data.options?.dotsOptions?.type || 'square';
+  dotsColor.value = data.options?.dotsOptions?.color || "#000000";
+  dotsType.value = data.options?.dotsOptions?.type || "square";
 
-  cornersSquareColor.value = data.options?.cornersSquareOptions?.color || '#000000';
-  cornersSquareType.value = data.options?.cornersSquareOptions?.type || 'square';
+  cornersSquareColor.value =
+    data.options?.cornersSquareOptions?.color || "#000000";
+  cornersSquareType.value =
+    data.options?.cornersSquareOptions?.type || "square";
 
-  cornersDotColor.value = data.options?.cornersDotOptions?.color || '#000000';
-  cornersDotType.value = data.options?.cornersDotOptions?.type || 'square';
+  cornersDotColor.value = data.options?.cornersDotOptions?.color || "#000000";
+  cornersDotType.value = data.options?.cornersDotOptions?.type || "square";
 
   selectedEvent.value = data.event?.data?.id ?? null;
   selectedTour.value = data.tour?.data?.id ?? null;
@@ -490,62 +561,59 @@ function getQRCodeOptions() {
 
 function initializeWatcher() {
   watch(
-    [
-      qrValue,
-      qrSize,
-      bgColor,
-      dotsColor,
-      dotsType,
-      cornersSquareColor,
-      cornersSquareType,
-      cornersDotColor,
-      cornersDotType,
-      gradient,
-      gradientType,
-      gradientRotation,
-      gradientStartColor,
-      gradientEndColor,
-      () => imageSettings.src,
-    ],
-    () => {
-      if (qrCode.value) {
-        qrCode.value.update(getQRCodeOptions());
-      }
-    },
-    { deep: true }
-  );
+  [
+    qrValue,
+    qrSize,
+    bgColor,
+    dotsColor,
+    dotsType,
+    cornersSquareColor,
+    cornersSquareType,
+    cornersDotColor,
+    cornersDotType,
+    gradient,
+    gradientType,
+    gradientRotation,
+    gradientStartColor,
+    gradientEndColor,
+    () => imageSettings.src,
+  ],
+  updateQRCodeDebounced,
+  { deep: true }
+);
+
 }
 
-const qrValue = ref('');
+const qrValue = ref("");
 const qrSize = ref(300);
 
-const bgColor = ref('#FFFFFF');
-const fgColor = ref('#000000');
+const bgColor = ref("#FFFFFF");
+const fgColor = ref("#000000");
 
-const gradient = ref(false); 
-const gradientType = ref('linear'); 
-const gradientRotation = ref(0); 
-const gradientStartColor = ref('#e6289d');
-const gradientEndColor = ref('#40353c');
+const gradient = ref(false);
+const gradientType = ref("linear");
+const gradientRotation = ref(0);
+const gradientStartColor = ref("#e6289d");
+const gradientEndColor = ref("#40353c");
 
-const name = ref('name');
+const name = ref("name");
 const link = ref(null);
 
 const imageSettings = reactive({
-  src: '',
+  src: "",
   imageSize: 0.4,
   margin: 0,
-  crossOrigin: 'anonymous',
+  crossOrigin: "anonymous",
 });
 
-const dotsColor = ref('#000000');
-const dotsType = ref('square');
+const dotsColor = ref("#000000");
+const dotsType = ref("square");
 
-const cornersSquareColor = ref('#000000');
-const cornersSquareType = ref('square');
+const cornersSquareColor = ref("#000000");
+const cornersSquareType = ref("square");
 
-const cornersDotColor = ref('#000000');
-const cornersDotType = ref('square');
+const cornersDotColor = ref("#000000");
+const cornersDotType = ref("square");
 
 const q_type = ref(null);
 
@@ -572,19 +640,27 @@ const selectedBand = ref(null);
 
 const fetchUserRelatedData = async () => {
   try {
-    const bandsResponse = await find('bands', { filters: { users_permissions_user: { id: user.value.id } } });
+    const bandsResponse = await find("bands", {
+      filters: { users_permissions_user: { id: user.value.id } },
+    });
     bands.value = bandsResponse.data;
 
-    const eventsResponse = await find('events', { filters: { users_permissions_user: { id: user.value.id } } });
+    const eventsResponse = await find("events", {
+      filters: { users_permissions_user: { id: user.value.id } },
+    });
     events.value = eventsResponse.data;
 
-    const toursResponse = await find('tours', { filters: { users_permissions_user: { id: user.value.id } } });
+    const toursResponse = await find("tours", {
+      filters: { users_permissions_user: { id: user.value.id } },
+    });
     tours.value = toursResponse.data;
 
-    const albumsResponse = await find('albums', { filters: { users_permissions_user: { id: user.value.id } } });
+    const albumsResponse = await find("albums", {
+      filters: { users_permissions_user: { id: user.value.id } },
+    });
     albums.value = albumsResponse.data;
   } catch (error) {
-    console.error('Error fetching user-related data:', error);
+    console.error("Error fetching user-related data:", error);
   }
 };
 
@@ -596,8 +672,8 @@ const selectType = (type) => {
   selectedTour.value = null;
   selectedEvent.value = null;
 
-  if (type === 'externalURL') {
-    qrValue.value = link.value || '';
+  if (type === "externalURL") {
+    qrValue.value = link.value || "";
   }
 };
 
@@ -608,7 +684,7 @@ const updateQrCodeSubmit = async () => {
     const formData = new FormData();
 
     // Update qrValue based on q_type
-    if (q_type.value === 'externalURL' && link.value) {
+    if (q_type.value === "externalURL" && link.value) {
       qrValue.value = link.value;
     }
 
@@ -647,39 +723,51 @@ const updateQrCodeSubmit = async () => {
           type: cornersDotType.value,
         },
       },
-      band: selectedBand.value !== 'createNew' ? selectedBand.value : null,
-      album: selectedAlbum.value !== 'createNew' ? selectedAlbum.value : null,
-      event: selectedEvent.value !== 'createNew' ? selectedEvent.value : null,
-      tour: selectedTour.value !== 'createNew' ? selectedTour.value : null,
+      band: selectedBand.value !== "createNew" ? selectedBand.value : null,
+      album: selectedAlbum.value !== "createNew" ? selectedAlbum.value : null,
+      event: selectedEvent.value !== "createNew" ? selectedEvent.value : null,
+      tour: selectedTour.value !== "createNew" ? selectedTour.value : null,
     };
 
     // Get the QR code as a blob
-    const blob = await qrCode.value.getRawData('png');
-    const file = new File([blob], 'qrcode.png');
+    const blob = await qrCode.value.getRawData("png");
+    const file = new File([blob], "qrcode.png");
 
-    formData.append('files.q_image', file, 'qrcode.png');
-    formData.append('data', JSON.stringify(form));
+    formData.append("files.q_image", file, "qrcode.png");
+    formData.append("data", JSON.stringify(form));
 
     await client(`/qrs/${qrId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: formData,
     });
 
     // Routing after successful update
-    if (selectedBand.value === 'createNew') {
-      router.push({ path: '/createband', query: { createnew: 'createNew', qrId: qrId } });
-    } else if (selectedAlbum.value === 'createNew') {
-      router.push({ path: '/newalbum', query: { createnew: 'createNew', qrId: qrId } });
-    } else if (selectedTour.value === 'createNew') {
-      router.push({ path: '/newtour', query: { createnew: 'createNew', qrId: qrId } });
-    } else if (selectedEvent.value === 'createNew') {
-      router.push({ path: '/newevent', query: { createnew: 'createNew', qrId: qrId } });
+    if (selectedBand.value === "createNew") {
+      router.push({
+        path: "/createband",
+        query: { createnew: "createNew", qrId: qrId },
+      });
+    } else if (selectedAlbum.value === "createNew") {
+      router.push({
+        path: "/newalbum",
+        query: { createnew: "createNew", qrId: qrId },
+      });
+    } else if (selectedTour.value === "createNew") {
+      router.push({
+        path: "/newtour",
+        query: { createnew: "createNew", qrId: qrId },
+      });
+    } else if (selectedEvent.value === "createNew") {
+      router.push({
+        path: "/newevent",
+        query: { createnew: "createNew", qrId: qrId },
+      });
     } else {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   } catch (error) {
     loading.value = false;
-    console.error('Error updating QR code:', error);
+    console.error("Error updating QR code:", error);
   } finally {
     loading.value = false;
   }
@@ -690,6 +778,16 @@ const updateQrCodeSubmit = async () => {
 /* Container Styling */
 .container {
   margin-top: 2rem;
+}
+
+/* Fade transition for the QR container */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 /* Spinner Styling */
@@ -766,7 +864,7 @@ const updateQrCodeSubmit = async () => {
   text-transform: uppercase;
   letter-spacing: 0.0892857143em;
   color: #fff;
-  background-color: #2C2C2C;
+  background-color: #2c2c2c;
   border: none;
   border-radius: 4px;
   cursor: pointer;

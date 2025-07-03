@@ -228,10 +228,17 @@
           >
             Download Image
           </button>
+
+          <button
+            @click="viewQr"
+            class="px-4 py-2 bg-blue-500 text-white rounded"
+          >
+           Close popup
+          </button>
         </div>
-        <div class="absolute bottom-10 right-10">
+        <!-- <div class="absolute bottom-10 right-10">
           <h2 @click="viewQr" class="text-white cursor-pointer">Close</h2>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -372,7 +379,7 @@ const eventItems = computed(() =>
 
 const viewQr = img => {
   imageURL.value = img;
-  qrView.value = true;
+  qrView.value = !qrView.value;
 };
 
 const downloadImage = () => {
