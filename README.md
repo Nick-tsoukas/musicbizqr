@@ -1,5 +1,9 @@
 # Task list 
 
+- [] add resend api key to railway RESEND_API_KEY=re_TVm9KVo6_Byht3rJUZ7QqVp4F9zSMCQ2x
+- [] CONTACT_TO=your.nick.tsoukas101@gmail.com
+
+
 - [x] limit and find number of max charater for artist bio
   - [x] add helper not in the edit for 
     - [x] max character for bio 225

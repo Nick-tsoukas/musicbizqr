@@ -4,7 +4,7 @@
       <div class="text-center">
         <h2 class="text-3xl font-bold">Contact Us</h2>
         <p class="mt-2 text-sm text-gray-400">
-          We'd love to hear from you. Fill out the form below and we'll get back to you soon.
+          We'd love to hear from you. Fill out the form below and we&#39;ll get back to you soon.
         </p>
       </div>
       <form class="space-y-6" @submit.prevent="submitForm">
@@ -70,9 +70,20 @@ const form = ref({
   message: '',
 });
 
-const submitForm = () => {
-  console.log('📩 Submitting contact form:', form.value);
-  alert('Thank you for contacting us!');
-  form.value = { name: '', email: '', message: '' };
-};
+const submitForm = async () => {
+  try {
+    const res = await $fetch('/api/contact', {
+      method: 'POST',
+      body: form.value
+    })
+    if (res.success) {
+      alert('✅ Your message has been sent!')
+      form.value = { name: '', email: '', message: '' }
+    }
+  } catch (err) {
+    console.error('Contact error:', err)
+    alert(err.data?.message || '❌ Failed to send—it might be a server error.')
+  }
+}
+
 </script>

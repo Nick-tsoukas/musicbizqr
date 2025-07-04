@@ -45,7 +45,7 @@
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <!-- Featured Song -->
-        <section v-if="band.data.singlesong" class="mt-10">
+        <section v-if="hasFeaturedSong" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
           </h2>
@@ -55,7 +55,7 @@
             <div
               class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
             >
-              <div
+              <!-- <div
                 v-if="!isEmbeddedPlaying"
                 @click="startEmbedded()"
                 class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
@@ -77,9 +77,9 @@
                     <polygon points="34,28 34,56 58,42" fill="white" />
                   </svg>
                 </div>
-              </div>
+              </div> -->
               <iframe
-                v-else
+                
                 :src="embedUrl + '?autoplay=1'"
                 frameborder="0"
                 allow="autoplay; encrypted-media; fullscreen; clipboard-write"
@@ -525,6 +525,22 @@ const bandUrl = computed(() =>
     ? `https://yourdomain.com/band/${route.params.slug?.toLowerCase()}`
     : ""
 );
+
+const hasFeaturedSong = computed(() => {
+  const s = band.value?.data?.singlesong
+  if (!s) return false
+
+  // embed case: requires a trackId + platform
+  if (s.isEmbed) {
+    return Boolean(s.trackId && s.platform)
+  }
+
+  // upload case: requires a real audio URL
+  const url =
+    s.song?.data?.attributes?.url ||   // nested v4 media
+    s.song?.url                        // flat media
+  return Boolean(url)
+})
 
 useHead({
   title: bandName,

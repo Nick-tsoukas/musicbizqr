@@ -37,6 +37,9 @@ export default defineNuxtConfig({
   css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css', '@fortawesome/fontawesome-free/css/all.css'],
 
   runtimeConfig: {
+    resendKey: process.env.RESEND_API_KEY,
+    contactTo: process.env.CONTACT_TO,
+    contactFrom: process.env.CONTACT_FROM,
     public: {
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
       // strapiUrl: ' https://finite-fit-queries-kansas.trycloudflare.com',
