@@ -77,8 +77,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useSignup } from '~/composables/useSignup'
+const router       = useRouter()
 
-const { createStripeCustomer, createCheckoutSession } = useSignup()
+const { registerUser } = useSignup()
+const loading      = ref(false)
+const errorMessage = ref('')
 
 const formData = ref({
   name: '',
@@ -87,22 +90,25 @@ const formData = ref({
 })
 
 const handleSignup = async () => {
+  loading.value = true
+  errorMessage.value = ''
+
   try {
-    // 1) Create a Stripe Customer
-    const customerId = await createStripeCustomer(formData.value.email, formData.value.name)
+    // 1️⃣ Register user & start 30-day trial in one call
+    const user = await registerUser(
+      formData.value.name,
+      formData.value.email,
+      formData.value.password
+    )
 
-    // 2) Create Checkout Session
-    const checkoutUrl = await createCheckoutSession(customerId)
-
-    // 3) Temporarily store the user data so we can use it after redirect
-    sessionStorage.setItem('signup_email', formData.value.email)
-sessionStorage.setItem('signup_password', formData.value.password)
-sessionStorage.setItem('signup_name', formData.value.name)
-    // 4) Redirect to Stripe
-    window.location.href = checkoutUrl
-  } catch (err) {
-    console.error(err)
-    alert('Signup failed')
+    // 2️⃣ Notify & navigate
+    alert(`✅ Welcome ${user.email}! Your 30-day trial is now active.`)
+    router.push('/signupSuccess')
+  } catch (err: any) {
+    console.error('Signup failed', err)
+    errorMessage.value = err.message || 'Signup failed. Please try again.'
+  } finally {
+    loading.value = false
   }
 }
 </script>

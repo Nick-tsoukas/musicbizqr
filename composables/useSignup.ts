@@ -3,9 +3,25 @@ import { useFetch, useRuntimeConfig  } from '#app'
 
 export function useSignup() {
     const config = useRuntimeConfig()
+
+    
   
     // 2) Use the public strapiUrl from nuxt.config.ts
     const strapiBaseURL = config.public.strapiUrl
+
+    const registerUser = async (name: string, email: string, password: string) => {
+      const url = `${strapiBaseURL}/api/stripe/register`
+      const res = await fetch(url, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, email, password })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data?.message || 'Registration failed')
+      }
+      return data.user  // { id, email }
+    }
 
   // 1) Create Stripe Customer
   const createStripeCustomer = async (email: string, name: string) => {
@@ -98,9 +114,10 @@ export function useSignup() {
   }
 
   return {
-    createStripeCustomer,
-    createCheckoutSession,
-    confirmPayment,
+    registerUser,
+    // createStripeCustomer,
+    // createCheckoutSession,
+    // confirmPayment,
     loginUser,
   }
 }
