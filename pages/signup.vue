@@ -92,6 +92,7 @@ const formData = ref({
 const handleSignup = async () => {
   loading.value = true
   errorMessage.value = ''
+  console.log('[handleSignup] payload →', JSON.stringify(formData.value))
 
   try {
     // 1️⃣ Register user & start 30-day trial in one call
