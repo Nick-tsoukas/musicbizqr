@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto">
+  <div class="container mx-auto pb-14">
     <div class="flex flex-col items-center p-4 max-w-5xl mx-auto">
       <div v-if="loading" class="loading-container">
         <div class="spinner"></div>
