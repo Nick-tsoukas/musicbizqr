@@ -2,16 +2,31 @@
   <div class="bg-[#000] pt-[var(--header-height)]">
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
+      
       <PastDueBanner />
+
+      <TrialBanner
+        v-if="!loadingTrial && daysLeft !== null && daysLeft > 0"
+        :days-left="daysLeft"
+        @add-payment="goToBillingPortal"
+      />
+
+      <p v-if="trialError" class="text-red-500">⚠️ {{ trialError }}</p>
 
       <!-- QR Codes Section -->
       <div v-if="loading">
         <SkeletonLoader />
       </div>
-      
+
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">QR Codes</h2>
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            QR Codes
+          </h2>
           <NuxtLink
             v-if="qrItems.length === 0"
             to="/createqr"
@@ -24,7 +39,8 @@
             class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one QR allowed
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one
+            QR allowed
           </button>
         </div>
 
@@ -40,40 +56,58 @@
               class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
             />
             <div class="flex-grow">
-              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ qr.title }}</span>
+              <span
+                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
+                >{{ qr.title }}</span
+              >
             </div>
-            <div class="flex  items-center gap-4">
+            <div class="flex items-center gap-4">
               <!-- <p class="text-white">Scans: {{ qr.scans.data.length ? qr.scans.data.length : 0 }}</p> -->
               <button
                 @click="viewQr(qr.imageUrl)"
                 class="text-blue-600 hover:text-blue-900"
               >
-                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/view-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 @click="editItem(qr.id, 'editqr')"
                 class="text-blue-600 hover:text-blue-900"
               >
-                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/edit-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 @click="deleteItem(qr.id, 'qr')"
                 class="text-red-600 hover:text-red-800"
               >
-                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/delete-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
-              
             </div>
             <div class="flex gap-4 p-2 ml-2 border-2 rounded-md border-solid">
-                <button
-                  @click="router.push(`/analyticsqr/${qr.id}`)"
-                  class="text-green-600 flex gap-4 hover:text-green-900 w-full h-full"
-                >
+              <button
+                @click="router.push(`/analyticsqr/${qr.id}`)"
+                class="text-green-600 flex gap-4 hover:text-green-900 w-full h-full"
+              >
                 <p class="text-white">Analytics</p>
-               
-                  <img src="@/assets/analytics-icon.svg" class="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
+
+                <img
+                  src="@/assets/analytics-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
           </li>
         </ul>
 
@@ -87,21 +121,29 @@
         <SkeletonLoader />
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Bands</h2>
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            Bands
+          </h2>
           <NuxtLink
             v-if="!hasBand"
             to="/createband"
             class="mdc-button flex justify-between w-full md:w-[300px]"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create Artist Page
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create
+            Artist Page
           </NuxtLink>
           <button
             v-else
             class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one artist allowed
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one
+            artist allowed
           </button>
         </div>
 
@@ -117,39 +159,57 @@
               class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
             />
             <div class="flex-grow">
-              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ band.title }}</span>
+              <span
+                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
+                >{{ band.title }}</span
+              >
             </div>
             <div class="flex items-center gap-4">
               <button
                 @click="router.push(`/${band.slug}`)"
                 class="text-blue-600 hover:text-blue-900"
               >
-                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/view-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 @click="router.push(`/editband/${band.id}`)"
                 class="text-blue-600 hover:text-blue-900"
               >
-                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/edit-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 @click="deleteItem(band.id, 'band')"
                 class="text-red-600 hover:text-red-800"
               >
-                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/delete-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
-            
             </div>
             <div class="flex gap-4 p-2 ml-2 border-2 rounded-md border-solid">
-                <button
-                  @click="router.push(`/analytics/${band.id}`)"
-                  class="text-green-600 flex gap-4 hover:text-green-900"
-                >
+              <button
+                @click="router.push(`/analytics/${band.id}`)"
+                class="text-green-600 flex gap-4 hover:text-green-900"
+              >
                 <p class="text-white">Analytics</p>
-               
-                  <img src="@/assets/analytics-icon.svg" class="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
+
+                <img
+                  src="@/assets/analytics-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
           </li>
         </ul>
 
@@ -163,13 +223,20 @@
         <SkeletonLoader />
       </div>
       <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <div class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0">
-          <h2 class="text-2xl text-white font-extrabold self-start md:flex-grow">Events</h2>
+        <div
+          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2
+            class="text-2xl text-white font-extrabold self-start md:flex-grow"
+          >
+            Events
+          </h2>
           <NuxtLink
             to="/newevent"
             class="mdc-button flex justify-between w-full md:w-[300px]"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create Event
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create
+            Event
           </NuxtLink>
         </div>
 
@@ -185,26 +252,41 @@
               class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
             />
             <div class="flex-grow">
-              <span class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold">{{ ev.title }}</span>
+              <span
+                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
+                >{{ ev.title }}</span
+              >
             </div>
             <div class="flex items-center gap-4">
               <button
                 @click="router.push(`/event/${ev.id}`)"
                 class="text-blue-600 hover:text-blue-900"
               >
-                <img src="@/assets/view-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/view-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 @click="router.push(`/editevent/${ev.id}`)"
                 class="text-blue-600 hover:text-blue-900"
               >
-                <img src="@/assets/edit-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/edit-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 @click="deleteItem(ev.id, 'event')"
                 class="text-red-600 hover:text-red-800"
               >
-                <img src="@/assets/delete-icon.svg" class="h-6 w-6" aria-hidden="true" />
+                <img
+                  src="@/assets/delete-icon.svg"
+                  class="h-6 w-6"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </li>
@@ -233,7 +315,7 @@
             @click="viewQr"
             class="px-4 py-2 bg-blue-500 text-white rounded"
           >
-           Close popup
+            Close popup
           </button>
         </div>
         <!-- <div class="absolute bottom-10 right-10">
@@ -247,12 +329,31 @@
 <script setup>
 import { useNuxtApp } from '#app'
 import { ref, onMounted, computed, inject } from 'vue'
+import { differenceInCalendarDays } from 'date-fns'
+import { useRuntimeConfig } from '#imports'
+
+const token = useStrapiToken()
+
+console.log('My JWT is:', token.value)  // undefined until you log in
+
+
+
+const config = useRuntimeConfig()
+
 const user = useStrapiUser();
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
+import { useStrapi } from '#imports'
 const { find } = useStrapi();
+const strapi      = useStrapi()
+
 const { setToken, fetchUser } = useStrapiAuth();
+
+// reactive state
+const daysLeft = ref(null)
+const loadingTrial = ref(false)
+const trialError = ref('')
 
 const nuxtApp = useNuxtApp()
 const historyStack = nuxtApp.$historyStack   // ← grab the real one
@@ -276,6 +377,51 @@ const videos = ref([]);
 
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
+
+async function fetchTrialInfo() {
+  loadingTrial.value = true;
+  console.debug('[Dashboard] fetchTrialInfo: starting…');
+
+  try {
+    console.debug('[Dashboard] fetchTrialInfo: GET /stripe/subscription-status via Strapi client');
+    // returns the raw body { status, plan, trialEndsAt, gracePeriodStart }
+    const subscription = await client('/stripe/subscription-status', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${useStrapiToken().value}` },
+    });
+    console.debug('[Dashboard] subscription-status response:', subscription);
+
+    // if your controller returned an error, subscription may have an `error` key
+    if (subscription.error) {
+      throw new Error(subscription.error.message || 'Stripe error');
+    }
+
+    // now subscription.trialEndsAt is what your controller sent
+    const rawEnds = subscription.trialEndsAt;
+    console.debug('[Dashboard] raw trialEndsAt:', rawEnds);
+
+    if (rawEnds) {
+      const endDate = typeof rawEnds === 'number'
+        ? new Date(rawEnds * 1000)
+        : new Date(rawEnds);
+      const diff = differenceInCalendarDays(endDate, new Date());
+      daysLeft.value = diff > 0 ? diff : 0;
+      console.debug('[Dashboard] daysLeft =', daysLeft.value);
+    } else {
+      daysLeft.value = null;
+      console.debug('[Dashboard] no trialEndsAt; user is on paid plan or inactive');
+    }
+
+  } catch (err) {
+    console.error('[Dashboard] fetchTrialInfo error:', err);
+    trialError.value = err.message || 'Unknown error fetching trial info';
+  } finally {
+    loadingTrial.value = false;
+    console.debug('[Dashboard] fetchTrialInfo: loadingTrial =', loadingTrial.value);
+  }
+}
+
+
 
 const fetchData = async () => {
   if (!user.value) return;
@@ -395,11 +541,12 @@ const imageURL = ref("");
 const qrView = ref(false);
 
 onMounted(async () => {
+  await fetchTrialInfo()
   console.log('Full history stack:', historyStack.value)
   console.log('Previous route:', previousRoute.value)
 
   if (
-    previousRoute.value?.path === '/createband' 
+    previousRoute.value?.path === '/createband'
   ) {
     // do the full reload
     window.location.reload()
@@ -429,11 +576,25 @@ const editItem = (id, page) => {
   padding: 8px 16px;
   border-radius: 4px;
 }
-.mdc-button img { height: 20px; }
-.mdc-button:hover { background: rgba(255,255,255,0.1); }
-img { object-fit: cover; }
-.text-white { color: #fff; }
-.border-white { border-color: #fff; }
-.bg-[#000] { background-color: #000; }
-.container { max-width: 1200px; }
+.mdc-button img {
+  height: 20px;
+}
+.mdc-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+img {
+  object-fit: cover;
+}
+.text-white {
+  color: #fff;
+}
+.border-white {
+  border-color: #fff;
+}
+.bg-[#000] {
+  background-color: #000;
+}
+.container {
+  max-width: 1200px;
+}
 </style>
