@@ -547,7 +547,7 @@ onMounted(async () => {
     console.debug('[Dashboard] found token in URL:', tok)
     setToken(tok)               // save into Nuxt-Strapi
     await fetchUser()           // populate strapiUser.value
-    console.debug('[Dashboard] fetched user after confirm:', strapiUser.value)
+    console.debug('[Dashboard] fetched user after confirm:', user)
     // clean URL so token isn’t visible
     router.replace({ path: route.path, query: {} })
   }
