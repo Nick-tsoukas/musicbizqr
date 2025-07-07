@@ -11,7 +11,7 @@
         @add-payment="goToBillingPortal"
       />
 
-      <p v-if="trialError" class="text-red-500">⚠️ {{ trialError }}</p>
+      <!-- <p v-if="trialError" class="text-red-500">⚠️ {{ trialError }}</p> -->
 
       <!-- QR Codes Section -->
       <div v-if="loading">
@@ -541,6 +541,17 @@ const imageURL = ref("");
 const qrView = ref(false);
 
 onMounted(async () => {
+ // ——— 1) Handle email-confirm token in URL
+ const tok = route.query.token
+  if (typeof tok === 'string') {
+    console.debug('[Dashboard] found token in URL:', tok)
+    setToken(tok)               // save into Nuxt-Strapi
+    await fetchUser()           // populate strapiUser.value
+    console.debug('[Dashboard] fetched user after confirm:', strapiUser.value)
+    // clean URL so token isn’t visible
+    router.replace({ path: route.path, query: {} })
+  }
+
   await fetchTrialInfo()
   console.log('Full history stack:', historyStack.value)
   console.log('Previous route:', previousRoute.value)
@@ -554,12 +565,7 @@ onMounted(async () => {
   }
 
 
-  const tok = route.query.token;
-  if (typeof tok === "string") {
-    setToken(tok);
-    router.replace({ query: {} });
-    await fetchUser();
-  }
+
   await fetchData();
 });
 
