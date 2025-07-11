@@ -2,11 +2,16 @@
   <div class="bg-[#000] pt-[var(--header-height)]">
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
-      
+
       <PastDueBanner />
 
       <TrialBanner
-        v-if="!loadingTrial && daysLeft !== null && daysLeft > 0"
+        v-if="
+          !loadingTrial &&
+          daysLeft !== null &&
+          daysLeft > 0 &&
+          billingInfo?.hasPaymentMethod === false
+        "
         :days-left="daysLeft"
         :disabled="loadingPortal"
         @add-payment="goToBillingPortal"
@@ -328,43 +333,41 @@
 </template>
 
 <script setup>
-import { useNuxtApp } from '#app'
-import { ref, onMounted, computed, inject, watch } from 'vue'
-import { differenceInCalendarDays } from 'date-fns'
-import { useRuntimeConfig } from '#imports'
+import { useNuxtApp } from "#app";
+import { ref, onMounted, computed, inject, watch } from "vue";
+import { differenceInCalendarDays } from "date-fns";
+import { useRuntimeConfig } from "#imports";
 
-const token = useStrapiToken()
-const loadingPortal = ref(false)
+const token = useStrapiToken();
+const loadingPortal = ref(false);
 
-console.log('My JWT is:', token.value)  // undefined until you log in
+console.log("My JWT is:", token.value); // undefined until you log in
 
-
-
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
 
 const user = useStrapiUser();
 const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
-import { useStrapi } from '#imports'
+import { useStrapi } from "#imports";
 const { find } = useStrapi();
-const strapi      = useStrapi()
+const strapi = useStrapi();
 
 const { setToken, fetchUser } = useStrapiAuth();
 
 // reactive state
-const daysLeft = ref(null)
-const loadingTrial = ref(false)
-const trialError = ref('')
+const daysLeft = ref(null);
+const loadingTrial = ref(false);
+const trialError = ref("");
+const billingInfo = ref(null);
 
-const nuxtApp = useNuxtApp()
-const historyStack = nuxtApp.$historyStack   // ← grab the real one
+const nuxtApp = useNuxtApp();
+const historyStack = nuxtApp.$historyStack; // ← grab the real one
 const previousRoute = computed(() =>
   historyStack.value.length
     ? historyStack.value[historyStack.value.length - 1]
     : null
-)
-
+);
 
 const loading = ref(true);
 const qrs = ref([]);
@@ -380,62 +383,74 @@ const videos = ref([]);
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
 
-
+async function fetchBillingInfo() {
+  try {
+    const result = await client("/stripe/billing", {
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    billingInfo.value = result;
+    console.debug("[Dashboard] billingInfo =", billingInfo.value);
+  } catch (err) {
+    console.warn("[Dashboard] Failed to fetch billing info:", err);
+  }
+}
 
 async function fetchTrialInfo() {
   loadingTrial.value = true;
-  console.debug('[Dashboard] fetchTrialInfo: starting…');
+  console.debug("[Dashboard] fetchTrialInfo: starting…");
 
   try {
-    console.debug('[Dashboard] fetchTrialInfo: GET /stripe/subscription-status via Strapi client');
+    console.debug(
+      "[Dashboard] fetchTrialInfo: GET /stripe/subscription-status via Strapi client"
+    );
     // returns the raw body { status, plan, trialEndsAt, gracePeriodStart }
-    const subscription = await client('/stripe/subscription-status', {
-      method: 'GET',
+    const subscription = await client("/stripe/subscription-status", {
+      method: "GET",
       headers: { Authorization: `Bearer ${useStrapiToken().value}` },
     });
-    console.debug('[Dashboard] subscription-status response:', subscription);
+    console.debug("[Dashboard] subscription-status response:", subscription);
 
     // if your controller returned an error, subscription may have an `error` key
     if (subscription.error) {
-      throw new Error(subscription.error.message || 'Stripe error');
+      throw new Error(subscription.error.message || "Stripe error");
     }
 
     // now subscription.trialEndsAt is what your controller sent
     const rawEnds = subscription.trialEndsAt;
-    console.debug('[Dashboard] raw trialEndsAt:', rawEnds);
+    console.debug("[Dashboard] raw trialEndsAt:", rawEnds);
 
     if (rawEnds) {
-      const endDate = typeof rawEnds === 'number'
-        ? new Date(rawEnds * 1000)
-        : new Date(rawEnds);
+      const endDate =
+        typeof rawEnds === "number"
+          ? new Date(rawEnds * 1000)
+          : new Date(rawEnds);
       const diff = differenceInCalendarDays(endDate, new Date());
       daysLeft.value = diff > 0 ? diff : 0;
-      console.debug('[Dashboard] daysLeft =', daysLeft.value);
+      console.debug("[Dashboard] daysLeft =", daysLeft.value);
     } else {
       daysLeft.value = null;
-      console.debug('[Dashboard] no trialEndsAt; user is on paid plan or inactive');
+      console.debug(
+        "[Dashboard] no trialEndsAt; user is on paid plan or inactive"
+      );
     }
-
   } catch (err) {
-    console.error('[Dashboard] fetchTrialInfo error:', err);
-    trialError.value = err.message || 'Unknown error fetching trial info';
+    console.error("[Dashboard] fetchTrialInfo error:", err);
+    trialError.value = err.message || "Unknown error fetching trial info";
   } finally {
     loadingTrial.value = false;
-    console.debug('[Dashboard] fetchTrialInfo: loadingTrial =', loadingTrial.value);
+    console.debug(
+      "[Dashboard] fetchTrialInfo: loadingTrial =",
+      loadingTrial.value
+    );
   }
 }
-
-
 
 const fetchData = async () => {
   if (!user.value) return;
   try {
     await fetchQrs();
     await fetchScans();
-    await Promise.all([
-      fetchBands(),
-      fetchEvents(),
-    ]);
+    await Promise.all([fetchBands(), fetchEvents()]);
   } catch (e) {
     console.error(e);
   } finally {
@@ -452,8 +467,11 @@ const fetchQrs = async () => {
 };
 
 const fetchScans = async () => {
-  const qrIds = qrs.value.map(q => q.id);
-  if (!qrIds.length) { scans.value = []; return; }
+  const qrIds = qrs.value.map((q) => q.id);
+  if (!qrIds.length) {
+    scans.value = [];
+    return;
+  }
   const resp = await find("scans", {
     filters: { qr: { id: { $in: qrIds } } },
     pagination: { pageSize: 1000 },
@@ -497,17 +515,17 @@ const deleteItem = async (id, type) => {
 };
 
 const qrItems = computed(() =>
-  qrs.value.map(qr => ({
+  qrs.value.map((qr) => ({
     id: qr.id,
     title: qr.attributes.name,
     imageUrl: qr.attributes.q_image?.data?.attributes?.url || "",
-    scans: qr.attributes.scans
+    scans: qr.attributes.scans,
   }))
 );
 
 const bandItems = computed(() =>
   Array.isArray(bands.value)
-    ? bands.value.map(b => ({
+    ? bands.value.map((b) => ({
         id: b.id,
         title: b.name,
         slug: b.slug,
@@ -517,17 +535,14 @@ const bandItems = computed(() =>
 );
 
 const eventItems = computed(() =>
-  events.value.map(ev => ({
+  events.value.map((ev) => ({
     id: ev.id,
     title: ev.attributes.title,
     imageUrl: ev.attributes.image?.data?.attributes?.url || "",
   }))
 );
 
-
-
-
-const viewQr = img => {
+const viewQr = (img) => {
   imageURL.value = img;
   qrView.value = !qrView.value;
 };
@@ -545,30 +560,28 @@ const imageURL = ref("");
 const qrView = ref(false);
 
 onMounted(async () => {
- // ——— 1) Handle email-confirm token in URL
- const tok = route.query.token
-  if (typeof tok === 'string') {
-    console.debug('[Dashboard] found token in URL:', tok)
-    setToken(tok)               // save into Nuxt-Strapi
-    await fetchUser()           // populate strapiUser.value
-    console.debug('[Dashboard] fetched user after confirm:', user)
+  // ——— 1) Handle email-confirm token in URL
+  const tok = route.query.token;
+  if (typeof tok === "string") {
+    console.debug("[Dashboard] found token in URL:", tok);
+    setToken(tok); // save into Nuxt-Strapi
+    await fetchUser(); // populate strapiUser.value
+    console.debug("[Dashboard] fetched user after confirm:", user);
     // clean URL so token isn’t visible
-    router.replace({ path: route.path, query: {} })
+    router.replace({ path: route.path, query: {} });
   }
 
-  await fetchTrialInfo()
-  console.log('Full history stack:', historyStack.value)
-  console.log('Previous route:', previousRoute.value)
+  await fetchBillingInfo();
 
-  if (
-    previousRoute.value?.path === '/createband'
-  ) {
+  await fetchTrialInfo();
+  console.log("Full history stack:", historyStack.value);
+  console.log("Previous route:", previousRoute.value);
+
+  if (previousRoute.value?.path === "/createband") {
     // do the full reload
-    window.location.reload()
-    return
+    window.location.reload();
+    return;
   }
-
-
 
   await fetchData();
 });
@@ -579,35 +592,33 @@ const editItem = (id, page) => {
 
 async function goToBillingPortal() {
   if (!token.value) {
-    return alert('You must be logged in.')
+    return alert("You must be logged in.");
   }
-  loadingPortal.value = true
+  loadingPortal.value = true;
   try {
-    const { url } = await client('/stripe/create-billing-portal-session', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token.value}` }
-    })
-    window.location.href = url
+    const { url } = await client("/stripe/create-billing-portal-session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    window.location.href = url;
   } catch (err) {
-    console.error('[Dashboard] billing-portal error', err)
-    alert('Could not open billing portal. Please try again.')
+    console.error("[Dashboard] billing-portal error", err);
+    alert("Could not open billing portal. Please try again.");
   } finally {
-    loadingPortal.value = false
+    loadingPortal.value = false;
   }
 }
-
-
 
 watch(
   () => route.query.portal,
   async (flag) => {
-    if (flag === 'returned') {
+    if (flag === "returned") {
       // they just came back from Stripe’s portal
-      await fetchTrialInfo()                // re-fetch daysLeft
-      router.replace({ path: route.path, query: {} })
+      await fetchTrialInfo(); // re-fetch daysLeft
+      router.replace({ path: route.path, query: {} });
     }
   }
-)
+);
 </script>
 
 <style scoped lang="css">
