@@ -216,6 +216,14 @@
                 />
               </button>
             </div>
+
+            <button
+              @click="copyToClipboard(`${config.public.baseUrl}/${band.slug}`)"
+              class="text-yellow-500 hover:text-yellow-700 flex gap-2"
+            >
+              <p class="text-white">Share</p>
+              <img src="@/assets/share-icon.svg" class="h-6 w-6" />
+            </button>
           </li>
         </ul>
 
@@ -285,6 +293,14 @@
                 />
               </button>
               <button
+                @click="
+                  copyToClipboard(`${config.public.baseUrl}/event/${ev.id}`)
+                "
+                class="text-yellow-500 hover:text-yellow-700"
+              >
+                <img src="@/assets/share-icon.svg" class="h-6 w-6" />
+              </button>
+              <button
                 @click="deleteItem(ev.id, 'event')"
                 class="text-red-600 hover:text-red-800"
               >
@@ -329,6 +345,14 @@
         </div> -->
       </div>
     </div>
+    <transition name="fade-slide">
+      <div
+        v-if="showToast"
+        class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm font-medium px-6 py-3 rounded shadow-lg z-50"
+      >
+        {{ toastMessage }}
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -383,6 +407,34 @@ const videos = ref([]);
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
 
+
+const showToast = ref(false)
+const toastMessage = ref('')
+let toastTimeout = null
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    toastMessage.value = '✅ Link copied to clipboard!'
+    showToast.value = true
+
+    // Clear any previous timeout
+    if (toastTimeout) clearTimeout(toastTimeout)
+
+    // Auto-hide after 3 seconds
+    toastTimeout = setTimeout(() => {
+      showToast.value = false
+    }, 3000)
+  }).catch(() => {
+    toastMessage.value = '❌ Failed to copy link.'
+    showToast.value = true
+    if (toastTimeout) clearTimeout(toastTimeout)
+    toastTimeout = setTimeout(() => {
+      showToast.value = false
+    }, 3000)
+  })
+}
+
+
 async function fetchBillingInfo() {
   try {
     const result = await client("/stripe/billing", {
@@ -393,6 +445,13 @@ async function fetchBillingInfo() {
   } catch (err) {
     console.warn("[Dashboard] Failed to fetch billing info:", err);
   }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => alert("✅ Link copied to clipboard!"))
+    .catch(() => alert("❌ Failed to copy link."));
 }
 
 async function fetchTrialInfo() {
@@ -622,6 +681,17 @@ watch(
 </script>
 
 <style scoped lang="css">
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
 .mdc-button {
   border: 1px solid white;
   background: transparent;

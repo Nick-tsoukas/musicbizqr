@@ -42,6 +42,7 @@ export default defineNuxtConfig({
     contactFrom: process.env.CONTACT_FROM,
     public: {
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+        baseUrl: process.env.BASE_URL || 'https://musicbizqr.com',
       // strapiUrl: ' https://finite-fit-queries-kansas.trycloudflare.com',
     
       stripe: {
