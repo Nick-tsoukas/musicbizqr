@@ -169,13 +169,14 @@
           </div>
           <div class="mdc-text-field mb-4">
             <input
-              type="url"
+              type="text"
               id="edit-event-link"
               class="mdc-text-field__input"
               v-model="event.link"
+              @blur="event.link = normalizeLink(event.link)"
               placeholder=" "
             />
-            <label class="mdc-floating-label" for="edit-event-link">Event Link</label>
+            <label class="mdc-floating-label" for="edit-event-link">Ticket Link</label>
             <div class="mdc-line-ripple"></div>
           </div>
         </div>
@@ -271,6 +272,20 @@ const event = ref({
   imageUrl: null as string | null,
   band: null as number | null
 })
+
+function normalizeLink(link: string): string {
+  if (!link) return ''
+
+  // Already has a protocol → return as-is
+  if (/^https?:\/\//i.test(link)) return link.trim()
+
+  // Starts with www → add https://
+  if (/^www\./i.test(link)) return `https://${link.trim()}`
+
+  // Otherwise assume https://
+  return `https://www.${link.trim()}`
+}
+
 
 // Toggle Bold / Italic / Underline helpers
 const toggleBold = () => {
@@ -372,7 +387,7 @@ const submitEditEvent = async () => {
       state: event.value.state || undefined,
       venue: event.value.venue || undefined,
       address: event.value.address || undefined,
-      link: event.value.link || undefined,
+      link: normalizeLink(event.value.link)|| undefined,
       users_permissions_user: user.value.id
     }
 

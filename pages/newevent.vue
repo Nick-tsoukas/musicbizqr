@@ -240,6 +240,7 @@
           <input
             type="file"
             required
+            name="new-event-image"
             id="new-event-image"
             class="styled-file-input"
             @change="handleNewEventImageUpload"
@@ -255,15 +256,16 @@
           <div
             class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
           >
-            <h2 class="font-semibold text-white text-2xl">Event Link</h2>
+            <h2 class="font-semibold text-white text-2xl">Ticket Link</h2>
           </div>
           <div class="p-6">
             <div class="mdc-text-field mb-4">
               <input
-                type="url"
+                type="text"
                 id="new-event-link"
                 class="mdc-text-field__input"
                 v-model="newEvent.link"
+                @blur="newEvent.link = normalizeLink(newEvent.link)"
                 placeholder=" "
               />
               <label class="mdc-floating-label" for="new-event-link">
@@ -436,6 +438,20 @@ const newEvent = ref({
   link: ''
 })
 
+function normalizeLink(link: string): string {
+  if (!link) return ''
+
+  // Already has a protocol → return as-is
+  if (/^https?:\/\//i.test(link)) return link.trim()
+
+  // Starts with www → add https://
+  if (/^www\./i.test(link)) return `https://${link.trim()}`
+
+  // Otherwise assume https://
+  return `https://www.${link.trim()}`
+}
+
+
 // 3) Create the Tiptap editor instance (JSON‐ready)
 const editor = useEditor({
   extensions: [StarterKit, Underline],
@@ -511,7 +527,7 @@ const submitNewEvent = async () => {
       venue: newEvent.value.venue,
       address: newEvent.value.address,
       time: formatTime(newEvent.value.time),
-      link: newEvent.value.link,
+      link:  normalizeLink(newEvent.value.link),
       users_permissions_user: user.value.id,
       contactEmail: newEvent.value.contactEmail,
       contactPhone: newEvent.value.contactPhone,
