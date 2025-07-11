@@ -8,6 +8,7 @@
       <TrialBanner
         v-if="!loadingTrial && daysLeft !== null && daysLeft > 0"
         :days-left="daysLeft"
+        :disabled="loadingPortal"
         @add-payment="goToBillingPortal"
       />
 
@@ -328,11 +329,12 @@
 
 <script setup>
 import { useNuxtApp } from '#app'
-import { ref, onMounted, computed, inject } from 'vue'
+import { ref, onMounted, computed, inject, watch } from 'vue'
 import { differenceInCalendarDays } from 'date-fns'
 import { useRuntimeConfig } from '#imports'
 
 const token = useStrapiToken()
+const loadingPortal = ref(false)
 
 console.log('My JWT is:', token.value)  // undefined until you log in
 
@@ -377,6 +379,8 @@ const videos = ref([]);
 
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
+
+
 
 async function fetchTrialInfo() {
   loadingTrial.value = true;
@@ -572,6 +576,38 @@ onMounted(async () => {
 const editItem = (id, page) => {
   router.push(`/${page}/${id}`);
 };
+
+async function goToBillingPortal() {
+  if (!token.value) {
+    return alert('You must be logged in.')
+  }
+  loadingPortal.value = true
+  try {
+    const { url } = await client('/stripe/create-billing-portal-session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    window.location.href = url
+  } catch (err) {
+    console.error('[Dashboard] billing-portal error', err)
+    alert('Could not open billing portal. Please try again.')
+  } finally {
+    loadingPortal.value = false
+  }
+}
+
+
+
+watch(
+  () => route.query.portal,
+  async (flag) => {
+    if (flag === 'returned') {
+      // they just came back from Stripe’s portal
+      await fetchTrialInfo()                // re-fetch daysLeft
+      router.replace({ path: route.path, query: {} })
+    }
+  }
+)
 </script>
 
 <style scoped lang="css">
