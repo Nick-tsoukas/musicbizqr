@@ -447,12 +447,7 @@ async function fetchBillingInfo() {
   }
 }
 
-function copyToClipboard(text) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => alert("✅ Link copied to clipboard!"))
-    .catch(() => alert("❌ Failed to copy link."));
-}
+
 
 async function fetchTrialInfo() {
   loadingTrial.value = true;
