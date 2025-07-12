@@ -6,7 +6,7 @@
     <main>
       <!-- Hero section -->
 
-      <div class="relative isolate min-h-[50vh]">
+      <div class="relative isolate min-h-[100vh]">
         <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
           <div
             class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
@@ -68,19 +68,35 @@
       </div>
 
       <!-- grid of main features and branded qrs -->
-      <section
-        class="text-center 2xl:text-left mb-10 mx-auto px-2 w-full lg:w-[90vw] lg:px-6 mt-0 lg:mb-10"
+            <!-- cta   -->
+            <div
+        ref="parallaxRef"
+        class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
       >
-        <!-- <h2 class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0">
-          <span
-            class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
-            >Example Splash Pages</span
+        <!-- Dark Overlay -->
+        <div
+          class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
+        >
+          <div
+            class="text-center h-full flex flex-col justify-center items-center md:text-left"
           >
-          <span
-            class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 italic"
-          ></span>
-        </h2> -->
-      </section>
+            <!-- Animated Text -->
+            <h1
+              class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+            >
+              Create Your Profile
+            </h1>
+            <!-- Buttons Section -->
+            <div
+              class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
+            >
+              <button class="cta-button-no w-auto mx-auto">
+                Sign Up For A Free 30 day Trial
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="flex flex-col justify-center image_gradient">
         <h2
@@ -258,9 +274,9 @@
               state-of-the-art data visualization and tracking technologies to
               boost user engagement and elevate your marketing strategies.
             </p>
-             <div class="mx-auto max-w-5xl">
-              <BarChart class="max-h-[30vh] w-auto mx-auto" />
-             </div>
+             
+              <BarChart  />
+            
           </div>
         </section>
       </section>
