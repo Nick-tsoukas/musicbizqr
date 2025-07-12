@@ -61,57 +61,41 @@
               alt=""
               class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
             />
+
             <div class="flex-grow">
               <span
                 class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
-                >{{ qr.title }}</span
               >
+                {{ qr.title }}
+              </span>
             </div>
-            <div class="flex items-center gap-4">
-              <!-- <p class="text-white">Scans: {{ qr.scans.data.length ? qr.scans.data.length : 0 }}</p> -->
-              <button
-                @click="viewQr(qr.imageUrl)"
-                class="text-blue-600 hover:text-blue-900"
-              >
-                <img
-                  src="@/assets/view-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+
+            <!-- ✅ Action Buttons: View, Edit, Delete, Analytics -->
+            <div class="flex flex-col md:flex-row gap-2 mt-4">
+              <button @click="viewQr(qr.imageUrl)" class="action-button">
+                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
+                <span>View</span>
               </button>
+
+              <button @click="editItem(qr.id, 'editqr')" class="action-button">
+                <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
+                <span>Edit</span>
+              </button>
+
+
               <button
-                @click="editItem(qr.id, 'editqr')"
-                class="text-blue-600 hover:text-blue-900"
+                @click="router.push(`/analyticsqr/${qr.id}`)"
+                class="action-button text-green-400 hover:text-green-200"
               >
-                <img
-                  src="@/assets/edit-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
+                <span>Analytics</span>
               </button>
               <button
                 @click="deleteItem(qr.id, 'qr')"
-                class="text-red-600 hover:text-red-800"
+                class="action-button text-red-400 hover:text-red-200"
               >
-                <img
-                  src="@/assets/delete-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-            <div class="flex gap-4 p-2 ml-2 border-2 rounded-md border-solid">
-              <button
-                @click="router.push(`/analyticsqr/${qr.id}`)"
-                class="text-green-600 flex gap-4 hover:text-green-900 w-full h-full"
-              >
-                <p class="text-white">Analytics</p>
-
-                <img
-                  src="@/assets/analytics-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/delete-icon.svg" class="h-5 w-5" />
+                <span>Delete</span>
               </button>
             </div>
           </li>
@@ -162,68 +146,62 @@
             <img
               :src="band.imageUrl"
               alt=""
-              class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
             />
+
             <div class="flex-grow">
               <span
                 class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
-                >{{ band.title }}</span
               >
+                {{ band.title }}
+              </span>
             </div>
-            <div class="flex items-center gap-4">
+
+            <!-- ✅ Band Action Buttons -->
+            <div class="flex flex-col md:flex-row flex-wrap gap-2 mt-4">
               <button
                 @click="router.push(`/${band.slug}`)"
-                class="text-blue-600 hover:text-blue-900"
+                class="action-button"
               >
-                <img
-                  src="@/assets/view-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
+                <span>View</span>
               </button>
+
               <button
                 @click="router.push(`/editband/${band.id}`)"
-                class="text-blue-600 hover:text-blue-900"
+                class="action-button"
               >
-                <img
-                  src="@/assets/edit-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
+                <span>Edit</span>
               </button>
-              <button
-                @click="deleteItem(band.id, 'band')"
-                class="text-red-600 hover:text-red-800"
-              >
-                <img
-                  src="@/assets/delete-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-            <div class="flex gap-4 p-2 ml-2 border-2 rounded-md border-solid">
+
+
               <button
                 @click="router.push(`/analytics/${band.id}`)"
-                class="text-green-600 flex gap-4 hover:text-green-900"
+                class="action-button text-green-400 hover:text-green-200"
               >
-                <p class="text-white">Analytics</p>
+                <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
+                <span>Analytics</span>
+              </button>
 
-                <img
-                  src="@/assets/analytics-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+              <button
+                @click="
+                  copyToClipboard(`${config.public.baseUrl}/${band.slug}`)
+                "
+                class="action-button text-yellow-400 hover:text-yellow-200"
+              >
+                <img src="@/assets/share-icon.svg" class="h-5 w-5" />
+                <span>Share</span>
+              </button>
+
+              <button
+                @click="deleteItem(band.id, 'band')"
+                class="action-button text-red-400 hover:text-red-200"
+              >
+                <img src="@/assets/delete-icon.svg" class="h-5 w-5" />
+                <span>Delete</span>
               </button>
             </div>
-
-            <button
-              @click="copyToClipboard(`${config.public.baseUrl}/${band.slug}`)"
-              class="text-yellow-500 hover:text-yellow-700 flex gap-2"
-            >
-              <p class="text-white">Share</p>
-              <img src="@/assets/share-icon.svg" class="h-6 w-6" />
-            </button>
           </li>
         </ul>
 
@@ -263,52 +241,51 @@
             <img
               :src="ev.imageUrl"
               alt=""
-              class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
             />
+
             <div class="flex-grow">
               <span
                 class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
-                >{{ ev.title }}</span
               >
+                {{ ev.title }}
+              </span>
             </div>
-            <div class="flex items-center gap-4">
+
+            <!-- ✅ Event Action Buttons -->
+            <div class="flex flex-col md:flex-row flex-wrap gap-2 mt-4">
               <button
                 @click="router.push(`/event/${ev.id}`)"
-                class="text-blue-600 hover:text-blue-900"
+                class="action-button"
               >
-                <img
-                  src="@/assets/view-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
+                <span>View</span>
               </button>
+
               <button
                 @click="router.push(`/editevent/${ev.id}`)"
-                class="text-blue-600 hover:text-blue-900"
+                class="action-button"
               >
-                <img
-                  src="@/assets/edit-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
+                <span>Edit</span>
               </button>
+
               <button
                 @click="
                   copyToClipboard(`${config.public.baseUrl}/event/${ev.id}`)
                 "
-                class="text-yellow-500 hover:text-yellow-700"
+                class="action-button text-yellow-400 hover:text-yellow-200"
               >
-                <img src="@/assets/share-icon.svg" class="h-6 w-6" />
+                <img src="@/assets/share-icon.svg" class="h-5 w-5" />
+                <span>Share</span>
               </button>
+
               <button
                 @click="deleteItem(ev.id, 'event')"
-                class="text-red-600 hover:text-red-800"
+                class="action-button text-red-400 hover:text-red-200"
               >
-                <img
-                  src="@/assets/delete-icon.svg"
-                  class="h-6 w-6"
-                  aria-hidden="true"
-                />
+                <img src="@/assets/delete-icon.svg" class="h-5 w-5" />
+                <span>Delete</span>
               </button>
             </div>
           </li>
@@ -407,33 +384,34 @@ const videos = ref([]);
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
 
-
-const showToast = ref(false)
-const toastMessage = ref('')
-let toastTimeout = null
+const showToast = ref(false);
+const toastMessage = ref("");
+let toastTimeout = null;
 
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    toastMessage.value = '✅ Link copied to clipboard!'
-    showToast.value = true
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      toastMessage.value = "✅ Link copied to clipboard!";
+      showToast.value = true;
 
-    // Clear any previous timeout
-    if (toastTimeout) clearTimeout(toastTimeout)
+      // Clear any previous timeout
+      if (toastTimeout) clearTimeout(toastTimeout);
 
-    // Auto-hide after 3 seconds
-    toastTimeout = setTimeout(() => {
-      showToast.value = false
-    }, 3000)
-  }).catch(() => {
-    toastMessage.value = '❌ Failed to copy link.'
-    showToast.value = true
-    if (toastTimeout) clearTimeout(toastTimeout)
-    toastTimeout = setTimeout(() => {
-      showToast.value = false
-    }, 3000)
-  })
+      // Auto-hide after 3 seconds
+      toastTimeout = setTimeout(() => {
+        showToast.value = false;
+      }, 3000);
+    })
+    .catch(() => {
+      toastMessage.value = "❌ Failed to copy link.";
+      showToast.value = true;
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        showToast.value = false;
+      }, 3000);
+    });
 }
-
 
 async function fetchBillingInfo() {
   try {
@@ -446,8 +424,6 @@ async function fetchBillingInfo() {
     console.warn("[Dashboard] Failed to fetch billing info:", err);
   }
 }
-
-
 
 async function fetchTrialInfo() {
   loadingTrial.value = true;
@@ -676,10 +652,11 @@ watch(
 </script>
 
 <style scoped lang="css">
-
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 .fade-slide-enter-from,
 .fade-slide-leave-to {
@@ -687,6 +664,9 @@ watch(
   transform: translateY(20px);
 }
 
+.action-button {
+  @apply flex items-center gap-2 px-4 py-2 border rounded-md text-white text-sm hover:bg-white/10 transition;
+}
 .mdc-button {
   border: 1px solid white;
   background: transparent;
