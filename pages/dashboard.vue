@@ -2,6 +2,7 @@
   <div class="bg-[#000] pt-[var(--header-height)]">
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
+      
 
       <PastDueBanner />
 
@@ -81,7 +82,6 @@
                 <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
                 <span>Edit</span>
               </button>
-
 
               <button
                 @click="router.push(`/analyticsqr/${qr.id}`)"
@@ -175,7 +175,6 @@
                 <span>Edit</span>
               </button>
 
-
               <button
                 @click="router.push(`/analytics/${band.id}`)"
                 class="action-button text-green-400 hover:text-green-200"
@@ -255,7 +254,7 @@
             <!-- ✅ Event Action Buttons -->
             <div class="flex flex-col md:flex-row flex-wrap gap-2 mt-4">
               <button
-                @click="router.push(`/event/${ev.id}`)"
+                @click="router.push(`/${ev.bandSlug}/event/${ev.slug}`)"
                 class="action-button"
               >
                 <img src="@/assets/view-icon.svg" class="h-5 w-5" />
@@ -271,9 +270,8 @@
               </button>
 
               <button
-                @click="
-                  copyToClipboard(`${config.public.baseUrl}/event/${ev.id}`)
-                "
+              @click="copyToClipboard(`${config.public.baseUrl}/${ev.bandSlug}/event/${ev.slug}`)"
+
                 class="action-button text-yellow-400 hover:text-yellow-200"
               >
                 <img src="@/assets/share-icon.svg" class="h-5 w-5" />
@@ -521,10 +519,17 @@ const fetchBands = async () => {
 const fetchEvents = async () => {
   const resp = await find("events", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    populate: "*",
+    populate: {
+      image: true,
+      band: {
+        fields: ['slug'],
+      },
+      fields: ['title', 'slug']
+    },
   });
   events.value = resp.data || [];
 };
+
 
 const deleteItem = async (id, type) => {
   if (!confirm(`Delete this ${type}?`)) return;
@@ -568,6 +573,8 @@ const eventItems = computed(() =>
   events.value.map((ev) => ({
     id: ev.id,
     title: ev.attributes.title,
+    slug: ev.attributes.slug, // ← event slug
+    bandSlug: ev.attributes.band?.data?.attributes?.slug || null, // ← band slug
     imageUrl: ev.attributes.image?.data?.attributes?.url || "",
   }))
 );
