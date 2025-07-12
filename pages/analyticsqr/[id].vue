@@ -4,6 +4,11 @@
   >
     <h1 class="text-2xl font-bold mb-4">QR Scans Analytics</h1>
 
+    <div v-if="!isLoading" class="text-xl font-semibold mb-6 space-y-2">
+      <p>Total Scans (All Time): <span class="text-purple-400">{{ totalScans }}</span></p>
+      <p>Avg Scans/Day (last {{ selectedRange }}d): <span class="text-purple-400">{{ averageScansPerDay }}</span></p>
+    </div>
+
     <!-- Range Selector -->
     <div class="flex space-x-2 mb-8">
       <button
@@ -14,16 +19,20 @@
           'px-3 py-1 text-sm rounded',
           selectedRange === Number(days)
             ? 'bg-purple-500 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
         ]"
       >
         {{ label }}
       </button>
+      <button
+        @click="viewToday = true"
+        class="px-3 py-1 text-sm rounded bg-teal-600 text-white hover:bg-teal-500"
+      >
+        View Today (Hourly)
+      </button>
     </div>
 
-    <div v-if="isLoading" class="text-white">
-      🔄 Loading data… (check console)
-    </div>
+    <div v-if="isLoading" class="text-white">🔄 Loading data…</div>
 
     <div v-else class="space-y-8">
       <!-- Line Chart -->
@@ -35,145 +44,164 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { useRoute, useRuntimeConfig } from '#imports'
-import { Chart, registerables } from 'chart.js'
-import { format, subDays } from 'date-fns'
+import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick } from "vue";
+import { useRoute, useRuntimeConfig } from "#imports";
+import { Chart, registerables } from "chart.js";
+import { format, subDays } from "date-fns";
 
-Chart.register(...registerables)
+Chart.register(...registerables);
 
-const route = useRoute()
-const config = useRuntimeConfig()
-const qrId = route.params.id as string
+const route = useRoute();
+const config = useRuntimeConfig();
+const qrId = route.params.id as string;
 
-// range selector
+const selectedRange = ref<number>(7);
+const viewToday = ref(false);
+
 const rangeOptions: Record<number, string> = {
-  7:   'Last 7 Days',
-  30:  'Last 30 Days',
-  90:  'Last 90 Days',
-  365: 'Last 1 Year'
-}
-const selectedRange = ref<number>(7)
+  7: "Last 7 Days",
+  30: "Last 30 Days",
+  90: "Last 90 Days",
+  365: "Last 1 Year",
+};
 
-const isLoading = ref(true)
-const analyticsData = ref<any[]>([])
+const isLoading = ref(true);
+const analyticsData = ref<any[]>([]);
 
-const chartCanvas = ref<HTMLCanvasElement|null>(null)
-let chartInstance: Chart|null = null
+const chartCanvas = ref<HTMLCanvasElement | null>(null);
+let chartInstance: Chart | null = null;
 
-/** build array of yyyy-MM-dd for last N days */
 function getLastNDates(n: number): string[] {
-  const today = new Date()
+  const today = new Date();
   return Array.from({ length: n }, (_, i) => {
-    const d = subDays(today, n - 1 - i)
-    return format(d, 'yyyy-MM-dd')
-  })
+    const d = subDays(today, n - 1 - i);
+    return format(d, "yyyy-MM-dd");
+  });
 }
 
-/** fetch all scans for this QR */
 async function fetchAnalyticsData() {
   try {
     const res = await fetch(
       `${config.public.strapiUrl}/api/scans?filters[qr][id][$eq]=${qrId}&pagination[pageSize]=1000`
-    )
-    if (!res.ok) throw new Error(`Status ${res.status}`)
-    const json = await res.json()
-    analyticsData.value = json.data || []
+    );
+    if (!res.ok) throw new Error(`Status ${res.status}`);
+    const json = await res.json();
+    analyticsData.value = json.data || [];
   } catch (err) {
-    console.error('Error fetching scan data:', err)
+    console.error("Error fetching scan data:", err);
   }
 }
 
-/** compute labels+counts for selected range */
+const totalScans = computed(() => analyticsData.value.length);
+
+const averageScansPerDay = computed(() => {
+  const { data } = buildTimeSeries();
+  const total = data.reduce((sum, n) => sum + n, 0);
+  return (total / selectedRange.value).toFixed(2);
+});
+
 function buildTimeSeries() {
-  const lastDates = getLastNDates(selectedRange.value)
+  if (viewToday.value) return buildHourlySeries();
+
+  const lastDates = getLastNDates(selectedRange.value);
   const counts: Record<string, number> = Object.fromEntries(
-    lastDates.map(d => [d, 0])
-  )
+    lastDates.map((d) => [d, 0])
+  );
 
-  analyticsData.value.forEach(scan => {
-    const dateStr = scan.attributes.createdAt.slice(0,10) // YYYY-MM-DD
-    if (counts[dateStr] !== undefined) counts[dateStr]++
-  })
+  analyticsData.value.forEach((scan) => {
+    const dateStr = scan.attributes.createdAt.slice(0, 10);
+    if (counts[dateStr] !== undefined) counts[dateStr]++;
+  });
 
-  const labels = lastDates.map(d =>
-    format(new Date(d), 'MMM d, yyyy')
-  )
-  const data = lastDates.map(d => counts[d])
-  return { labels, data }
+  const labels = lastDates.map((d) => format(new Date(d), "MMM d, yyyy"));
+  const data = lastDates.map((d) => counts[d]);
+  return { labels, data };
 }
 
-/** render or update the chart */
-function renderChart() {
-  const { labels, data } = buildTimeSeries()
-  const ctx = chartCanvas.value?.getContext('2d')
-  if (!ctx) return
+function buildHourlySeries() {
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+  const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
-  if (chartInstance) chartInstance.destroy()
+  const counts: Record<number, number> = Object.fromEntries(
+    hours.map((_, h) => [h, 0])
+  );
+
+  analyticsData.value.forEach((scan) => {
+    const timestamp = scan.attributes.createdAt;
+    if (timestamp.startsWith(todayStr)) {
+      const hour = new Date(timestamp).getHours();
+      counts[hour]++;
+    }
+  });
+
+  const labels = hours;
+  const data = hours.map((_, i) => counts[i]);
+  return { labels, data };
+}
+
+function renderChart() {
+  const { labels, data } = buildTimeSeries();
+  const ctx = chartCanvas.value?.getContext("2d");
+  if (!ctx) return;
+
+  if (chartInstance) chartInstance.destroy();
   chartInstance = new Chart(ctx, {
-    type: 'line',
+    type: "line",
     data: {
       labels,
-      datasets: [{
-        label: 'Scans',
-        data,
-        borderColor: '#8B5CF6',
-        backgroundColor: 'rgba(139,92,246,0.3)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 3
-      }]
+      datasets: [
+        {
+          label: "Scans",
+          data,
+          borderColor: "#8B5CF6",
+          backgroundColor: "rgba(139,92,246,0.3)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+        },
+      ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
         x: {
-          ticks: { color: 'white', autoSkip: true, maxRotation: 0 },
-          grid: { color: '#444' }
+          ticks: { color: "white", autoSkip: true },
+          grid: { color: "#444" },
         },
         y: {
           beginAtZero: true,
-          ticks: { color: 'white', stepSize: 1 },
-          grid: { color: '#444' }
-        }
+          ticks: { color: "white", stepSize: 1 },
+          grid: { color: "#444" },
+        },
       },
       plugins: {
-        legend: {
-          labels: { color: 'white' },
-          position: 'top'
-        },
+        legend: { labels: { color: "white" }, position: "top" },
         tooltip: {
           callbacks: {
-            label: ctx => `${ctx.dataset.label}: ${ctx.formattedValue}`
-          }
-        }
-      }
-    }
-  })
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.formattedValue}`,
+          },
+        },
+      },
+    },
+  });
 }
 
-/** fetch + draw */
 async function fetchAndRender() {
-  isLoading.value = true
-  await fetchAnalyticsData()
-  isLoading.value = false
-
-  // wait for canvas to exist
-  await nextTick()
-  await nextTick()
-  renderChart()
+  isLoading.value = true;
+  await fetchAnalyticsData();
+  isLoading.value = false;
+  await nextTick();
+  renderChart();
 }
 
-onMounted(fetchAndRender)
-// re-draw when user changes range
-watch(selectedRange, () => {
-  if (!isLoading.value) renderChart()
-})
-// clean up
+onMounted(fetchAndRender);
+watch([selectedRange, viewToday], () => {
+  if (!isLoading.value) renderChart();
+});
 onBeforeUnmount(() => {
-  chartInstance?.destroy()
-})
+  chartInstance?.destroy();
+});
 </script>
 
 <style scoped>
