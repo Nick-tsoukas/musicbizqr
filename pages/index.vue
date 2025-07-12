@@ -105,7 +105,7 @@
                 :src="slide.image"
                 :srcset="slide.srcset"
                 alt="Main Image"
-                class="w-full md:w-[50vw] max-h-[80vh] object-contain rounded-lg shadow-lg"
+                class="w-full md:w-[50vw] max-h-[50vh] object-contain rounded-lg shadow-lg"
               />
             </SwiperSlide>
 
@@ -120,14 +120,14 @@
         </div>
       </div>
       <section
-        class="min-h-screen flex flex-col items-center justify-between py-12 md:py-16 px-4"
+        class=" flex flex-col items-center justify-between py-12 md:py-16 px-4"
       >
         <!-- Text Section -->
         <div class="max-w-4xl text-center md:text-center flex-grow">
           <h2 class="text-white text-4xl lg:text-6xl font-bold mx-auto md:mx-0">
             Add All Your Social Links
           </h2>
-          <p class="text-white text-lg mt-6 md:mt-8 mx-auto md:mx-0">
+          <p class="text-white text-lg pb-10 mt-6 md:mt-8 mx-auto md:mx-0">
             Give your audience a single link to access all your socials
             instantly. Whether it’s Instagram, TikTok, Spotify, or YouTube, keep
             your fans connected with your latest updates, releases, and content.
@@ -136,7 +136,7 @@
 
         <!-- Icons Section -->
         <div
-          class="w-full flex items-center justify-center mt-auto pb-6 md:pb-12"
+          class="w-full  flex items-center justify-center mt-auto pb-6 md:pb-12"
         >
           <InfiniteScrollIcons />
         </div>
@@ -258,7 +258,9 @@
               state-of-the-art data visualization and tracking technologies to
               boost user engagement and elevate your marketing strategies.
             </p>
-            <BarChart class="" />
+             <div class="mx-auto max-w-5xl">
+              <BarChart class="max-h-[30vh] w-auto mx-auto" />
+             </div>
           </div>
         </section>
       </section>
