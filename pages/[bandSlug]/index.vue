@@ -81,6 +81,13 @@
                     </svg>
                   </div>
                 </div> -->
+              <!-- Click-capturing overlay -->
+              <div
+                v-if="!embedClickCaptured"
+                class="absolute inset-0 z-10"
+                @click="onEmbedClick"
+                style="background: transparent; cursor: pointer"
+              ></div>
               <iframe
                 :src="embedUrl + '?autoplay=1'"
                 frameborder="0"
@@ -367,6 +374,7 @@ import twitterIcon from "@/assets/twitter.png";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
+const embedClickCaptured = ref(false);
 
 const nuxtApp = useNuxtApp();
 const historyStack = nuxtApp.$historyStack; // <— here!
@@ -380,6 +388,20 @@ const band = ref(null);
 const events = ref([]);
 
 const isEmbeddedPlaying = ref(false);
+
+async function onEmbedClick() {
+  console.log("🎯 Embedded iframe clicked");
+
+  const bandId = band.value?.data?.id;
+  const title = band.value?.data?.singlesong?.title || "Unknown";
+
+  try {
+    await trackMediaPlay(bandId, "song", title + " (embed)");
+    embedClickCaptured.value = true; // ✅ remove overlay after tracking
+  } catch (err) {
+    console.error("❌ Error tracking embed click:", err);
+  }
+}
 
 // Streaming + social platform definitions:
 const streamingPlatforms = [
@@ -469,6 +491,8 @@ async function onSongPlay() {
     console.error("❌ trackMediaPlay error:", err);
   }
 }
+
+
 
 // Embedded track “play”
 async function startEmbedded() {
