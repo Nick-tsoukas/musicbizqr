@@ -1,5 +1,7 @@
 <template>
-  <div class="flex justify-center items-center w-screen pt-[var(--header-height)] custom_height">
+  <div
+    class="flex justify-center items-center w-screen pt-[var(--header-height)] custom_height"
+  >
     <!-- Loading Spinner (if needed) -->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
@@ -57,42 +59,61 @@
 
           <!-- Sign Up button -->
           <div>
-            <button type="submit" class="mdc-button mdc-button--raised w-full mb-4">
+            <button
+              type="submit"
+              class="mdc-button mdc-button--raised w-full mb-4"
+            >
               Sign Up
             </button>
           </div>
+          <button class="google-btn" @click="handleGoogleLogin">
+            Sign up with Google
+          </button>
         </form>
 
         <!-- Already have an account? -->
         <p class="text-right">
           Already have an account?
-          <NuxtLink to="/login" class="text-underline text-blue-800">Login</NuxtLink>
+          <NuxtLink to="/login" class="text-underline text-blue-800"
+            >Login</NuxtLink
+          >
         </p>
       </div>
     </div>
   </div>
 </template>
 
+<script setup >
+import { ref } from "vue";
+import { useSignup } from "~/composables/useSignup";
+const { loginWithGoogle } = useFirebase()
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useSignup } from '~/composables/useSignup'
-const router       = useRouter()
+const router = useRouter();
 
-const { registerUser } = useSignup()
-const loading      = ref(false)
-const errorMessage = ref('')
+const { registerUser } = useSignup();
+const loading = ref(false);
+const errorMessage = ref("");
 
 const formData = ref({
-  name: '',
-  email: '',
-  password: '',
-})
+  name: "",
+  email: "",
+  password: "",
+});
+
+const handleGoogleLogin = async () => {
+  try {
+    await loginWithGoogle(); // all logic handled inside
+  } catch (err) {
+    console.error('[Google Signup Error]', err)
+    alert("Something went wrong signing in with Google")
+  }
+}
+
 
 const handleSignup = async () => {
-  loading.value = true
-  errorMessage.value = ''
-  console.log('[handleSignup] payload →', JSON.stringify(formData.value))
+  loading.value = true;
+  errorMessage.value = "";
+  console.log("[handleSignup] payload →", JSON.stringify(formData.value));
 
   try {
     // 1️⃣ Register user & start 30-day trial in one call
@@ -100,16 +121,16 @@ const handleSignup = async () => {
       formData.value.name,
       formData.value.email,
       formData.value.password
-    )
+    );
 
     // 2️⃣ Notify & navigate
-    alert(`✅ Welcome ${user.email}! Your 30-day trial is now active.`)
-    router.push('/signupSuccess')
-  } catch (err: any) {
-    console.error('Signup failed', err)
-    errorMessage.value = err.message || 'Signup failed. Please try again.'
+    alert(`✅ Welcome ${user.email}! Your 30-day trial is now active.`);
+    router.push("/signupSuccess");
+  } catch (err) {
+    console.error("Signup failed", err);
+    errorMessage.value = err.message || "Signup failed. Please try again.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
