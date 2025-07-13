@@ -212,6 +212,29 @@ onMounted(async () => {
     return
   }
 
+  try {
+    const eventId = route.params.id
+    const eventTitle = '...' // use actual title from your event data if already fetched
+
+    await client('/event-page-views', {
+      method: 'POST',
+      body: {
+        data: {
+          event: eventId,
+          title: eventTitle,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          referrer: document.referrer,
+        },
+      },
+    })
+    console.log('📈 Event view tracked')
+  } catch (err) {
+    console.error('⚠️ Failed to track event page view:', err)
+  }
+
+  
+
 
 })
 

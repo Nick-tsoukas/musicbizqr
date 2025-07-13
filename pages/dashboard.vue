@@ -2,7 +2,6 @@
   <div class="bg-[#000] pt-[var(--header-height)]">
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
-      
 
       <PastDueBanner />
 
@@ -270,12 +269,23 @@
               </button>
 
               <button
-              @click="copyToClipboard(`${config.public.baseUrl}/${ev.bandSlug}/event/${ev.slug}`)"
-
+                @click="
+                  copyToClipboard(
+                    `${config.public.baseUrl}/${ev.bandSlug}/event/${ev.slug}`
+                  )
+                "
                 class="action-button text-yellow-400 hover:text-yellow-200"
               >
                 <img src="@/assets/share-icon.svg" class="h-5 w-5" />
                 <span>Share</span>
+              </button>
+
+              <button
+                @click="router.push(`/event-analytics/${ev.id}`)"
+                class="action-button text-green-400 hover:text-green-200"
+              >
+                <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
+                <span>Analytics</span>
               </button>
 
               <button
@@ -522,14 +532,13 @@ const fetchEvents = async () => {
     populate: {
       image: true,
       band: {
-        fields: ['slug'],
+        fields: ["slug"],
       },
-      fields: ['title', 'slug']
+      fields: ["title", "slug"],
     },
   });
   events.value = resp.data || [];
 };
-
 
 const deleteItem = async (id, type) => {
   if (!confirm(`Delete this ${type}?`)) return;
