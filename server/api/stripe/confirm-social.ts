@@ -72,7 +72,9 @@ export default defineEventHandler(async (event) => {
       Authorization: `Bearer ${jwt}`
     },
     body: {
-      customerId: customer.id
+      customerId: customer.id,
+      subscriptionId: customer.subscriptionId,
+      trialEndsAt: customer.trialEndsAt
     }
   })
 

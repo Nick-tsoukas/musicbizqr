@@ -20,7 +20,7 @@ export async function createStripeCustomerAndTrial(user: MinimalUser) {
     }
   })
 
-  await stripe.subscriptions.create({
+  const subscription = await stripe.subscriptions.create({
     customer: customer.id,
     items: [
       {
@@ -30,5 +30,9 @@ export async function createStripeCustomerAndTrial(user: MinimalUser) {
     trial_period_days: 30
   })
 
-  return customer
+  return {
+    id: customer.id,
+    subscriptionId: subscription.id,
+    trialEndsAt: new Date(subscription.trial_end! * 1000).toISOString()
+  }
 }
