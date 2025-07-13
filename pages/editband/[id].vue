@@ -195,7 +195,7 @@
             >
               <input
                 :id="net"
-                type="url"
+                type="text"
                 class="mdc-text-field__input"
                 v-model="social[net]"
                 placeholder=" "
@@ -223,7 +223,7 @@
             >
               <input
                 :id="stream"
-                type="url"
+                type="text"
                 class="mdc-text-field__input"
                 v-model="streaming[stream]"
                 placeholder=" "
@@ -369,7 +369,6 @@
                 type="text"
                 class="mdc-text-field__input"
                 placeholder=" "
-                
               />
               <label class="mdc-floating-label" for="singlevideo-title">
                 Video Title
@@ -492,6 +491,19 @@ function deleteVideo() {
   singlevideoYoutubeUrl.value = "";
 }
 
+function normalizeLink(link) {
+  if (!link) return "";
+
+  // Already has a protocol → return as-is
+  if (/^https?:\/\//i.test(link)) return link.trim();
+
+  // Starts with www → add https://
+  if (/^www\./i.test(link)) return `https://${link.trim()}`;
+
+  // Otherwise assume https://
+  return `https://www.${link.trim()}`;
+}
+
 async function fetchBand() {
   loading.value = true;
   const id = route.params.id;
@@ -510,7 +522,7 @@ async function fetchBand() {
     bandName.value = attrs.name || "";
     genre.value = attrs.genre || "";
     bio.value = attrs.bio || "";
-    websitelink.value = attrs.websitelink || "";
+    websitelink.value = normalizeLink(attrs.websitelink) || "";
     websitelinktext.value = attrs.websitelinktext || "";
 
     // Existing image
@@ -569,6 +581,8 @@ function handleImageUpload(e) {
 function handleSingleSongUpload(e) {
   singlesongFile.value = e.target.files[0];
 }
+
+// Normalize links before including them in the payload
 
 async function submitForm() {
   loading.value = true;
@@ -633,6 +647,20 @@ async function submitForm() {
           title: singlevideoTitle.value,
         };
 
+    const normalizedSocial = Object.fromEntries(
+      Object.entries(social.value).map(([key, val]) => [
+        key,
+        normalizeLink(val),
+      ])
+    );
+
+    const normalizedStreaming = Object.fromEntries(
+      Object.entries(streaming.value).map(([key, val]) => [
+        key,
+        normalizeLink(val),
+      ])
+    );
+
     const payload = {
       name: bandName.value,
       genre: genre.value,
@@ -647,8 +675,8 @@ async function submitForm() {
         name: m.name,
         instrument: m.instrument,
       })),
-      ...social.value,
-      ...streaming.value,
+      ...normalizedSocial,
+      ...normalizedStreaming,
       singlesong: singlesongPayload,
       singlevideo: singlevideoPayload,
     };

@@ -391,6 +391,18 @@ import { v4 as uuidv4 } from "uuid";
 import { useDebounceFn } from "@vueuse/core";
 
 
+function normalizeLink(link) {
+  if (!link) return "";
+
+  // Already has a protocol → return as-is
+  if (/^https?:\/\//i.test(link)) return link.trim();
+
+  // Starts with www → add https://
+  if (/^www\./i.test(link)) return `https://${link.trim()}`;
+
+  // Otherwise assume https://
+  return `https://www.${link.trim()}`;
+}
 
 // References for the QR code wrapper
 const qrcodeWrapper = ref(null);
@@ -641,7 +653,7 @@ const saveQrCode = async () => {
       url: qrValue.value,
       users_permissions_user: { id: user.value.id },
       q_type: route.query.type,
-      link: link.value,
+      link: normalizeLink(link.value),
       name: name.value,
       options: {
         size: qrSize.value,

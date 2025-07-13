@@ -169,7 +169,7 @@
             >
               <input
                 :id="net"
-                type="url"
+                type="text"
                 class="mdc-text-field__input"
                 v-model="social[net]"
                 placeholder=" "
@@ -197,7 +197,7 @@
             >
               <input
                 :id="stream"
-                type="url"
+                type="text"
                 class="mdc-text-field__input"
                 v-model="streaming[stream]"
                 placeholder=" "
@@ -390,6 +390,19 @@ const websitelink = ref("");
 const websitelinktext = ref("");
 const max = 247;
 
+function normalizeLink(link) {
+  if (!link) return ''
+
+  // Already has a protocol → return as-is
+  if (/^https?:\/\//i.test(link)) return link.trim()
+
+  // Starts with www → add https://
+  if (/^www\./i.test(link)) return `https://${link.trim()}`
+
+  // Otherwise assume https://
+  return `https://www.${link.trim()}`
+}
+
 // Members
 const members = ref([
   { name: "", instrument: "", image: null, imageUrl: null },
@@ -470,7 +483,7 @@ async function submitForm() {
       isBandNameInLogo: isBandNameInLogo.value,
       genre: genre.value,
       bio: bio.value,
-      websitelink: websitelink.value || null,
+      websitelink: normalizeLink(websitelink.value) || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
 
@@ -480,11 +493,15 @@ async function submitForm() {
         instrument: m.instrument,
       })),
 
-      // social
-      ...social.value,
+       // social
+  ...Object.fromEntries(
+    Object.entries(social.value).map(([key, val]) => [key, normalizeLink(val)])
+  ),
 
-      // streaming
-      ...streaming.value,
+  // streaming
+  ...Object.fromEntries(
+    Object.entries(streaming.value).map(([key, val]) => [key, normalizeLink(val)])
+  ),
 
       // featured song
       singlesong: {

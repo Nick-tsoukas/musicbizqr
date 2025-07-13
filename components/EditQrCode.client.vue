@@ -408,6 +408,19 @@ const props = defineProps({
   type: String,
 });
 
+function normalizeLink(link) {
+  if (!link) return "";
+
+  // Already has a protocol → return as-is
+  if (/^https?:\/\//i.test(link)) return link.trim();
+
+  // Starts with www → add https://
+  if (/^www\./i.test(link)) return `https://${link.trim()}`;
+
+  // Otherwise assume https://
+  return `https://www.${link.trim()}`;
+}
+
 const { findOne, find } = useStrapi();
 const user = useStrapiUser();
 const router = useRouter();
@@ -465,7 +478,7 @@ function initializeVariables() {
   const data = qrData.value.attributes;
 
   q_type.value = data.q_type || null;
-  link.value = data.link || null;
+  link.value = normalizeLink(data.link) || null;
   name.value = data.name || "add name";
   qrValue.value = data.url || "";
   qrSize.value = data.options?.size || 300;
