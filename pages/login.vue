@@ -1,28 +1,44 @@
 <script setup>
-import { useRuntimeConfig } from '#imports';
-import { ref } from 'vue';
+import { useRuntimeConfig } from "#imports";
+import { useFirebase } from "@/composables/useFirebase";
+const { loginWithGoogle } = useFirebase();
+import { ref } from "vue";
 
 const { register, login } = useStrapiAuth();
 const router = useRouter();
 
 const { values, defineField } = useForm();
-const [email, emailAttrs] = defineField('email');
-const [password, passwordAttrs] = defineField('password');
+const [email, emailAttrs] = defineField("email");
+const [password, passwordAttrs] = defineField("password");
 
 const showPassword = ref(false);
 const loading = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref("");
 
 // Get Strapi Base URL from runtime config
 const config = useRuntimeConfig();
 const strapiBaseUrl = config.public.strapiUrl;
 
+const handleGoogleLogin = async () => {
+  try {
+    await loginWithGoogle(); // This handles Firebase + Strapi + Stripe
+  } catch (err) {
+    console.error("[Google Login Error]", err);
+    alert("Something went wrong signing in with Google");
+  }
+};
+
+// change to login
 const signUp = async () => {
   try {
-    await register({ username: values.email, email: values.email, password: values.password });
-    router.push('/dashboard');
+    await register({
+      username: values.email,
+      email: values.email,
+      password: values.password,
+    });
+    router.push("/dashboard");
   } catch (e) {
-    console.log('There was an error');
+    console.log("There was an error");
   }
 };
 
@@ -30,11 +46,11 @@ const loginUser = async () => {
   loading.value = true;
   try {
     await login({ identifier: values.email, password: values.password });
-    router.push('/dashboard');
+    router.push("/dashboard");
     loading.value = false;
   } catch (error) {
     console.log(error);
-    errorMessage.value = 'Invalid email or password. Please try again.';
+    errorMessage.value = "Invalid email or password. Please try again.";
     loading.value = false;
   }
 };
@@ -45,7 +61,9 @@ const loginWithProvider = (provider) => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center w-screen pt-[var(--header-height)] custom_height">
+  <div
+    class="flex justify-center items-center w-screen pt-[var(--header-height)] custom_height"
+  >
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
     </div>
@@ -92,28 +110,77 @@ const loginWithProvider = (provider) => {
             @click="showPassword = !showPassword"
           >
             <!-- Eye Icon -->
-            <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            <svg
+              v-if="!showPassword"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
             </svg>
             <!-- Eye Off Icon -->
-            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.975 9.975 0 012.187-3.368m3.048-2.634A9.935 9.935 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.271 5.145M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
-</svg>
-
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.975 9.975 0 012.187-3.368m3.048-2.634A9.935 9.935 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.271 5.145M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 3l18 18"
+              />
+            </svg>
           </button>
         </div>
 
         <!-- Login button -->
         <div>
-          <button @click="loginUser" class="mdc-button mdc-button--raised w-full mb-4">
+          <button
+            @click="loginUser"
+            class="mdc-button mdc-button--raised w-full mb-4"
+          >
             Login
+          </button>
+
+          <div class="my-2">
+            <p class="text-center">or</p>
+          </div>
+
+          <button
+            class="flex items-center justify-center gap-2 w-full bg-white border border-gray-300 text-black font-semibold py-2 px-4 rounded hover:bg-gray-100 transition mb-2"
+            @click="handleGoogleLogin"
+          >
+            <img src="@/assets/google-icon.png" alt="Google" class="w-5 h-5" />
+            Login with Google
           </button>
           <p class="text-center">
             Need an account?
-            <NuxtLink to="/signup" class="text-underline text-blue-800">SIGN UP</NuxtLink>
+            <NuxtLink to="/signup" class="text-underline text-blue-800"
+              >SIGN UP</NuxtLink
+            >
           </p>
         </div>
       </div>

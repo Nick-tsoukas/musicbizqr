@@ -61,12 +61,19 @@
           <div>
             <button
               type="submit"
-              class="mdc-button mdc-button--raised w-full mb-4"
+              class="mdc-button mdc-button--raised w-full "
             >
               Sign Up
             </button>
           </div>
-          <button class="google-btn" @click="handleGoogleLogin">
+          <div class="my-2">
+            <p class="text-center">or</p>
+          </div>
+          <button
+            class="flex items-center justify-center gap-2 w-full bg-white border border-gray-300 text-black font-semibold py-2 px-4 rounded hover:bg-gray-100 transition mb-2"
+            @click="handleGoogleLogin"
+          >
+            <img src="@/assets/google-icon.png" alt="Google" class="w-5 h-5" />
             Sign up with Google
           </button>
         </form>
@@ -83,10 +90,10 @@
   </div>
 </template>
 
-<script setup >
+<script setup>
 import { ref } from "vue";
 import { useSignup } from "~/composables/useSignup";
-const { loginWithGoogle } = useFirebase()
+const { loginWithGoogle } = useFirebase();
 
 const router = useRouter();
 
@@ -104,11 +111,10 @@ const handleGoogleLogin = async () => {
   try {
     await loginWithGoogle(); // all logic handled inside
   } catch (err) {
-    console.error('[Google Signup Error]', err)
-    alert("Something went wrong signing in with Google")
+    console.error("[Google Signup Error]", err);
+    alert("Something went wrong signing in with Google");
   }
-}
-
+};
 
 const handleSignup = async () => {
   loading.value = true;

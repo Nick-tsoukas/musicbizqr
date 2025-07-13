@@ -1,8 +1,6 @@
 <template>
   <div class="px-6 py-8 bg-black min-h-screen pt-[var(--header-height)]">
-    <h2 class="text-2xl font-bold mb-6 text-white">
-      Analytics Dashboard
-    </h2>
+    <h2 class="text-2xl font-bold mb-6 text-white">Analytics Dashboard</h2>
 
     <!-- Tabs -->
     <div class="flex space-x-4 mb-6">
@@ -14,7 +12,7 @@
           'px-4 py-2 font-medium rounded',
           selectedTab === tab
             ? 'bg-purple-600 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
         ]"
       >
         {{ tab }}
@@ -22,7 +20,7 @@
     </div>
 
     <!-- Range Selector -->
-    <div class="flex space-x-2 mb-8">
+    <div class="flex space-x-2 mb-4">
       <button
         v-for="(label, days) in rangeOptions"
         :key="days"
@@ -31,35 +29,35 @@
           'px-3 py-1 text-sm rounded',
           selectedRange === Number(days)
             ? 'bg-purple-500 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
         ]"
       >
         {{ label }}
       </button>
     </div>
 
-    <div v-if="isLoading" class="text-white">
-      🔄 Loading data… (check console for details)
+    <!-- Date Picker (Only for Today/Hourly) -->
+    <div v-if="selectedRange === 1" class="mb-6">
+      <label class="text-white mr-2">Select Day:</label>
+      <input
+        type="date"
+        v-model="selectedDate"
+        class="bg-gray-800 text-white rounded px-2 py-1"
+      />
     </div>
 
+    <div v-if="isLoading" class="text-white">🔄 Loading data…</div>
+
     <div v-else class="space-y-8">
-      <!-- Line Chart -->
       <div class="bg-gray-900 rounded-lg p-4 shadow-lg">
         <canvas ref="lineChartCanvas" class="w-full h-64"></canvas>
-      </div>
-      <!-- Bar Chart -->
-      <div class="bg-gray-900 rounded-lg p-4 shadow-lg">
-        <h3 class="text-lg font-medium text-white mb-2">
-          Total Clicks by Platform
-        </h3>
-        <canvas ref="barChartCanvas" class="w-full h-64"></canvas>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+<script setup>
+import { ref, watch, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute, useStrapiClient } from '#imports'
 import {
   Chart,
@@ -67,172 +65,42 @@ import {
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  BarController,
   Title,
   Tooltip,
   Legend,
-  Filler
 } from 'chart.js'
-import { parseISO, format, subDays } from 'date-fns'
+import { parseISO, format, subDays, getHours } from 'date-fns'
 
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  BarController,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-)
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const client = useStrapiClient()
 const route = useRoute()
 
-const tabs = ['Link Clicks', 'Songs', 'Videos']
-const selectedTab = ref<string>(tabs[0])
-
-const rangeOptions: Record<number, string> = {
+const tabs = ['Page Views', 'Link Clicks', 'Songs', 'Videos']
+const selectedTab = ref('Page Views')
+const rangeOptions = {
+  1: 'Today',
   7: 'Last 7 Days',
   30: 'Last 30 Days',
-  90: 'Last 90 Days',
-  365: 'Last 1 Year'
+  365: 'Last 1 Year',
 }
-const selectedRange = ref<number>(7)
+const selectedRange = ref(1)
+const selectedDate = ref(format(new Date(), 'yyyy-MM-dd'))
 
-const isLoading = ref<boolean>(true)
-const rawLinkClicks = ref<any[]>([])
-const rawMediaPlays = ref<any[]>([])
+const isLoading = ref(true)
+const rawPageViews = ref([])
+const rawLinkClicks = ref([])
+const rawMediaPlays = ref([])
 
-const lineChartCanvas = ref<HTMLCanvasElement | null>(null)
-const barChartCanvas = ref<HTMLCanvasElement | null>(null)
-let lineChartInstance: Chart | null = null
-let barChartInstance: Chart | null = null
+const lineChartCanvas = ref(null)
+let lineChartInstance = null
 
-function getLastNDates(n: number): string[] {
+function getLastNDates(n) {
   const today = new Date()
   return Array.from({ length: n }, (_, i) => {
     const d = subDays(today, n - 1 - i)
     return format(d, 'yyyy-MM-dd')
   })
-}
-
-function getDateRangeArray(rangeDays: number): string[] {
-  return getLastNDates(rangeDays)
-}
-
-function tallyLinkClicks(
-  clicks: Array<{ timestamp: string; platform: string; clickCount?: number }>,
-  lastDates: string[]
-) {
-  const platforms = Array.from(
-    new Set(clicks.map((e) => e.platform).filter(Boolean))
-  )
-  const counts: Record<string, Record<string, number>> = {}
-  platforms.forEach((plat) => {
-    counts[plat] = {}
-    lastDates.forEach((day) => {
-      counts[plat][day] = 0
-    })
-  })
-  for (const { platform, timestamp, clickCount = 1 } of clicks) {
-    if (!platform || !timestamp) continue
-    const day = format(parseISO(timestamp), 'yyyy-MM-dd')
-    if (lastDates.includes(day)) {
-      counts[platform][day] += clickCount
-    }
-  }
-  return { platforms, counts }
-}
-
-function tallyMediaPlaysByTitle(
-  plays: Array<{ timestamp: string; mediaType: 'song' | 'video'; title: string }>,
-  lastDates: string[],
-  mediaType: 'song' | 'video'
-) {
-  const filtered = plays.filter((p) => p.mediaType === mediaType)
-  const titles = Array.from(new Set(filtered.map((p) => p.title).filter(Boolean)))
-  const countsByTitle: Record<string, Record<string, number>> = {}
-  titles.forEach((t) => {
-    countsByTitle[t] = {}
-    lastDates.forEach((d) => { countsByTitle[t][d] = 0 })
-  })
-  for (const { timestamp, title } of filtered) {
-    const day = format(parseISO(timestamp), 'yyyy-MM-dd')
-    if (titles.includes(title) && lastDates.includes(day)) {
-      countsByTitle[title][day] += 1
-    }
-  }
-  return { titles, countsByTitle }
-}
-
-function buildLinkClicksDataset(
-  platforms: string[],
-  counts: Record<string, Record<string, number>>,
-  lastDates: string[]
-) {
-  const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444']
-  return platforms.map((plat, idx) => ({
-    label: plat,
-    data: lastDates.map((d) => counts[plat][d] || 0),
-    borderColor: colors[idx % colors.length],
-    backgroundColor: colors[idx % colors.length],
-    fill: false,
-    tension: 0.3,
-    pointRadius: 3
-  }))
-}
-
-function buildMediaPlaysDatasetByTitle(
-  titles: string[],
-  countsByTitle: Record<string, Record<string, number>>,
-  lastDates: string[]
-) {
-  const palette = [
-    '#3B82F6', '#EC4899', '#10B981', '#F59E0B',
-    '#8B5CF6', '#EF4444', '#3F51B5', '#795548'
-  ]
-  return titles.map((t, idx) => ({
-    label: t.length > 20 ? t.slice(0, 20) + '…' : t,
-    data: lastDates.map((d) => countsByTitle[t][d] || 0),
-    borderColor: palette[idx % palette.length],
-    backgroundColor: palette[idx % palette.length],
-    fill: true,
-    tension: 0.3,
-    pointRadius: 3
-  }))
-}
-
-function buildChartOptions(xLabels: string[]) {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: { ticks: { color: 'white' }, grid: { color: '#444' } },
-      y: { ticks: { color: 'white' }, grid: { color: '#444' } }
-    },
-    plugins: {
-      legend: { labels: { color: 'white' }, position: 'top' as const },
-      tooltip: {
-        callbacks: {
-          label: (ctx: any) => `${ctx.dataset.label}: ${ctx.formattedValue}`
-        }
-      }
-    }
-  }
-}
-
-function computePlatformTotals(clicks: Array<{ platform?: string; clickCount?: number }>) {
-  const totals: Record<string, number> = {}
-  clicks.forEach(({ platform = 'Unknown', clickCount = 1 }) => {
-    totals[platform] = (totals[platform] || 0) + clickCount
-  })
-  const labels = Object.keys(totals)
-  const data = labels.map((l) => totals[l])
-  return { labels, data }
 }
 
 function renderLineChart() {
@@ -241,100 +109,206 @@ function renderLineChart() {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  const dateLabels = getDateRangeArray(selectedRange.value)
-  let datasets: any[] = []
+  let labels = []
+  let datasets = []
   let title = ''
+  const day = selectedDate.value
+
+  const hourlyLabels = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`)
+  const dailyLabels = getLastNDates(selectedRange.value)
+
+  if (selectedTab.value === 'Page Views') {
+    if (selectedRange.value === 1) {
+      const counts = Object.fromEntries(hourlyLabels.map((h) => [h, 0]))
+      rawPageViews.value.forEach((view) => {
+        const ts = view?.attributes?.timestamp
+        if (!ts) return
+        const date = format(parseISO(ts), 'yyyy-MM-dd')
+        if (date !== day) return
+        const hour = `${String(getHours(parseISO(ts))).padStart(2, '0')}:00`
+        if (counts[hour] !== undefined) counts[hour]++
+      })
+      labels = hourlyLabels
+      datasets = [
+        {
+          label: `Page Views (${day})`,
+          data: labels.map((h) => counts[h]),
+          borderColor: '#10B981',
+          backgroundColor: '#10B981',
+          fill: false,
+          tension: 0.3,
+          pointRadius: 3,
+        },
+      ]
+      title = `Page Views (Hourly)`
+    } else {
+      const counts = Object.fromEntries(dailyLabels.map((d) => [d, 0]))
+      rawPageViews.value.forEach((view) => {
+        const ts = view?.attributes?.timestamp
+        if (!ts) return
+        const date = format(parseISO(ts), 'yyyy-MM-dd')
+        if (counts[date] !== undefined) counts[date]++
+      })
+      labels = dailyLabels
+      datasets = [
+        {
+          label: 'Page Views',
+          data: labels.map((d) => counts[d]),
+          borderColor: '#10B981',
+          backgroundColor: '#10B981',
+          fill: false,
+          tension: 0.3,
+          pointRadius: 3,
+        },
+      ]
+      title = `Page Views (Last ${selectedRange.value} Days)`
+    }
+  }
 
   if (selectedTab.value === 'Link Clicks') {
-    const { platforms, counts } = tallyLinkClicks(rawLinkClicks.value, dateLabels)
-    datasets = buildLinkClicksDataset(platforms, counts, dateLabels)
-    title = `Link Clicks (Last ${selectedRange.value} Days)`
-  } else {
-    const mediaType = selectedTab.value === 'Songs' ? 'song' : 'video'
-    const { titles, countsByTitle } = tallyMediaPlaysByTitle(rawMediaPlays.value, dateLabels, mediaType)
-    datasets = buildMediaPlaysDatasetByTitle(titles, countsByTitle, dateLabels)
-    title = `${selectedTab.value} Plays (Last ${selectedRange.value} Days)`
+    if (selectedRange.value === 1) {
+      const counts = {}
+      rawLinkClicks.value.forEach((item) => {
+        const { platform, timestamp } = item
+        const date = format(parseISO(timestamp), 'yyyy-MM-dd')
+        const hour = `${String(getHours(parseISO(timestamp))).padStart(2, '0')}:00`
+        if (date === day && platform) {
+          counts[platform] ??= Object.fromEntries(hourlyLabels.map((h) => [h, 0]))
+          counts[platform][hour]++
+        }
+      })
+      labels = hourlyLabels
+      datasets = Object.entries(counts).map(([plat, data], idx) => ({
+        label: plat,
+        data: labels.map((h) => data[h]),
+        borderColor: ['#8B5CF6', '#EC4899', '#10B981'][idx % 3],
+        backgroundColor: ['#8B5CF6', '#EC4899', '#10B981'][idx % 3],
+        fill: false,
+        tension: 0.3,
+        pointRadius: 3,
+      }))
+      title = `Link Clicks (Hourly)`
+    } else {
+      const platforms = [...new Set(rawLinkClicks.value.map((c) => c.platform))]
+      const counts = Object.fromEntries(
+        platforms.map((p) => [p, Object.fromEntries(dailyLabels.map((d) => [d, 0]))])
+      )
+      rawLinkClicks.value.forEach((c) => {
+        const date = format(parseISO(c.timestamp), 'yyyy-MM-dd')
+        if (counts[c.platform]?.[date] !== undefined) {
+          counts[c.platform][date]++
+        }
+      })
+      labels = dailyLabels
+      datasets = platforms.map((p, idx) => ({
+        label: p,
+        data: labels.map((d) => counts[p][d]),
+        borderColor: ['#8B5CF6', '#EC4899', '#10B981'][idx % 3],
+        backgroundColor: ['#8B5CF6', '#EC4899', '#10B981'][idx % 3],
+        fill: false,
+        tension: 0.3,
+        pointRadius: 3,
+      }))
+      title = `Link Clicks (Last ${selectedRange.value} Days)`
+    }
+  }
+
+  if (selectedTab.value === 'Songs' || selectedTab.value === 'Videos') {
+    const type = selectedTab.value === 'Songs' ? 'song' : 'video'
+    const filtered = rawMediaPlays.value.filter((m) => m.mediaType === type)
+    if (selectedRange.value === 1) {
+      const counts = {}
+      filtered.forEach((m) => {
+        const hour = `${String(getHours(parseISO(m.timestamp))).padStart(2, '0')}:00`
+        const date = format(parseISO(m.timestamp), 'yyyy-MM-dd')
+        if (date === day) {
+          counts[m.title] ??= Object.fromEntries(hourlyLabels.map((h) => [h, 0]))
+          counts[m.title][hour]++
+        }
+      })
+      labels = hourlyLabels
+      datasets = Object.entries(counts).map(([title, data], idx) => ({
+        label: title,
+        data: labels.map((h) => data[h]),
+        borderColor: ['#3B82F6', '#EC4899', '#10B981'][idx % 3],
+        backgroundColor: ['#3B82F6', '#EC4899', '#10B981'][idx % 3],
+        fill: false,
+        tension: 0.3,
+        pointRadius: 3,
+      }))
+      title = `${selectedTab.value} Plays (Hourly)`
+    } else {
+      const titles = [...new Set(filtered.map((m) => m.title))]
+      const counts = Object.fromEntries(
+        titles.map((t) => [t, Object.fromEntries(dailyLabels.map((d) => [d, 0]))])
+      )
+      filtered.forEach((m) => {
+        const date = format(parseISO(m.timestamp), 'yyyy-MM-dd')
+        if (counts[m.title]?.[date] !== undefined) {
+          counts[m.title][date]++
+        }
+      })
+      labels = dailyLabels
+      datasets = titles.map((t, idx) => ({
+        label: t,
+        data: labels.map((d) => counts[t][d]),
+        borderColor: ['#3B82F6', '#EC4899', '#10B981'][idx % 3],
+        backgroundColor: ['#3B82F6', '#EC4899', '#10B981'][idx % 3],
+        fill: false,
+        tension: 0.3,
+        pointRadius: 3,
+      }))
+      title = `${selectedTab.value} Plays (Last ${selectedRange.value} Days)`
+    }
   }
 
   lineChartInstance?.destroy()
   lineChartInstance = new Chart(ctx, {
     type: 'line',
-    data: { labels: dateLabels, datasets },
+    data: { labels, datasets },
     options: {
-      ...buildChartOptions(dateLabels),
-      plugins: {
-        ...buildChartOptions(dateLabels).plugins,
-        title: { display: true, text: title, color: 'white', font: { size: 18 } }
-      }
-    }
-  })
-}
-
-function renderBarChart() {
-  const canvas = barChartCanvas.value
-  if (!canvas) return
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  const { labels, data } = computePlatformTotals(rawLinkClicks.value)
-  barChartInstance?.destroy()
-  barChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets: [{ label: 'Total Clicks', data }] },
-    options: {
-      ...buildChartOptions(labels),
-      plugins: {
-        ...buildChartOptions(labels).plugins,
-        title: { display: true, text: 'Total Clicks by Platform', color: 'white', font: { size: 18 } }
-      },
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
-        x: {
-          ...buildChartOptions(labels).scales.x,
-          ticks: { ...buildChartOptions(labels).scales.x.ticks, callback: (v: any) => labels[v], maxRotation: 45, minRotation: 45 }
-        },
-        y: { ...buildChartOptions(labels).scales.y, beginAtZero: true }
-      }
-    }
+        x: { ticks: { color: 'white' }, grid: { color: '#444' } },
+        y: { ticks: { color: 'white' }, grid: { color: '#444' }, beginAtZero: true },
+      },
+      plugins: {
+        legend: { labels: { color: 'white' } },
+        title: { display: true, text: title, color: 'white', font: { size: 18 } },
+      },
+    },
   })
 }
 
 async function fetchAndRender() {
   isLoading.value = true
 
-  // 1) Fetch link-clicks
-  const { data: clicks } = await client(
-    `/link-clicks/band/${encodeURIComponent(route.params.id as string)}`,
-    { params: { populate: ['band'], sort: ['timestamp:desc'] } }
-  )
-  rawLinkClicks.value = clicks
+  const [viewsRes, clicksRes, mediaRes] = await Promise.all([
+    client('/band-page-views', {
+      params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'] },
+    }),
+    client(`/link-clicks/band/${route.params.id}`),
+    client('/media-plays', {
+      params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'] },
+    }),
+  ])
 
-  // 2) Fetch media plays
-  const { data: plays } = await client('/media-plays', {
-    params: { filters: { band: { id: route.params.id } }, populate: ['band'], sort: ['timestamp:desc'] }
-  })
-  rawMediaPlays.value = plays
+  rawPageViews.value = viewsRes.data
+  rawLinkClicks.value = clicksRes.data
+  rawMediaPlays.value = mediaRes.data
 
   isLoading.value = false
-
-  // Wait for the DOM (v-if swap + canvases)
   await nextTick()
-  await nextTick()
-
   renderLineChart()
-  renderBarChart()
 }
 
 onMounted(fetchAndRender)
-watch(() => route.params.id, fetchAndRender)
-onBeforeUnmount(() => {
-  lineChartInstance?.destroy()
-  barChartInstance?.destroy()
-})
-watch([selectedTab, selectedRange], () => {
+watch([selectedTab, selectedRange, selectedDate], () => {
   if (!isLoading.value) renderLineChart()
 })
-watch(rawLinkClicks, () => {
-  if (!isLoading.value) renderBarChart()
+onBeforeUnmount(() => {
+  lineChartInstance?.destroy()
 })
 </script>
 
