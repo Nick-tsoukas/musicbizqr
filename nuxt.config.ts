@@ -1,6 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
+ 
+
   router: {
     options: {
       // @ts-ignore
@@ -99,10 +101,45 @@ export default defineNuxtConfig({
     '@vee-validate/nuxt',
     "@nuxt/image",
     "nuxt-particles",
-    "@unlok-co/nuxt-stripe"
+    "@unlok-co/nuxt-stripe",
+    '@nuxtjs/sitemap',
   ],
 
+  // sitemap: {
+  //   sitemaps: {
+  //     main: {
+  //       sitemapName: 'sitemap.xml',
+  //       defaults: {
+  //         changefreq: 'weekly',
+  //         priority: 0.8,
+  //         lastmod: new Date(),
+  //       },
+  //       gzip: true,
+  //       trailingSlash: false,
+  //       // ✅ Dynamic site URL
+  //       siteUrl: process.env.BASE_URL || 'https://musicbizqr.com',
+  //       // ✅ Async route generation using Strapi
+  //       async routes() {
+  //         const config = useRuntimeConfig();
+  //         const strapiUrl = config.public.strapiUrl;
+  
+  //         const [seoRes, bandRes, eventRes] = await Promise.all([
+  //           fetch(`${strapiUrl}/api/seo-pages`).then(res => res.json()),
+  //           fetch(`${strapiUrl}/api/bands`).then(res => res.json()),
+  //           fetch(`${strapiUrl}/api/events`).then(res => res.json()),
+  //         ]);
+  
+  //         const seoRoutes = seoRes.data.map(p => `/seo/${p.attributes.slug}`);
+  //         const bandRoutes = bandRes.data.map(b => `/${b.attributes.slug}`);
+  //         const eventRoutes = eventRes.data.map(e => `/events/${e.attributes.slug}`);
+  
+  //         return [...seoRoutes, ...bandRoutes, ...eventRoutes];
+  //       }
+  //     }
+  //   }
+  // },
 
+  
 
   aos: {
     // Global settings:
@@ -162,5 +199,29 @@ export default defineNuxtConfig({
    
   ],
 
-  compatibilityDate: '2025-04-11'
+  compatibilityDate: '2025-04-11',
+
+  hooks: {
+    'nitro:config': async (nitroConfig) => {
+      if (process.env.NODE_ENV !== 'production') return
+  
+      const seoApiUrl = `${process.env.STRAPI_URL}/api/seo-pages?pagination[pageSize]=1000`
+  
+      try {
+        const res = await fetch(seoApiUrl)
+        const json = await res.json()
+  
+        const routes = json.data.map((page) => `/seo/${page.attributes.slug}`)
+        nitroConfig.prerender = nitroConfig.prerender || {}
+        nitroConfig.prerender.routes = [
+          ...(nitroConfig.prerender.routes || []),
+          ...routes,
+        ]
+      } catch (e) {
+        console.error('❌ Failed to prerender SEO pages:', e)
+      }
+    }
+  }
+  
 })
+

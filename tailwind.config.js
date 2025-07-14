@@ -9,6 +9,22 @@ module.exports = {
     ],
     theme: {
       extend: {
+        typography: (theme) => ({
+          invert: {
+            css: {
+              color: theme('colors.gray.100'),
+              a: { color: theme('colors.pink.400') },
+              h1: { color: theme('colors.white') },
+              h2: { color: theme('colors.white') },
+              strong: { color: theme('colors.white') },
+              blockquote: {
+                borderLeftColor: theme('colors.pink.500'),
+                color: theme('colors.pink.100'),
+              },
+              // etc.
+            },
+          },
+        }),
         keyframes: {
           slideinview: {
             '0%, 100%': { transform: 'rotate(-3deg)' },
@@ -46,6 +62,6 @@ module.exports = {
         },
       },
     },
-    plugins: [],
+    plugins: [require('@tailwindcss/typography')],
   };
   
