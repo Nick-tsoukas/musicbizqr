@@ -24,26 +24,44 @@ if (error.value) {
 const page = seoPage.value?.data?.[0]?.attributes || {}
 const pageUrl = `https://musicbizqr.com/article/${category}/${slug}`
 const publishedDate = page.publishedAt || new Date().toISOString()
+const authorName = page.author?.name || 'MusicBizQR'
+const keywordsArray = (page.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+const ogImage = page.ogImage?.url || 'https://musicbizqr.com/default-og.png' // Fallback
 
 useHead({
   title: page.metaTitle || page.title || 'Discover New Music',
   meta: [
-    {
-      name: 'description',
-      content: page.metaDescription || page.excerpt || page.title || 'Explore music growth strategies using QR codes and smart links.',
-    },
+    { name: 'description', content: page.metaDescription || page.excerpt || page.title || 'Explore music growth strategies using QR codes and smart links.' },
+
+    // ✅ Open Graph
     { property: 'og:title', content: page.metaTitle || page.title },
     { property: 'og:description', content: page.metaDescription || page.excerpt || page.title },
     { property: 'og:url', content: pageUrl },
     { property: 'og:type', content: 'article' },
-    { property: 'og:image', content: page.ogImage?.url },
+    { property: 'og:image', content: ogImage },
+    { property: 'article:published_time', content: publishedDate },
+    { property: 'article:section', content: category },
+    ...keywordsArray.map(tag => ({ property: 'article:tag', content: tag })),
+
+    // ✅ Twitter
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: page.metaTitle || page.title },
     { name: 'twitter:description', content: page.metaDescription || page.excerpt || page.title },
-    { name: 'keywords', content: page.keywords || '' }
+    { name: 'twitter:image', content: ogImage },
+
+    // ✅ Author & Keywords
+    { name: 'author', content: authorName },
+    { name: 'keywords', content: keywordsArray.join(', ') },
+
+    // ✅ Optional polish
+    { name: 'theme-color', content: '#000000' }
   ],
-  link: [{ rel: 'canonical', href: pageUrl }],
+  link: [
+    { rel: 'canonical', href: pageUrl },
+    { rel: 'icon', href: '/favicon.ico' }
+  ],
   script: [
+    // ✅ Article JSON-LD
     {
       type: 'application/ld+json',
       children: JSON.stringify({
@@ -52,8 +70,8 @@ useHead({
         "headline": page.metaTitle || page.title,
         "description": page.metaDescription || page.excerpt || page.title,
         "author": {
-          "@type": "Organization",
-          "name": "MusicBizQR"
+          "@type": "Person",
+          "name": authorName
         },
         "datePublished": publishedDate,
         "publisher": {
@@ -67,12 +85,44 @@ useHead({
         "mainEntityOfPage": {
           "@type": "WebPage",
           "@id": pageUrl
-        }
+        },
+        "image": ogImage,
+        "keywords": keywordsArray
+      })
+    },
+
+    // ✅ Breadcrumbs JSON-LD
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://musicbizqr.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Articles",
+            "item": `https://musicbizqr.com/article/${category}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": page.title,
+            "item": pageUrl
+          }
+        ]
       })
     }
   ]
 })
 </script>
+
 
 <template>
   <div class="bg-black text-white py-16 px-6 max-w-3xl mx-auto">
