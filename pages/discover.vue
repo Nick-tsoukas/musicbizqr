@@ -16,7 +16,7 @@
           class="p-6 border border-white rounded-lg hover:border-pink-500 transition"
         >
           <NuxtLink
-            :to="`/seo/${page.attributes.slug}`"
+            :to="`/article/${page.attributes.slug}`"
             class="text-2xl font-bold text-white hover:underline"
           >
             {{ page.attributes.title }}

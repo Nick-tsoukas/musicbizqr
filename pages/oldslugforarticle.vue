@@ -16,7 +16,7 @@ if (error.value) {
 }
 
 const page = seoPage.value?.data?.[0]?.attributes || {}
-const pageUrl = `https://musicbizqr.com/seo/${slug}`
+const pageUrl = `https://musicbizqr.com/article/${slug}`
 const publishedDate = page.publishedAt || new Date().toISOString()
 const updatedDate = page.updatedAt || publishedDate
 const ogImage = page.ogImage?.url || 'https://musicbizqr.com/default-og.png'

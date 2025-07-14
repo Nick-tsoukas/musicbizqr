@@ -112,22 +112,38 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
-    credits: false,           // optional: remove sitemap styling credit
-    xsl: false,               // optional: disables XML styling (pure raw XML)
-
-    // ✅ Add dynamic article routes from Strapi
+    credits: false,
+    xsl: false,
     async urls() {
-      const res = await fetch(`${process.env.STRAPI_URL}/api/seo-pages`)
+      const base = process.env.STRAPI_URL || 'http://localhost:1337'
+      const res = await fetch(`${base}/api/seo-pages?populate=category`)
       const { data } = await res.json()
-
-      return data.map((page) => ({
-        loc: `/seo/${page.attributes.slug}`,
-        lastmod: page.attributes.updatedAt,
+  
+      // Deduplicate categories
+      const categories = new Set<string>()
+      const articleRoutes = data.map((page) => {
+        const category = page.attributes.category
+        const slug = page.attributes.slug
+        if (category) categories.add(category)
+  
+        return {
+          loc: `/article/${category}/${slug}`,
+          lastmod: page.attributes.updatedAt,
+          changefreq: 'weekly',
+          priority: 0.9
+        }
+      })
+  
+      const categoryRoutes = Array.from(categories).map((cat) => ({
+        loc: `/article/${cat}`,
         changefreq: 'weekly',
-        priority: 0.8
+        priority: 0.7
       }))
+  
+      return [...articleRoutes, ...categoryRoutes]
     }
   },
+  
   
 
   aos: {
@@ -194,22 +210,31 @@ export default defineNuxtConfig({
     'nitro:config': async (nitroConfig) => {
       if (process.env.NODE_ENV !== 'production') return
   
-      const seoApiUrl = `${process.env.STRAPI_URL}/api/seo-pages?pagination[pageSize]=1000`
+      const seoApiUrl = `${process.env.STRAPI_URL}/api/seo-pages?populate=category&pagination[pageSize]=1000`
   
       try {
         const res = await fetch(seoApiUrl)
         const json = await res.json()
   
-        const routes = json.data.map((page) => `/seo/${page.attributes.slug}`)
+        const prerenderRoutes = json.data.flatMap((page) => {
+          const cat = page.attributes.category
+          const slug = page.attributes.slug
+          return [
+            `/article/${cat}`,
+            `/article/${cat}/${slug}`
+          ]
+        })
+  
         nitroConfig.prerender = nitroConfig.prerender || {}
         nitroConfig.prerender.routes = [
           ...(nitroConfig.prerender.routes || []),
-          ...routes,
+          ...prerenderRoutes,
         ]
       } catch (e) {
         console.error('❌ Failed to prerender SEO pages:', e)
       }
     }
   }
+  
   
 })
