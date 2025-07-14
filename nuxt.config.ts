@@ -102,43 +102,32 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "nuxt-particles",
     "@unlok-co/nuxt-stripe",
-    '@nuxtjs/sitemap',
+    '@nuxtjs/seo'
   ],
 
-  // sitemap: {
-  //   sitemaps: {
-  //     main: {
-  //       sitemapName: 'sitemap.xml',
-  //       defaults: {
-  //         changefreq: 'weekly',
-  //         priority: 0.8,
-  //         lastmod: new Date(),
-  //       },
-  //       gzip: true,
-  //       trailingSlash: false,
-  //       // ✅ Dynamic site URL
-  //       siteUrl: process.env.BASE_URL || 'https://musicbizqr.com',
-  //       // ✅ Async route generation using Strapi
-  //       async routes() {
-  //         const config = useRuntimeConfig();
-  //         const strapiUrl = config.public.strapiUrl;
-  
-  //         const [seoRes, bandRes, eventRes] = await Promise.all([
-  //           fetch(`${strapiUrl}/api/seo-pages`).then(res => res.json()),
-  //           fetch(`${strapiUrl}/api/bands`).then(res => res.json()),
-  //           fetch(`${strapiUrl}/api/events`).then(res => res.json()),
-  //         ]);
-  
-  //         const seoRoutes = seoRes.data.map(p => `/seo/${p.attributes.slug}`);
-  //         const bandRoutes = bandRes.data.map(b => `/${b.attributes.slug}`);
-  //         const eventRoutes = eventRes.data.map(e => `/events/${e.attributes.slug}`);
-  
-  //         return [...seoRoutes, ...bandRoutes, ...eventRoutes];
-  //       }
-  //     }
-  //   }
-  // },
+  site: {
+    url: 'https://musicbizqr.com',
+      name: 'MusicBizQR',
+  description: 'Dynamic QR codes and smart links for bands and musicians.'
+  },
 
+  sitemap: {
+    credits: false,           // optional: remove sitemap styling credit
+    xsl: false,               // optional: disables XML styling (pure raw XML)
+
+    // ✅ Add dynamic article routes from Strapi
+    async urls() {
+      const res = await fetch(`${process.env.STRAPI_URL}/api/seo-pages`)
+      const { data } = await res.json()
+
+      return data.map((page) => ({
+        loc: `/seo/${page.attributes.slug}`,
+        lastmod: page.attributes.updatedAt,
+        changefreq: 'weekly',
+        priority: 0.8
+      }))
+    }
+  },
   
 
   aos: {
@@ -224,4 +213,3 @@ export default defineNuxtConfig({
   }
   
 })
-

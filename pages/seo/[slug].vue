@@ -1,11 +1,12 @@
 <script setup>
-import { useRoute, useAsyncData, useHead, useRuntimeConfig } from '#imports'
+import { useRoute, useAsyncData, useSeoMeta, useHead, useRuntimeConfig } from '#imports'
 import { marked } from 'marked'
 
 const route = useRoute()
 const slug = route.params.slug
 const config = useRuntimeConfig()
 
+// Fetch page content from Strapi
 const { data: seoPage, error } = await useAsyncData(`seo-${slug}`, () =>
   $fetch(`${config.public.strapiUrl}/api/seo-pages?filters[slug][$eq]=${slug}&populate=*`)
 )
@@ -17,53 +18,59 @@ if (error.value) {
 const page = seoPage.value?.data?.[0]?.attributes || {}
 const pageUrl = `https://musicbizqr.com/seo/${slug}`
 const publishedDate = page.publishedAt || new Date().toISOString()
+const updatedDate = page.updatedAt || publishedDate
+const ogImage = page.ogImage?.url || 'https://musicbizqr.com/default-og.png'
 
+// 🔥 SEO META TAGS (Nuxt SEO)
+useSeoMeta({
+  title: () => page.title || 'Discover New Music',
+  description: () => page.excerpt || page.title || '',
+  ogTitle: () => page.title,
+  ogDescription: () => page.excerpt || page.title,
+  ogUrl: () => pageUrl,
+  ogImage: () => ogImage,
+  twitterTitle: () => page.title,
+  twitterDescription: () => page.excerpt || page.title,
+  twitterImage: () => ogImage,
+  twitterCard: 'summary_large_image',
+  canonical: () => pageUrl
+})
+
+// 🔍 JSON-LD STRUCTURED DATA
 useHead({
-  title: page.title || 'Discover New Music',
-  meta: [
-    {
-      name: 'description',
-      content: page.excerpt || page.title || 'Explore artist QR tech and music marketing tips.',
-    },
-    { property: "og:title", content: page.title },
-    { property: "og:description", content: page.excerpt || page.title },
-    { property: "og:url", content: pageUrl },
-    { property: "og:type", content: "article" },
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: page.title },
-    { name: "twitter:description", content: page.excerpt || page.title }
-  ],
-  link: [{ rel: "canonical", href: pageUrl }],
   script: [
     {
-      type: "application/ld+json",
+      type: 'application/ld+json',
       children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": page.title,
-        "description": page.excerpt || page.title,
-        "author": {
-          "@type": "Organization",
-          "name": "MusicBizQR"
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: page.title,
+        description: page.excerpt || page.title,
+        author: {
+          '@type': 'Organization',
+          name: 'MusicBizQR'
         },
-        "datePublished": publishedDate,
-        "publisher": {
-          "@type": "Organization",
-          "name": "MusicBizQR",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://musicbizqr.com/logo.png"
+        image: ogImage,
+        datePublished: publishedDate,
+        dateModified: updatedDate,
+        publisher: {
+          '@type': 'Organization',
+          name: 'MusicBizQR',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://musicbizqr.com/logo.png'
           }
         },
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": pageUrl
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': pageUrl
         }
       })
     }
   ]
 })
 </script>
+
 
 
 <template>
