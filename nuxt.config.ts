@@ -118,7 +118,8 @@ export default defineNuxtConfig({
       const base = process.env.STRAPI_URL || 'http://localhost:1337'
       const res = await fetch(`${base}/api/seo-pages?populate=category`)
       const { data } = await res.json()
-  
+      console.log('Sitemap: total articles from Strapi:', data.length)
+
       // Deduplicate categories
       const categories = new Set<string>()
       const articleRoutes = data.map((page) => {
