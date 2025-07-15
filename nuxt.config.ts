@@ -111,30 +111,35 @@ export default defineNuxtConfig({
   description: 'Dynamic QR codes and smart links for bands and musicians.'
   },
 
-  sitemap: {
-    expose: true, // Make sitemap.xml publicly accessible
-    credits: false,
-    xsl: false,
-    cacheTime: 0, // <-- 🔥 VERY IMPORTANT: disables caching of sitemap
-    sitemapName: 'sitemap.xml',
-    async urls() {
-      const base = process.env.STRAPI_URL || 'http://localhost:1337';
-      const res = await fetch(`${base}/api/seo-pages?populate=category&pagination[pageSize]=1000`);
-      const { data } = await res.json();
+  // sitemap: {
+  //   expose: true,
+  //   credits: false,
+  //   xsl: false,
+  //   cacheTime: 0, // disables caching to force regeneration
+  //   sitemapName: 'sitemap.xml',
+  //   async urls() {
+  //     const base = process.env.STRAPI_URL || 'http://localhost:1337';
+  //     console.log('🧠 Rebuilding sitemap from Strapi at:', base); // ✅ LOG ADDED
   
-      return data.map((page) => {
-        const cat = page.attributes.category || 'uncategorized';
-        const slug = page.attributes.slug;
+  //     const res = await fetch(`${base}/api/seo-pages?populate=category&pagination[pageSize]=1000`);
+  //     const { data } = await res.json();
   
-        return {
-          loc: `/article/${cat}/${slug}`,
-          lastmod: page.attributes.updatedAt,
-          changefreq: 'weekly',
-          priority: 0.9,
-        };
-      });
-    },
-  },
+  //     console.log(`✅ Sitemap includes ${data.length} articles`); // ✅ LOG ADDED
+  
+  //     return data.map((page) => {
+  //       const cat = page.attributes.category || 'uncategorized';
+  //       const slug = page.attributes.slug;
+  
+  //       return {
+  //         loc: `/article/${cat}/${slug}`,
+  //         lastmod: page.attributes.updatedAt,
+  //         changefreq: 'weekly',
+  //         priority: 0.9,
+  //       };
+  //     });
+  //   },
+  // },
+  
   
 
   
