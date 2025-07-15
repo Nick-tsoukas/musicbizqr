@@ -112,38 +112,31 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
+    expose: true, // Make sitemap.xml publicly accessible
     credits: false,
     xsl: false,
+    cacheTime: 0, // <-- 🔥 VERY IMPORTANT: disables caching of sitemap
+    sitemapName: 'sitemap.xml',
     async urls() {
-      const base = process.env.STRAPI_URL || 'http://localhost:1337'
-      const res = await fetch(`${base}/api/seo-pages?populate=category`)
-      const { data } = await res.json()
-      console.log('Sitemap: total articles from Strapi:', data.length)
-
-      // Deduplicate categories
-      const categories = new Set<string>()
-      const articleRoutes = data.map((page) => {
-        const category = page.attributes.category
-        const slug = page.attributes.slug
-        if (category) categories.add(category)
+      const base = process.env.STRAPI_URL || 'http://localhost:1337';
+      const res = await fetch(`${base}/api/seo-pages?populate=category&pagination[pageSize]=1000`);
+      const { data } = await res.json();
+  
+      return data.map((page) => {
+        const cat = page.attributes.category || 'uncategorized';
+        const slug = page.attributes.slug;
   
         return {
-          loc: `/article/${category}/${slug}`,
+          loc: `/article/${cat}/${slug}`,
           lastmod: page.attributes.updatedAt,
           changefreq: 'weekly',
-          priority: 0.9
-        }
-      })
-  
-      const categoryRoutes = Array.from(categories).map((cat) => ({
-        loc: `/article/${cat}`,
-        changefreq: 'weekly',
-        priority: 0.7
-      }))
-  
-      return [...articleRoutes, ...categoryRoutes]
-    }
+          priority: 0.9,
+        };
+      });
+    },
   },
+  
+
   
   
 
