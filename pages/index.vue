@@ -17,6 +17,7 @@
             >
               Music Biz Qr
             </h1>
+          
             <div class="flex justify-center mb-12 2xl:hidden">
               <img
                 src="@/assets/qrcode.png"
@@ -343,6 +344,31 @@
           </div>
         </div>
       </div>
+
+      <!-- articles  -->
+      <section class="bg-black text-white px-4 py-16 max-w-5xl mx-auto">
+      <h2 class="text-3xl font-extrabold mb-6 text-gradient">Featured Articles</h2>
+
+      <div v-if="featuredRes?.data?.length" class="grid gap-8 md:grid-cols-1">
+        <div
+          v-for="post in featuredRes.data"
+          :key="post.id"
+          class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition"
+        >
+          <NuxtLink
+            :to="`/article/${post.attributes.category}/${post.attributes.slug}`"
+            class="block mb-2 text-xl font-bold text-pink-400 hover:underline"
+          >
+            {{ post.attributes.title }}
+          </NuxtLink>
+          <p class="text-sm text-gray-400">
+            {{ post.attributes.metaDescription }}
+          </p>
+        </div>
+      </div>
+
+     
+    </section>
      
       <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
     <h1 class="text-3xl font-bold text-center md:text-left   text-white mb-8">
@@ -510,6 +536,75 @@ import { tsParticles } from "@tsparticles/engine";
 
 const { mode } = useRuntimeConfig().public.particles;
 const imageToRender = ref(bandScreen);
+
+const config = useRuntimeConfig()
+
+const { data: featuredRes, error: featuredError } = await useAsyncData(
+  'featured-articles',
+  () => $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+    params: {
+      populate: '*',
+      sort: ['publishedAt:desc'],
+      'filters[featured][$eq]': true
+    }
+  })
+)
+
+console.log('this is article ', featuredRes)
+
+if (featuredError.value) {
+  console.error('❌ Failed to load featured articles:', featuredError.value)
+}
+
+const ldJson = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "MusicBizQR",
+  "url": "https://musicbizqr.com",
+  "description": "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "MusicBizQR",
+    "url": "https://musicbizqr.com"
+  }
+}
+
+useHead({
+  title: 'MusicBizQR | Smart QR Codes & Link-in-Bio Tools for Artists',
+  meta: [
+    { name: 'description', content: 'Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today.' },
+    { name: 'keywords', content: 'QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool' },
+    { name: 'robots', content: 'index, follow' },
+    { property: 'og:title', content: 'MusicBizQR | QR Codes + Smart Links for Artists' },
+    { property: 'og:description', content: 'Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters.' },
+    { property: 'og:image', content: 'https://musicbizqr.com/musicbizlogo.png' },
+    { property: 'og:url', content: 'https://musicbizqr.com' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'MusicBizQR | QR Codes + Smart Links for Artists' },
+    { name: 'twitter:description', content: 'All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.' },
+    { name: 'twitter:image', content: 'https://musicbizqr.com/og-image.jpg' }
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://musicbizqr.com' }
+  ],
+
+  script: [
+    {
+      // VueUse Head allows `children` for script content
+      type: 'application/ld+json',
+      children: JSON.stringify(ldJson),
+      // optional key to tie this tag to the sanitizer override below
+      key: 'ld-json'
+    }
+  ],
+  // disable sanitization only for the script tagged 'ld-json'
+  __dangerouslyDisableSanitizersByTagID: {
+    'ld-json': ['children']
+  }
+  
+})
+
 
 const show = ref(false);
 
