@@ -217,14 +217,23 @@ export default defineNuxtConfig({
         const res = await fetch(seoApiUrl)
         const json = await res.json()
   
-        const prerenderRoutes = json.data.flatMap((page) => {
-          const cat = page.attributes.category
-          const slug = page.attributes.slug
-          return [
-            `/article/${cat}`,
-            `/article/${cat}/${slug}`
-          ]
-        })
+        const prerenderRoutes = []
+        let skipped = 0
+  
+        for (const page of json.data) {
+          const { category, slug } = page.attributes
+  
+          if (!category || !slug) {
+            console.warn(`⚠️ Skipping SEO page (missing category or slug): ID ${page.id}`)
+            skipped++
+            continue
+          }
+  
+          prerenderRoutes.push(`/article/${category}`)
+          prerenderRoutes.push(`/article/${category}/${slug}`)
+        }
+  
+        console.log(`✅ Pre-rendering ${prerenderRoutes.length} routes (${json.data.length - skipped} of ${json.data.length} articles)`)
   
         nitroConfig.prerender = nitroConfig.prerender || {}
         nitroConfig.prerender.routes = [
@@ -236,6 +245,7 @@ export default defineNuxtConfig({
       }
     }
   }
+  
   
   
 })
