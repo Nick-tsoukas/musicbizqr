@@ -35,6 +35,7 @@
         <p v-if="user" @click="logoutUser" class="nav-link cursor-pointer">
           Logout
         </p>
+        <NuxtLink to="/article" class="nav-link">Articles</NuxtLink>
         <NuxtLink to="/contact" class="nav-link">Contact</NuxtLink>
         <NuxtLink v-if="user" to="/account" class="nav-link">Account</NuxtLink>
       </nav>
