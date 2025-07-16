@@ -1,388 +1,575 @@
 <template>
   <div class="bg-[#000] overflow-x-hidden pt-[var(--header-height)]">
     <div class="relative min-h-screen">
-    <NuxtParticles id="tsparticles" :options="options"    class="fixed inset-0 -z-10 pointer-events-none"  />
-    <!-- Main content -->
-    <main>
-      <!-- Hero section -->
+      <NuxtParticles
+        id="tsparticles"
+        :options="options"
+        class="fixed inset-0 -z-10 pointer-events-none"
+      />
+      <!-- Main content -->
+      <main>
+        <!-- Hero section -->
 
-      <div class="relative isolate min-h-[100vh]">
-        <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
+        <div class="relative isolate min-h-[100vh]">
           <div
-            class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
+            class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8"
           >
-            <h1
-              data-aos="fade-up"
-              class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 mb-16 text-center font-extrabold tracking-tight text-7xl md:text-8xl lg:text-left"
-            >
-              Music Biz Qr
-            </h1>
-          
-            <div class="flex justify-center mb-12 2xl:hidden">
-              <img
-                src="@/assets/qrcode.png"
-                alt=""
-                class="h-[225px] w-[225px]"
-                data-aos="fade-left"
-              />
-            </div>
-
-            <ul
-              class="list-disc list-inside space-y-2 text-lg lg:text-xl text-white mt-6"
-            >
-              <li>Create Artist QR codes</li>
-              <li>
-                Generate Artist Splash Page For Streaming and Social Media
-              </li>
-              <li>Enable Artist Featured Song Player</li>
-              <li>Enable Artist Featured Video Player</li>
-              <li>Create Ticket Purchase Links</li>
-              <!-- <li>
-                Connnect social media links, streaming services, and websites
-              </li> -->
-              <li>Track Artist Links Activity</li>
-            </ul>
             <div
-              class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6"
+              class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
             >
-              <NuxtLink
-                to="/signup"
-                class="mdc-button mb-4 w-full md:mb-0 md:w-auto"
-                >Create Account</NuxtLink
+              <h1
+                data-aos="fade-up"
+                class="font-extrabold tracking-tight leading-none text-center lg:text-left"
               >
-              <NuxtLink to="/login" class="mdc-button w-full md:w-auto"
-                >Member Login
-              </NuxtLink>
-            </div>
-          </div>
+                <span
+                  class="block text-7xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+                >
+                  MusicBizQR
+                </span>
+                <span
+                  class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200"
+                >
+                  Dynamic QR Codes &amp; Smart Link Pages for Musicians
+                </span>
+              </h1>
 
-          <div
-            class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-center lg:mt-0 lg:flex-shrink-0 lg:flex-grow"
-          >
-            <img
-              src="@/assets/qrcode.png"
-              alt=""
-              class="md:h-[425px] md:w-[425px]"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- grid of main features and branded qrs -->
-            <!-- cta   -->
-            <div
-        ref="parallaxRef"
-        class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
-      >
-        <!-- Dark Overlay -->
-        <div
-          class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
-        >
-          <div
-            class="text-center h-full flex flex-col justify-center items-center md:text-left"
-          >
-            <!-- Animated Text -->
-            <h1
-              class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
-            >
-              Create Your Profile
-            </h1>
-            <!-- Buttons Section -->
-            <div
-              class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
-            >
-              <button class="cta-button-no w-auto mx-auto">
-                Sign Up For A Free 30 day Trial
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col justify-center image_gradient">
-        <h2
-          class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0 pt-16 text-center"
-        >
-          Example Splash Pages
-        </h2>
-        <div class="w-full max-w-md md:max-w-5xl mx-auto">
-          <!-- Swiper with Cards -->
-          <Swiper
-            :modules="[EffectCards]"
-            effect="cards"
-            grabCursor="true"
-            class="main-gallery h-auto md:w-[60vw]"
-          >
-            <SwiperSlide
-              v-for="(slide, index) in slides"
-              :key="index"
-              class="flex items-center justify-center mt-10 mb-6 px-2"
-            >
-              <img
-                :src="slide.image"
-                :srcset="slide.srcset"
-                alt="Main Image"
-                class="w-full md:w-[50vw] max-h-[50vh] object-contain rounded-lg shadow-lg"
-              />
-            </SwiperSlide>
-
-            <!-- Preview Button -->
-            <NuxtLink
-              to="/buringthunder"
-              class="block font-bold cta-button-full my-16 mx-auto text-center text-white"
-            >
-              Preview Page
-            </NuxtLink>
-          </Swiper>
-        </div>
-      </div>
-      <section
-        class=" flex flex-col items-center justify-between py-12 md:py-16 px-4"
-      >
-        <!-- Text Section -->
-        <div class="max-w-4xl text-center md:text-center flex-grow">
-          <h2 class="text-white text-4xl lg:text-6xl font-bold mx-auto md:mx-0">
-            Add All Your Social Links
-          </h2>
-          <p class="text-white text-lg pb-10 mt-6 md:mt-8 mx-auto md:mx-0">
-            Give your audience a single link to access all your socials
-            instantly. Whether it’s Instagram, TikTok, Spotify, or YouTube, keep
-            your fans connected with your latest updates, releases, and content.
-          </p>
-        </div>
-
-        <!-- Icons Section -->
-        <div
-          class="w-full  flex items-center justify-center mt-auto pb-6 md:pb-12"
-        >
-          <InfiniteScrollIcons />
-        </div>
-      </section>
-
-      <!-- embed section -->
-      <section
-        class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient"
-      >
-        <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row">
-          <!-- left Side: Music Player Mockup -->
-          <div class="w-full md:w-3/5 flex flex-col justify-between px-6">
-            <!-- Content Section -->
-            <div class="flex-grow flex flex-col justify-start">
-              <h2
-                class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl"
-              >
-                Embed Music from your streaming platform
-              </h2>
-              <p
-                class="text-white text-lg text-center md:text-left pb-10 md:pb-0"
-              >
-                Get More Listeners
-              </p>
-            </div>
-          </div>
-
-          <!-- right Side: Spotify Embed -->
-          <div class="w-full mb-16 md:mb-0 md:w-2/5 flex justify-center">
-            <iframe
-              class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
-              src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
-              frameborder="0"
-              allowtransparency="true"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-        </div>
-        <!-- Full-Width Icons at Bottom -->
-        <div class="left-0 w-auto">
-          <div
-            class="flex items-center px-6 md:px-0 pb-10 md:py-20 justify-around space-x-6"
-          >
-            <Icon
-              v-for="icon in streamingIcons"
-              :key="icon.name"
-              :icon="icon.icon"
-              class="w-10 h-10 text-white hover:text-green-500 transition"
-            />
-          </div>
-        </div>
-      </section>
-
-      <!-- video section  -->
-      <section
-        class="min-h-screen flex flex-col items-center justify-center pt-10 md:py-24"
-      >
-        <!-- Text Section -->
-        <div class="text-center px-6 max-w-4xl">
-          <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
-            Embed Your Latest Video
-          </h2>
-          <p class="text-white text-lg mb-10">
-            Elevate your profile with interactive embedded videos that showcase
-            your latest releases and creative vision.
-          </p>
-        </div>
-
-        <!-- Video Section -->
-        <div class="w-full flex justify-center">
-          <div class="relative w-[90vw] md:w-[80vw] max-w-4xl">
-            <!-- Thumbnail (Click to Play) -->
-            <div
-              v-if="!isPlaying"
-              class="relative cursor-pointer"
-              @click="isPlaying = true"
-            >
-              <img
-                :src="thumbnail"
-                alt="Video Thumbnail"
-                class="rounded-lg shadow-lg w-full h-auto"
-              />
-              <!-- Play Button Overlay -->
-              <div class="absolute inset-0 flex items-center justify-center">
-                <Icon
-                  icon="mdi:play-circle"
-                  class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
+              <div class="flex justify-center items-start mb-12 2xl:hidden">
+                <img
+                  src="@/assets/qrcode.png"
+                  alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
+                  class="h-[225px] w-[225px]"
+                  data-aos="fade-left"
                 />
+              </div>
+
+              <ul class="space-y-3 text-lg lg:text-xl text-white mt-6">
+                <li>
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                    >Dynamic QR Codes for Artists & Bands</strong
+                  >
+                  – print once, update destinations anytime.
+                </li>
+                <li>
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                    >Smart Link Splash Pages</strong
+                  >
+                  – pull in Spotify, Apple Music, YouTube & socials in one scan.
+                </li>
+                <li>
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                    >Embed Music & Video</strong
+                  >
+                  – feature a track, playlist, or latest music video instantly.
+                </li>
+                <li>
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                    >Sell Tickets & Merch</strong
+                  >
+                  – add tappable purchase links fans can use at the show.
+                </li>
+                <li>
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                    >Real‑Time Scan Analytics</strong
+                  >
+                  – see where, when & how fans engage; route tours smarter.
+                </li>
+              </ul>
+
+              <!-- <p
+                class="mt-6 text-lg lg:text-xl text-white text-center lg:text-left max-w-4xl leading-snug"
+              >
+                <strong>Dynamic QR Codes</strong> •
+                <strong>Smart Link Splash Pages</strong> •
+                <strong>Music &amp; Video Embeds</strong> •
+                <strong>Ticket &amp; Merch Links</strong> •
+                <strong>Real‑Time Scan Analytics</strong>
+                <span class="sr-only">for artists, bands, and musicians</span>
+              </p> -->
+
+              <div
+                class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6"
+              >
+                <NuxtLink
+                  to="/signup"
+                  class="mdc-button mb-4 w-full md:mb-0 md:w-auto"
+                  >Create Account</NuxtLink
+                >
+                <NuxtLink to="/login" class="mdc-button w-full md:w-auto"
+                  >Member Login
+                </NuxtLink>
               </div>
             </div>
 
-            <!-- YouTube Embed (Shown When Playing) -->
-            <iframe
-              v-if="isPlaying"
-              class="w-full h-64 md:h-96 rounded-lg shadow-lg"
-              :src="videoUrl"
-              frameborder="0"
-              allowfullscreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
-
-      <!-- end of image galler   -->
-      <!-- Chart  -->
-      <section class="w-[100vw] mx-auto">
-        <section
-          class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20"
-        >
-          <div class="container mx-auto text-center px-4">
-            <h2
-              class="text-4xl md:text-4xl lg:text-6xl pb-10 text-center font-extrabold text-white"
-            >
-              Advanced Analytics
-            </h2>
-            <p class="text-white text-lg lg:text-2xl mb-14 text-center">
-              Enhance your campaign ROI with our comprehensive analytics,
-              turning QR code scans into actionable insights. Leverage
-              state-of-the-art data visualization and tracking technologies to
-              boost user engagement and elevate your marketing strategies.
-            </p>
-             
-              <BarChart  />
-            
-          </div>
-        </section>
-      </section>
-   <!-- pricing  -->
-   <section class="py-10 md:py-20 bg-black text-white">
-        <div class="max-w-7xl mx-auto text-center">
-   
-          
-        </div>
-
-        <div
-          class="grid gap-8 mt-12 max-w-5xl mx-auto grid-cols-1 md:grid-cols-1"
-        >
-          <!-- Starter Plan -->
-          <div class="pricing-card text-center">
-            <h2
-            class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
-          >
-         Simple Pricing
-          </h2>
-            <p class="text-white"></p>
-            <p class="text-4xl font-extrabold mt-6">
-              $7<span class="text-lg">/mo</span>
-            </p>
-            <ul class="pricing-features">
-              <li>✔ Advanced analytics</li>
-              <li>✔ 3 QR Codes</li>
-              <li>✔ 1 Artist Profile</li>
-            </ul>
-            <button class="pricing-button">Sign Up for a 30 day free trial</button>
-          </div>
-
-         
-         
-        </div>
-      </section>
-    
-      <!-- cta   -->
-      <div
-        ref="parallaxRef"
-        class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
-      >
-        <!-- Dark Overlay -->
-        <div
-          class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
-        >
-          <div
-            class="text-center h-full flex flex-col justify-center items-center md:text-left"
-          >
-            <!-- Animated Text -->
-            <h1
-              class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
-            >
-              Create Your Profile
-            </h1>
-            <!-- Buttons Section -->
             <div
-              class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
+              class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-start lg:mt-0 lg:flex-shrink-0 lg:flex-grow"
             >
-              <button class="cta-button-no w-auto mx-auto">
-                Sign Up For A Free 30 day Trial
-              </button>
+              <img
+                src="@/assets/qrcode.png"
+                alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
+                class="md:h-[425px] md:w-[425px]"
+              />
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- articles  -->
-      <section class="bg-black text-white px-4 py-16 max-w-5xl mx-auto">
-      <h2 class="text-3xl font-extrabold mb-6 text-gradient">Featured Articles</h2>
-
-      <div v-if="featuredRes?.data?.length" class="grid gap-8 md:grid-cols-1">
+        <!-- grid of main features and branded qrs -->
+        <!-- cta   -->
         <div
-          v-for="post in featuredRes.data"
-          :key="post.id"
-          class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition"
+          ref="parallaxRef"
+          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
         >
-          <NuxtLink
-            :to="`/article/${post.attributes.category}/${post.attributes.slug}`"
-            class="block mb-2 text-xl font-bold text-pink-400 hover:underline"
+          <!-- Dark Overlay -->
+          <div
+            class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
           >
-            {{ post.attributes.title }}
-          </NuxtLink>
-          <p class="text-sm text-gray-400">
-            {{ post.attributes.metaDescription }}
-          </p>
+            <div
+              class="text-center h-full flex flex-col justify-center items-center md:text-left"
+            >
+              <!-- Animated Text -->
+              <h2                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+              >
+                Create Your Profile
+              </h2>
+              <!-- Buttons Section -->
+              <div
+                class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
+              >
+                <NuxtLink to="/signup" class="cta-button-no w-auto mx-auto">
+                  Sign Up For A Free 30 day Trial
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="flex flex-col justify-center image_gradient">
+          <h2
+            class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0 pt-16 text-center"
+          >
+            Artist Smart Link &amp; Splash Page Examples
+          </h2>
+          <p
+            class="mt-4 max-w-3xl mx-auto text-center text-white/90 text-lg leading-relaxed"
+          >
+            When fans scan one of your
+            <strong>MusicBizQR dynamic QR codes</strong>, they land on a
+            mobile‑first <strong>artist splash page</strong> that pulls in your
+            streaming platforms (Spotify, Apple Music, YouTube), socials,
+            featured tracks or videos, and even
+            <strong>merch &amp; ticket links</strong>—all in one tap‑friendly
+            layout you can update anytime and track in real time.
+          </p>
+          <p
+            class="mt-3 max-w-2xl mx-auto text-center text-gray-300 text-base leading-snug"
+          >
+            Browse the demos below, then
+            <NuxtLink
+              to="/signup"
+              class="text-black hover:underline font-semibold"
+            >
+              build your own splash page
+            </NuxtLink>
+            in minutes.
+          </p>
+
+          <div class="w-full max-w-md md:max-w-5xl mx-auto">
+            <!-- Swiper with Cards -->
+            <Swiper
+              :modules="[EffectCards]"
+              effect="cards"
+              grabCursor="true"
+              class="main-gallery h-auto md:w-[60vw]"
+            >
+              <SwiperSlide
+                v-for="(slide, index) in slides"
+                :key="index"
+                class="flex items-center justify-center mt-10 mb-6 px-2"
+              >
+                <img
+                  :src="slide.image"
+                  :srcset="slide.srcset"
+                  alt="Main Image"
+                  class="w-full md:w-[50vw] max-h-[50vh] object-contain rounded-lg shadow-lg"
+                />
+              </SwiperSlide>
+
+              <!-- Preview Button -->
+              <NuxtLink
+                to="/buringthunder"
+                class="block font-bold cta-button-full my-16 mx-auto text-center text-white"
+              >
+                Preview Page
+              </NuxtLink>
+            </Swiper>
+          </div>
+        </div>
+
+        <section class=" py-24 px-6 text-white">
+          <div class="max-w-6xl mx-auto text-center lg:text-left">
+            <h2 class="text-4xl lg:text-5xl font-extrabold text-gradient mb-4">
+              Why MusicBizQR?
+            </h2>
+            <p
+              class="max-w-3xl mx-auto lg:mx-0 text-lg text-white/90 leading-relaxed"
+            >
+              MusicBizQR turns every poster, merch tag, and bio link into a
+              <strong>trackable marketing channel</strong>. Create dynamic QR
+              codes, launch mobile <strong>smart link splash pages</strong>,
+              embed music &amp; video, sell tickets and merch, and measure fan
+              engagement in real time—built specifically for independent
+              artists, touring bands, and music marketers.
+            </p>
+          </div>
+
+          <div
+            class="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto text-center lg:text-left"
+          >
+            <article>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Dynamic QR Codes
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                Print once, update anytime. Switch from a pre‑save to tour dates
+                or merch without reprinting your codes.
+              </p>
+            </article>
+
+            <article>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Smart Link Splash Pages
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                Pull in Spotify, Apple Music, YouTube, TikTok &amp; socials—give
+                fans everything in one tap‑friendly page.
+              </p>
+            </article>
+
+            <article>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Music, Video &amp; Sales
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                Feature a track or video, collect emails, and add ticket &amp;
+                merch purchase links fans can use at the show.
+              </p>
+            </article>
+
+            <article>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Real‑Time Scan Analytics
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                See scans by city, device &amp; time of day. Route tours
+                smarter, measure promo impact, and grow what works.
+              </p>
+            </article>
+          </div>
+
+          <div
+            class="mt-16 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start max-w-6xl mx-auto"
+          >
+            <NuxtLink
+              to="/signup"
+              class="cta-button-no w-full sm:w-auto text-center"
+              aria-label="Start free 30 day MusicBizQR trial"
+            >
+              Start Free 30‑Day Trial
+            </NuxtLink>
+            <NuxtLink
+              to="/article/qr-code-strategy"
+              class="mdc-button w-full sm:w-auto text-center"
+            >
+              Learn QR Strategy
+            </NuxtLink>
+          </div>
+
+          <!-- hidden keyword helpers for accessibility + SEO -->
+          <span class="sr-only">
+            QR code generator for musicians, smart link pages for bands, music
+            marketing analytics
+          </span>
+        </section>
+
+        <!-- Text Section -->
+        <!-- <section
+          class="flex flex-col items-center justify-between py-12 md:py-16 px-4"
+        >
+          
+          <div class="max-w-4xl text-center md:text-center flex-grow">
+            <h2
+              class="text-white text-4xl lg:text-6xl font-bold mx-auto md:mx-0"
+            >
+              Add All Your Social Links
+            </h2>
+            <p class="text-white text-lg pb-10 mt-6 md:mt-8 mx-auto md:mx-0">
+              Give your audience a single link to access all your socials
+              instantly. Whether it’s Instagram, TikTok, Spotify, or YouTube,
+              keep your fans connected with your latest updates, releases, and
+              content.
+            </p>
+          </div>
+
+        
+          <div
+            class="w-full flex items-center justify-center mt-auto pb-6 md:pb-12"
+          >
+            <InfiniteScrollIcons />
+          </div>
+        </section> -->
+
+        <!-- embed section -->
+        <section
+          class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient"
+        >
+          <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row">
+            <!-- left Side: Music Player Mockup -->
+            <div class="w-full md:w-3/5 flex flex-col justify-between px-6">
+              <!-- Content Section -->
+              <div class="flex-grow flex flex-col justify-start">
+                <h2
+                  class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl"
+                >
+                  Embed Music from your streaming platform
+                </h2>
+                <p
+                  class="text-white text-lg text-center md:text-left pb-10 md:pb-0 leading-relaxed max-w-xl"
+                >
+                  Drop a live streaming player—<strong>Spotify</strong>,
+                  <strong>Apple Music</strong>, <strong>YouTube</strong>,
+                  whatever you use—directly into your MusicBizQR smart link
+                  page. Fans scan at shows and tap to play, boosting streams,
+                  followers &amp; pre‑saves on the spot.
+                  <span class="sr-only"
+                    >embed music players qr code music marketing for artists and
+                    bands</span
+                  >
+                </p>
+              </div>
+            </div>
+
+            <!-- right Side: Spotify Embed -->
+            <div class="w-full mb-16 md:mb-0 md:w-2/5 flex justify-center">
+              <iframe
+                class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
+                src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
+                frameborder="0"
+                allowtransparency="true"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              ></iframe>
+            </div>
+          </div>
+          <!-- Full-Width Icons at Bottom -->
+          <div class="left-0 w-auto">
+            <div
+              class="flex items-center px-6 md:px-0 pb-10 md:py-20 justify-around space-x-6"
+            >
+              <Icon
+                v-for="icon in streamingIcons"
+                :key="icon.name"
+                :icon="icon.icon"
+                class="w-10 h-10 text-white hover:text-green-500 transition"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- video section  -->
+        <section
+          class="min-h-screen flex flex-col items-center justify-center pt-10 md:py-24"
+        >
+          <!-- Text Section -->
+          <div class="text-center px-6 max-w-4xl">
+            <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
+              Showcase Your Music Videos &amp; Live Clips
+            </h2>
+            <p class="text-white text-lg mb-10 leading-relaxed">
+              Embed a new single, lyric video, rehearsal clip or full playlist
+              in your MusicBizQR smart link. Fans scan a poster, merch tag or
+              bio link, tap play, and share—no searching, no typing.
+              <span class="sr-only"
+                >music video embed qr smart link for artists bands
+                musicians</span
+              >
+            </p>
+          </div>
+
+          <!-- Video Section -->
+          <div class="w-full flex justify-center">
+            <div class="relative w-[90vw] md:w-[80vw] max-w-4xl">
+              <!-- Thumbnail (Click to Play) -->
+              <div
+                v-if="!isPlaying"
+                class="relative cursor-pointer"
+                @click="isPlaying = true"
+              >
+                <img
+                  :src="thumbnail"
+                  alt="Video Thumbnail"
+                  class="rounded-lg shadow-lg w-full h-auto"
+                />
+                <!-- Play Button Overlay -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <Icon
+                    icon="mdi:play-circle"
+                    class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
+                  />
+                </div>
+              </div>
+
+              <!-- YouTube Embed (Shown When Playing) -->
+              <iframe
+                v-if="isPlaying"
+                class="w-full h-64 md:h-96 rounded-lg shadow-lg"
+                :src="videoUrl"
+                frameborder="0"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </section>
+
+        <!-- end of image galler   -->
+        <!-- Chart  -->
+        <section class="w-[100vw] mx-auto">
+          <section
+            class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20"
+          >
+            <div class="container mx-auto text-center px-4">
+              <h2
+                class="text-4xl md:text-4xl lg:text-6xl pb-10 text-center font-extrabold text-white"
+              >
+                QR Scan Analytics for Musicians
+              </h2>
+              <p
+                class="text-white text-lg lg:text-2xl mb-14 text-center leading-relaxed max-w-3xl mx-auto"
+              >
+                See where, when &amp; how fans engage with your QR codes. Track
+                scans by city, device &amp; time, spot your hottest markets, and
+                double down on campaigns that drive streams, signups, tickets
+                &amp; merch.
+                <span class="sr-only"
+                  >music marketing analytics for artists bands qr code
+                  data</span
+                >
+              </p>
+
+              <BarChart />
+            </div>
+          </section>
+        </section>
+        <!-- pricing  -->
+        <section class="py-10 md:py-20  text-white">
+          <div class="max-w-7xl mx-auto text-center"></div>
+
+          <div
+            class="grid gap-8 mt-12 max-w-5xl mx-auto grid-cols-1 md:grid-cols-1"
+          >
+            <!-- Starter Plan -->
+            <div class="pricing-card text-center">
+              <h2
+                class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
+              >
+                Simple Pricing
+              </h2>
+              <p class="text-white"></p>
+              <p class="text-4xl font-extrabold mt-6">
+                $7<span class="text-lg">/mo</span>
+              </p>
+              <ul class="pricing-features">
+                <li>✔ 1 <strong>Dynamic QR Code</strong> (edit destination anytime)</li>
+  <li>✔ All scans tracked in your <strong>Analytics Dashboard</strong></li>
+  <li>✔ 1 <strong>Artist Smart Link / Splash Page</strong></li>
+  <li>✔ Streaming Buttons: Spotify, Apple Music, YouTube &amp; more</li>
+  <li>✔ Embed 1 Featured Track &amp; 1 Video</li>
+  <li>✔ Merch &amp; Ticket Purchase Links</li>
+  <li>✔ Print‑ready PNG / SVG QR downloads</li>
+  <li>✔ Email Support • Cancel anytime</li>
+              </ul>
+              <button class="pricing-button">
+                Sign Up for a 30 day free trial
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- cta   -->
+        <div
+          ref="parallaxRef"
+          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
+        >
+          <!-- Dark Overlay -->
+          <div
+            class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+            <div
+              class="text-center h-full flex flex-col justify-center items-center md:text-left"
+            >
+              <!-- Animated Text -->
+              <h2
+                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+              >
+                Create Your Profile
+              </h2>
+              <!-- Buttons Section -->
+              <div
+                class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white"
+              >
+                <button class="cta-button-no w-auto mx-auto">
+                  Sign Up For A Free 30 day Trial
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- articles  -->
+        <section class="bg-black text-white px-4 py-16 max-w-5xl mx-auto">
+          <h2 class="text-3xl font-extrabold mb-6 text-gradient">
+            Featured Articles
+          </h2>
+
+          <div
+            v-if="featuredRes?.data?.length"
+            class="grid gap-8 md:grid-cols-1"
+          >
+            <div
+              v-for="post in featuredRes.data"
+              :key="post.id"
+              class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition"
+            >
+              <NuxtLink
+                :to="`/article/${post.attributes.category}/${post.attributes.slug}`"
+                class="block mb-2 text-xl font-bold text-pink-400 hover:underline"
+              >
+                {{ post.attributes.title }}
+              </NuxtLink>
+              <p class="text-sm text-gray-400">
+                {{ post.attributes.metaDescription }}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
+          <h2
+            class="text-3xl font-bold text-center md:text-left text-white mb-8"
+          >
+            Frequently Asked Questions
+          </h2>
+
+          <FaqAccordion :faqs="faqItems" />
+        </div>
+      </main>
+      <!-- <Footer /> -->
+      <div class="h-40 flex justify-center items-center">
+        <img src="@/assets/musicbizlogo.png" class="h-12" />
       </div>
-
-     
-    </section>
-     
-      <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
-    <h1 class="text-3xl font-bold text-center md:text-left   text-white mb-8">
-      Frequently Asked Questions
-    </h1>
-
-    <FaqAccordion :faqs="faqItems" />
-  </div>
-    </main>
-    <!-- <Footer /> -->
-    <div class="h-40 flex justify-center items-center">
-      <img src="@/assets/musicbizlogo.png" class="h-12" />
     </div>
-   </div>
   </div>
 </template>
 
@@ -398,44 +585,44 @@ import deezer from "@/assets/dezzer.svg";
 const parallaxBg = ref(null);
 const faqItems = ref([
   {
-    question: '❓ What is a “dynamic QR code”?',
+    question: "❓ What is a “dynamic QR code”?",
     answer:
-      'A dynamic QR code points to a short redirect URL on our server. You can update its destination at any time without reprinting the QR. All scans are tracked, and you can edit or delete it from your dashboard.',
+      "A dynamic QR code points to a short redirect URL on our server. You can update its destination at any time without reprinting the QR. All scans are tracked, and you can edit or delete it from your dashboard.",
   },
   {
-    question: '🔄 Can I create and delete QR codes as I like?',
+    question: "🔄 Can I create and delete QR codes as I like?",
     answer:
-      'Yes. You can generate unlimited dynamic QR codes. At any point, delete any existing QR and create a fresh one. Old scans remain in analytics, but new scans use the new QR link.',
+      "Yes. You can generate unlimited dynamic QR codes. At any point, delete any existing QR and create a fresh one. Old scans remain in analytics, but new scans use the new QR link.",
   },
   {
-    question: '📈 How many scans can a dynamic QR code handle?',
+    question: "📈 How many scans can a dynamic QR code handle?",
     answer:
-      'Unlimited. Every scan (regardless of volume) gets logged. You’ll see real-time counts of total scans, location data, and device types on your analytics page.',
+      "Unlimited. Every scan (regardless of volume) gets logged. You’ll see real-time counts of total scans, location data, and device types on your analytics page.",
   },
   {
-    question: '📊 What analytics are provided?',
+    question: "📊 What analytics are provided?",
     answer:
-      'Our analytics dashboard shows total scan count, top locations (city, country), scan timestamps, device type breakdown, and referrer sources. This helps you optimize distribution of your QR codes.',
+      "Our analytics dashboard shows total scan count, top locations (city, country), scan timestamps, device type breakdown, and referrer sources. This helps you optimize distribution of your QR codes.",
   },
   {
-    question: '🔒 Is my data private?',
+    question: "🔒 Is my data private?",
     answer:
-      'Absolutely. Only you (and team members you invite) can view your QR code analytics. We do not share your scan data with third parties, and all connections are encrypted.',
+      "Absolutely. Only you (and team members you invite) can view your QR code analytics. We do not share your scan data with third parties, and all connections are encrypted.",
   },
   {
-    question: '💳 How do I cancel my subscription?',
+    question: "💳 How do I cancel my subscription?",
     answer:
-      'You can cancel at any time by visiting your Account page > Subscription > Cancel. Once canceled, you retain dashboard access until the end of your billing cycle. No additional charges apply.',
+      "You can cancel at any time by visiting your Account page > Subscription > Cancel. Once canceled, you retain dashboard access until the end of your billing cycle. No additional charges apply.",
   },
   {
-    question: '🆓 Is there a free plan?',
+    question: "🆓 Is there a free plan?",
     answer:
-      'Yes! Our Free plan includes one active dynamic QR code with up to 500 scans/month and basic analytics. Upgrade anytime for unlimited QR codes and advanced insights.',
+      "Yes! Our Free plan includes one active dynamic QR code with up to 500 scans/month and basic analytics. Upgrade anytime for unlimited QR codes and advanced insights.",
   },
   {
-    question: '🔧 How do I update the destination URL of a QR code?',
+    question: "🔧 How do I update the destination URL of a QR code?",
     answer:
-      'Go to Dashboard > My QR Codes, click “Edit” beside the QR you want to change, enter the new destination URL, and save. The code’s design stays the same—only the redirect target updates.',
+      "Go to Dashboard > My QR Codes, click “Edit” beside the QR you want to change, enter the new destination URL, and save. The code’s design stays the same—only the redirect target updates.",
   },
 ]);
 const handleScroll = () => {
@@ -537,73 +724,199 @@ import { tsParticles } from "@tsparticles/engine";
 const { mode } = useRuntimeConfig().public.particles;
 const imageToRender = ref(bandScreen);
 
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
 
 const { data: featuredRes, error: featuredError } = await useAsyncData(
-  'featured-articles',
-  () => $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
-    params: {
-      populate: '*',
-      sort: ['publishedAt:desc'],
-      'filters[featured][$eq]': true
-    }
-  })
-)
+  "featured-articles",
+  () =>
+    $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+      params: {
+        populate: "*",
+        sort: ["publishedAt:desc"],
+        "filters[featured][$eq]": true,
+      },
+    })
+);
 
-console.log('this is article ', featuredRes)
+console.log("this is article ", featuredRes);
 
 if (featuredError.value) {
-  console.error('❌ Failed to load featured articles:', featuredError.value)
+  console.error("❌ Failed to load featured articles:", featuredError.value);
 }
 
 const ldJson = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "MusicBizQR",
-  "url": "https://musicbizqr.com",
-  "description": "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.",
-  "publisher": {
+  name: "MusicBizQR",
+  url: "https://musicbizqr.com",
+  description:
+    "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.",
+  publisher: {
     "@type": "Organization",
-    "name": "MusicBizQR",
-    "url": "https://musicbizqr.com"
+    name: "MusicBizQR",
+    url: "https://musicbizqr.com",
+  },
+};
+
+/* ---------------------------------------------
+ * Schema.org Structured Data
+ * ---------------------------------------------
+ * We create three linked graph nodes:
+ * - WebSite  (#website)
+ * - Organization  (#organization)
+ * - SoftwareApplication  (#software)
+ * Search engines read all three; linking via @id helps disambiguate.
+ * ------------------------------------------- */
+
+// If you have real social profiles, put them in runtimeConfig.public.social* or hardcode below.
+const socialLinks = [
+  // config.public.twitterUrl,
+  // config.public.instagramUrl,
+  // config.public.youtubeUrl
+].filter(Boolean)
+
+// Reusable IDs
+const orgId = 'https://musicbizqr.com/#organization'
+const appId = 'https://musicbizqr.com/#software'
+const siteId = 'https://musicbizqr.com/#website'
+
+// WebSite node (updated from previous ldJson)
+const webSiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': siteId,
+  'url': 'https://musicbizqr.com',
+  'name': 'MusicBizQR',
+  'description': 'Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.',
+  // tie to Organization node
+  'publisher': { '@id': orgId },
+  // optional site search action (update path if you add search)
+  'potentialAction': {
+    '@type': 'SearchAction',
+    'target': 'https://musicbizqr.com/search?q={search_term_string}',
+    'query-input': 'required name=search_term_string'
   }
 }
+
+// Organization node
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': orgId,
+  'name': 'MusicBizQR',
+  'url': 'https://musicbizqr.com',
+  'logo': 'https://musicbizqr.com/musicbizlogo.png',
+  ...(socialLinks.length ? { sameAs: socialLinks } : {})
+}
+
+// SoftwareApplication node
+const appLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  '@id': appId,
+  'name': 'MusicBizQR',
+  'url': 'https://musicbizqr.com',
+  'applicationCategory': 'MarketingApplication',          // broad category; acceptable
+  'applicationSubCategory': 'MusicMarketing',             // free‑text helpful hint
+  'operatingSystem': 'Web',                               // SaaS
+  'image': 'https://musicbizqr.com/og-image.jpg',         // 1200x630 recommended
+  'description': 'Dynamic QR code & smart link platform for musicians. Create trackable QR campaigns, embed streaming & video, sell merch & tickets, and view scan analytics.',
+  'publisher': { '@id': orgId },
+  'offers': {
+    '@type': 'Offer',
+    'url': 'https://musicbizqr.com/signup',
+    'price': '7.00',
+    'priceCurrency': 'USD',
+    'availability': 'https://schema.org/InStock',
+    'category': 'subscription',
+    // 30‑day free trial note (informational)
+    'eligibleDuration': 'P30D'
+  },
+  // mark that a free plan exists (adjust if you restrict)
+  'isAccessibleForFree': false
+}
+
+// Remove leading emoji/punctuation characters so Google sees clean Q text
+const cleanFaqText = (q: string) => q.replace(/^[^A-Za-z0-9]+/, '').trim()
+
+const faqLd = computed(() => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  'mainEntity': faqItems.value.map(f => ({
+    '@type': 'Question',
+    'name': cleanFaqText(f.question),
+    'acceptedAnswer': {
+      '@type': 'Answer',
+      'text': f.answer
+    }
+  }))
+}))
+
+
 
 useHead({
   title: 'MusicBizQR | Smart QR Codes & Link-in-Bio Tools for Artists',
   meta: [
-    { name: 'description', content: 'Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today.' },
-    { name: 'keywords', content: 'QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool' },
+    {
+      name: 'description',
+      content: 'Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today.'
+    },
+    {
+      name: 'keywords',
+      content: 'QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool'
+    },
     { name: 'robots', content: 'index, follow' },
     { property: 'og:title', content: 'MusicBizQR | QR Codes + Smart Links for Artists' },
-    { property: 'og:description', content: 'Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters.' },
+    {
+      property: 'og:description',
+      content: 'Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters.'
+    },
     { property: 'og:image', content: 'https://musicbizqr.com/musicbizlogo.png' },
     { property: 'og:url', content: 'https://musicbizqr.com' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'MusicBizQR | QR Codes + Smart Links for Artists' },
-    { name: 'twitter:description', content: 'All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.' },
+    {
+      name: 'twitter:description',
+      content: 'All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.'
+    },
     { name: 'twitter:image', content: 'https://musicbizqr.com/og-image.jpg' }
   ],
   link: [
-    { rel: 'canonical', href: 'https://musicbizqr.com' }
+    { rel: 'canonical', href: 'https://musicbizqr.com' },
+    // Perf: preconnect fonts (optional but recommended)
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
   ],
-
   script: [
     {
-      // VueUse Head allows `children` for script content
       type: 'application/ld+json',
-      children: JSON.stringify(ldJson),
-      // optional key to tie this tag to the sanitizer override below
-      key: 'ld-json'
+      children: JSON.stringify(webSiteLd),
+      key: 'ld-website'
+    },
+    {
+  type: 'application/ld+json',
+  children: JSON.stringify(faqLd.value),
+  key: 'ld-faq'
+},
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify(orgLd),
+      key: 'ld-org'
+    },
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify(appLd),
+      key: 'ld-app'
     }
   ],
-  // disable sanitization only for the script tagged 'ld-json'
   __dangerouslyDisableSanitizersByTagID: {
-    'ld-json': ['children']
+    'ld-website': ['children'],
+    'ld-org': ['children'],
+    'ld-app': ['children'],
+    'ld-faq': ['children']
   }
-  
 })
+
 
 
 const show = ref(false);

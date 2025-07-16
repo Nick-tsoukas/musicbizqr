@@ -152,6 +152,7 @@ export default defineNuxtConfig({
       // 4) Return the combined list
       return [
         // optional: add other static routes here
+        { loc: '/', changefreq: 'daily', priority: 1.0 },
         ...categoryUrls,
         ...articleUrls,
       ];
