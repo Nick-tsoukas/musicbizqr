@@ -118,17 +118,27 @@ export default defineNuxtConfig({
     sitemapName: 'sitemap.xml',
     async urls() {
       const base = process.env.STRAPI_URL || 'http://localhost:1337';
-      console.log('🧠 Rebuilding sitemap from Strapi at:', base); // ✅ LOG ADDED
+      console.log('🧠 Rebuilding sitemap from Strapi at:', base);
   
       const res = await fetch(`${base}/api/seo-pages?populate=category&pagination[pageSize]=1000`);
       const { data } = await res.json();
   
-      console.log(`✅ Sitemap includes ${data.length} articles`); // ✅ LOG ADDED
+      // 1) Build a set of unique categories
+      const categories = Array.from(
+        new Set(data.map((page) => page.attributes.category || 'uncategorized'))
+      );
   
-      return data.map((page) => {
+      // 2) Generate a URL entry for each category (pillar page)
+      const categoryUrls = categories.map((cat) => ({
+        loc: `/article/${cat}`,
+        changefreq: 'weekly',
+        priority: 0.8,
+      }));
+  
+      // 3) Generate a URL entry for each article (cluster page)
+      const articleUrls = data.map((page) => {
         const cat = page.attributes.category || 'uncategorized';
         const slug = page.attributes.slug;
-  
         return {
           loc: `/article/${cat}/${slug}`,
           lastmod: page.attributes.updatedAt,
@@ -136,8 +146,18 @@ export default defineNuxtConfig({
           priority: 0.9,
         };
       });
+  
+      console.log(`✅ Sitemap includes ${categories.length} categories and ${articleUrls.length} articles`);
+  
+      // 4) Return the combined list
+      return [
+        // optional: add other static routes here
+        ...categoryUrls,
+        ...articleUrls,
+      ];
     },
   },
+  
   
   
 
