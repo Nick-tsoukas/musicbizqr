@@ -5,6 +5,11 @@ export const useFirebase = () => {
   const strapiAuth = useStrapiAuth()
   const router = useRouter()
 
+  const {
+    public: { strapiUrl }
+  } = useRuntimeConfig()
+
+
   const loginWithGoogle = async () => {
     try {
       const { signInWithPopup } = await import('firebase/auth')
@@ -19,6 +24,7 @@ export const useFirebase = () => {
 
       const res = await $fetch('/api/stripe/confirm-social', {
         method: 'POST',
+        baseURL: strapiUrl, 
         body: {
           email: user.email,
           name: user.displayName,
