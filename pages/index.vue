@@ -33,7 +33,7 @@
                 </span>
               </h1>
 
-              <div class="flex justify-center items-start mb-12 2xl:hidden">
+              <div class="flex justify-center mt-10 items-start mb-12 2xl:hidden">
                 <img
                   src="@/assets/qrcode.png"
                   alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
