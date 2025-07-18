@@ -27,3 +27,13 @@
 
 - [] make sure data is loaded in the analytics page ... sometimes on page load no data is there 
 
+gets all articles 
+fetch('https://qrserver-production.up.railway.app/api/seo-pages?populate=category&filters[category][slug][$eq]=smart-links&fields[title,slug]&pagination[pageSize]=100')
+  .then(res => res.json())
+  .then(data => {
+    console.log('📄 Smart Link Articles:');
+    data.data.forEach(article => {
+      console.log(`- ${article.attributes.title} [/${article.attributes.slug}]`);
+    });
+  })
+  .catch(err => console.error('❌ Error:', err));
