@@ -1,10 +1,24 @@
-export default defineNuxtPlugin(() => {
-    const router = useRouter()
-  
-    router.afterEach((to) => {
-      if (window.gtag) {
-        window.gtag('config', 'G-LRB82HECE7', {
-          page_path: to.fullPath,
-        })
-      }
+export default defineNuxtPlugin((nuxtApp) => {
+    useHead({
+      script: [
+        {
+          hid: 'ga',
+          src: `https://www.googletagmanager.com/gtag/js?id=G-LRB82HECE7`,
+          async: true,
+        },
+        {
+          hid: 'ga-config',
+          innerHTML: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXX');
+          `,
+        },
+      ],
+      __dangerouslyDisableSanitizersByTagID: {
+        'ga-config': ['innerHTML'],
+      },
     })
+  })
+  
