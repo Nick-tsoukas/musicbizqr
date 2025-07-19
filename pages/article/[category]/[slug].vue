@@ -21,6 +21,23 @@ if (error.value) {
   console.error('Article fetch error:', error.value)
 }
 
+// ———————— Related Posts ———————— 
+// — Related Posts —
+const { data: articles, error: relatedError } = await useAsyncData(
+  `related-${category}`,
+  () => $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+    params: {
+      'filters[category][$eq]': category,
+      sort: ['publishedAt:desc'],
+      pagination: { limit: 3 },
+      fields: ['title','slug','metaTitle','metaDescription']
+    }
+  })
+)
+
+if (relatedError.value) {
+  console.error('Related posts fetch error:', relatedError.value)
+}
 const page = seoPage.value?.data?.[0]?.attributes || {}
 const pageUrl = `https://musicbizqr.com/article/${category}/${slug}`
 const publishedDate = page.publishedAt || new Date().toISOString()
@@ -173,6 +190,28 @@ useHead({
         <NuxtLink to="/"><img src="@/assets/musicbizlogo.png" class="h-12" /></NuxtLink>
       </div>
   </div>
+
+  <!-- i want to add the last 3 posts here as related posts to the category  -->
+  <div v-if="articles?.data?.length" class="space-y-8 max-w-3xl mx-auto mt-16 px-6">
+    <h2 class="text-2xl font-bold text-pink-400">Realted Posts</h2>
+  <div
+    v-for="post in articles.data"
+    :key="post.id"
+    class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition"
+  >
+    <NuxtLink
+      :to="`/article/${category}/${post.attributes.slug}`"
+      class="text-2xl font-bold text-pink-400"
+    >
+      {{ post.attributes.metaTitle || post.attributes.title }}
+    </NuxtLink>
+    <p class="text-sm text-gray-400 mt-2">
+      {{ post.attributes.metaDescription }}
+    </p>
+  </div>
+</div>
+
+
 </template>
 
 <style scoped>
