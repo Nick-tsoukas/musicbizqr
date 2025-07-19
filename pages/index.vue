@@ -33,7 +33,9 @@
                 </span>
               </h1>
 
-              <div class="flex justify-center mt-10 items-start mb-12 2xl:hidden">
+              <div
+                class="flex justify-center mt-10 items-start mb-12 2xl:hidden"
+              >
                 <img
                   src="@/assets/qrcode.png"
                   alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
@@ -131,7 +133,8 @@
               class="text-center h-full flex flex-col justify-center items-center md:text-left"
             >
               <!-- Animated Text -->
-              <h2                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+              <h2
+                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
               >
                 Create Your Profile
               </h2>
@@ -179,7 +182,7 @@
 
           <div class="w-full max-w-md md:max-w-5xl mx-auto">
             <!-- Swiper with Cards -->
-            <Swiper
+            <!-- <Swiper
               :modules="[EffectCards]"
               effect="cards"
               grabCursor="true"
@@ -198,18 +201,57 @@
                 />
               </SwiperSlide>
 
-              <!-- Preview Button -->
+              
               <NuxtLink
                 to="/buringthunder"
                 class="block font-bold cta-button-full my-16 mx-auto text-center text-white"
               >
                 Preview Page
               </NuxtLink>
-            </Swiper>
+            </Swiper> -->
+            <section
+            class=" max-w-5xl mx-auto bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-2xl shadow-xl my-12 overflow-hidden"
+          >
+            <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
+              <!-- Text -->
+              <div>
+                <h2 class="text-3xl font-extrabold mb-4">
+                  Built for Musicians. Powered by Smart Links.
+                </h2>
+                <p class="text-lg mb-4">
+                  MusicBizQR gives you a powerful landing page with streaming
+                  links, videos, social buttons, and real-time fan analytics —
+                  all from a single QR code.
+                </p>
+                <ul class="space-y-2 mb-6">
+                  <li>🎯 Unlimited link clicks & analytics</li>
+                  <li>📈 Track Spotify streams, YouTube plays, and QR scans</li>
+                  <li>📱 Mobile-optimized artist pages</li>
+                  <li>🚀 Create your first Smart Link in seconds</li>
+                </ul>
+                <NuxtLink
+                  to="/signup"
+                  class="inline-block bg-white text-black font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 transition"
+                >
+                  Start Your Free Trial
+                </NuxtLink>
+              </div>
+
+              <!-- Screenshot -->
+              <div class="flex justify-center">
+                <img
+                  src="public\screenshotappnovideo.png"
+                  alt="MusicBizQR dashboard"
+                  class="rounded-xl w-full max-w-md shadow-2xl"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </section>
           </div>
         </div>
 
-        <section class=" py-24 px-6 text-white">
+        <section class="py-24 px-6 text-white">
           <div class="max-w-6xl mx-auto text-center lg:text-left">
             <h2 class="text-4xl lg:text-5xl font-extrabold text-gradient mb-4">
               Why MusicBizQR?
@@ -431,6 +473,45 @@
               ></iframe>
             </div>
           </div>
+          <section
+            class=" max-w-5xl mx-auto bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-2xl shadow-xl my-12 overflow-hidden"
+          >
+            <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
+              <!-- Text -->
+              <div>
+                <h2 class="text-3xl font-extrabold mb-4">
+                  Built for Musicians. Powered by Smart Links.
+                </h2>
+                <p class="text-lg mb-4">
+                  MusicBizQR gives you a powerful landing page with streaming
+                  links, videos, social buttons, and real-time fan analytics —
+                  all from a single QR code.
+                </p>
+                <ul class="space-y-2 mb-6">
+                  <li>🎯 Unlimited link clicks & analytics</li>
+                  <li>📈 Track Spotify streams, YouTube plays, and QR scans</li>
+                  <li>📱 Mobile-optimized artist pages</li>
+                  <li>🚀 Create your first Smart Link in seconds</li>
+                </ul>
+                <NuxtLink
+                  to="/signup"
+                  class="inline-block bg-white text-black font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 transition"
+                >
+                  Start Your Free Trial
+                </NuxtLink>
+              </div>
+
+              <!-- Screenshot -->
+              <div class="flex justify-center">
+                <img
+                  src="public\screenshotappnovideo.png"
+                  alt="MusicBizQR dashboard"
+                  class="rounded-xl w-full max-w-md shadow-2xl"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </section>
         </section>
 
         <!-- end of image galler   -->
@@ -463,7 +544,7 @@
           </section>
         </section>
         <!-- pricing  -->
-        <section class="py-10 md:py-20  text-white">
+        <section class="py-10 md:py-20 text-white">
           <div class="max-w-7xl mx-auto text-center"></div>
 
           <div
@@ -481,14 +562,22 @@
                 $7<span class="text-lg">/mo</span>
               </p>
               <ul class="pricing-features">
-                <li>✔ 1 <strong>Dynamic QR Code</strong> (edit destination anytime)</li>
-  <li>✔ All scans tracked in your <strong>Analytics Dashboard</strong></li>
-  <li>✔ 1 <strong>Artist Smart Link / Splash Page</strong></li>
-  <li>✔ Streaming Buttons: Spotify, Apple Music, YouTube &amp; more</li>
-  <li>✔ Embed 1 Featured Track &amp; 1 Video</li>
-  <li>✔ Merch &amp; Ticket Purchase Links</li>
-  <li>✔ Print‑ready PNG / SVG QR downloads</li>
-  <li>✔ Email Support • Cancel anytime</li>
+                <li>
+                  ✔ 1 <strong>Dynamic QR Code</strong> (edit destination
+                  anytime)
+                </li>
+                <li>
+                  ✔ All scans tracked in your
+                  <strong>Analytics Dashboard</strong>
+                </li>
+                <li>✔ 1 <strong>Artist Smart Link / Splash Page</strong></li>
+                <li>
+                  ✔ Streaming Buttons: Spotify, Apple Music, YouTube &amp; more
+                </li>
+                <li>✔ Embed 1 Featured Track &amp; 1 Video</li>
+                <li>✔ Merch &amp; Ticket Purchase Links</li>
+                <li>✔ Print‑ready PNG / SVG QR downloads</li>
+                <li>✔ Email Support • Cancel anytime</li>
               </ul>
               <button class="pricing-button">
                 Sign Up for a 30 day free trial
@@ -773,151 +862,162 @@ const socialLinks = [
   // config.public.twitterUrl,
   // config.public.instagramUrl,
   // config.public.youtubeUrl
-].filter(Boolean)
+].filter(Boolean);
 
 // Reusable IDs
-const orgId = 'https://musicbizqr.com/#organization'
-const appId = 'https://musicbizqr.com/#software'
-const siteId = 'https://musicbizqr.com/#website'
+const orgId = "https://musicbizqr.com/#organization";
+const appId = "https://musicbizqr.com/#software";
+const siteId = "https://musicbizqr.com/#website";
 
 // WebSite node (updated from previous ldJson)
 const webSiteLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  '@id': siteId,
-  'url': 'https://musicbizqr.com',
-  'name': 'MusicBizQR',
-  'description': 'Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.',
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": siteId,
+  url: "https://musicbizqr.com",
+  name: "MusicBizQR",
+  description:
+    "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.",
   // tie to Organization node
-  'publisher': { '@id': orgId },
+  publisher: { "@id": orgId },
   // optional site search action (update path if you add search)
-  'potentialAction': {
-    '@type': 'SearchAction',
-    'target': 'https://musicbizqr.com/search?q={search_term_string}',
-    'query-input': 'required name=search_term_string'
-  }
-}
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://musicbizqr.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
 
 // Organization node
 const orgLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': orgId,
-  'name': 'MusicBizQR',
-  'url': 'https://musicbizqr.com',
-  'logo': 'https://musicbizqr.com/musicbizlogo.png',
-  ...(socialLinks.length ? { sameAs: socialLinks } : {})
-}
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": orgId,
+  name: "MusicBizQR",
+  url: "https://musicbizqr.com",
+  logo: "https://musicbizqr.com/musicbizlogo.png",
+  ...(socialLinks.length ? { sameAs: socialLinks } : {}),
+};
 
 // SoftwareApplication node
 const appLd = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  '@id': appId,
-  'name': 'MusicBizQR',
-  'url': 'https://musicbizqr.com',
-  'applicationCategory': 'MarketingApplication',          // broad category; acceptable
-  'applicationSubCategory': 'MusicMarketing',             // free‑text helpful hint
-  'operatingSystem': 'Web',                               // SaaS
-  'image': 'https://musicbizqr.com/og-image.jpg',         // 1200x630 recommended
-  'description': 'Dynamic QR code & smart link platform for musicians. Create trackable QR campaigns, embed streaming & video, sell merch & tickets, and view scan analytics.',
-  'publisher': { '@id': orgId },
-  'offers': {
-    '@type': 'Offer',
-    'url': 'https://musicbizqr.com/signup',
-    'price': '7.00',
-    'priceCurrency': 'USD',
-    'availability': 'https://schema.org/InStock',
-    'category': 'subscription',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": appId,
+  name: "MusicBizQR",
+  url: "https://musicbizqr.com",
+  applicationCategory: "MarketingApplication", // broad category; acceptable
+  applicationSubCategory: "MusicMarketing", // free‑text helpful hint
+  operatingSystem: "Web", // SaaS
+  image: "https://musicbizqr.com/og-image.jpg", // 1200x630 recommended
+  description:
+    "Dynamic QR code & smart link platform for musicians. Create trackable QR campaigns, embed streaming & video, sell merch & tickets, and view scan analytics.",
+  publisher: { "@id": orgId },
+  offers: {
+    "@type": "Offer",
+    url: "https://musicbizqr.com/signup",
+    price: "7.00",
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+    category: "subscription",
     // 30‑day free trial note (informational)
-    'eligibleDuration': 'P30D'
+    eligibleDuration: "P30D",
   },
   // mark that a free plan exists (adjust if you restrict)
-  'isAccessibleForFree': false
-}
+  isAccessibleForFree: false,
+};
 
 // Remove leading emoji/punctuation characters so Google sees clean Q text
-const cleanFaqText = (q: string) => q.replace(/^[^A-Za-z0-9]+/, '').trim()
+const cleanFaqText = (q: string) => q.replace(/^[^A-Za-z0-9]+/, "").trim();
 
 const faqLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  'mainEntity': faqItems.value.map(f => ({
-    '@type': 'Question',
-    'name': cleanFaqText(f.question),
-    'acceptedAnswer': {
-      '@type': 'Answer',
-      'text': f.answer
-    }
-  }))
-}))
-
-
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.value.map((f) => ({
+    "@type": "Question",
+    name: cleanFaqText(f.question),
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: f.answer,
+    },
+  })),
+}));
 
 useHead({
-  title: 'MusicBizQR | Smart QR Codes & Link-in-Bio Tools for Artists',
+  title: "MusicBizQR | Smart QR Codes & Link-in-Bio Tools for Artists",
   meta: [
     {
-      name: 'description',
-      content: 'Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today.'
+      name: "description",
+      content:
+        "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today.",
     },
     {
-      name: 'keywords',
-      content: 'QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool'
+      name: "keywords",
+      content:
+        "QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool",
     },
-    { name: 'robots', content: 'index, follow' },
-    { property: 'og:title', content: 'MusicBizQR | QR Codes + Smart Links for Artists' },
+    { name: "robots", content: "index, follow" },
     {
-      property: 'og:description',
-      content: 'Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters.'
+      property: "og:title",
+      content: "MusicBizQR | QR Codes + Smart Links for Artists",
     },
-    { property: 'og:image', content: 'https://musicbizqr.com/musicbizlogo.png' },
-    { property: 'og:url', content: 'https://musicbizqr.com' },
-    { property: 'og:type', content: 'website' },
-    { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'MusicBizQR | QR Codes + Smart Links for Artists' },
     {
-      name: 'twitter:description',
-      content: 'All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.'
+      property: "og:description",
+      content:
+        "Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters.",
     },
-    { name: 'twitter:image', content: 'https://musicbizqr.com/og-image.jpg' }
+    {
+      property: "og:image",
+      content: "https://musicbizqr.com/musicbizlogo.png",
+    },
+    { property: "og:url", content: "https://musicbizqr.com" },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+    {
+      name: "twitter:title",
+      content: "MusicBizQR | QR Codes + Smart Links for Artists",
+    },
+    {
+      name: "twitter:description",
+      content:
+        "All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.",
+    },
+    { name: "twitter:image", content: "https://musicbizqr.com/og-image.jpg" },
   ],
   link: [
-    { rel: 'canonical', href: 'https://musicbizqr.com' },
+    { rel: "canonical", href: "https://musicbizqr.com" },
     // Perf: preconnect fonts (optional but recommended)
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
+    { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
   ],
   script: [
     {
-      type: 'application/ld+json',
+      type: "application/ld+json",
       children: JSON.stringify(webSiteLd),
-      key: 'ld-website'
+      key: "ld-website",
     },
     {
-  type: 'application/ld+json',
-  children: JSON.stringify(faqLd.value),
-  key: 'ld-faq'
-},
+      type: "application/ld+json",
+      children: JSON.stringify(faqLd.value),
+      key: "ld-faq",
+    },
     {
-      type: 'application/ld+json',
+      type: "application/ld+json",
       children: JSON.stringify(orgLd),
-      key: 'ld-org'
+      key: "ld-org",
     },
     {
-      type: 'application/ld+json',
+      type: "application/ld+json",
       children: JSON.stringify(appLd),
-      key: 'ld-app'
-    }
+      key: "ld-app",
+    },
   ],
   __dangerouslyDisableSanitizersByTagID: {
-    'ld-website': ['children'],
-    'ld-org': ['children'],
-    'ld-app': ['children'],
-    'ld-faq': ['children']
-  }
-})
-
-
+    "ld-website": ["children"],
+    "ld-org": ["children"],
+    "ld-app": ["children"],
+    "ld-faq": ["children"],
+  },
+});
 
 const show = ref(false);
 

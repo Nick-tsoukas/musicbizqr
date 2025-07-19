@@ -130,10 +130,46 @@ useHead({
       {{ page.title }}
     </h1>
 
+
+
+
     <div
       class="prose prose-invert max-w-none"
       v-html="marked(page.content || '')"
     />
+
+    <section class="bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-2xl shadow-xl my-12 overflow-hidden">
+  <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
+    <!-- Text -->
+    <div>
+      <h2 class="text-3xl font-extrabold mb-4">Built for Musicians. Powered by Smart Links.</h2>
+      <p class="text-lg mb-4">
+        MusicBizQR gives you a powerful landing page with streaming links, videos, social buttons, and real-time fan analytics — all from a single QR code.
+      </p>
+      <ul class="space-y-2 mb-6">
+        <li>🎯 Unlimited link clicks & analytics</li>
+        <li>📈 Track Spotify streams, YouTube plays, and QR scans</li>
+        <li>📱 Mobile-optimized artist pages</li>
+        <li>🚀 Create your first Smart Link in seconds</li>
+      </ul>
+      <NuxtLink to="/signup" class="inline-block bg-white text-black font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 transition">
+        Start Your Free Trial
+      </NuxtLink>
+    </div>
+
+    <!-- Screenshot -->
+    <div class="flex justify-center">
+      <img
+        src="public\screenshotappnovideo.png"
+        alt="MusicBizQR dashboard"
+        class="rounded-xl w-full max-w-md shadow-2xl"
+        loading="lazy"
+      />
+    </div>
+  </div>
+</section>
+
+
   </div>
 </template>
 
