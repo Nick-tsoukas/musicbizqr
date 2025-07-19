@@ -655,8 +655,9 @@
         </div>
       </main>
       <!-- <Footer /> -->
-      <div class="h-40 flex justify-center items-center">
-        <img src="@/assets/musicbizlogo.png" class="h-12" />
+      <div class="h-40 flex flex-col justify-center items-center">
+        <NuxtLink to="/"><img src="@/assets/musicbizlogo.png" class="h-12" /></NuxtLink>
+       
       </div>
     </div>
   </div>

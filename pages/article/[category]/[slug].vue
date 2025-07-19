@@ -169,7 +169,9 @@ useHead({
   </div>
 </section>
 
-
+<div class="h-40 flex justify-center items-center">
+        <NuxtLink to="/"><img src="@/assets/musicbizlogo.png" class="h-12" /></NuxtLink>
+      </div>
   </div>
 </template>
 
