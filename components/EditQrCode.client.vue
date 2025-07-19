@@ -401,6 +401,9 @@
 import { ref, reactive, watch, onMounted } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import { useDebounceFn } from "@vueuse/core";
+import { useRuntimeConfig } from '#app'
+
+const config = useRuntimeConfig()
 
 const qrcodeWrapper = ref(null);
 
@@ -442,37 +445,48 @@ const updateQRCodeDebounced = useDebounceFn(() => {
 }, 150);
 
 onMounted(async () => {
-  loading.value = true;
+  loading.value = true
   try {
+    // 1) Fetch QR record, including its uploaded image
     const response = await findOne("qrs", route.params.id, {
       populate: {
         event: { populate: "*" },
         tour: { populate: "*" },
         album: { populate: "*" },
         band: { populate: "*" },
+        q_image: { populate: "*" },        // <-- ensure the image relation is populated
       },
-    });
-    qrData.value = response.data;
+    })
+    // 2) Grab the data + attributes
+    qrData.value = response.data
+    const attrs = qrData.value.attributes
 
-    // Initialize reactive variables after data is fetched
-    initializeVariables();
+    // // 3) If there's a saved logo, load it into imageSettings.src
+    // const uploadedUrl = attrs.q_image?.data?.attributes?.url
+    // if (uploadedUrl) {
+    //   imageSettings.src = `${config.public.strapiUrl}${uploadedUrl}`
+    // }
 
+    // 4) Initialize your other refs from the fetched data
+    initializeVariables()
+
+    // 5) Only on client, mount the QR library
     if (process.client) {
-      const { default: QRCodeStyling } = await import("qr-code-styling");
-      qrCode.value = new QRCodeStyling(getQRCodeOptions());
-      qrCode.value.append(qrcodeWrapper.value);
-
-      qrCode.value.update(getQRCodeOptions());
-
-      // Initialize the watcher after qrCode.value is set
-      initializeWatcher();
+      const { default: QRCodeStyling } = await import("qr-code-styling")
+      qrCode.value = new QRCodeStyling(getQRCodeOptions({ image: imageSettings.src}))
+      qrCode.value.append(qrcodeWrapper.value)
+      // Draw initial state (with your logo)
+      qrCode.value.update(getQRCodeOptions())
+      // Start watching for further changes
+      initializeWatcher()
     }
   } catch (error) {
-    console.error("Error fetching QR code data:", error);
+    console.error("Error fetching QR code data:", error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
+
 
 function initializeVariables() {
   const data = qrData.value.attributes;
@@ -495,7 +509,8 @@ function initializeVariables() {
   gradientEndColor.value =
     data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || "#40353c";
 
-  imageSettings.src = data.options?.imageOptions?.src || "";
+  // imageSettings.src = data.options?.imageOptions?.src || "";
+  imageSettings.src       = data.options?.image || "";
   imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.4;
   imageSettings.margin = data.options?.imageOptions?.margin || 0;
   imageSettings.crossOrigin = "anonymous";

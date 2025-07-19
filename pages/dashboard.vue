@@ -116,7 +116,7 @@
           <h2
             class="text-2xl text-white font-extrabold self-start md:flex-grow"
           >
-            Bands
+            Artist Smart Link Page
           </h2>
           <NuxtLink
             v-if="!hasBand"
