@@ -41,7 +41,6 @@
     "@vee-validate/nuxt": "^4.13.0",
     "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^12.8.2",
-    "aframe-html-shader": "^0.2.0",
     "animate.css": "^4.1.1",
     "aos": "^2.3.4",
     "chart.js": "^4.4.9",
