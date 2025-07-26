@@ -85,15 +85,17 @@
               <div
                 v-if="!embedClickCaptured"
                 class="absolute inset-0 z-10"
-                @click="onEmbedClick"
+                @mousedown="onEmbedClick"
                 style="background: transparent; cursor: pointer"
               ></div>
               <iframe
+                id="embedPlayer"
                 :src="embedUrl + '?autoplay=1'"
                 frameborder="0"
                 allow="autoplay; encrypted-media; fullscreen; clipboard-write"
                 allowfullscreen
                 class="absolute inset-0 w-full h-full"
+                 :class="{ 'animate-wobble': embedClickCaptured }"
               />
             </div>
           </div>
@@ -634,6 +636,7 @@ async function scrollToUpcoming() {
 onMounted(async () => {
   await fetchBandData();
 
+
   const config = useRuntimeConfig();
   const bandId = band.value?.data?.id || band.value?.id;
 
@@ -673,6 +676,20 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+
+@keyframes wobble {
+  0% { transform: rotate(0deg); }
+  15% { transform: rotate(-3deg); }
+  30% { transform: rotate(3deg); }
+  45% { transform: rotate(-2deg); }
+  60% { transform: rotate(2deg); }
+  75% { transform: rotate(-1deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-wobble {
+  animation: wobble 0.6s ease-in-out;
+}
 .embed-container {
   position: relative;
   width: 100%;

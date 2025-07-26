@@ -167,18 +167,7 @@
             <strong>merch &amp; ticket links</strong>—all in one tap‑friendly
             layout you can update anytime and track in real time.
           </p>
-          <p
-            class="mt-3 max-w-2xl mx-auto text-center text-gray-300 text-base leading-snug"
-          >
-            Browse the demos below, then
-            <NuxtLink
-              to="/signup"
-              class="text-black hover:underline font-semibold"
-            >
-              build your own splash page
-            </NuxtLink>
-            in minutes.
-          </p>
+         
 
           <div class="w-full max-w-md md:max-w-5xl mx-auto">
             <!-- Swiper with Cards -->
@@ -210,11 +199,11 @@
               </NuxtLink>
             </Swiper> -->
             <section
-            class=" max-w-5xl mx-auto bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-2xl shadow-xl my-12 overflow-hidden"
+            class=" max-w-5xl mx-auto  text-white  my-12 overflow-hidden"
           >
             <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
               <!-- Text -->
-              <div>
+              <div >
                 <h2 class="text-3xl font-extrabold mb-4">
                   Built for Musicians. Powered by Smart Links.
                 </h2>
@@ -231,7 +220,7 @@
                 </ul>
                 <NuxtLink
                   to="/signup"
-                  class="inline-block bg-white text-black font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 transition"
+                  class="inline-block bg-white w-full text-center text-black font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 transition"
                 >
                   Start Your Free Trial
                 </NuxtLink>
@@ -473,12 +462,12 @@
               ></iframe>
             </div>
           </div>
-          <section
+          <!-- <section
             class=" max-w-5xl mx-auto bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-2xl shadow-xl my-12 overflow-hidden"
-          >
-            <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
+          > -->
+            <!-- <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center"> -->
               <!-- Text -->
-              <div>
+              <!-- <div>
                 <h2 class="text-3xl font-extrabold mb-4">
                   Built for Musicians. Powered by Smart Links.
                 </h2>
@@ -499,19 +488,19 @@
                 >
                   Start Your Free Trial
                 </NuxtLink>
-              </div>
+              </div> -->
 
               <!-- Screenshot -->
-              <div class="flex justify-center">
+              <!-- <div class="flex justify-center">
                 <img
                   src="public\screenshotappnovideo.png"
                   alt="MusicBizQR dashboard"
                   class="rounded-xl w-full max-w-md shadow-2xl"
                   loading="lazy"
                 />
-              </div>
-            </div>
-          </section>
+              </div> -->
+            <!-- </div> -->
+          <!-- </section> -->
         </section>
 
         <!-- end of image galler   -->
