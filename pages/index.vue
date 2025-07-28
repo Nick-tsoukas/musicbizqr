@@ -150,11 +150,11 @@
           </div>
         </div>
 
-        <div class="flex flex-col justify-center image_gradient">
+        <div class="flex flex-col justify-center">
           <h2
-            class="text-4xl lg:text-4xl 2xl:text-5xl text-white font-bold mt-0 pt-16 text-center"
+            class="text-4xl lg:text-4xl 2xl:text-5xl font-bold mt-0 pt-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
           >
-            Artist Smart Link &amp; Splash Page Examples
+            Artist Smart Link &amp; Splash Page Example
           </h2>
           <p
             class="mt-4 max-w-3xl mx-auto text-center text-white/90 text-lg leading-relaxed"
@@ -167,7 +167,6 @@
             <strong>merch &amp; ticket links</strong>—all in one tap‑friendly
             layout you can update anytime and track in real time.
           </p>
-         
 
           <div class="w-full max-w-md md:max-w-5xl mx-auto">
             <!-- Swiper with Cards -->
@@ -198,53 +197,64 @@
                 Preview Page
               </NuxtLink>
             </Swiper> -->
-            <section
-            class=" max-w-5xl mx-auto  text-white  my-12 overflow-hidden"
-          >
-            <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
-              <!-- Text -->
-              <div >
-                <h2 class="text-3xl font-extrabold mb-4">
-                  Built for Musicians. Powered by Smart Links.
-                </h2>
-                <p class="text-lg mb-4">
-                  MusicBizQR gives you a powerful landing page with streaming
-                  links, videos, social buttons, and real-time fan analytics —
-                  all from a single QR code.
-                </p>
-                <ul class="space-y-2 mb-6">
-                  <li>🎯 Unlimited link clicks & analytics</li>
-                  <li>📈 Track Spotify streams, YouTube plays, and QR scans</li>
-                  <li>📱 Mobile-optimized artist pages</li>
-                  <li>🚀 Create your first Smart Link in seconds</li>
-                </ul>
-                <NuxtLink
-                  to="/signup"
-                  class="inline-block bg-white w-full text-center text-black font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 transition"
-                >
-                  Start Your Free Trial
-                </NuxtLink>
-              </div>
+            <section class="max-w-5xl mx-auto text-white my-12 overflow-hidden">
+              <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
+                <!-- Text -->
+                <div>
+                  <h2
+                    class="text-3xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500"
+                  >
+                    Built for Musicians. Powered by Smart Links.
+                  </h2>
+                  <p class="text-lg mb-4">
+                    MusicBizQR gives you a powerful landing page with streaming
+                    links, videos, social buttons, and real-time fan analytics —
+                    all from a single QR code.
+                  </p>
+                  <ul class="space-y-2 mb-6">
+                    <li>🎯 Unlimited link clicks & analytics</li>
+                    <li>
+                      📈 Track Spotify streams, YouTube plays, and QR scans
+                    </li>
+                    <li>📱 Mobile-optimized artist pages</li>
+                    <li>🚀 Create your first Smart Link in seconds</li>
+                  </ul>
+                  <NuxtLink
+                    to="/burningthunder"
+                    class="mb-8 inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
+                  >
+                    Preview Page
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/signup"
+                    class="inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
+                  >
+                    Start Your Free Trial
+                  </NuxtLink>
+                </div>
 
-              <!-- Screenshot -->
-              <div class="flex justify-center">
-                <img
-                  src="public\screenshotappnovideo.png"
-                  alt="MusicBizQR dashboard"
-                  class="rounded-xl w-full max-w-md shadow-2xl"
-                  loading="lazy"
-                />
+                <!-- Screenshot -->
+                <div class="flex justify-center image_gradient p-10 rounded-lg">
+                  <img
+                    src="public\screenshotappnovideo.png"
+                    alt="MusicBizQR dashboard"
+                    class="rounded-xl w-full max-w-md shadow-2xl"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
           </div>
         </div>
 
         <section class="py-24 px-6 text-white">
           <div class="max-w-6xl mx-auto text-center lg:text-left">
-            <h2 class="text-4xl lg:text-5xl font-extrabold text-gradient mb-4">
+            <h2
+              class="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500 mb-4"
+            >
               Why MusicBizQR?
             </h2>
+
             <p
               class="max-w-3xl mx-auto lg:mx-0 text-lg text-white/90 leading-relaxed"
             >
@@ -465,9 +475,9 @@
           <!-- <section
             class=" max-w-5xl mx-auto bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-2xl shadow-xl my-12 overflow-hidden"
           > -->
-            <!-- <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center"> -->
-              <!-- Text -->
-              <!-- <div>
+          <!-- <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center"> -->
+          <!-- Text -->
+          <!-- <div>
                 <h2 class="text-3xl font-extrabold mb-4">
                   Built for Musicians. Powered by Smart Links.
                 </h2>
@@ -490,8 +500,8 @@
                 </NuxtLink>
               </div> -->
 
-              <!-- Screenshot -->
-              <!-- <div class="flex justify-center">
+          <!-- Screenshot -->
+          <!-- <div class="flex justify-center">
                 <img
                   src="public\screenshotappnovideo.png"
                   alt="MusicBizQR dashboard"
@@ -499,7 +509,7 @@
                   loading="lazy"
                 />
               </div> -->
-            <!-- </div> -->
+          <!-- </div> -->
           <!-- </section> -->
         </section>
 
@@ -645,8 +655,9 @@
       </main>
       <!-- <Footer /> -->
       <div class="h-40 flex flex-col justify-center items-center">
-        <NuxtLink to="/"><img src="@/assets/musicbizlogo.png" class="h-12" /></NuxtLink>
-       
+        <NuxtLink to="/"
+          ><img src="@/assets/musicbizlogo.png" class="h-12"
+        /></NuxtLink>
       </div>
     </div>
   </div>
@@ -681,7 +692,7 @@ const faqItems = ref([
   {
     question: "📊 What analytics are provided?",
     answer:
-      "Our analytics dashboard shows total scan count, top locations (city, country), scan timestamps, device type breakdown, and referrer sources. This helps you optimize distribution of your QR codes.",
+      "Our analytics dashboard tracks engagement by time of day, including page views, song plays, video views, and event interactions. You can view data by day, week, month, or year. We also track interactions with social links and streaming platforms, giving you a full picture of fan behavior — all without tracking user location.",
   },
   {
     question: "🔒 Is my data private?",
@@ -692,11 +703,6 @@ const faqItems = ref([
     question: "💳 How do I cancel my subscription?",
     answer:
       "You can cancel at any time by visiting your Account page > Subscription > Cancel. Once canceled, you retain dashboard access until the end of your billing cycle. No additional charges apply.",
-  },
-  {
-    question: "🆓 Is there a free plan?",
-    answer:
-      "Yes! Our Free plan includes one active dynamic QR code with up to 500 scans/month and basic analytics. Upgrade anytime for unlimited QR codes and advanced insights.",
   },
   {
     question: "🔧 How do I update the destination URL of a QR code?",
