@@ -27,7 +27,7 @@
 
 - [] make sure data is loaded in the analytics page ... sometimes on page load no data is there 
 
-gets all articles 
+gets all articles here
 fetch('https://qrserver-production.up.railway.app/api/seo-pages?populate=category&filters[category][slug][$eq]=smart-links&fields[title,slug]&pagination[pageSize]=100')
   .then(res => res.json())
   .then(data => {
