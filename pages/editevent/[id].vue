@@ -30,26 +30,38 @@
               Event Description
             </label>
             <client-only>
-              <div v-if="editor" class="bg-white rounded-md border border-gray-300 p-2">
+              <div
+                v-if="editor"
+                class="bg-white rounded-md border border-gray-300 p-2"
+              >
                 <!-- Toolbar Buttons -->
                 <div class="flex space-x-2 mb-2">
                   <button
                     type="button"
-                    :class="[ 'px-2 py-1 border rounded', editor.isActive('bold') ? 'bg-gray-200' : 'bg-white' ]"
+                    :class="[
+                      'px-2 py-1 border rounded',
+                      editor.isActive('bold') ? 'bg-gray-200' : 'bg-white',
+                    ]"
                     @click="toggleBold"
                   >
                     <strong>B</strong>
                   </button>
                   <button
                     type="button"
-                    :class="[ 'px-2 py-1 border rounded', editor.isActive('italic') ? 'bg-gray-200' : 'bg-white' ]"
+                    :class="[
+                      'px-2 py-1 border rounded',
+                      editor.isActive('italic') ? 'bg-gray-200' : 'bg-white',
+                    ]"
                     @click="toggleItalic"
                   >
                     <em>I</em>
                   </button>
                   <button
                     type="button"
-                    :class="[ 'px-2 py-1 border rounded', editor.isActive('underline') ? 'bg-gray-200' : 'bg-white' ]"
+                    :class="[
+                      'px-2 py-1 border rounded',
+                      editor.isActive('underline') ? 'bg-gray-200' : 'bg-white',
+                    ]"
                     @click="toggleUnderline"
                   >
                     <u>U</u>
@@ -151,7 +163,9 @@
               v-model="event.state"
               placeholder=" "
             />
-            <label class="mdc-floating-label" for="edit-event-state">State</label>
+            <label class="mdc-floating-label" for="edit-event-state"
+              >State</label
+            >
             <div class="mdc-line-ripple"></div>
           </div>
           <div class="mdc-text-field mb-4">
@@ -176,7 +190,38 @@
               @blur="event.link = normalizeLink(event.link)"
               placeholder=" "
             />
-            <label class="mdc-floating-label" for="edit-event-link">Ticket Link</label>
+            <label class="mdc-floating-label" for="edit-event-link"
+              >Ticket Link</label
+            >
+            <div class="mdc-line-ripple"></div>
+          </div>
+          <!-- Contact Phone -->
+          <div class="mdc-text-field mb-4">
+            <input
+              type="tel"
+              id="edit-event-phone"
+              class="mdc-text-field__input"
+              v-model="event.contactPhone"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-phone"
+              >Contact Phone</label
+            >
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <!-- Contact Email -->
+          <div class="mdc-text-field mb-4">
+            <input
+              type="email"
+              id="edit-event-email"
+              class="mdc-text-field__input"
+              v-model="event.contactEmail"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-email"
+              >Contact Email</label
+            >
             <div class="mdc-line-ripple"></div>
           </div>
         </div>
@@ -236,8 +281,6 @@
         </div>
       </div>
 
-   
-
       <!-- Save Changes Button -->
       <button type="submit" class="mdc-button mb-4 w-full mt-10">
         Save Changes
@@ -247,20 +290,20 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
-const router = useRouter()
-const client = useStrapiClient()
-const user = useStrapiUser()
-const loading = ref(false)
+const route = useRoute();
+const router = useRouter();
+const client = useStrapiClient();
+const user = useStrapiUser();
+const loading = ref(false);
 
-import { parse, format } from 'date-fns'
-import { useEditor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
-import Underline from '@tiptap/extension-underline'
+import { parse, format } from "date-fns";
+import { useEditor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
 
 const event = ref({
   title: "",
-  description: {} as any,  // ← use `any` so it can hold ProseMirror JSON
+  description: {} as any, // ← use `any` so it can hold ProseMirror JSON
   date: "",
   time: "",
   state: "",
@@ -268,38 +311,39 @@ const event = ref({
   address: "",
   venue: "",
   link: "",
+  contactEmail: "",
+  contactPhone: "",
   image: null as File | null,
   imageUrl: null as string | null,
-  band: null as number | null
-})
+  band: null as number | null,
+});
 
 function normalizeLink(link: string): string {
-  if (!link) return ''
+  if (!link) return "";
 
   // Already has a protocol → return as-is
-  if (/^https?:\/\//i.test(link)) return link.trim()
+  if (/^https?:\/\//i.test(link)) return link.trim();
 
   // Starts with www → add https://
-  if (/^www\./i.test(link)) return `https://${link.trim()}`
+  if (/^www\./i.test(link)) return `https://${link.trim()}`;
 
   // Otherwise assume https://
-  return `https://www.${link.trim()}`
+  return `https://www.${link.trim()}`;
 }
-
 
 // Toggle Bold / Italic / Underline helpers
 const toggleBold = () => {
-  if (!editor.value) return
-  editor.value.chain().focus().toggleBold().run()
-}
+  if (!editor.value) return;
+  editor.value.chain().focus().toggleBold().run();
+};
 const toggleItalic = () => {
-  if (!editor.value) return
-  editor.value.chain().focus().toggleItalic().run()
-}
+  if (!editor.value) return;
+  editor.value.chain().focus().toggleItalic().run();
+};
 const toggleUnderline = () => {
-  if (!editor.value) return
-  editor.value.chain().focus().toggleUnderline().run()
-}
+  if (!editor.value) return;
+  editor.value.chain().focus().toggleUnderline().run();
+};
 
 // 1) Initialize Tiptap editor (starts empty; we’ll set content when fetched)
 const editor = useEditor({
@@ -308,30 +352,30 @@ const editor = useEditor({
   autofocus: false,
   editorProps: {
     attributes: {
-      class: "px-2 py-2 outline-none"
-    }
-  }
-})
+      class: "px-2 py-2 outline-none",
+    },
+  },
+});
 
-const bands = ref<Array<{ id: number; name: string }>>([])
-const selectedBandId = ref(null as number | null)
+const bands = ref<Array<{ id: number; name: string }>>([]);
+const selectedBandId = ref(null as number | null);
 
 const fetchEvent = async () => {
-  const eventId = route.params.id as string
+  const eventId = route.params.id as string;
   try {
     // — Use response.data.attributes, not response.data.data.attributes —
     const { data } = await client(`/events/${eventId}`, {
       params: {
         populate: {
           band: { populate: "*" },
-          image: { populate: "*" }
-        }
-      }
-    })
+          image: { populate: "*" },
+        },
+      },
+    });
     // `data` is now the Strapi object with an `attributes` field
-    const attrs = data.attributes
+    const attrs = data.attributes;
 
-    selectedBandId.value = attrs.band?.data?.id || null
+    selectedBandId.value = attrs.band?.data?.id || null;
 
     event.value = {
       title: attrs.title,
@@ -342,76 +386,83 @@ const fetchEvent = async () => {
       city: attrs.city,
       address: attrs.address,
       venue: attrs.venue,
+      contactEmail: attrs.contactEmail,
+      contactPhone: attrs.contactPhone,
       link: attrs.link,
       image: null,
       imageUrl: attrs.image?.data?.attributes?.url || null,
-      band: attrs.band?.data?.id || null
-    }
+      band: attrs.band?.data?.id || null,
+    };
   } catch (error) {
-    console.error("Error fetching event:", error)
+    console.error("Error fetching event:", error);
   }
-}
+};
 
 const handleEventImageUpload = (e: Event) => {
-  const file = (e.target as HTMLInputElement).files![0]
-  event.value.image = file
-  event.value.imageUrl = URL.createObjectURL(file)
-}
+  const file = (e.target as HTMLInputElement).files![0];
+  event.value.image = file;
+  event.value.imageUrl = URL.createObjectURL(file);
+};
 
 const formatTime = (timeStr: string) => {
-  if (!timeStr) return ""
+  if (!timeStr) return "";
   try {
-    const parsedTime = parse(timeStr, "HH:mm", new Date())
-    return format(parsedTime, "HH:mm:ss.SSS")
+    const parsedTime = parse(timeStr, "HH:mm", new Date());
+    return format(parsedTime, "HH:mm:ss.SSS");
   } catch (error) {
-    console.error("Error parsing/formatting time:", error)
-    return timeStr
+    console.error("Error parsing/formatting time:", error);
+    return timeStr;
   }
-}
+};
 
 const submitEditEvent = async () => {
-  const eventId = route.params.id as string
+  const eventId = route.params.id as string;
   try {
-    loading.value = true
-    const eventForm = new FormData()
+    loading.value = true;
+    const eventForm = new FormData();
 
     // — Always pull from Tiptap, not from event.value.description —
-    const descriptionJson = editor.value?.getJSON() || { type: 'doc', content: [] }
+    const descriptionJson = editor.value?.getJSON() || {
+      type: "doc",
+      content: [],
+    };
 
     const eventData: Record<string, unknown> = {
       title: event.value.title || undefined,
-      description: descriptionJson,    // ← now sending JSON
+      description: descriptionJson, // ← now sending JSON
       date: event.value.date || undefined,
       time: formatTime(event.value.time) || undefined,
       city: event.value.city || undefined,
       state: event.value.state || undefined,
       venue: event.value.venue || undefined,
       address: event.value.address || undefined,
-      link: normalizeLink(event.value.link)|| undefined,
-      users_permissions_user: user.value.id
-    }
+      contactPhone: event.value.contactPhone || undefined,
+      contactEmail: event.value.contactEmail || undefined,
+      link: normalizeLink(event.value.link) || undefined,
+      users_permissions_user: user.value.id,
+    };
 
     if (event.value.band) {
-      eventData.band = event.value.band
+      eventData.band = event.value.band;
     }
 
-    eventForm.append("data", JSON.stringify(eventData))
+    eventForm.append("data", JSON.stringify(eventData));
 
     if (event.value.image) {
-      eventForm.append("files.image", event.value.image)
+      eventForm.append("files.image", event.value.image);
     }
 
     await client(`/events/${eventId}`, {
       method: "PUT",
-      body: eventForm
-    })
+      body: eventForm,
+    });
 
-    router.push("/dashboard")
+    router.push("/dashboard");
   } catch (error) {
-    loading.value = false
-    console.error("Error updating event:", error)
+    loading.value = false;
+    console.error("Error updating event:", error);
   }
-}
+};
 
 onMounted(async () => {
   try {
@@ -419,32 +470,32 @@ onMounted(async () => {
     const response = await client("/bands", {
       params: {
         filters: {
-          users_permissions_user: { id: user.value.id }
+          users_permissions_user: { id: user.value.id },
         },
-        populate: ["users_permissions_user"]
-      }
-    })
-    console.log('this is the response ', response.data)
+        populate: ["users_permissions_user"],
+      },
+    });
+    console.log("this is the response ", response.data);
     bands.value = response.data.map((b: any) => ({
       id: b.id,
-      name: b.name
-    }))
+      name: b.name,
+    }));
   } catch (error) {
-    console.error("Error fetching bands:", error)
+    console.error("Error fetching bands:", error);
   }
 
-  await fetchEvent()
-})
+  await fetchEvent();
+});
 
 // 2) Once `event.description` is fetched, push into Tiptap
 watch(
   () => event.value.description,
   (newDesc) => {
     if (editor.value && newDesc !== undefined) {
-      editor.value.commands.setContent(newDesc, false)
+      editor.value.commands.setContent(newDesc, false);
     }
   }
-)
+);
 
 // 3) Removed the “editor.on('update')” watcher entirely
 </script>
@@ -506,7 +557,9 @@ watch(
   line-height: 1;
   color: #aaa;
   pointer-events: none;
-  transition: transform 0.2s, color 0.2s;
+  transition:
+    transform 0.2s,
+    color 0.2s;
 }
 .mdc-text-field__input:focus + .mdc-floating-label,
 .mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {

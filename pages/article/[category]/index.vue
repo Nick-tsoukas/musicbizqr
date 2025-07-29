@@ -63,7 +63,7 @@ const pillarHtml = computed(() => {
 </script>
 
 <template>
-  <div class="bg-black text-white px-4 py-16 max-w-5xl mx-auto">
+  <div class="bg-black text-white px-4 py-16 max-w-3xl mx-auto">
 
     <!-- Pillar Header -->
     <h1 class="text-4xl font-extrabold mb-4 text-gradient">

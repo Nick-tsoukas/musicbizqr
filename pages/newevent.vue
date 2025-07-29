@@ -183,7 +183,7 @@
                 class="mdc-text-field__input"
                 v-model="newEvent.contactEmail"
                 placeholder=" "
-                required
+                
               />
               <label class="mdc-floating-label" for="new-event-contact-email">
                 Contact Email
@@ -207,7 +207,7 @@
             </div>
 
             <!-- Age Restriction -->
-            <div class="mdc-text-field mb-4">
+            <!-- <div class="mdc-text-field mb-4">
               <input
                 type="text"
                 id="new-event-age-restriction"
@@ -219,7 +219,7 @@
                 Age Restriction
               </label>
               <div class="mdc-line-ripple"></div>
-            </div>
+            </div> -->
           </div>
         </div>
 
