@@ -161,8 +161,8 @@
         </section>
 
         <!-- Streaming Links -->
-        <section class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+        <section v-if="hasStreamingLinks" class="mt-10">
+          <h2  class="text-2xl md:text-3xl font-bold text-white mb-4">
             Streaming Links
           </h2>
           <template v-for="platform in streamingPlatforms" :key="platform.name">
@@ -404,6 +404,10 @@ async function onEmbedClick() {
     console.error("❌ Error tracking embed click:", err);
   }
 }
+
+const hasStreamingLinks = computed(() => {
+  return streamingPlatforms.some(platform => !!band.value?.data?.[platform.name]);
+});
 
 // Streaming + social platform definitions:
 const streamingPlatforms = [

@@ -1,5 +1,7 @@
 # Task list 
 
+- [] remove streaming links header if there are no streaming links 
+
 - [] add resend api key to railway RESEND_API_KEY=re_TVm9KVo6_Byht3rJUZ7QqVp4F9zSMCQ2x
 - [] CONTACT_TO=your.nick.tsoukas101@gmail.com
 
