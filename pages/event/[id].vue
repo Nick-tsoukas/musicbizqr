@@ -296,6 +296,12 @@ const hasSocialLinks = computed(() =>
   font-weight: 600;
 }
 
+.text-gradient {
+  background: linear-gradient(to right, #ec4899, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .gradient-icon {
   /* Set the icon size */
   font-size: 1rem;
