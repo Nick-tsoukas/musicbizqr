@@ -2,16 +2,24 @@
   <div class="bg-black text-white min-h-screen pt-[var(--header-height)] pb-20">
     <div class="container mx-auto my-10 px-4">
       <!-- Event Hero -->
+      <!-- Event Hero (Option A) -->
       <div
         v-if="eventData"
-        class="relative w-full max-w-4xl mx-auto rounded-lg overflow-hidden mb-8 shadow-xl"
+        class="relative w-full max-w-4xl mx-auto rounded-lg overflow-hidden mb-8 shadow-xl bg-black"
+        tabindex="-1"
       >
-        <img
-          v-if="eventData.image?.data"
-          :src="eventData.image.data.attributes.url"
-          alt="Event Hero Image"
-          class="w-full h-full object-contain rounded-lg"
-        />
+        <div
+          class="aspect-video md:aspect-[21/9] lg:aspect-[2/1] max-h-[70vh] select-none"
+        >
+          <img
+            v-if="eventData.image?.data?.attributes?.url"
+            :src="eventData.image.data.attributes.url"
+            alt="Event Hero Image"
+            class="w-full h-full object-contain pointer-events-none"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

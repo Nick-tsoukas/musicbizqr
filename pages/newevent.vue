@@ -505,14 +505,28 @@ const formatTime = (time: string) => {
 }
 
 // 8) Submit new event to Strapi
+// 8) Submit new event to Strapi
 const submitNewEvent = async () => {
   if (!editor.value) {
     console.warn('Editor not ready')
     return
   }
 
+  loading.value = true
   try {
-    loading.value = true
+    // --- OPTIONAL: quick pre-check so user gets instant feedback ---
+    const dup = await client('/events', {
+      params: {
+        filters: { title: { $eq: newEvent.value.title } },
+        pagination: { pageSize: 1 }
+      }
+    })
+    if (dup?.data?.length) {
+      alert('That title is already taken. Please choose another.')
+      return
+    }
+    // ---------------------------------------------------------------
+
     const eventForm = new FormData()
 
     // ▶ Grab JSON from Tiptap for Strapi’s JSON field
@@ -527,7 +541,7 @@ const submitNewEvent = async () => {
       venue: newEvent.value.venue,
       address: newEvent.value.address,
       time: formatTime(newEvent.value.time),
-      link:  normalizeLink(newEvent.value.link),
+      link: normalizeLink(newEvent.value.link),
       users_permissions_user: user.value.id,
       contactEmail: newEvent.value.contactEmail,
       contactPhone: newEvent.value.contactPhone,
@@ -557,14 +571,26 @@ const submitNewEvent = async () => {
 
     // If a QR ID was passed via query, attach it
     if (route.query.qrId) {
-      await update('qrs', route.query.qrId as string, {
-        event: event.id
-      })
+      await update('qrs', route.query.qrId as string, { event: event.id })
     }
 
     router.push('/dashboard')
-  } catch (error) {
-    console.error('Error creating new event:', error)
+  } catch (err: any) {
+    // Nice message for Strapi's unique constraint
+    const msg =
+      err?.error?.message ||
+      err?.data?.error?.message ||
+      err?.response?.data?.error?.message ||
+      (Array.isArray(err?.error?.details?.errors) && err.error.details.errors[0]?.message) ||
+      'Something went wrong.'
+
+    if (/unique|already exists|duplicate/i.test(String(msg))) {
+      alert('That title is already taken. Please choose another.')
+    } else {
+      alert(msg)
+    }
+
+    console.error('Error creating new event:', err)
   } finally {
     loading.value = false
   }
