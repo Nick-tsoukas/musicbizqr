@@ -10,16 +10,20 @@
           v-if="eventData.image?.data"
           :src="eventData.image.data.attributes.url"
           alt="Event Hero Image"
-          class="w-full object-cover max-h-[calc(100vh-90px)] rounded-lg"
+          class="w-full h-full object-contain rounded-lg"
         />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Left Column -->
-        <div class="md:col-span-2 bg-[#1c1c1e] text-white shadow-lg rounded-xl p-6">
+        <div
+          class="md:col-span-2 bg-[#1c1c1e] text-white shadow-lg rounded-xl p-6"
+        >
           <!-- Description -->
           <section v-if="descriptionHTML" class="mb-8">
-            <h2 class="section-heading"><i class="fas fa-info-circle mr-2"></i> Description</h2>
+            <h2 class="section-heading">
+              <i class="fas fa-info-circle mr-2"></i> Description
+            </h2>
             <div
               class="prose prose-invert max-w-none text-lg leading-relaxed space-y-4"
               v-html="descriptionHTML"
@@ -28,21 +32,38 @@
 
           <!-- Date & Time -->
           <section v-if="eventData.date || eventData.time" class="mb-8">
-            <h2 class="section-heading"><i class="far fa-calendar-alt mr-2"></i> Date & Time</h2>
-            <p v-if="eventData.date" class="text-lg">{{ formatDate(eventData.date) }}</p>
-            <p v-if="eventData.time" class="text-lg">{{ formatTime(eventData.time) }}</p>
+            <h2 class="section-heading">
+              <i class="far fa-calendar-alt mr-2"></i> Date & Time
+            </h2>
+            <p v-if="eventData.date" class="text-lg">
+              {{ formatDate(eventData.date) }}
+            </p>
+            <p v-if="eventData.time" class="text-lg">
+              {{ formatTime(eventData.time) }}
+            </p>
           </section>
 
           <!-- Location -->
           <section
-            v-if="eventData.venue || eventData.address || eventData.city || eventData.state"
+            v-if="
+              eventData.venue ||
+              eventData.address ||
+              eventData.city ||
+              eventData.state
+            "
             class="mb-8"
           >
-            <h2 class="section-heading"><i class="fas fa-map-marker-alt mr-2"></i> Location</h2>
+            <h2 class="section-heading">
+              <i class="fas fa-map-marker-alt mr-2"></i> Location
+            </h2>
             <p v-if="eventData.venue" class="text-lg">{{ eventData.venue }}</p>
-            <p v-if="eventData.address" class="text-lg">{{ eventData.address }}</p>
+            <p v-if="eventData.address" class="text-lg">
+              {{ eventData.address }}
+            </p>
             <p v-if="eventData.city || eventData.state" class="text-lg">
-              {{ eventData.city }}<span v-if="eventData.city && eventData.state">, </span>{{ eventData.state }}
+              {{ eventData.city
+              }}<span v-if="eventData.city && eventData.state">, </span
+              >{{ eventData.state }}
             </p>
           </section>
 
@@ -61,17 +82,28 @@
         <!-- Right Column -->
         <div class="bg-[#1c1c1e] text-white shadow-lg rounded-xl p-6">
           <!-- Contact -->
-          <section v-if="eventData.contactEmail || eventData.contactPhone" class="mb-6">
-            <h2 class="section-heading"><i class="fas fa-address-book mr-2"></i> Contact</h2>
+          <section
+            v-if="eventData.contactEmail || eventData.contactPhone"
+            class="mb-6"
+          >
+            <h2 class="section-heading">
+              <i class="fas fa-address-book mr-2"></i> Contact
+            </h2>
             <p v-if="eventData.contactEmail" class="text-lg flex items-center">
               <i class="fas fa-envelope mr-2"></i>
-              <a :href="`mailto:${eventData.contactEmail}`" class="hover:underline">
+              <a
+                :href="`mailto:${eventData.contactEmail}`"
+                class="hover:underline"
+              >
                 {{ eventData.contactEmail }}
               </a>
             </p>
             <p v-if="eventData.contactPhone" class="text-lg flex items-center">
               <i class="fas fa-phone mr-2"></i>
-              <a :href="`tel:${eventData.contactPhone}`" class="hover:underline">
+              <a
+                :href="`tel:${eventData.contactPhone}`"
+                class="hover:underline"
+              >
                 {{ eventData.contactPhone }}
               </a>
             </p>
@@ -79,30 +111,64 @@
 
           <!-- Age Restriction -->
           <section v-if="eventData.ageRestriction" class="mb-6">
-            <h2 class="section-heading"><i class="fas fa-user-lock mr-2"></i> Age Restriction</h2>
+            <h2 class="section-heading">
+              <i class="fas fa-user-lock mr-2"></i> Age Restriction
+            </h2>
             <p class="text-lg">{{ eventData.ageRestriction }}</p>
           </section>
 
           <!-- Social -->
           <section v-if="hasSocialLinks" class="mb-6">
-            <h2 class="section-heading"><i class="fas fa-share-alt mr-2"></i> Follow Us</h2>
+            <h2 class="section-heading">
+              <i class="fas fa-share-alt mr-2"></i> Follow Us
+            </h2>
             <div class="flex space-x-4 text-white text-2xl">
-              <a v-if="eventData.facebook" :href="eventData.facebook" target="_blank" class="hover:text-blue-500">
+              <a
+                v-if="eventData.facebook"
+                :href="eventData.facebook"
+                target="_blank"
+                class="hover:text-blue-500"
+              >
                 <i class="fab fa-facebook-square"></i>
               </a>
-              <a v-if="eventData.twitter" :href="eventData.twitter" target="_blank" class="hover:text-sky-400">
+              <a
+                v-if="eventData.twitter"
+                :href="eventData.twitter"
+                target="_blank"
+                class="hover:text-sky-400"
+              >
                 <i class="fab fa-twitter-square"></i>
               </a>
-              <a v-if="eventData.instagram" :href="eventData.instagram" target="_blank" class="hover:text-pink-500">
+              <a
+                v-if="eventData.instagram"
+                :href="eventData.instagram"
+                target="_blank"
+                class="hover:text-pink-500"
+              >
                 <i class="fab fa-instagram-square"></i>
               </a>
-              <a v-if="eventData.youtube" :href="eventData.youtube" target="_blank" class="hover:text-red-600">
+              <a
+                v-if="eventData.youtube"
+                :href="eventData.youtube"
+                target="_blank"
+                class="hover:text-red-600"
+              >
                 <i class="fab fa-youtube-square"></i>
               </a>
-              <a v-if="eventData.tiktok" :href="eventData.tiktok" target="_blank" class="hover:text-gray-100">
+              <a
+                v-if="eventData.tiktok"
+                :href="eventData.tiktok"
+                target="_blank"
+                class="hover:text-gray-100"
+              >
                 <i class="fab fa-tiktok"></i>
               </a>
-              <a v-if="eventData.website" :href="eventData.website" target="_blank" class="hover:text-green-300">
+              <a
+                v-if="eventData.website"
+                :href="eventData.website"
+                target="_blank"
+                class="hover:text-green-300"
+              >
                 <i class="fas fa-globe"></i>
               </a>
             </div>
@@ -110,7 +176,9 @@
 
           <!-- Band Info -->
           <section v-if="eventData.band?.data" class="mb-6">
-            <h2 class="section-heading"><i class="fas fa-music mr-2"></i> Band</h2>
+            <h2 class="section-heading">
+              <i class="fas fa-music mr-2"></i> Band
+            </h2>
             <p class="text-lg">{{ eventData.band.data.attributes.name }}</p>
           </section>
         </div>
@@ -118,7 +186,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
