@@ -317,4 +317,8 @@ canvas {
   width: 100% !important;
   height: 600px !important;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* makes black icons white */
+}
 </style>
