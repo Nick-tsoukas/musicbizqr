@@ -307,48 +307,64 @@
             </div>
 
             <!-- Embed mode -->
+            <!-- Embed mode: paste raw iframe code -->
             <div v-else class="space-y-4">
-              <!-- Platform selector -->
-              <div class="mdc-text-field w-full">
-                <select
-                  id="singlesong-platform"
-                  class="mdc-text-field__input"
-                  v-model="singlesongPlatform"
-                >
-                  <option disabled value="">Select Platform</option>
-                  <option value="spotify">Spotify</option>
-                  <option value="appleMusic">Apple Music</option>
-                </select>
-                <label class="mdc-floating-label" for="singlesong-platform"
-                  >Platform</label
-                >
-                <div class="mdc-line-ripple"></div>
-              </div>
-
-              <!-- Track ID input -->
               <div class="mdc-text-field">
-                <input
-                  type="text"
-                  id="singlesong-trackid"
+                <textarea
+                  id="singlesong-embedhtml"
                   class="mdc-text-field__input"
-                  v-model="singlesongTrackId"
-                  placeholder="e.g. 6ILpnOUHollfHp4xWH7nqV"
-                />
-                <label class="mdc-floating-label" for="singlesong-trackid"
-                  >Track ID</label
-                >
+                  v-model="singlesongEmbedHtml"
+                  placeholder='<iframe src="https://open.spotify.com/embed/track/..." frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>'
+                  rows="6"
+                ></textarea>
+                <label class="mdc-floating-label" for="singlesong-embedhtml">
+                  Paste embed code (iframe)
+                </label>
                 <div class="mdc-line-ripple"></div>
               </div>
 
-              <!-- Delete button -->
               <button
                 type="button"
-                v-if="singlesongTrackId"
+                v-if="singlesongEmbedHtml"
                 @click="deleteSong"
                 class="mdc-button mdc-button--danger w-full"
               >
                 Delete Embed
               </button>
+
+              <!-- Optional: keep the legacy fields hidden for now
+       (remove this whole comment if you don't need them) -->
+              <!--
+  <details class="text-white/70">
+    <summary>Legacy platform / trackId (optional)</summary>
+    <div class="mdc-text-field w-full mt-2">
+      <select id="singlesong-platform" class="mdc-text-field__input" v-model="singlesongPlatform">
+        <option disabled value="">Select Platform</option>
+        <option value="spotify">Spotify</option>
+        <option value="appleMusic">Apple Music</option>
+        <option value="youtube">YouTube</option>
+        <option value="deezer">Deezer</option>
+        <option value="bandcamp">Bandcamp</option>
+        <option value="mixcloud">Mixcloud</option>
+        <option value="audiomack">Audiomack</option>
+        <option value="soundcloud">SoundCloud</option>
+      </select>
+      <label class="mdc-floating-label" for="singlesong-platform">Platform</label>
+      <div class="mdc-line-ripple"></div>
+    </div>
+    <div class="mdc-text-field mt-2">
+      <input
+        type="text"
+        id="singlesong-trackid"
+        class="mdc-text-field__input"
+        v-model="singlesongTrackId"
+        placeholder="Only if not pasting iframe"
+      />
+      <label class="mdc-floating-label" for="singlesong-trackid">Track ID</label>
+      <div class="mdc-line-ripple"></div>
+    </div>
+  </details>
+  -->
             </div>
           </div>
         </div>
@@ -413,6 +429,7 @@
 import { ref, onMounted } from "vue";
 
 const singlevideoTitle = ref("");
+const singlesongEmbedHtml = ref("");
 
 const config = useRuntimeConfig();
 const router = useRouter();
@@ -480,6 +497,7 @@ function deleteSong() {
   singlesongTitle.value = "";
   singlesongPlatform.value = "";
   singlesongTrackId.value = "";
+  singlesongEmbedHtml.value = ""; // NEW
   singlesongFile.value = null;
   singlesongFileId.value = null;
 }
@@ -490,6 +508,9 @@ function deleteVideo() {
   removeVideo.value = true;
   singlevideoYoutubeUrl.value = "";
 }
+
+
+const rawEmbedHtml = computed(() => band.value?.data?.singlesong?.embedHtml || "");
 
 function normalizeLink(link) {
   if (!link) return "";
@@ -551,13 +572,15 @@ async function fetchBand() {
       singlesongTitle.value = ss.title || "";
       if (ss.isEmbed) {
         singlesongType.value = "embed";
+        // legacy (keep reading in case old data exists)
         singlesongPlatform.value = ss.platform || "";
         singlesongTrackId.value = ss.trackId || "";
+        // NEW: load raw embed code if present
+        singlesongEmbedHtml.value = ss.embedHtml || "";
       } else {
         singlesongType.value = "upload";
       }
-      const songData = ss.song?.data;
-      singlesongFileId.value = songData?.id || null;
+      singlesongFileId.value = ss.song?.data?.id || null;
     }
 
     // Singlevideo component
@@ -604,10 +627,10 @@ async function submitForm() {
       });
       const uj = await up.json();
       if (!up.ok) throw uj;
-      newImageId = uj[0]?.id;
+      newImageId = uj[0]?.id ?? null;
     }
 
-    // 2) Upload new song file if chosen
+    // 2) Upload new song file if chosen (only relevant for upload mode)
     let newSongId = null;
     if (singlesongFile.value) {
       const fm2 = new FormData();
@@ -622,38 +645,56 @@ async function submitForm() {
       });
       const suj = await su.json();
       if (!su.ok) throw suj;
-      newSongId = suj[0]?.id;
+      newSongId = suj[0]?.id ?? null;
     }
 
-    // 3) Build payload, null out components if flagged
-    const singlesongPayload = removeSong.value
-      ? null
-      : {
-          title: singlesongTitle.value,
-          isEmbed: singlesongType.value === "embed",
-          platform:
-            singlesongType.value === "embed" ? singlesongPlatform.value : null,
-          trackId:
-            singlesongType.value === "embed" ? singlesongTrackId.value : null,
-          ...(newSongId
-            ? { song: newSongId }
-            : singlesongFileId.value && { song: singlesongFileId.value }),
-        };
+    // Optional: require a real <iframe> when in embed mode and user pasted something
+    if (singlesongType.value === "embed" && singlesongEmbedHtml.value.trim()) {
+      const looksLikeIframe = /<iframe[\s\S]*<\/iframe>/i.test(
+        singlesongEmbedHtml.value
+      );
+      if (!looksLikeIframe) {
+        alert("Please paste a full <iframe> embed code for the embedded song.");
+        loading.value = false;
+        return;
+      }
+    }
 
+    // 3) Build payloads
+    // Featured song
+    let singlesongPayload = null;
+    if (!removeSong.value) {
+      const isEmbed = singlesongType.value === "embed";
+      const embedHtml = isEmbed ? (singlesongEmbedHtml.value || "").trim() : "";
+
+      singlesongPayload = {
+        title: singlesongTitle.value || "",
+        isEmbed,
+        // Prefer raw embed HTML. If present, we ignore platform/trackId.
+        embedHtml: isEmbed ? embedHtml || null : null,
+        platform:
+          isEmbed && !embedHtml ? singlesongPlatform.value || null : null, // legacy fallback
+        trackId: isEmbed && !embedHtml ? singlesongTrackId.value || null : null, // legacy fallback
+        embedUrl: null, // no builder anymore
+        song: !isEmbed ? newSongId || singlesongFileId.value || null : null,
+      };
+    }
+
+    // Featured video
     const singlevideoPayload = removeVideo.value
       ? null
       : {
           youtubeid: singlevideoYoutubeUrl.value || "",
-          title: singlevideoTitle.value,
+          title: singlevideoTitle.value || "",
         };
 
+    // Normalize socials/streaming
     const normalizedSocial = Object.fromEntries(
       Object.entries(social.value).map(([key, val]) => [
         key,
         normalizeLink(val),
       ])
     );
-
     const normalizedStreaming = Object.fromEntries(
       Object.entries(streaming.value).map(([key, val]) => [
         key,
@@ -661,6 +702,7 @@ async function submitForm() {
       ])
     );
 
+    // Full band payload
     const payload = {
       name: bandName.value,
       genre: genre.value,
@@ -696,7 +738,7 @@ async function submitForm() {
     router.push("/dashboard");
   } catch (err) {
     console.error("❌ submitForm error:", err);
-    alert(err.error?.message || "Update failed");
+    alert(err?.error?.message || "Update failed");
   } finally {
     loading.value = false;
   }

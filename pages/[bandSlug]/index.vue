@@ -54,53 +54,35 @@
           </h2>
 
           <!-- Embedded Track -->
-          <div v-if="band.data.singlesong.isEmbed && embedUrl" class="w-full">
-            <div
-              class="relative w-full h-[360px] rounded-lg overflow-hidden bg-black"
-            >
-              <!-- <div
-                  v-if="!isEmbeddedPlaying"
-                  @click="startEmbedded()"
-                  class="absolute inset-0 bg-black bg-opacity-75 cursor-pointer"
-                >
-                  <div class="absolute top-2 left-2">
-                    <p class="text-white font-bold">
-                      {{ band.data.singlesong.title }}
-                    </p>
-                    <p class="text-gray-300 text-sm">{{ band.data.name }}</p>
-                  </div>
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="w-16 h-16 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 84 84"
-                    >
-                      <circle cx="42" cy="42" r="42" fill="rgba(0,0,0,0.6)" />
-                      <polygon points="34,28 34,56 58,42" fill="white" />
-                    </svg>
-                  </div>
-                </div> -->
-              <!-- Click-capturing overlay -->
+          <div
+            v-if="band.data.singlesong.isEmbed && safeEmbedHtml"
+            class="w-full"
+          >
+            <div class="relative w-full h-64 rounded-lg overflow-hidden">
+              <!-- Iframe container -->
+              <div
+                id="embedPlayerWrapper"
+                class="absolute inset-0 w-full h-full"
+                v-html="safeEmbedHtml"
+              ></div>
+
+              <!-- Overlay that animates on first click -->
               <div
                 v-if="!embedClickCaptured"
-                class="absolute inset-0 z-10"
-                @mousedown="onEmbedClick"
-                style="background: transparent; cursor: pointer"
-              ></div>
-              <iframe
-                id="embedPlayer"
-                :src="embedUrl + '?autoplay=1'"
-                frameborder="0"
-                allow="autoplay; encrypted-media; fullscreen; clipboard-write"
-                allowfullscreen
-                class="absolute inset-0 w-full h-full"
-                 :class="{ 'animate-wobble': embedClickCaptured }"
-              />
+                :class="[
+                  'absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer z-10',
+                  { 'animate-wobble': showWobble },
+                ]"
+                @click="handleFirstClick"
+              >
+                <span class="text-white text-lg font-semibold"
+                  >▶ Click to Play</span
+                >
+              </div>
             </div>
           </div>
 
-          <!-- Raw Audio: always show AudioPlayer -->
+          <!-- Raw Audio: custom player fallback -->
           <div v-else class="w-full">
             <AudioPlayer
               :album="formatSingleSong(band.data.singlesong)"
@@ -130,9 +112,7 @@
             />
             <div
               class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            >
-              <!-- your play icon here -->
-            </div>
+            ></div>
           </div>
 
           <!-- actual YouTube iframe -->
@@ -162,7 +142,7 @@
 
         <!-- Streaming Links -->
         <section v-if="hasStreamingLinks" class="mt-10">
-          <h2  class="text-2xl md:text-3xl font-bold text-white mb-4">
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Streaming Links
           </h2>
           <template v-for="platform in streamingPlatforms" :key="platform.name">
@@ -224,7 +204,6 @@
           </template>
         </section>
 
-        <!-- Events & Tours -->
         <!-- Upcoming Events -->
         <section
           v-if="upcomingEvents.length"
@@ -348,16 +327,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick, inject } from "vue";
-
-import { useRuntimeConfig } from "#imports";
+import { ref, onMounted, computed, nextTick, watch } from "vue";
+import { useRuntimeConfig, useHead } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
-import YouTube from "vue3-youtube";
 import { useRoute, useRouter } from "vue-router";
 import { useNuxtApp } from "#app";
-
 import AudioPlayer from "@/components/AudioPlayer.vue";
-import { useHead } from "#imports";
 
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
@@ -372,14 +347,16 @@ import spotifyIcon from "@/assets/spotify.svg";
 import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
-// redploy coment
+
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/effect-cards";
+
 const embedClickCaptured = ref(false);
+const hasTrackedEmbedClick = ref(false); // ← add this
 
 const nuxtApp = useNuxtApp();
-const historyStack = nuxtApp.$historyStack; // <— here!
+const historyStack = nuxtApp.$historyStack;
 const { trackClick, trackMediaPlay } = useBeacon();
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -390,26 +367,83 @@ const band = ref(null);
 const events = ref([]);
 
 const isEmbeddedPlaying = ref(false);
+const isVideoPlaying = ref(false);
 
-async function onEmbedClick() {
-  console.log("🎯 Embedded iframe clicked");
-
-  const bandId = band.value?.data?.id;
-  const title = band.value?.data?.singlesong?.title || "Unknown";
-
-  try {
-    await trackMediaPlay(bandId, "song", title + " (embed)");
-    embedClickCaptured.value = true; // ✅ remove overlay after tracking
-  } catch (err) {
-    console.error("❌ Error tracking embed click:", err);
-  }
+function extractYouTubeId(url) {
+  const m = url?.match(/[?&]v=([^&]+)/) || url?.match(/youtu\.be\/([^?]+)/);
+  return m ? m[1] : "";
 }
 
-const hasStreamingLinks = computed(() => {
-  return streamingPlatforms.some(platform => !!band.value?.data?.[platform.name]);
-});
+function sanitizeEmbed(html) {
+  if (!html) return "";
+  if (!/<iframe[\s\S]*<\/iframe>/i.test(html)) return "";
+  return html.replace(/<script[\s\S]*?<\/script>/gi, "");
+}
 
-// Streaming + social platform definitions:
+const rawEmbedHtml = computed(
+  () => band.value?.data?.singlesong?.embedHtml || ""
+);
+const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
+
+const showWobble = ref(false);
+
+async function handleFirstClick() {
+  if (embedClickCaptured.value) return;
+
+  // optional wobble
+  // showWobble.value = true;
+
+  // Track exactly once with plain title
+  if (!hasTrackedEmbedClick.value) {
+    try {
+      const bandId = band.value?.data?.id;
+      const title  = band.value?.data?.singlesong?.title || "Unknown";
+      if (bandId) await trackMediaPlay(bandId, "song", title);
+      hasTrackedEmbedClick.value = true;
+    } catch (e) {
+      console.error("trackMediaPlay failed:", e);
+    }
+  }
+
+  // Hide overlay immediately (or after wobble duration)
+  embedClickCaptured.value = true;
+
+  // if using wobble:
+  // setTimeout(() => { embedClickCaptured.value = true; showWobble.value = false; }, 600);
+}
+
+
+// async function onEmbedClick() {
+//   try {
+//     const bandId = band.value?.data?.id;
+//     const title = band.value?.data?.singlesong?.title || "Unknown";
+//     await trackMediaPlay(bandId, "song", `${title} (embed click)`);
+//   } catch (_) {}
+//   embedClickCaptured.value = true;
+
+//   // add autoplay=1 once user interacts
+//   requestAnimationFrame(() => {
+//     const wrapper = document.getElementById("embedPlayerWrapper");
+//     const iframe = wrapper?.querySelector("iframe");
+//     if (iframe && iframe.src) {
+//       const hasQuery = iframe.src.includes("?");
+//       const sep = hasQuery ? "&" : "?";
+//       if (!/autoplay=1/.test(iframe.src))
+//         iframe.src = iframe.src + sep + "autoplay=1";
+//     }
+//   });
+// }
+
+
+
+watch(
+  () => rawEmbedHtml.value,
+  );
+
+const hasStreamingLinks = computed(() =>
+  streamingPlatforms.some((p) => !!band.value?.data?.[p.name])
+);
+
 const streamingPlatforms = [
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
   { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
@@ -429,64 +463,41 @@ const socialPlatforms = [
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
 
-// reactive “previous route” (or undefined if none)
 const previousRoute = computed(() => {
   const arr = historyStack.value;
   return arr.length ? arr[arr.length - 1] : null;
 });
 
-// Compute embed URL for an embedded track (Spotify / Apple Music)
-function extractYouTubeId(url) {
-  const m = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
-  return m ? m[1] : "";
-}
-
-const embedUrl = computed(() => {
-  const s = band.value?.data?.singlesong;
-  if (!s?.isEmbed || !s.trackId || !s.platform) return "";
-  return s.platform === "spotify"
-    ? `https://open.spotify.com/embed/track/${s.trackId}`
-    : `https://embed.music.apple.com/us/song/${s.trackId}`;
-});
-
-// Compute YouTube thumbnail and embed for video
 const singleVideoThumbnail = computed(() => {
   const id = extractYouTubeId(band.value?.data?.singlevideo?.youtubeid || "");
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
 });
 const singleVideoEmbedUrl = computed(() => {
   const id = extractYouTubeId(band.value?.data?.singlevideo?.youtubeid || "");
-  return id ? `https://www.youtube.com/embed/${id}?autoplay=1` : "";
+  return id ? `https://www.youtube.com/embed/${id}` : "";
 });
-const playerOptions = { autoplay: 1, rel: 0, modestbranding: 1 };
 
-// Helpers
 function formatDate(dateStr) {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US");
 }
 
-// Build a “single-song” object that matches AudioPlayer.vue’s expected shape
 function formatSingleSong(single) {
-  // first try the nested Strapi v4-media shape
-  const nestedUrl = single.song?.data?.attributes?.url;
-  // then fall back to the flat media object’s url
-  const directUrl = single.song?.url;
+  const nestedUrl = single?.song?.data?.attributes?.url;
+  const directUrl = single?.song?.url;
   const fileUrl = nestedUrl || directUrl || null;
 
   return {
-    id: single.id,
+    id: single?.id,
     attributes: {
-      title: single.title,
-      // re-wrap it into the shape AudioPlayer expects:
+      title: single?.title,
       song: { data: { attributes: { url: fileUrl } } },
-      duration: single.duration || 0,
-      cover: single.cover || null,
-      artist: band.value.data.name,
+      duration: single?.duration || 0,
+      cover: single?.cover || null,
+      artist: band.value?.data?.name,
     },
   };
 }
 
-// Analytics for “play”
 async function onSongPlay() {
   if (!band.value?.data?.singlesong) return;
   const bandId = band.value.data.id;
@@ -498,27 +509,11 @@ async function onSongPlay() {
   }
 }
 
-
-
-// Embedded track “play”
-async function startEmbedded() {
-  isEmbeddedPlaying.value = true;
-  const bandId = band.value.data.id;
-  const title = band.value.data.singlesong.title;
-  try {
-    await trackMediaPlay(bandId, "song", title);
-  } catch (err) {
-    console.error("❌ trackMediaPlay (embedded) error:", err);
-  }
-}
-
-// Video analytics
-const isVideoPlaying = ref(false);
 async function playVideo() {
   isVideoPlaying.value = true;
   const bandId = band.value.data.id;
   const title =
-    band.value.data.singlevideo.title || band.value.data.singlesong.title;
+    band.value.data.singlevideo?.title || band.value.data.singlesong?.title;
   try {
     await trackMediaPlay(bandId, "video", title);
   } catch (err) {
@@ -526,24 +521,23 @@ async function playVideo() {
   }
 }
 
-// Outbound link click tracking
 function handleClick(bandId, platform, url) {
   trackClick(bandId, platform, url);
 }
 
-// Fetch band by slug
 async function fetchBandData() {
   const slug = route.params.bandSlug?.toLowerCase() || "";
-
   const apiUrl = config.public.strapiUrl;
   const res = await fetch(
     `${apiUrl}/api/bands/slug/${slug}?populate=bandImg,events,tours,albums,singlesong,singlevideo`
   );
   const data = await res.json();
   band.value = data;
-  const evts = data.data.events || [];
   events.value = data.data.events || [];
   loading.value = false;
+
+  // attach tracking after initial render of the embed
+  attachEmbedTracking();
 }
 
 const today = new Date();
@@ -560,7 +554,6 @@ const pastEvents = computed(() =>
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 );
 
-// SEO: dynamic <head> tags using band data
 const bandName = computed(() => band.value?.data?.name || "");
 const bandBio = computed(() =>
   band.value?.data?.bio ? band.value.data.bio.slice(0, 155) : ""
@@ -578,15 +571,9 @@ const hasFeaturedSong = computed(() => {
   const s = band.value?.data?.singlesong;
   if (!s) return false;
 
-  // embed case: requires a trackId + platform
-  if (s.isEmbed) {
-    return Boolean(s.trackId && s.platform);
-  }
+  if (s.isEmbed) return Boolean(safeEmbedHtml.value);
 
-  // upload case: requires a real audio URL
-  const url =
-    s.song?.data?.attributes?.url || // nested v4 media
-    s.song?.url; // flat media
+  const url = s.song?.data?.attributes?.url || s.song?.url;
   return Boolean(url);
 });
 
@@ -601,21 +588,9 @@ useHead({
         "Discover this artist on musicbizqr—dynamic QR link tree with analytics.",
     },
     { hid: "og:title", property: "og:title", content: bandName },
-    {
-      hid: "og:description",
-      property: "og:description",
-      content: bandBio,
-    },
-    {
-      hid: "og:image",
-      property: "og:image",
-      content: bandImage,
-    },
-    {
-      hid: "og:url",
-      property: "og:url",
-      content: bandUrl,
-    },
+    { hid: "og:description", property: "og:description", content: bandBio },
+    { hid: "og:image", property: "og:image", content: bandImage },
+    { hid: "og:url", property: "og:url", content: bandUrl },
     {
       hid: "twitter:card",
       name: "twitter:card",
@@ -625,63 +600,45 @@ useHead({
 });
 
 async function scrollToUpcoming() {
-  console.log("this is scroll to upcoming function ");
-  // DOM needs to be rendered
   await nextTick();
   await nextTick();
   const el = document.getElementById("upcoming-events");
-  console.log("this the element ", el);
-  if (el) {
-    console.log("this is the element condition of scroll function ");
-    el.scrollIntoView({ behavior: "auto", block: "start" });
-  }
+  if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
 }
 
 onMounted(async () => {
   await fetchBandData();
 
-
-  const config = useRuntimeConfig();
+  const cfg = useRuntimeConfig();
   const bandId = band.value?.data?.id || band.value?.id;
-
   if (!bandId) {
     console.warn("⚠️ No bandId found for page view tracking");
-    return;
-  }
-
-  try {
-    const res = await $fetch(`${config.public.strapiUrl}/api/band-page-views`, {
-      method: "POST",
-      body: {
-        data: {
-          band: bandId,
-          timestamp: new Date().toISOString(),
-          ipAddress: null,
-          userAgent: navigator.userAgent,
+  } else {
+    try {
+      await $fetch(`${cfg.public.strapiUrl}/api/band-page-views`, {
+        method: "POST",
+        body: {
+          data: {
+            band: bandId,
+            timestamp: new Date().toISOString(),
+            ipAddress: null,
+            userAgent: navigator.userAgent,
+          },
         },
-      },
-    });
-
-    console.log("👁️ Band page view tracked successfully:", res);
-  } catch (err) {
-    console.error("❌ Failed to track band page view:", err);
+      });
+    } catch (err) {
+      console.error("❌ Failed to track band page view:", err);
+    }
   }
 
-  // Optional: scroll behavior if coming from event page
-  await nextTick();
-  await nextTick();
   if (previousRoute.value?.fullPath.includes("/event/")) {
     scrollToUpcoming();
   }
 });
-
-// 2) If someone navigates client-side to a new hash
-// watch(() => route.hash, scrollToUpcoming)
 </script>
 
 <style scoped>
-
-@keyframes wobble {
+/* @keyframes wobble {
   0% { transform: rotate(0deg); }
   15% { transform: rotate(-3deg); }
   30% { transform: rotate(3deg); }
@@ -691,15 +648,22 @@ onMounted(async () => {
   100% { transform: rotate(0deg); }
 }
 
-.animate-wobble {
-  animation: wobble 0.6s ease-in-out;
-}
+.animate-wobble { animation: wobble 0.6s ease-in-out; } */
+
 .embed-container {
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
 }
 .embed-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure pasted iframe fills the wrapper */
+:deep(#embedPlayerWrapper iframe) {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -724,5 +688,13 @@ onMounted(async () => {
   height: 60px;
   animation: spin 1s linear infinite;
   margin-top: 2rem;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

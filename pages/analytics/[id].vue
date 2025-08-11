@@ -79,7 +79,7 @@ const route = useRoute()
 const tabs = ['Page Views', 'Link Clicks', 'Songs', 'Videos']
 const selectedTab = ref('Page Views')
 const rangeOptions = {
-  1: 'Today',
+  1: 'Daily',
   7: 'Last 7 Days',
   30: 'Last 30 Days',
   365: 'Last 1 Year',

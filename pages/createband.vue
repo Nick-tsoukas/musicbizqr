@@ -211,6 +211,7 @@
         </div>
 
         <!-- Single Song Section (Embed or Upload) -->
+        <!-- Single Song Section (Embed or Upload) -->
         <div class="bg-[#fff] rounded-md">
           <div
             class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
@@ -271,38 +272,23 @@
                 Choose Single Song File
               </label>
               <div v-if="singlesongFile" class="mt-4 text-black">
-                Selected Song: {{  singlesongFile.name }}
+                Selected Song: {{ singlesongFile.name }}
               </div>
             </div>
 
-            <!-- Embed Mode -->
-            <div v-else>
-              <div class="mdc-text-field mb-4">
-                <select
-                  id="singlesong-platform"
-                  v-model="singlesongPlatform"
+            <!-- Embed Mode: paste raw iframe code -->
+            <div v-else class="space-y-4">
+              <div class="mdc-text-field">
+                <textarea
+                  id="singlesong-embedhtml"
                   class="mdc-text-field__input"
-                >
-                  <option disabled value="">Select Platform</option>
-                  <option value="spotify">Spotify</option>
-                  <option value="appleMusic">Apple Music</option>
-                </select>
-                <label class="mdc-floating-label" for="singlesong-platform"
-                  >Platform</label
-                >
-                <div class="mdc-line-ripple"></div>
-              </div>
-              <div class="mdc-text-field mb-4">
-                <input
-                  type="text"
-                  id="singlesong-trackid"
-                  class="mdc-text-field__input"
-                  v-model="singlesongTrackId"
-                  placeholder=" "
-                />
-                <label class="mdc-floating-label" for="singlesong-trackid"
-                  >Track ID</label
-                >
+                  v-model="singlesongEmbedHtml"
+                  placeholder='<iframe src="https://open.spotify.com/embed/track/..." frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>'
+                  rows="6"
+                ></textarea>
+                <label class="mdc-floating-label" for="singlesong-embedhtml">
+                  Paste embed code (iframe)
+                </label>
                 <div class="mdc-line-ripple"></div>
               </div>
             </div>
@@ -366,7 +352,7 @@ import {
   useStrapiClient,
   useStrapiUser,
   useStrapiToken,
-  useStrapi,
+  useRuntimeConfig,
 } from "#imports";
 
 const config = useRuntimeConfig();
@@ -380,7 +366,6 @@ const loading = ref(false);
 const isBandNameInLogo = ref(false);
 
 // Band basics
-
 const bandName = ref("");
 const genre = ref("");
 const bio = ref("");
@@ -390,23 +375,8 @@ const websitelink = ref("");
 const websitelinktext = ref("");
 const max = 247;
 
-function normalizeLink(link) {
-  if (!link) return ''
-
-  // Already has a protocol → return as-is
-  if (/^https?:\/\//i.test(link)) return link.trim()
-
-  // Starts with www → add https://
-  if (/^www\./i.test(link)) return `https://${link.trim()}`
-
-  // Otherwise assume https://
-  return `https://www.${link.trim()}`
-}
-
 // Members
-const members = ref([
-  { name: "", instrument: "", image: null, imageUrl: null },
-]);
+const members = ref([{ name: "", instrument: "", image: null, imageUrl: null }]);
 function addMember() {
   members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
 }
@@ -440,14 +410,22 @@ const streaming = ref({
 });
 
 // Featured song/video
-const singlesongType = ref("upload");
+const singlesongType = ref("upload"); // 'upload' | 'embed'
 const singlesongTitle = ref("");
-const singlesongPlatform = ref("");
-const singlesongTrackId = ref("");
 const singlesongFile = ref(null);
 const singlesongFileName = ref("");
+const singlesongEmbedHtml = ref(""); // NEW: raw iframe paste
+
 const singlevideoYoutubeUrl = ref("");
 const singlevideoTitle = ref("");
+
+// Helpers
+function normalizeLink(link) {
+  if (!link) return "";
+  if (/^https?:\/\//i.test(link)) return link.trim();
+  if (/^www\./i.test(link)) return `https://${link.trim()}`;
+  return `https://www.${link.trim()}`;
+}
 
 function handleImageUpload(e) {
   bandImg.value = e.target.files[0];
@@ -456,14 +434,13 @@ function handleImageUpload(e) {
 function handleSingleSongUpload(e) {
   const f = e.target.files[0];
   singlesongFile.value = f;
-  console.log(f.name, 'this is the file ')
-  singlesongFileName.value =  f.name;
+  singlesongFileName.value = f?.name || "";
 }
 
-// Fetch existing bands for user (optional)
+// Optional: preload user bands
 onMounted(async () => {
   try {
-    const r = await client("/bands", {
+    await client("/bands", {
       params: {
         filters: { users_permissions_user: { id: user.value.id } },
         populate: ["users_permissions_user"],
@@ -477,7 +454,19 @@ onMounted(async () => {
 async function submitForm() {
   loading.value = true;
   try {
-    // 1) Build plain‐JS payload
+    // Validate embed mode: require a real iframe
+    if (singlesongType.value === "embed" && singlesongEmbedHtml.value.trim()) {
+      const looksLikeIframe = /<iframe[\s\S]*<\/iframe>/i.test(
+        singlesongEmbedHtml.value
+      );
+      if (!looksLikeIframe) {
+        alert("Please paste a full <iframe> embed code for the embedded song.");
+        loading.value = false;
+        return;
+      }
+    }
+
+    // 1) Build JSON payload
     const payload = {
       name: bandName.value,
       isBandNameInLogo: isBandNameInLogo.value,
@@ -493,36 +482,44 @@ async function submitForm() {
         instrument: m.instrument,
       })),
 
-       // social
-  ...Object.fromEntries(
-    Object.entries(social.value).map(([key, val]) => [key, normalizeLink(val)])
-  ),
+      // social (normalized)
+      ...Object.fromEntries(
+        Object.entries(social.value).map(([key, val]) => [
+          key,
+          normalizeLink(val),
+        ])
+      ),
 
-  // streaming
-  ...Object.fromEntries(
-    Object.entries(streaming.value).map(([key, val]) => [key, normalizeLink(val)])
-  ),
+      // streaming (normalized)
+      ...Object.fromEntries(
+        Object.entries(streaming.value).map(([key, val]) => [
+          key,
+          normalizeLink(val),
+        ])
+      ),
 
-      // featured song
+      // featured song — embedHtml OR upload
       singlesong: {
-        title: singlesongTitle.value,
+        title: singlesongTitle.value || "",
         isEmbed: singlesongType.value === "embed",
-        platform:
-          singlesongType.value === "embed" ? singlesongPlatform.value : null,
-        trackId:
-          singlesongType.value === "embed" ? singlesongTrackId.value : null,
+        embedHtml:
+          singlesongType.value === "embed"
+            ? (singlesongEmbedHtml.value || "").trim()
+            : null,
+        // no platform/trackId/embedUrl here anymore
       },
 
       // featured video
       singlevideo: {
         youtubeid: singlevideoYoutubeUrl.value || "",
-        title: singlevideoTitle.value,
+        title: singlevideoTitle.value || "",
       },
     };
 
-    // 2) Wrap in FormData...
+    // 2) Wrap in FormData for file uploads
     const fd = new FormData();
     fd.append("data", JSON.stringify(payload));
+
     if (bandImg.value) {
       fd.append("files.bandImg", bandImg.value);
     }
@@ -535,7 +532,7 @@ async function submitForm() {
       fd.append("files.singlesong.song", singlesongFile.value);
     }
 
-    // 3) POST...
+    // 3) Create band
     const res = await fetch(`${config.public.strapiUrl}/api/bands`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token.value}` },
@@ -549,12 +546,13 @@ async function submitForm() {
     await router.push(slug ? { name: "slug", params: { slug } } : "/dashboard");
   } catch (err) {
     console.error("❌ createBand error:", err);
-    alert(err.error?.message || "Creation failed");
+    alert(err?.error?.message || "Creation failed");
   } finally {
     loading.value = false;
   }
 }
 </script>
+
 
 <style scoped>
 @tailwind base;
@@ -575,7 +573,7 @@ async function submitForm() {
   line-height: 1;
 }
 .mdc-text-field-helper--error {
-  color: #b00020;   /* a red for over-limit */
+  color: #b00020; /* a red for over-limit */
 }
 .title {
   font-size: 1.5rem;
@@ -603,7 +601,7 @@ async function submitForm() {
 
 /* reveal placeholder only when the input is focused */
 .mdc-text-field__input:focus::placeholder {
-  color: #888;  /* or whatever light gray matches your theme */
+  color: #888; /* or whatever light gray matches your theme */
 }
 
 .mdc-floating-label {

@@ -75,7 +75,7 @@ const selectedRange = ref(1);
 const selectedDate = ref(format(new Date(), "yyyy-MM-dd"));
 
 const rangeOptions = {
-  1: "Today",
+  1: "daily",
   7: "Last 7 Days",
   30: "Last 30 Days",
   365: "Last 1 Year",
