@@ -399,150 +399,168 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted } from "vue";
-import { v4 as uuidv4 } from "uuid";
 import { useDebounceFn } from "@vueuse/core";
 import { useRuntimeConfig } from '#app'
 
 const config = useRuntimeConfig()
+const { findOne, find } = useStrapi()
+const user = useStrapiUser()
+const router = useRouter()
+const route = useRoute()
+const client = useStrapiClient()
 
-const qrcodeWrapper = ref(null);
+const loading = ref(false)
+const qrcodeWrapper = ref(null)
+const qrCode = ref(null)
+const qrData = ref(null)
 
-const props = defineProps({
-  type: String,
-});
+const qrValue = ref("")
+const qrSize = ref(300)
 
-function normalizeLink(link) {
-  if (!link) return "";
+const bgColor = ref("#FFFFFF")
+const gradient = ref(false)
+const gradientType = ref("linear")
+const gradientRotation = ref(0)
+const gradientStartColor = ref("#e6289d")
+const gradientEndColor = ref("#40353c")
 
-  // Already has a protocol → return as-is
-  if (/^https?:\/\//i.test(link)) return link.trim();
+const name = ref("name")
+const link = ref("")
+const q_type = ref(null)
 
-  // Starts with www → add https://
-  if (/^www\./i.test(link)) return `https://${link.trim()}`;
+const imageSettings = reactive({
+  src: "",
+  imageSize: 0.4,
+  margin: 0,
+  crossOrigin: "anonymous",
+})
 
-  // Otherwise assume https://
-  return `https://www.${link.trim()}`;
+const dotsColor = ref("#000000")
+const dotsType = ref("square")
+
+const cornersSquareColor = ref("#000000")
+const cornersSquareType = ref("square")
+
+const cornersDotColor = ref("#000000")
+const cornersDotType = ref("square")
+
+const bands = ref([])
+const events = ref([])
+const tours = ref([])
+const albums = ref([])
+
+const selectedEvent = ref(null)
+const selectedTour = ref(null)
+const selectedAlbum = ref(null)
+const selectedBand = ref(null)
+
+function normalizeLink(val) {
+  if (!val) return ""
+  if (/^https?:\/\//i.test(val)) return val.trim()
+  if (/^www\./i.test(val)) return `https://${val.trim()}`
+  return `https://www.${val.trim()}`
 }
 
-const { findOne, find } = useStrapi();
-const user = useStrapiUser();
-const router = useRouter();
-const route = useRoute();
-const client = useStrapiClient();
+// Live sync for externalURL type
+watch(link, (val) => {
+  if (q_type.value === "externalURL") {
+    qrValue.value = normalizeLink(val || "")
+    updateQRCodeDebounced()
+  }
+})
 
-const loading = ref(false);
-
-const qrCode = ref(null);
-
-// Fetch QR code data from backend
-const qrData = ref(null);
-
-// Debounced updater: waits 150 ms after last change before calling .update()
+// Debounced QR update
 const updateQRCodeDebounced = useDebounceFn(() => {
   if (qrCode.value) {
-    qrCode.value.update(getQRCodeOptions());
+    qrCode.value.update(getQRCodeOptions())
   }
-}, 150);
+}, 150)
 
 onMounted(async () => {
   loading.value = true
   try {
-    // 1) Fetch QR record, including its uploaded image
     const response = await findOne("qrs", route.params.id, {
       populate: {
         event: { populate: "*" },
         tour: { populate: "*" },
         album: { populate: "*" },
         band: { populate: "*" },
-        q_image: { populate: "*" },        // <-- ensure the image relation is populated
+        q_image: { populate: "*" },
       },
     })
-    // 2) Grab the data + attributes
     qrData.value = response.data
-    const attrs = qrData.value.attributes
-
-    // // 3) If there's a saved logo, load it into imageSettings.src
-    // const uploadedUrl = attrs.q_image?.data?.attributes?.url
-    // if (uploadedUrl) {
-    //   imageSettings.src = `${config.public.strapiUrl}${uploadedUrl}`
-    // }
-
-    // 4) Initialize your other refs from the fetched data
     initializeVariables()
 
-    // 5) Only on client, mount the QR library
     if (process.client) {
       const { default: QRCodeStyling } = await import("qr-code-styling")
-      qrCode.value = new QRCodeStyling(getQRCodeOptions({ image: imageSettings.src}))
+      qrCode.value = new QRCodeStyling(getQRCodeOptions())
       qrCode.value.append(qrcodeWrapper.value)
-      // Draw initial state (with your logo)
-      qrCode.value.update(getQRCodeOptions())
-      // Start watching for further changes
+      updateQRCodeDebounced()
       initializeWatcher()
     }
-  } catch (error) {
-    console.error("Error fetching QR code data:", error)
+  } catch (err) {
+    console.error("Error fetching QR code data:", err)
   } finally {
     loading.value = false
   }
 })
 
-
 function initializeVariables() {
-  const data = qrData.value.attributes;
+  const data = qrData.value.attributes
 
-  q_type.value = data.q_type || null;
-  link.value = normalizeLink(data.link) || null;
-  name.value = data.name || "add name";
-  qrValue.value = data.url || "";
-  qrSize.value = data.options?.size || 300;
+  q_type.value = data.q_type || null
+  link.value = data.link || ""
+  name.value = data.name || "add name"
+  qrValue.value = data.url || ""
+  qrSize.value = data.options?.size || 300
 
-  bgColor.value = data.options?.backgroundOptions?.color || "#FFFFFF";
+  bgColor.value = data.options?.backgroundOptions?.color || "#FFFFFF"
 
-  gradient.value = !!data.options?.dotsOptions?.gradient;
-  gradientType.value = data.options?.dotsOptions?.gradient?.type || "linear";
+  gradient.value = !!data.options?.dotsOptions?.gradient
+  gradientType.value = data.options?.dotsOptions?.gradient?.type || "linear"
   gradientRotation.value = data.options?.dotsOptions?.gradient?.rotation
     ? (data.options.dotsOptions.gradient.rotation * 180) / Math.PI
-    : 0;
+    : 0
   gradientStartColor.value =
-    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || "#e6289d";
+    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || "#e6289d"
   gradientEndColor.value =
-    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || "#40353c";
+    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || "#40353c"
 
-  // imageSettings.src = data.options?.imageOptions?.src || "";
-  imageSettings.src       = data.options?.image || "";
-  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.5;
-  imageSettings.margin = data.options?.imageOptions?.margin || 0;
-  imageSettings.crossOrigin = "anonymous";
+  imageSettings.src =
+    data.options?.imageOptions?.src ||
+    data.options?.image ||
+    ""
+  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.7
+  imageSettings.margin = data.options?.imageOptions?.margin || 0
+  imageSettings.crossOrigin = "anonymous"
 
-  dotsColor.value = data.options?.dotsOptions?.color || "#000000";
-  dotsType.value = data.options?.dotsOptions?.type || "square";
+  dotsColor.value = data.options?.dotsOptions?.color || "#000000"
+  dotsType.value = data.options?.dotsOptions?.type || "square"
 
   cornersSquareColor.value =
-    data.options?.cornersSquareOptions?.color || "#000000";
+    data.options?.cornersSquareOptions?.color || "#000000"
   cornersSquareType.value =
-    data.options?.cornersSquareOptions?.type || "square";
+    data.options?.cornersSquareOptions?.type || "square"
 
-  cornersDotColor.value = data.options?.cornersDotOptions?.color || "#000000";
-  cornersDotType.value = data.options?.cornersDotOptions?.type || "square";
+  cornersDotColor.value =
+    data.options?.cornersDotOptions?.color || "#000000"
+  cornersDotType.value =
+    data.options?.cornersDotOptions?.type || "square"
 
-  selectedEvent.value = data.event?.data?.id ?? null;
-  selectedTour.value = data.tour?.data?.id ?? null;
-  selectedAlbum.value = data.album?.data?.id ?? null;
-  selectedBand.value = data.band?.data?.id ?? null;
+  selectedEvent.value = data.event?.data?.id ?? null
+  selectedTour.value = data.tour?.data?.id ?? null
+  selectedAlbum.value = data.album?.data?.id ?? null
+  selectedBand.value = data.band?.data?.id ?? null
 
-  // Fetch user-related data
-  fetchUserRelatedData();
+  fetchUserRelatedData()
 }
 
 function getQRCodeOptions() {
-  const options = {
+  const opts = {
     width: qrSize.value,
     height: qrSize.value,
-    data: qrValue.value,
-    dotsOptions: {
-      type: dotsType.value,
-    },
+    data: qrValue.value || "https://musicbizqr.com",
+    dotsOptions: { type: dotsType.value },
     cornersSquareOptions: {
       color: cornersSquareColor.value,
       type: cornersSquareType.value,
@@ -551,169 +569,104 @@ function getQRCodeOptions() {
       color: cornersDotColor.value,
       type: cornersDotType.value,
     },
-    backgroundOptions: {
-      color: bgColor.value,
-    },
+    backgroundOptions: { color: bgColor.value },
     imageOptions: {
       crossOrigin: imageSettings.crossOrigin,
       margin: imageSettings.margin,
       imageSize: imageSettings.imageSize,
+      src: imageSettings.src,
     },
-  };
-
-  // Set image if available
-  if (imageSettings.src) {
-    options.image = imageSettings.src;
   }
 
-  // Handle gradient vs. color in dotsOptions
+  if (imageSettings.src) {
+    opts.image = imageSettings.src
+  }
+
   if (gradient.value) {
-    options.dotsOptions.gradient = {
+    opts.dotsOptions.gradient = {
       type: gradientType.value,
       rotation: (gradientRotation.value * Math.PI) / 180,
       colorStops: [
         { offset: 0, color: gradientStartColor.value },
         { offset: 1, color: gradientEndColor.value },
       ],
-    };
-    // Remove color key when using gradient
-    delete options.dotsOptions.color;
+    }
   } else {
-    options.dotsOptions.color = dotsColor.value;
-    // Remove gradient key when using color
-    delete options.dotsOptions.gradient;
+    opts.dotsOptions.color = dotsColor.value
   }
 
-  return options;
+  return opts
 }
 
 function initializeWatcher() {
   watch(
-  [
-    qrValue,
-    qrSize,
-    bgColor,
-    dotsColor,
-    dotsType,
-    cornersSquareColor,
-    cornersSquareType,
-    cornersDotColor,
-    cornersDotType,
-    gradient,
-    gradientType,
-    gradientRotation,
-    gradientStartColor,
-    gradientEndColor,
-    () => imageSettings.src,
-  ],
-  updateQRCodeDebounced,
-  { deep: true }
-);
-
+    [
+      qrValue,
+      qrSize,
+      bgColor,
+      dotsColor,
+      dotsType,
+      cornersSquareColor,
+      cornersSquareType,
+      cornersDotColor,
+      cornersDotType,
+      gradient,
+      gradientType,
+      gradientRotation,
+      gradientStartColor,
+      gradientEndColor,
+      () => imageSettings.src,
+    ],
+    updateQRCodeDebounced,
+    { deep: true }
+  )
 }
 
-const qrValue = ref("");
-const qrSize = ref(300);
-
-const bgColor = ref("#FFFFFF");
-const fgColor = ref("#000000");
-
-const gradient = ref(false);
-const gradientType = ref("linear");
-const gradientRotation = ref(0);
-const gradientStartColor = ref("#e6289d");
-const gradientEndColor = ref("#40353c");
-
-const name = ref("name");
-const link = ref(null);
-
-const imageSettings = reactive({
-  src: "",
-  imageSize: 0.4,
-  margin: 0,
-  crossOrigin: "anonymous",
-});
-
-const dotsColor = ref("#000000");
-const dotsType = ref("square");
-
-const cornersSquareColor = ref("#000000");
-const cornersSquareType = ref("square");
-
-const cornersDotColor = ref("#000000");
-const cornersDotType = ref("square");
-
-const q_type = ref(null);
-
 const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageSettings.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+  const file = event.target.files[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    imageSettings.src = e.target.result
+    if (qrCode.value) {
+      qrCode.value.update({ image: imageSettings.src })
+    }
   }
-};
-
-const bands = ref([]);
-const events = ref([]);
-const tours = ref([]);
-const albums = ref([]);
-
-const selectedEvent = ref(null);
-const selectedTour = ref(null);
-const selectedAlbum = ref(null);
-const selectedBand = ref(null);
+  reader.readAsDataURL(file)
+}
 
 const fetchUserRelatedData = async () => {
   try {
-    const bandsResponse = await find("bands", {
-      filters: { users_permissions_user: { id: user.value.id } },
-    });
-    bands.value = bandsResponse.data;
-
-    const eventsResponse = await find("events", {
-      filters: { users_permissions_user: { id: user.value.id } },
-    });
-    events.value = eventsResponse.data;
-
-    const toursResponse = await find("tours", {
-      filters: { users_permissions_user: { id: user.value.id } },
-    });
-    tours.value = toursResponse.data;
-
-    const albumsResponse = await find("albums", {
-      filters: { users_permissions_user: { id: user.value.id } },
-    });
-    albums.value = albumsResponse.data;
-  } catch (error) {
-    console.error("Error fetching user-related data:", error);
+    bands.value = (await find("bands", { filters: { users_permissions_user: { id: user.value.id } } })).data
+    events.value = (await find("events", { filters: { users_permissions_user: { id: user.value.id } } })).data
+    tours.value = (await find("tours", { filters: { users_permissions_user: { id: user.value.id } } })).data
+    albums.value = (await find("albums", { filters: { users_permissions_user: { id: user.value.id } } })).data
+  } catch (err) {
+    console.error("Error fetching user-related data:", err)
   }
-};
+}
 
 const selectType = (type) => {
-  q_type.value = type;
-  link.value = null;
-  selectedBand.value = null;
-  selectedAlbum.value = null;
-  selectedTour.value = null;
-  selectedEvent.value = null;
+  q_type.value = type
+  selectedBand.value = null
+  selectedAlbum.value = null
+  selectedTour.value = null
+  selectedEvent.value = null
 
   if (type === "externalURL") {
-    qrValue.value = link.value || "";
+    qrValue.value = normalizeLink(link.value || "")
   }
-};
+  updateQRCodeDebounced()
+}
 
 const updateQrCodeSubmit = async () => {
-  const qrId = route.params.id;
+  const qrId = route.params.id
   try {
-    loading.value = true;
-    const formData = new FormData();
+    loading.value = true
+    const formData = new FormData()
 
-    // Update qrValue based on q_type
     if (q_type.value === "externalURL" && link.value) {
-      qrValue.value = link.value;
+      qrValue.value = normalizeLink(link.value)
     }
 
     const form = {
@@ -724,9 +677,8 @@ const updateQrCodeSubmit = async () => {
       name: name.value,
       options: {
         size: qrSize.value,
-        backgroundOptions: {
-          color: bgColor.value,
-        },
+        backgroundOptions: { color: bgColor.value },
+        image: imageSettings.src,
         imageOptions: { ...imageSettings },
         dotsOptions: {
           type: dotsType.value,
@@ -755,52 +707,34 @@ const updateQrCodeSubmit = async () => {
       album: selectedAlbum.value !== "createNew" ? selectedAlbum.value : null,
       event: selectedEvent.value !== "createNew" ? selectedEvent.value : null,
       tour: selectedTour.value !== "createNew" ? selectedTour.value : null,
-    };
-
-    // Get the QR code as a blob
-    const blob = await qrCode.value.getRawData("png");
-    const file = new File([blob], "qrcode.png");
-
-    formData.append("files.q_image", file, "qrcode.png");
-    formData.append("data", JSON.stringify(form));
-
-    await client(`/qrs/${qrId}`, {
-      method: "PUT",
-      body: formData,
-    });
-
-    // Routing after successful update
-    if (selectedBand.value === "createNew") {
-      router.push({
-        path: "/createband",
-        query: { createnew: "createNew", qrId: qrId },
-      });
-    } else if (selectedAlbum.value === "createNew") {
-      router.push({
-        path: "/newalbum",
-        query: { createnew: "createNew", qrId: qrId },
-      });
-    } else if (selectedTour.value === "createNew") {
-      router.push({
-        path: "/newtour",
-        query: { createnew: "createNew", qrId: qrId },
-      });
-    } else if (selectedEvent.value === "createNew") {
-      router.push({
-        path: "/newevent",
-        query: { createnew: "createNew", qrId: qrId },
-      });
-    } else {
-      router.push("/dashboard");
     }
-  } catch (error) {
-    loading.value = false;
-    console.error("Error updating QR code:", error);
+
+    const blob = await qrCode.value.getRawData("png")
+    const file = new File([blob], "qrcode.png")
+    formData.append("files.q_image", file, "qrcode.png")
+    formData.append("data", JSON.stringify(form))
+
+    await client(`/qrs/${qrId}`, { method: "PUT", body: formData })
+
+    if (selectedBand.value === "createNew") {
+      router.push({ path: "/createband", query: { createnew: "createNew", qrId } })
+    } else if (selectedAlbum.value === "createNew") {
+      router.push({ path: "/newalbum", query: { createnew: "createNew", qrId } })
+    } else if (selectedTour.value === "createNew") {
+      router.push({ path: "/newtour", query: { createnew: "createNew", qrId } })
+    } else if (selectedEvent.value === "createNew") {
+      router.push({ path: "/newevent", query: { createnew: "createNew", qrId } })
+    } else {
+      router.push("/dashboard")
+    }
+  } catch (err) {
+    console.error("Error updating QR code:", err)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
+
 
 <style scoped>
 /* Container Styling */
