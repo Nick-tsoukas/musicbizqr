@@ -8,7 +8,7 @@
       <transition name="fade">
         <div
           ref="qrcodeWrapper"
-          class="p-4 border sticky top-0 z-50 border-gray-300 rounded-lg shadow-md"
+          class="p-4 border sticky top-10 z-50 border-gray-300 rounded-lg shadow-md"
         >
           <!-- QR code will be rendered here by qr-code-styling -->
         </div>
@@ -692,7 +692,7 @@ function initializeWatcher() {
       await rebuildQr()
     }
   )
-  
+
   watch(
     [
       qrValue,
