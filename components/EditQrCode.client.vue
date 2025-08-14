@@ -511,7 +511,7 @@ function initializeVariables() {
 
   // imageSettings.src = data.options?.imageOptions?.src || "";
   imageSettings.src       = data.options?.image || "";
-  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.4;
+  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.7;
   imageSettings.margin = data.options?.imageOptions?.margin || 0;
   imageSettings.crossOrigin = "anonymous";
 
