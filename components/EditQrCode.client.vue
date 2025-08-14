@@ -620,6 +620,22 @@ function initializeVariables() {
   fetchUserRelatedData();
 }
 
+async function rebuildQr() {
+  if (!process.client) return
+  // Lazy import to avoid SSR hiccups
+  const { default: QRCodeStyling } = await import("qr-code-styling")
+
+  // Clear old node (this effectively "destroys" the instance)
+  if (qrcodeWrapper.value) {
+    qrcodeWrapper.value.innerHTML = ""
+  }
+
+  // Recreate with current options (including qrOptions.typeNumber / EC level)
+  qrCode.value = new QRCodeStyling(getQRCodeOptions())
+  qrCode.value.append(qrcodeWrapper.value)
+}
+
+
 function getQRCodeOptions() {
   const opts = {
     qrOptions: {
@@ -670,6 +686,13 @@ function getQRCodeOptions() {
 }
 
 function initializeWatcher() {
+  watch(
+    [qrTypeNumber, qrEcLevel, qrValue],
+    async () => {
+      await rebuildQr()
+    }
+  )
+  
   watch(
     [
       qrValue,
