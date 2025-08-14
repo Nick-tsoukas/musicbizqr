@@ -637,17 +637,19 @@ async function rebuildQr() {
 
 
 function getQRCodeOptions() {
+  const baseDots = { type: dotsType.value }
+
   const opts = {
     qrOptions: {
-      typeNumber: qrTypeNumber.value,           // 0–40
-      errorCorrectionLevel: qrEcLevel.value,    // L,M,Q,H
-      margin: qrMargin.value,                   // quiet zone
-      // mode: "Byte" // (optional) you can add this if you want to force Byte mode
+      typeNumber: qrTypeNumber.value,
+      errorCorrectionLevel: qrEcLevel.value,
+      margin: qrMargin.value,
     },
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value || "https://musicbizqr.com",
-    dotsOptions: { type: dotsType.value },
+    // build dotsOptions below so we can force-clear gradient when needed
+    dotsOptions: baseDots,
     cornersSquareOptions: {
       color: cornersSquareColor.value,
       type: cornersSquareType.value,
@@ -663,10 +665,10 @@ function getQRCodeOptions() {
       imageSize: imageSettings.imageSize,
       src: imageSettings.src,
     },
-  };
+  }
 
   if (imageSettings.src) {
-    opts.image = imageSettings.src;
+    opts.image = imageSettings.src
   }
 
   if (gradient.value) {
@@ -677,15 +679,32 @@ function getQRCodeOptions() {
         { offset: 0, color: gradientStartColor.value },
         { offset: 1, color: gradientEndColor.value },
       ],
-    };
+    }
+    // no color when gradient is on
   } else {
-    opts.dotsOptions.color = dotsColor.value;
+    // IMPORTANT: force remove old gradient
+    opts.dotsOptions.gradient = null
+    opts.dotsOptions.color = dotsColor.value
   }
 
-  return opts;
+  return opts
 }
 
+
 function initializeWatcher() {
+
+  watch(gradient, async (isOn, wasOn) => {
+  if (!qrCode.value) return
+  if (!isOn && wasOn) {
+    // user turned gradient OFF → explicitly clear gradient then update
+    qrCode.value.update({ dotsOptions: { gradient: null, color: dotsColor.value } })
+    // If for any reason your instance still keeps the old gradient,
+    // uncomment the next line:
+    // await rebuildQr()
+  }
+  updateQRCodeDebounced()
+})
+
   watch(
     [qrTypeNumber, qrEcLevel, qrValue],
     async () => {
