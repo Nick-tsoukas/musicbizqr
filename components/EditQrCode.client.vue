@@ -287,6 +287,66 @@
           </div>
         </div>
 
+        <!-- QR Encoding Options -->
+        <div class="bg-white rounded-md">
+          <div
+            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-xl">
+              QR Encoding Options
+            </h2>
+          </div>
+          <div class="p-4 grid gap-4 md:grid-cols-3">
+            <!-- Type Number -->
+            <label class="mdc-text-field">
+              <span class="mb-1 text-gray-700 block">Type Number (0–40)</span>
+              <input
+                v-model.number="qrTypeNumber"
+                type="number"
+                min="0"
+                max="40"
+                class="mdc-text-field__input"
+                placeholder="0 (auto)"
+              />
+              <span class="mdc-line-ripple"></span>
+              <small class="text-gray-500 block mt-1">
+                0 = auto. Higher = more modules (denser dots).
+              </small>
+            </label>
+
+            <!-- Error Correction -->
+            <label class="mdc-text-field">
+              <span class="mb-1 text-gray-700 block">Error Correction</span>
+              <select v-model="qrEcLevel" class="mdc-text-field__input">
+                <option value="L">L (Low)</option>
+                <option value="M">M (Medium)</option>
+                <option value="Q">Q (Quartile)</option>
+                <option value="H">H (High)</option>
+              </select>
+              <span class="mdc-line-ripple"></span>
+              <small class="text-gray-500 block mt-1">
+                Higher = more redundancy (slightly denser).
+              </small>
+            </label>
+
+            <!-- Quiet Zone / Margin -->
+            <label class="mdc-text-field">
+              <span class="mb-1 text-gray-700 block">Quiet Zone (margin)</span>
+              <input
+                v-model.number="qrMargin"
+                type="number"
+                min="0"
+                class="mdc-text-field__input"
+                placeholder="4"
+              />
+              <span class="mdc-line-ripple"></span>
+              <small class="text-gray-500 block mt-1">
+                White border (modules) around the code.
+              </small>
+            </label>
+          </div>
+        </div>
+
         <!-- Dots Options -->
         <div class="bg-white rounded-md">
           <div
@@ -400,84 +460,89 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from "vue";
 import { useDebounceFn } from "@vueuse/core";
-import { useRuntimeConfig } from '#app'
+import { useRuntimeConfig } from "#app";
 
-const config = useRuntimeConfig()
-const { findOne, find } = useStrapi()
-const user = useStrapiUser()
-const router = useRouter()
-const route = useRoute()
-const client = useStrapiClient()
+const config = useRuntimeConfig();
+const { findOne, find } = useStrapi();
+const user = useStrapiUser();
+const router = useRouter();
+const route = useRoute();
+const client = useStrapiClient();
 
-const loading = ref(false)
-const qrcodeWrapper = ref(null)
-const qrCode = ref(null)
-const qrData = ref(null)
+const loading = ref(false);
+const qrcodeWrapper = ref(null);
+const qrCode = ref(null);
+const qrData = ref(null);
 
-const qrValue = ref("")
-const qrSize = ref(300)
+const qrValue = ref("");
+const qrSize = ref(300);
 
-const bgColor = ref("#FFFFFF")
-const gradient = ref(false)
-const gradientType = ref("linear")
-const gradientRotation = ref(0)
-const gradientStartColor = ref("#e6289d")
-const gradientEndColor = ref("#40353c")
+const bgColor = ref("#FFFFFF");
+const gradient = ref(false);
+const gradientType = ref("linear");
+const gradientRotation = ref(0);
+const gradientStartColor = ref("#e6289d");
+const gradientEndColor = ref("#40353c");
 
-const name = ref("name")
-const link = ref("")
-const q_type = ref(null)
+const name = ref("name");
+const link = ref("");
+const q_type = ref(null);
+
+// qrOptions controls
+const qrTypeNumber = ref(0)   // 0 = auto, 1–40 fixed
+const qrEcLevel = ref("Q")    // L, M, Q, H
+const qrMargin = ref(4)       // quiet zone (modules)
 
 const imageSettings = reactive({
   src: "",
   imageSize: 0.4,
   margin: 0,
   crossOrigin: "anonymous",
-})
+});
 
-const dotsColor = ref("#000000")
-const dotsType = ref("square")
+const dotsColor = ref("#000000");
+const dotsType = ref("square");
 
-const cornersSquareColor = ref("#000000")
-const cornersSquareType = ref("square")
+const cornersSquareColor = ref("#000000");
+const cornersSquareType = ref("square");
 
-const cornersDotColor = ref("#000000")
-const cornersDotType = ref("square")
+const cornersDotColor = ref("#000000");
+const cornersDotType = ref("square");
 
-const bands = ref([])
-const events = ref([])
-const tours = ref([])
-const albums = ref([])
+const bands = ref([]);
+const events = ref([]);
+const tours = ref([]);
+const albums = ref([]);
 
-const selectedEvent = ref(null)
-const selectedTour = ref(null)
-const selectedAlbum = ref(null)
-const selectedBand = ref(null)
+const selectedEvent = ref(null);
+const selectedTour = ref(null);
+const selectedAlbum = ref(null);
+const selectedBand = ref(null);
 
 function normalizeLink(val) {
-  if (!val) return ""
-  if (/^https?:\/\//i.test(val)) return val.trim()
-  if (/^www\./i.test(val)) return `https://${val.trim()}`
-  return `https://www.${val.trim()}`
+  if (!val) return "";
+  if (/^https?:\/\//i.test(val)) return val.trim();
+  if (/^www\./i.test(val)) return `https://${val.trim()}`;
+  return `https://www.${val.trim()}`;
 }
 
 // Live sync for externalURL type
 watch(link, (val) => {
   if (q_type.value === "externalURL") {
-    qrValue.value = normalizeLink(val || "")
-    updateQRCodeDebounced()
+    qrValue.value = normalizeLink(val || "");
+    updateQRCodeDebounced();
   }
-})
+});
 
 // Debounced QR update
 const updateQRCodeDebounced = useDebounceFn(() => {
   if (qrCode.value) {
-    qrCode.value.update(getQRCodeOptions())
+    qrCode.value.update(getQRCodeOptions());
   }
-}, 150)
+}, 150);
 
 onMounted(async () => {
-  loading.value = true
+  loading.value = true;
   try {
     const response = await findOne("qrs", route.params.id, {
       populate: {
@@ -487,76 +552,82 @@ onMounted(async () => {
         band: { populate: "*" },
         q_image: { populate: "*" },
       },
-    })
-    qrData.value = response.data
-    initializeVariables()
+    });
+    qrData.value = response.data;
+    initializeVariables();
 
     if (process.client) {
-      const { default: QRCodeStyling } = await import("qr-code-styling")
-      qrCode.value = new QRCodeStyling(getQRCodeOptions())
-      qrCode.value.append(qrcodeWrapper.value)
-      updateQRCodeDebounced()
-      initializeWatcher()
+      const { default: QRCodeStyling } = await import("qr-code-styling");
+      qrCode.value = new QRCodeStyling(getQRCodeOptions());
+      qrCode.value.append(qrcodeWrapper.value);
+      updateQRCodeDebounced();
+      initializeWatcher();
     }
   } catch (err) {
-    console.error("Error fetching QR code data:", err)
+    console.error("Error fetching QR code data:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 
 function initializeVariables() {
-  const data = qrData.value.attributes
+  const data = qrData.value.attributes;
 
-  q_type.value = data.q_type || null
-  link.value = data.link || ""
-  name.value = data.name || "add name"
-  qrValue.value = data.url || ""
-  qrSize.value = data.options?.size || 300
+   // qrOptions (with safe defaults)
+   qrTypeNumber.value = data.options?.qrOptions?.typeNumber ?? 0
+  qrEcLevel.value    = data.options?.qrOptions?.errorCorrectionLevel ?? "Q"
+  qrMargin.value     = data.options?.qrOptions?.margin ?? 4
+  q_type.value = data.q_type || null;
+  link.value = data.link || "";
+  name.value = data.name || "add name";
+  qrValue.value = data.url || "";
+  qrSize.value = data.options?.size || 300;
 
-  bgColor.value = data.options?.backgroundOptions?.color || "#FFFFFF"
+  bgColor.value = data.options?.backgroundOptions?.color || "#FFFFFF";
 
-  gradient.value = !!data.options?.dotsOptions?.gradient
-  gradientType.value = data.options?.dotsOptions?.gradient?.type || "linear"
+  gradient.value = !!data.options?.dotsOptions?.gradient;
+  gradientType.value = data.options?.dotsOptions?.gradient?.type || "linear";
   gradientRotation.value = data.options?.dotsOptions?.gradient?.rotation
     ? (data.options.dotsOptions.gradient.rotation * 180) / Math.PI
-    : 0
+    : 0;
   gradientStartColor.value =
-    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || "#e6289d"
+    data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || "#e6289d";
   gradientEndColor.value =
-    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || "#40353c"
+    data.options?.dotsOptions?.gradient?.colorStops?.[1]?.color || "#40353c";
 
   imageSettings.src =
-    data.options?.imageOptions?.src ||
-    data.options?.image ||
-    ""
-  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.7
-  imageSettings.margin = data.options?.imageOptions?.margin || 0
-  imageSettings.crossOrigin = "anonymous"
+    data.options?.imageOptions?.src || data.options?.image || "";
+  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.7;
+  imageSettings.margin = data.options?.imageOptions?.margin || 0;
+  imageSettings.crossOrigin = "anonymous";
 
-  dotsColor.value = data.options?.dotsOptions?.color || "#000000"
-  dotsType.value = data.options?.dotsOptions?.type || "square"
+  dotsColor.value = data.options?.dotsOptions?.color || "#000000";
+  dotsType.value = data.options?.dotsOptions?.type || "square";
 
   cornersSquareColor.value =
-    data.options?.cornersSquareOptions?.color || "#000000"
+    data.options?.cornersSquareOptions?.color || "#000000";
   cornersSquareType.value =
-    data.options?.cornersSquareOptions?.type || "square"
+    data.options?.cornersSquareOptions?.type || "square";
 
-  cornersDotColor.value =
-    data.options?.cornersDotOptions?.color || "#000000"
-  cornersDotType.value =
-    data.options?.cornersDotOptions?.type || "square"
+  cornersDotColor.value = data.options?.cornersDotOptions?.color || "#000000";
+  cornersDotType.value = data.options?.cornersDotOptions?.type || "square";
 
-  selectedEvent.value = data.event?.data?.id ?? null
-  selectedTour.value = data.tour?.data?.id ?? null
-  selectedAlbum.value = data.album?.data?.id ?? null
-  selectedBand.value = data.band?.data?.id ?? null
+  selectedEvent.value = data.event?.data?.id ?? null;
+  selectedTour.value = data.tour?.data?.id ?? null;
+  selectedAlbum.value = data.album?.data?.id ?? null;
+  selectedBand.value = data.band?.data?.id ?? null;
 
-  fetchUserRelatedData()
+  fetchUserRelatedData();
 }
 
 function getQRCodeOptions() {
   const opts = {
+    qrOptions: {
+      typeNumber: qrTypeNumber.value,           // 0–40
+      errorCorrectionLevel: qrEcLevel.value,    // L,M,Q,H
+      margin: qrMargin.value,                   // quiet zone
+      // mode: "Byte" // (optional) you can add this if you want to force Byte mode
+    },
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value || "https://musicbizqr.com",
@@ -576,10 +647,10 @@ function getQRCodeOptions() {
       imageSize: imageSettings.imageSize,
       src: imageSettings.src,
     },
-  }
+  };
 
   if (imageSettings.src) {
-    opts.image = imageSettings.src
+    opts.image = imageSettings.src;
   }
 
   if (gradient.value) {
@@ -590,12 +661,12 @@ function getQRCodeOptions() {
         { offset: 0, color: gradientStartColor.value },
         { offset: 1, color: gradientEndColor.value },
       ],
-    }
+    };
   } else {
-    opts.dotsOptions.color = dotsColor.value
+    opts.dotsOptions.color = dotsColor.value;
   }
 
-  return opts
+  return opts;
 }
 
 function initializeWatcher() {
@@ -619,54 +690,70 @@ function initializeWatcher() {
     ],
     updateQRCodeDebounced,
     { deep: true }
-  )
+  );
 }
 
 const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-  const reader = new FileReader()
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
   reader.onload = (e) => {
-    imageSettings.src = e.target.result
+    imageSettings.src = e.target.result;
     if (qrCode.value) {
-      qrCode.value.update({ image: imageSettings.src })
+      qrCode.value.update({ image: imageSettings.src });
     }
-  }
-  reader.readAsDataURL(file)
-}
+  };
+  reader.readAsDataURL(file);
+};
 
 const fetchUserRelatedData = async () => {
   try {
-    bands.value = (await find("bands", { filters: { users_permissions_user: { id: user.value.id } } })).data
-    events.value = (await find("events", { filters: { users_permissions_user: { id: user.value.id } } })).data
-    tours.value = (await find("tours", { filters: { users_permissions_user: { id: user.value.id } } })).data
-    albums.value = (await find("albums", { filters: { users_permissions_user: { id: user.value.id } } })).data
+    bands.value = (
+      await find("bands", {
+        filters: { users_permissions_user: { id: user.value.id } },
+      })
+    ).data;
+    events.value = (
+      await find("events", {
+        filters: { users_permissions_user: { id: user.value.id } },
+      })
+    ).data;
+    tours.value = (
+      await find("tours", {
+        filters: { users_permissions_user: { id: user.value.id } },
+      })
+    ).data;
+    albums.value = (
+      await find("albums", {
+        filters: { users_permissions_user: { id: user.value.id } },
+      })
+    ).data;
   } catch (err) {
-    console.error("Error fetching user-related data:", err)
+    console.error("Error fetching user-related data:", err);
   }
-}
+};
 
 const selectType = (type) => {
-  q_type.value = type
-  selectedBand.value = null
-  selectedAlbum.value = null
-  selectedTour.value = null
-  selectedEvent.value = null
+  q_type.value = type;
+  selectedBand.value = null;
+  selectedAlbum.value = null;
+  selectedTour.value = null;
+  selectedEvent.value = null;
 
   if (type === "externalURL") {
-    qrValue.value = normalizeLink(link.value || "")
+    qrValue.value = normalizeLink(link.value || "");
   }
-  updateQRCodeDebounced()
-}
+  updateQRCodeDebounced();
+};
 
 const updateQrCodeSubmit = async () => {
-  const qrId = route.params.id
+  const qrId = route.params.id;
   try {
-    loading.value = true
-    const formData = new FormData()
+    loading.value = true;
+    const formData = new FormData();
 
     if (q_type.value === "externalURL" && link.value) {
-      qrValue.value = normalizeLink(link.value)
+      qrValue.value = normalizeLink(link.value);
     }
 
     const form = {
@@ -707,34 +794,45 @@ const updateQrCodeSubmit = async () => {
       album: selectedAlbum.value !== "createNew" ? selectedAlbum.value : null,
       event: selectedEvent.value !== "createNew" ? selectedEvent.value : null,
       tour: selectedTour.value !== "createNew" ? selectedTour.value : null,
-    }
+    };
 
-    const blob = await qrCode.value.getRawData("png")
-    const file = new File([blob], "qrcode.png")
-    formData.append("files.q_image", file, "qrcode.png")
-    formData.append("data", JSON.stringify(form))
+    const blob = await qrCode.value.getRawData("png");
+    const file = new File([blob], "qrcode.png");
+    formData.append("files.q_image", file, "qrcode.png");
+    formData.append("data", JSON.stringify(form));
 
-    await client(`/qrs/${qrId}`, { method: "PUT", body: formData })
+    await client(`/qrs/${qrId}`, { method: "PUT", body: formData });
 
     if (selectedBand.value === "createNew") {
-      router.push({ path: "/createband", query: { createnew: "createNew", qrId } })
+      router.push({
+        path: "/createband",
+        query: { createnew: "createNew", qrId },
+      });
     } else if (selectedAlbum.value === "createNew") {
-      router.push({ path: "/newalbum", query: { createnew: "createNew", qrId } })
+      router.push({
+        path: "/newalbum",
+        query: { createnew: "createNew", qrId },
+      });
     } else if (selectedTour.value === "createNew") {
-      router.push({ path: "/newtour", query: { createnew: "createNew", qrId } })
+      router.push({
+        path: "/newtour",
+        query: { createnew: "createNew", qrId },
+      });
     } else if (selectedEvent.value === "createNew") {
-      router.push({ path: "/newevent", query: { createnew: "createNew", qrId } })
+      router.push({
+        path: "/newevent",
+        query: { createnew: "createNew", qrId },
+      });
     } else {
-      router.push("/dashboard")
+      router.push("/dashboard");
     }
   } catch (err) {
-    console.error("Error updating QR code:", err)
+    console.error("Error updating QR code:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
-
 
 <style scoped>
 /* Container Styling */
