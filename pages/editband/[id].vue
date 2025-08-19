@@ -51,7 +51,7 @@
                 placeholder=" "
                 required
               ></textarea>
-              <label class="mdc-floating-label" for="bio">Bio</label>
+              <label class="mdc-floating-label" for="bio">Artist Description/Introduction</label>
               <div class="mdc-line-ripple"></div>
             </div>
           </div>
