@@ -3,7 +3,11 @@
     <div class="container bg-[#000] mx-auto p-4">
       <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
 
-      <PastDueBanner />
+      <PastDueBanner
+        :status="subscriptionStatus"
+        :days-left="daysLeft"
+        :has-payment-method="billingInfo?.hasPaymentMethod ?? null"
+      />
 
       <TrialBanner
         v-if="
@@ -369,6 +373,7 @@ const daysLeft = ref(null);
 const loadingTrial = ref(false);
 const trialError = ref("");
 const billingInfo = ref(null);
+const subscriptionStatus = ref(null); // new
 
 const nuxtApp = useNuxtApp();
 const historyStack = nuxtApp.$historyStack; // ← grab the real one
@@ -435,28 +440,17 @@ async function fetchBillingInfo() {
 
 async function fetchTrialInfo() {
   loadingTrial.value = true;
-  console.debug("[Dashboard] fetchTrialInfo: starting…");
-
   try {
-    console.debug(
-      "[Dashboard] fetchTrialInfo: GET /stripe/subscription-status via Strapi client"
-    );
-    // returns the raw body { status, plan, trialEndsAt, gracePeriodStart }
     const subscription = await client("/stripe/subscription-status", {
       method: "GET",
       headers: { Authorization: `Bearer ${useStrapiToken().value}` },
     });
     console.debug("[Dashboard] subscription-status response:", subscription);
 
-    // if your controller returned an error, subscription may have an `error` key
-    if (subscription.error) {
-      throw new Error(subscription.error.message || "Stripe error");
-    }
+    subscriptionStatus.value =
+      subscription && subscription.status ? subscription.status : null;
 
-    // now subscription.trialEndsAt is what your controller sent
     const rawEnds = subscription.trialEndsAt;
-    console.debug("[Dashboard] raw trialEndsAt:", rawEnds);
-
     if (rawEnds) {
       const endDate =
         typeof rawEnds === "number"
@@ -464,24 +458,27 @@ async function fetchTrialInfo() {
           : new Date(rawEnds);
       const diff = differenceInCalendarDays(endDate, new Date());
       daysLeft.value = diff > 0 ? diff : 0;
-      console.debug("[Dashboard] daysLeft =", daysLeft.value);
     } else {
       daysLeft.value = null;
-      console.debug(
-        "[Dashboard] no trialEndsAt; user is on paid plan or inactive"
-      );
     }
   } catch (err) {
     console.error("[Dashboard] fetchTrialInfo error:", err);
     trialError.value = err.message || "Unknown error fetching trial info";
   } finally {
     loadingTrial.value = false;
-    console.debug(
-      "[Dashboard] fetchTrialInfo: loadingTrial =",
-      loadingTrial.value
-    );
   }
 }
+
+// refresh everything after billing portal return
+watch(
+  () => route.query.portal,
+  async (flag) => {
+    if (flag === "returned") {
+      await Promise.all([fetchTrialInfo(), fetchBillingInfo(), fetchUser()]);
+      router.replace({ path: route.path, query: {} });
+    }
+  }
+);
 
 const fetchData = async () => {
   if (!user.value) return;
