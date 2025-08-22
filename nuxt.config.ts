@@ -32,9 +32,10 @@ export default defineNuxtConfig({
         '@tiptap/starter-kit',]
     }
   },
+  
   build: {
     transpile: ['chart.js', 'chartjs-adapter-luxon',   '@tiptap/vue-3',
-      '@tiptap/starter-kit',]
+      '@tiptap/starter-kit']
   },
   css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css', '@fortawesome/fontawesome-free/css/all.css'],
 

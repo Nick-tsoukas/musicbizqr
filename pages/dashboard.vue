@@ -60,6 +60,7 @@
             :key="qr.id"
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
+            <!-- simple preview image -->
             <img
               :src="qr.imageUrl"
               alt=""
@@ -74,11 +75,17 @@
               </span>
             </div>
 
-            <!-- ✅ Action Buttons: View, Edit, Delete, Analytics -->
             <div class="flex flex-col md:flex-row gap-2 mt-4">
-              <button @click="viewQr(qr.imageUrl)" class="action-button">
+              <!-- keep your existing simple viewer -->
+              <!-- <button @click="viewQr(qr.imageUrl)" class="action-button">
                 <img src="@/assets/view-icon.svg" class="h-5 w-5" />
                 <span>View</span>
+              </button> -->
+
+              <!-- NEW: open the download modal (PNG/JPEG/SVG) -->
+              <button @click="openDownloadForQr(qr.raw)" class="action-button">
+                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
+                <span>Download</span>
               </button>
 
               <button @click="editItem(qr.id, 'editqr')" class="action-button">
@@ -93,6 +100,7 @@
                 <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
                 <span>Analytics</span>
               </button>
+
               <button
                 @click="deleteItem(qr.id, 'qr')"
                 class="action-button text-red-400 hover:text-red-200"
@@ -307,9 +315,16 @@
           Create Your First Event
         </div>
       </div>
+      <!-- Download modal (client-only component) -->
 
+      <DownloadQr
+        v-model="showDownload"
+        :qr-options="activeQrOptions"
+        :default-name="activeQrName"
+        :key="showDownload ? activeQrName : 'closed'"
+      />
       <!-- VIEW QR Popup -->
-      <div
+      <!-- <div
         v-if="qrView"
         class="h-screen w-screen bg-black z-50 fixed overflow-hidden top-0 right-0 flex justify-center items-center"
       >
@@ -329,10 +344,8 @@
             Close popup
           </button>
         </div>
-        <!-- <div class="absolute bottom-10 right-10">
-          <h2 @click="viewQr" class="text-white cursor-pointer">Close</h2>
-        </div> -->
-      </div>
+      
+      </div> -->
     </div>
     <transition name="fade-slide">
       <div
@@ -350,6 +363,7 @@ import { useNuxtApp } from "#app";
 import { ref, onMounted, computed, inject, watch } from "vue";
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
+import DownloadQr from "~/components/DownloadQr.client.vue";
 
 const token = useStrapiToken();
 const loadingPortal = ref(false);
@@ -400,6 +414,58 @@ const hasBand = computed(() => bandItems.value.length > 0);
 const showToast = ref(false);
 const toastMessage = ref("");
 let toastTimeout = null;
+const showDownload = ref(false);
+const activeQrOptions = ref(null);
+const activeQrName = ref("qr-code");
+
+console.log(qrs.value, "this is the qrs");
+
+function openDownloadForQr(raw) {
+  const built = buildQrOptionsFromStrapi(raw);
+  console.log("[Dashboard] built options:", built); // ← must show { data: '...', ... }
+  activeQrOptions.value = built;
+  activeQrName.value = raw?.attributes?.name || `qr-${raw?.id || ""}`;
+  showDownload.value = true;
+}
+
+function buildQrOptionsFromStrapi(raw) {
+  const a = raw?.attributes || {};
+  const saved = a.options || {};
+  const dataValue = a.url || a.qrValue || a.link || a.data || "";
+
+  const logo = saved.image || saved.imageOptions?.src || a.logo?.url || null;
+
+  // mirror the shape from your Edit page’s getQRCodeOptions()
+  const opts = {
+    data: dataValue || "https://musicbizqr.com",
+    width: Number(saved.size || saved.width || 300),
+    height: Number(saved.size || saved.height || 300),
+    backgroundOptions: { color: saved.backgroundOptions?.color || "#FFFFFF" },
+    dotsOptions: {
+      type: saved.dotsOptions?.type || "square",
+      color: saved.dotsOptions?.color || "#000000",
+      gradient: saved.dotsOptions?.gradient ?? null,
+    },
+    cornersSquareOptions: {
+      color: saved.cornersSquareOptions?.color || "#000000",
+      type: saved.cornersSquareOptions?.type || "square",
+    },
+    cornersDotOptions: {
+      color: saved.cornersDotOptions?.color || "#000000",
+      type: saved.cornersDotOptions?.type || "square",
+    },
+    imageOptions: {
+      src: logo || "",
+      imageSize: saved.imageOptions?.imageSize ?? 0.4,
+      margin: saved.imageOptions?.margin ?? 0,
+      crossOrigin:
+        logo && !String(logo).startsWith("data:") ? "anonymous" : "anonymous",
+    },
+  };
+
+  if (logo) opts.image = logo;
+  return opts;
+}
 
 function copyToClipboard(text) {
   navigator.clipboard
@@ -561,6 +627,7 @@ const qrItems = computed(() =>
     title: qr.attributes.name,
     imageUrl: qr.attributes.q_image?.data?.attributes?.url || "",
     scans: qr.attributes.scans,
+    raw: qr, // ← keep the full Strapi row so we can build QR options later
   }))
 );
 
