@@ -173,7 +173,7 @@
         </section>
 
         <!-- Social Media -->
-        <section v-if="socialPlatforms.length > 0" class="mt-10">
+        <section v-if="hasSocialLinks" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Social Media
           </h2>
@@ -383,6 +383,10 @@ function sanitizeEmbed(html) {
 const rawEmbedHtml = computed(
   () => band.value?.data?.singlesong?.embedHtml || ""
 );
+
+const hasSocialLinks = computed(() => 
+  socialPlatforms.some(p => !!band.value?.data?.[p.name])
+)
 const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
 
 const showWobble = ref(false);
