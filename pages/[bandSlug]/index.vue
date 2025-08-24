@@ -173,7 +173,7 @@
         </section>
 
         <!-- Social Media -->
-        <section class="mt-10">
+        <section v-if="socialPlatforms.length > 0" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Social Media
           </h2>
