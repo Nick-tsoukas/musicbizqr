@@ -38,19 +38,20 @@
             QR Codes
           </h2>
           <NuxtLink
-            v-if="qrItems.length === 0"
+            v-if="qrItems.length === 0 || isSpecialUser"
             to="/createqr"
             class="mdc-button flex justify-between w-full md:w-[300px]"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create QR
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
+            Create QR
           </NuxtLink>
           <button
             v-else
             class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one
-            QR allowed
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
+            Only one QR allowed
           </button>
         </div>
 
@@ -131,20 +132,20 @@
             Artist Smart Link Page
           </h2>
           <NuxtLink
-            v-if="!hasBand"
+            v-if="!hasBand || isSpecialUser"
             to="/createband"
             class="mdc-button flex justify-between w-full md:w-[300px]"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create
-            Artist Page
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
+            Create Artist Page
           </NuxtLink>
           <button
             v-else
             class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Only one
-            artist allowed
+            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
+            Only one artist allowed
           </button>
         </div>
 
@@ -364,6 +365,10 @@ import { ref, onMounted, computed, inject, watch } from "vue";
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
 import DownloadQr from "~/components/DownloadQr.client.vue";
+
+// special user override
+const specialEmail = "mjc773@gmail.com";
+const isSpecialUser = computed(() => user.value?.email === specialEmail);
 
 const token = useStrapiToken();
 const loadingPortal = ref(false);
