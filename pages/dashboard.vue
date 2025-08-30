@@ -365,6 +365,7 @@ import { ref, onMounted, computed, inject, watch } from "vue";
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
 import DownloadQr from "~/components/DownloadQr.client.vue";
+// rebuild
 
 // special user override
 const specialEmail = "mjc773@gmail.com";
