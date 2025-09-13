@@ -50,8 +50,7 @@
         <!-- Featured Song -->
         <section v-if="hasFeaturedSong" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            <span v-if="!isTH">Featured Song</span>
-            <span v-else>เพลงเด่น</span>
+            Featured Song
           </h2>
 
           <!-- Embedded Track -->
@@ -72,8 +71,7 @@
                 @click="handleFirstClick"
               >
                 <span class="text-white text-lg font-semibold">
-                  ▶ <span v-if="!isTH">Click to Play</span
-                  ><span v-else>คลิกเพื่อเล่น</span>
+                  ▶ Click to Play
                 </span>
               </div>
             </div>
@@ -93,8 +91,7 @@
         <!-- Featured Video -->
         <section v-if="band.data.singlevideo?.youtubeid" class="w-full mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            <span v-if="!isTH">Featured Video</span>
-            <span v-else>วิดีโอเด่น</span>
+            Featured Video
           </h2>
 
           <div
@@ -107,9 +104,7 @@
               :alt="`${band.data.name} video thumbnail`"
               class="absolute inset-0 w-full h-full object-cover"
             />
-            <div
-              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            ></div>
+            <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"></div>
           </div>
 
           <div v-else class="embed-container rounded-lg overflow-hidden">
@@ -124,8 +119,7 @@
         <!-- Website Link -->
         <section v-if="band.data.websitelink" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
-            <span v-if="!isTH">Website Link</span>
-            <span v-else>ลิงก์เว็บไซต์</span>
+            Website Link
           </h2>
           <a
             :href="band.data.websitelink"
@@ -140,16 +134,13 @@
         <!-- Streaming Links -->
         <section v-if="hasStreamingLinks" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            <span v-if="!isTH">Streaming Links</span>
-            <span v-else>ฟังเพลง</span>
+            Streaming Links
           </h2>
           <template v-for="platform in streamingPlatforms" :key="platform.name">
             <span v-if="band.data[platform.name]">
               <a
                 :href="band.data[platform.name]"
-                @click.prevent="
-                  handleClick(band.data.id, platform.name, band.data[platform.name])
-                "
+                @click.prevent="handleClick(band.data.id, platform.name, band.data[platform.name])"
               >
                 <button
                   class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
@@ -169,16 +160,13 @@
         <!-- Social Media -->
         <section v-if="hasSocialLinks" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            <span v-if="!isTH">Social Media</span>
-            <span v-else>โซเชียลมีเดีย</span>
+            Social Media
           </h2>
           <template v-for="platform in socialPlatforms" :key="platform.name">
             <span v-if="band.data[platform.name]">
               <a
                 :href="band.data[platform.name]"
-                @click.prevent="
-                  handleClick(band.data.id, platform.name, band.data[platform.name])
-                "
+                @click.prevent="handleClick(band.data.id, platform.name, band.data[platform.name])"
               >
                 <button
                   class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
@@ -196,27 +184,18 @@
         </section>
 
         <!-- Upcoming Events -->
-        <section
-          v-if="upcomingEvents.length"
-          id="upcoming-events"
-          class="mt-10"
-        >
+        <section v-if="upcomingEvents.length" id="upcoming-events" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            <span v-if="!isTH">Upcoming Events</span>
-            <!-- <span v-else>งานที่จะถึง</span> -->
+            Upcoming Events
           </h2>
-          <div
-            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
-          >
-            <table
-              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-            >
+          <div class="overflow-x-scroll md:overflow-hidden relative no-scrollbar">
+            <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
               <thead>
                 <tr class="border-b border-purple-500 border-opacity-30">
-                  <th class="px-2 py-2 text-left">{{ isTH ? "วันที่" : "Date" }}</th>
-                  <th class="px-2 py-2 text-left">{{ isTH ? "เมือง" : "City" }}</th>
-                  <th class="px-2 py-2 text-left">{{ isTH ? "สถานที่" : "Venue" }}</th>
-                  <th class="px-2 py-2 text-left">{{ isTH ? "ตั๋ว" : "Tickets" }}</th>
+                  <th class="px-2 py-2 text-left">Date</th>
+                  <th class="px-2 py-2 text-left">City</th>
+                  <th class="px-2 py-2 text-left">Venue</th>
+                  <th class="px-2 py-2 text-left">Tickets</th>
                 </tr>
               </thead>
               <tbody>
@@ -224,28 +203,23 @@
                   v-for="event in upcomingEvents"
                   :key="event.id"
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click.stop="
-                    router.push(`/${route.params.bandSlug}/event/${event.slug}`)
-                  "
+                  @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                 >
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ formatDate(event.date) }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.city || (isTH ? "ไม่ระบุ" : "N/A") }},
-                    {{ event.state }}
+                    {{ event.city || "N/A" }}, {{ event.state }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.venue || (isTH ? "ไม่ระบุ" : "N/A") }}
+                    {{ event.venue || "N/A" }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
-                      @click.stop="
-                        router.push(`/${route.params.bandSlug}/event/${event.slug}`)
-                      "
+                      @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                       class="text-purple-400"
                     >
-                      {{ isTH ? "ดูงาน" : "View Event" }}
+                      View Event
                     </button>
                   </td>
                 </tr>
@@ -257,21 +231,16 @@
         <!-- Past Events -->
         <section v-if="pastEvents.length" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            <span v-if="!isTH">Past Events</span>
-            <span v-else>งานที่ผ่านมา</span>
+            Past Events
           </h2>
-          <div
-            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
-          >
-            <table
-              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-            >
+          <div class="overflow-x-scroll md:overflow-hidden relative no-scrollbar">
+            <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
               <thead>
                 <tr class="border-b border-purple-500 border-opacity-30">
-                  <th class="px-2 py-2 text-left">{{ isTH ? "วันที่" : "Date" }}</th>
-                  <th class="px-2 py-2 text-left">{{ isTH ? "เมือง" : "City" }}</th>
-                  <th class="px-2 py-2 text-left">{{ isTH ? "สถานที่" : "Venue" }}</th>
-                  <th class="px-2 py-2 text-left">{{ isTH ? "ตั๋ว" : "Tickets" }}</th>
+                  <th class="px-2 py-2 text-left">Date</th>
+                  <th class="px-2 py-2 text-left">City</th>
+                  <th class="px-2 py-2 text-left">Venue</th>
+                  <th class="px-2 py-2 text-left">Tickets</th>
                 </tr>
               </thead>
               <tbody>
@@ -279,28 +248,23 @@
                   v-for="event in pastEvents"
                   :key="event.id"
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click.stop="
-                    router.push(`/${route.params.bandSlug}/event/${event.slug}`)
-                  "
+                  @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                 >
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ formatDate(event.date) }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.city || (isTH ? "ไม่ระบุ" : "N/A") }},
-                    {{ event.state }}
+                    {{ event.city || "N/A" }}, {{ event.state }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.venue || (isTH ? "ไม่ระบุ" : "N/A") }}
+                    {{ event.venue || "N/A" }}
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
-                      @click.stop="
-                        router.push(`/${route.params.bandSlug}/event/${event.slug}`)
-                      "
+                      @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                       class="text-purple-400"
                     >
-                      {{ isTH ? "ดูงาน" : "View Event" }}
+                      View Event
                     </button>
                   </td>
                 </tr>
@@ -318,8 +282,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from "vue";
-import { useRuntimeConfig, useHead } from "#imports";
+import { ref, onMounted, computed } from "vue";
+import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import { useRoute, useRouter } from "vue-router";
 import { useNuxtApp } from "#app";
@@ -346,20 +310,6 @@ import "swiper/css/effect-cards";
 const embedClickCaptured = ref(false);
 const hasTrackedEmbedClick = ref(false);
 const nuxtApp = useNuxtApp();
-const isTH = ref(false);
-
-// onMounted(() => {
-//   const locale =
-//     (navigator.language ||
-//       (navigator.languages && navigator.languages[0]) ||
-//       ""
-//     ).toLowerCase();
-
-//   if (locale.startsWith("th")) {
-//     isTH.value = true;
-//     document.documentElement.classList.add("th-font");
-//   }
-// });
 
 const historyStack = nuxtApp.$historyStack;
 const { trackClick, trackMediaPlay } = useBeacon();
@@ -384,9 +334,7 @@ function sanitizeEmbed(html) {
   return html.replace(/<script[\s\S]*?<\/script>/gi, "");
 }
 
-const rawEmbedHtml = computed(
-  () => band.value?.data?.singlesong?.embedHtml || ""
-);
+const rawEmbedHtml = computed(() => band.value?.data?.singlesong?.embedHtml || "");
 const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
 
 const hasStreamingLinks = computed(() =>
@@ -395,40 +343,6 @@ const hasStreamingLinks = computed(() =>
 const hasSocialLinks = computed(() =>
   socialPlatforms.some((p) => !!band.value?.data?.[p.name])
 );
-
-async function handleFirstClick() {
-  if (embedClickCaptured.value) return;
-  if (!hasTrackedEmbedClick.value) {
-    try {
-      const bandId = band.value?.data?.id;
-      const title = band.value?.data?.singlesong?.title || "Unknown";
-      if (bandId) await trackMediaPlay(bandId, "song", title);
-      hasTrackedEmbedClick.value = true;
-    } catch (e) {
-      console.error("trackMediaPlay failed:", e);
-    }
-  }
-  embedClickCaptured.value = true;
-}
-
-const streamingPlatforms = [
-  { name: "youtube", img: youtubeIcon, label: "YouTube" },
-  { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
-  { name: "spotify", img: spotifyIcon, label: "Spotify" },
-  { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
-  { name: "reverbnation", img: reverbnationIcon, label: "Reverbnation" },
-  { name: "soundcloud", img: soundcloudIcon, label: "SoundCloud" },
-  { name: "bandcamp", img: bandcampIcon, label: "Bandcamp" },
-  { name: "twitch", img: twitchIcon, label: "Twitch" },
-  { name: "deezer", img: deezerIcon, label: "Deezer" },
-];
-
-const socialPlatforms = [
-  { name: "facebook", img: facebookIcon, label: "Facebook" },
-  { name: "instagram", img: instagramIcon, label: "Instagram" },
-  { name: "twitter", img: twitterIcon, label: "Twitter" },
-  { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
-];
 
 const singleVideoThumbnail = computed(() => {
   const id = extractYouTubeId(band.value?.data?.singlevideo?.youtubeid || "");
@@ -440,10 +354,12 @@ const singleVideoEmbedUrl = computed(() => {
 });
 
 function formatDate(dateStr) {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString(
-    isTH ? "th-TH" : "en-US",
-    { day: "numeric", month: "short", year: "numeric" }
-  );
+  // Always English (US) now
+  return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function formatSingleSong(single) {
@@ -515,13 +431,24 @@ const pastEvents = computed(() =>
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 );
 
-const hasFeaturedSong = computed(() => {
-  const s = band.value?.data?.singlesong;
-  if (!s) return false;
-  if (s.isEmbed) return Boolean(safeEmbedHtml.value);
-  const url = s.song?.data?.attributes?.url || s.song?.url;
-  return Boolean(url);
-});
+const streamingPlatforms = [
+  { name: "youtube", img: youtubeIcon, label: "YouTube" },
+  { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
+  { name: "spotify", img: spotifyIcon, label: "Spotify" },
+  { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
+  { name: "reverbnation", img: reverbnationIcon, label: "Reverbnation" },
+  { name: "soundcloud", img: soundcloudIcon, label: "SoundCloud" },
+  { name: "bandcamp", img: bandcampIcon, label: "Bandcamp" },
+  { name: "twitch", img: twitchIcon, label: "Twitch" },
+  { name: "deezer", img: deezerIcon, label: "Deezer" },
+];
+
+const socialPlatforms = [
+  { name: "facebook", img: facebookIcon, label: "Facebook" },
+  { name: "instagram", img: instagramIcon, label: "Instagram" },
+  { name: "twitter", img: twitterIcon, label: "Twitter" },
+  { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
+];
 
 onMounted(fetchBandData);
 </script>
@@ -563,11 +490,7 @@ onMounted(fetchBandData);
   margin-top: 2rem;
 }
 @keyframes spin {
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
 }
 </style>
