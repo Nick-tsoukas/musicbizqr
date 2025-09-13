@@ -348,19 +348,18 @@ const hasTrackedEmbedClick = ref(false);
 const nuxtApp = useNuxtApp();
 const isTH = ref(false);
 
-onMounted(() => {
-  const locale =
-    (navigator.language ||
-      (navigator.languages && navigator.languages[0]) ||
-      ""
-    ).toLowerCase();
+// onMounted(() => {
+//   const locale =
+//     (navigator.language ||
+//       (navigator.languages && navigator.languages[0]) ||
+//       ""
+//     ).toLowerCase();
 
-  if (locale.startsWith("th")) {
-    isTH.value = true;
-    document.documentElement.classList.add("th-font");
-  }
-});
-
+//   if (locale.startsWith("th")) {
+//     isTH.value = true;
+//     document.documentElement.classList.add("th-font");
+//   }
+// });
 
 const historyStack = nuxtApp.$historyStack;
 const { trackClick, trackMediaPlay } = useBeacon();
