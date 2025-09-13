@@ -203,7 +203,7 @@
         >
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             <span v-if="!isTH">Upcoming Events</span>
-            <span v-else>งานที่จะถึง</span>
+            <!-- <span v-else>งานที่จะถึง</span> -->
           </h2>
           <div
             class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
