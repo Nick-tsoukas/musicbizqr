@@ -311,7 +311,6 @@ const embedClickCaptured = ref(false);
 const hasTrackedEmbedClick = ref(false);
 const nuxtApp = useNuxtApp();
 
-const historyStack = nuxtApp.$historyStack;
 const { trackClick, trackMediaPlay } = useBeacon();
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -323,6 +322,7 @@ const events = ref([]);
 
 const isVideoPlaying = ref(false);
 
+/* ---------- helpers ---------- */
 function extractYouTubeId(url) {
   const m = url?.match(/[?&]v=([^&]+)/) || url?.match(/youtu\.be\/([^?]+)/);
   return m ? m[1] : "";
@@ -330,13 +330,49 @@ function extractYouTubeId(url) {
 
 function sanitizeEmbed(html) {
   if (!html) return "";
+  // must contain an iframe; strip scripts
   if (!/<iframe[\s\S]*<\/iframe>/i.test(html)) return "";
   return html.replace(/<script[\s\S]*?<\/script>/gi, "");
 }
 
+/* ---------- embed & featured song ---------- */
 const rawEmbedHtml = computed(() => band.value?.data?.singlesong?.embedHtml || "");
 const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
 
+const hasFeaturedSong = computed(() => {
+  const s = band.value?.data?.singlesong;
+  if (!s) return false;
+
+  if (s.isEmbed) {
+    // Only render if we truly have a valid iframe after sanitization
+    return !!safeEmbedHtml.value;
+  }
+
+  // Raw audio mode: require a real file URL
+  const nestedUrl = s?.song?.data?.attributes?.url;
+  const directUrl = s?.song?.url;
+  return !!(nestedUrl || directUrl);
+});
+
+function handleFirstClick() {
+  // Hide overlay so the iframe can be interacted with
+  embedClickCaptured.value = true;
+
+  // Optional: track the first interaction
+  if (!hasTrackedEmbedClick.value) {
+    try {
+      const bandId = band.value?.data?.id;
+      const title = band.value?.data?.singlesong?.title || "song-embed";
+      trackMediaPlay(bandId, "song-embed", title);
+    } catch (e) {
+      console.error("trackMediaPlay (embed) error:", e);
+    } finally {
+      hasTrackedEmbedClick.value = true;
+    }
+  }
+}
+
+/* ---------- streaming & social sections ---------- */
 const hasStreamingLinks = computed(() =>
   streamingPlatforms.some((p) => !!band.value?.data?.[p.name])
 );
@@ -344,6 +380,7 @@ const hasSocialLinks = computed(() =>
   socialPlatforms.some((p) => !!band.value?.data?.[p.name])
 );
 
+/* ---------- video ---------- */
 const singleVideoThumbnail = computed(() => {
   const id = extractYouTubeId(band.value?.data?.singlevideo?.youtubeid || "");
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
@@ -353,8 +390,9 @@ const singleVideoEmbedUrl = computed(() => {
   return id ? `https://www.youtube.com/embed/${id}` : "";
 });
 
+/* ---------- formatting ---------- */
 function formatDate(dateStr) {
-  // Always English (US) now
+  // Always English (US)
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
@@ -363,25 +401,28 @@ function formatDate(dateStr) {
 }
 
 function formatSingleSong(single) {
+  if (!single) return null;
   const nestedUrl = single?.song?.data?.attributes?.url;
   const directUrl = single?.song?.url;
   const fileUrl = nestedUrl || directUrl || null;
+
   return {
     id: single?.id,
     attributes: {
-      title: single?.title,
+      title: single?.title || "Untitled",
       song: { data: { attributes: { url: fileUrl } } },
       duration: single?.duration || 0,
       cover: single?.cover || null,
-      artist: band.value?.data?.name,
+      artist: band.value?.data?.name || "Artist",
     },
   };
 }
 
+/* ---------- tracking ---------- */
 async function onSongPlay() {
   if (!band.value?.data?.singlesong) return;
   const bandId = band.value.data.id;
-  const title = band.value.data.singlesong.title;
+  const title = band.value.data.singlesong.title || "song";
   try {
     await trackMediaPlay(bandId, "song", title);
   } catch (err) {
@@ -391,9 +432,9 @@ async function onSongPlay() {
 
 async function playVideo() {
   isVideoPlaying.value = true;
-  const bandId = band.value.data.id;
+  const bandId = band.value?.data?.id;
   const title =
-    band.value.data.singlevideo?.title || band.value.data.singlesong?.title;
+    band.value?.data?.singlevideo?.title || band.value?.data?.singlesong?.title || "video";
   try {
     await trackMediaPlay(bandId, "video", title);
   } catch (err) {
@@ -405,18 +446,43 @@ function handleClick(bandId, platform, url) {
   trackClick(bandId, platform, url);
 }
 
+/* ---------- data fetch ---------- */
 async function fetchBandData() {
   const slug = route.params.bandSlug?.toLowerCase() || "";
   const apiUrl = config.public.strapiUrl;
-  const res = await fetch(
-    `${apiUrl}/api/bands/slug/${slug}?populate=bandImg,events,tours,albums,singlesong,singlevideo`
-  );
-  const data = await res.json();
-  band.value = data;
-  events.value = data.data.events || [];
-  loading.value = false;
+
+  // Expanded populate to ensure singlesong -> song/cover file URLs are present
+  const url =
+    `${apiUrl}/api/bands/slug/${slug}` +
+    `?populate[bandImg]=*` +
+    `&populate[events]=*` +
+    `&populate[tours]=*` +
+    `&populate[albums]=*` +
+    `&populate[singlevideo]=*` +
+    `&populate[singlesong][populate]=song,cover`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    band.value = data;
+    events.value = data?.data?.events || [];
+
+    // quick visibility logs (helps diagnose silent failures)
+    const s = band.value?.data?.singlesong;
+    console.log("Singlesong:", s);
+    console.log("Embed?", s?.isEmbed, "Valid iframe?", !!safeEmbedHtml.value);
+    console.log(
+      "Audio URL:",
+      s?.song?.data?.attributes?.url || s?.song?.url || null
+    );
+  } catch (e) {
+    console.error("Fetch band error:", e);
+  } finally {
+    loading.value = false;
+  }
 }
 
+/* ---------- events ---------- */
 const today = new Date();
 
 const upcomingEvents = computed(() =>
@@ -452,6 +518,7 @@ const socialPlatforms = [
 
 onMounted(fetchBandData);
 </script>
+
 
 <style scoped>
 .embed-container {
