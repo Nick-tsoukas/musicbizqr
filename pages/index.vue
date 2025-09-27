@@ -10,30 +10,54 @@
       <main>
         <!-- Hero -->
         <div class="relative isolate min-h-[100vh]">
-          <div class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8">
-            <div class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto">
+          <div
+            class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8"
+          >
+            <div
+              class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
+            >
               <!-- TH greeting ribbon -->
-              <div v-if="isTH" class="mb-4 flex items-center justify-center lg:justify-start">
-                <span class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-600/90 px-4 py-2 text-sm font-semibold">
-                  🎬 สวัสดีครับ/ค่ะ Thailand! — ใช้ MusicBizQR กับเพลง ภาพยนตร์ และซีรีส์ได้เลย
+              <div
+                v-if="isTH"
+                class="mb-4 flex items-center justify-center lg:justify-start"
+              >
+                <span
+                  class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-600/90 px-4 py-2 text-sm font-semibold"
+                >
+                  🎬 สวัสดีครับ/ค่ะ Thailand! — ใช้ MusicBizQR กับเพลง ภาพยนตร์
+                  และซีรีส์ได้เลย
                 </span>
               </div>
 
-              <h1 data-aos="fade-up" class="font-extrabold tracking-tight leading-none text-center lg:text-left">
-                <span class="block text-7xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+              <h1
+                data-aos="fade-up"
+                class="font-extrabold tracking-tight leading-none text-center lg:text-left"
+              >
+                <span
+                  class="block text-7xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+                >
                   MusicBizQR
                 </span>
 
                 <!-- Localized subtitle -->
-                <span v-if="!isTH" class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200">
+                <span
+                  v-if="!isTH"
+                  class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200"
+                >
                   Dynamic QR Codes &amp; Smart Link Pages for Musicians
                 </span>
-                <span v-else class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200">
-                  คิวอาร์โค้ดไดนามิก & ลิงก์รวมอัจฉริยะสำหรับศิลปินและงานภาพยนตร์
+                <span
+                  v-else
+                  class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200"
+                >
+                  คิวอาร์โค้ดไดนามิก &
+                  ลิงก์รวมอัจฉริยะสำหรับศิลปินและงานภาพยนตร์
                 </span>
               </h1>
 
-              <div class="flex justify-center mt-10 items-start mb-12 2xl:hidden">
+              <div
+                class="flex justify-center mt-10 items-start mb-12 2xl:hidden"
+              >
                 <img
                   src="@/assets/qrcode.png"
                   alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
@@ -45,31 +69,41 @@
               <!-- Bullets (kept English; concise & universal) -->
               <ul class="space-y-3 text-lg lg:text-xl text-white mt-6">
                 <li>
-                  <strong class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                  >
                     Dynamic QR Codes for Artists & Bands
                   </strong>
                   – print once, update destinations anytime.
                 </li>
                 <li>
-                  <strong class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                  >
                     Smart Link Splash Pages
                   </strong>
                   – pull in Spotify, Apple Music, YouTube & socials in one scan.
                 </li>
                 <li>
-                  <strong class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                  >
                     Embed Music & Video
                   </strong>
                   – feature a track, playlist, or latest music video instantly.
                 </li>
                 <li>
-                  <strong class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                  >
                     Sell Tickets & Merch
                   </strong>
                   – add tappable purchase links fans can use at the show.
                 </li>
                 <li>
-                  <strong class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                  <strong
+                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
+                  >
                     Real-Time Scan Analytics
                   </strong>
                   – see where, when & how fans engage; route tours smarter.
@@ -77,8 +111,13 @@
               </ul>
 
               <!-- Primary CTAs (localized) -->
-              <div class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6">
-                <NuxtLink to="/signup" class="mdc-button mb-4 w-full md:mb-0 md:w-auto">
+              <div
+                class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6"
+              >
+                <NuxtLink
+                  to="/signup"
+                  class="mdc-button mb-4 w-full md:mb-0 md:w-auto"
+                >
                   <span v-if="!isTH">Create Account</span>
                   <span v-else>เริ่มต้นใช้งานฟรี</span>
                 </NuxtLink>
@@ -90,11 +129,15 @@
 
               <!-- Micro trust for Thailand -->
               <p v-if="isTH" class="text-sm text-white/70">
-                รองรับครีเอเตอร์สายเพลงและภาพยนตร์ — สร้างลิงก์รวมสำหรับโปสเตอร์/บัตรเชิญ/หน้าเพจ พร้อมสถิติแบบเรียลไทม์
+                รองรับครีเอเตอร์สายเพลงและภาพยนตร์ —
+                สร้างลิงก์รวมสำหรับโปสเตอร์/บัตรเชิญ/หน้าเพจ
+                พร้อมสถิติแบบเรียลไทม์
               </p>
             </div>
 
-            <div class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-start lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+            <div
+              class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-start lg:mt-0 lg:flex-shrink-0 lg:flex-grow"
+            >
               <img
                 src="@/assets/qrcode.png"
                 alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
@@ -103,19 +146,208 @@
             </div>
           </div>
         </div>
+        <!-- needs section here  -->
+
+        <section class="relative text-white overflow-hidden">
+          <!-- subtle gradient glow -->
+          <div
+            class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(120%_110%_at_50%_100%,rgba(199,36,177,0.38),transparent_80%)]"
+          />
+
+          <div class="container mx-auto px-6 py-16 md:py-24">
+            <div
+              class="grid grid-cols-1 md:grid-cols-12 items-center gap-10 md:gap-8"
+            >
+              <!-- Center content -->
+              <div class="md:col-span-7 text-center md:text-left">
+                <h1
+                  class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight"
+                >
+                  One QR Code. Every Fan. Every Link.
+                </h1>
+
+                <p class="mt-4 text-white/80">
+                  Give your audience a single QR code “Smart Link Tree”
+                </p>
+
+                <ul class="mt-6 space-y-3">
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20"
+                    >
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span>Your content on all platforms with 1 scan</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20"
+                    >
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span>Real-time analytics (see who’s clicking what!)</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20"
+                    >
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span>Showcase 1 song, 1 video</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/20"
+                    >
+                      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span>Post upcoming events & ticket links</span>
+                  </li>
+                </ul>
+
+                <NuxtLink
+                  to="/signup"
+                  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-violet-600/80 hover:bg-violet-600 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+                >
+                  <span>🚀 Free 30 Day Trial</span>
+                  <span class="text-white/80 font-normal"
+                    >No Credit Card Required</span
+                  >
+                </NuxtLink>
+              </div>
+
+              <!-- Right phones -->
+              <div class="hidden md:flex md:col-span-5 justify-center gap-6">
+                <!-- Phone 1 -->
+                <div class="relative select-none">
+                  <div
+                    class="relative rounded-[2.4rem] border border-white/20 bg-neutral-900 shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+                    style="width: 230px; height: 470px"
+                  >
+                    <div
+                      class="absolute inset-0 rounded-[2.4rem] pointer-events-none"
+                      style="
+                        box-shadow:
+                          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+                          inset 0 0 24px rgba(255, 255, 255, 0.06);
+                      "
+                    ></div>
+                    <div
+                      class="absolute left-1/2 -translate-x-1/2 top-1.5 h-5 w-24 rounded-b-2xl bg-black/80"
+                    ></div>
+                    <div
+                      class="absolute inset-[10px] rounded-[1.9rem] overflow-hidden bg-black"
+                    >
+                      <img
+                        :src="leftPhoneSrcResolved"
+                        :alt="leftPhoneAltResolved"
+                        class="h-full w-full object-cover"
+                        style="aspect-ratio: 9/19.5"
+                      />
+                    </div>
+                    <div
+                      class="absolute bottom-2 left-1/2 -translate-x-1/2 h-1 w-24 rounded-full bg-white/10"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Phone 2 -->
+                <div class="relative select-none">
+                  <div
+                    class="relative rounded-[2.4rem] border border-white/20 bg-neutral-900 shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+                    style="width: 230px; height: 470px"
+                  >
+                    <div
+                      class="absolute inset-0 rounded-[2.4rem] pointer-events-none"
+                      style="
+                        box-shadow:
+                          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+                          inset 0 0 24px rgba(255, 255, 255, 0.06);
+                      "
+                    ></div>
+                    <div
+                      class="absolute left-1/2 -translate-x-1/2 top-1.5 h-5 w-24 rounded-b-2xl bg-black/80"
+                    ></div>
+                    <div
+                      class="absolute inset-[10px] rounded-[1.9rem] overflow-hidden bg-black"
+                    >
+                      <img
+                        :src="rightPhoneSrcResolved"
+                        :alt="rightPhoneAltResolved"
+                        class="h-full w-full object-cover"
+                        style="aspect-ratio: 9/19.5"
+                      />
+                    </div>
+                    <div
+                      class="absolute bottom-2 left-1/2 -translate-x-1/2 h-1 w-24 rounded-full bg-white/10"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <!-- CTA block -->
-        <div ref="parallaxRef" class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50">
-          <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div class="text-center h-full flex flex-col justify-center items-center md:text-left">
-              <h2 class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+        <div
+          ref="parallaxRef"
+          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
+        >
+          <div
+            class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+            <div
+              class="text-center h-full flex flex-col justify-center items-center md:text-left"
+            >
+              <h2
+                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+              >
                 <span v-if="!isTH">Create Your Profile</span>
                 <span v-else>เริ่มสร้างโปรไฟล์ของคุณ</span>
               </h2>
-              <div class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white">
-                <NuxtLink to="/signup" class="cta-button-no w-auto mx-auto">
-                  <span v-if="!isTH">Sign Up For A Free 30 day Trial</span>
-                  <span v-else>สมัครใช้งานฟรี 30 วัน</span>
+              <div
+                class="flex w-full justify-center md:justify-center px-2 gap-6 mt-10 text-white"
+              >
+                <NuxtLink
+                  to="/signup"
+                  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+                >
+                  <span>🚀 Free 30 Day Trial</span>
+                  <span class="text-white/80 font-normal"
+                    >No Credit Card Required</span
+                  >
                 </NuxtLink>
               </div>
             </div>
@@ -124,28 +356,42 @@
 
         <!-- Example section (unchanged content, global) -->
         <div class="flex flex-col justify-center">
-          <h2 class="text-4xl lg:text-4xl 2xl:text-5xl font-bold mt-0 pt-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+          <h2
+            class="text-4xl lg:text-4xl 2xl:text-5xl font-bold mt-0 pt-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+          >
             Artist Smart Link &amp; Splash Page Example
           </h2>
-          <p class="mt-4 max-w-3xl mx-auto text-center text-white/90 text-lg leading-relaxed">
-            When fans scan one of your <strong>MusicBizQR dynamic QR codes</strong>, they land on a
-            mobile-first <strong>artist splash page</strong> that pulls in your streaming platforms (Spotify, Apple Music, YouTube), socials,
-            featured tracks or videos, and even <strong>merch &amp; ticket links</strong>—all in one tap-friendly layout you can update anytime and track in real time.
+          <p
+            class="mt-4 max-w-3xl mx-auto text-center text-white/90 text-lg leading-relaxed"
+          >
+            When fans scan one of your
+            <strong>MusicBizQR dynamic QR codes</strong>, they land on a
+            mobile-first <strong>artist splash page</strong> that pulls in your
+            streaming platforms (Spotify, Apple Music, YouTube), socials,
+            featured tracks or videos, and even
+            <strong>merch &amp; ticket links</strong>—all in one tap-friendly
+            layout you can update anytime and track in real time.
           </p>
 
           <div class="w-full max-w-md md:max-w-5xl mx-auto">
             <section class="max-w-5xl mx-auto text-white my-12 overflow-hidden">
               <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
                 <div>
-                  <h2 class="text-3xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">
+                  <h2
+                    class="text-3xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500"
+                  >
                     Built for Musicians. Powered by Smart Links.
                   </h2>
                   <p class="text-lg mb-4">
-                    MusicBizQR gives you a powerful landing page with streaming links, videos, social buttons, and real-time fan analytics — all from a single QR code.
+                    MusicBizQR gives you a powerful landing page with streaming
+                    links, videos, social buttons, and real-time fan analytics —
+                    all from a single QR code.
                   </p>
                   <ul class="space-y-2 mb-6">
                     <li>🎯 Unlimited link clicks & analytics</li>
-                    <li>📈 Track Spotify streams, YouTube plays, and QR scans</li>
+                    <li>
+                      📈 Track Spotify streams, YouTube plays, and QR scans
+                    </li>
                     <li>📱 Mobile-optimized artist pages</li>
                     <li>🚀 Create your first Smart Link in seconds</li>
                   </ul>
@@ -156,12 +402,15 @@
                     Preview Page
                   </NuxtLink>
                   <NuxtLink
-                    to="/signup"
-                    class="inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
-                  >
-                    <span v-if="!isTH">Start Your Free Trial</span>
-                    <span v-else>เริ่มทดลองใช้งานฟรี</span>
-                  </NuxtLink>
+  to="/signup"
+  class="mt-8 w-full inline-flex items-center gap-3 rounded-2xl border border-white/15 
+         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
+         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
+         px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+>
+  <span>🚀 Free 30 Day Trial</span>
+  <span class="text-white/80 font-normal">No Credit Card Required</span>
+</NuxtLink>
                 </div>
 
                 <div class="flex justify-center image_gradient p-10 rounded-lg">
@@ -180,62 +429,124 @@
         <!-- Why section (kept English) -->
         <section class="py-24 px-6 text-white">
           <div class="max-w-6xl mx-auto text-center lg:text-left">
-            <h2 class="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500 mb-4">
+            <h2
+              class="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500 mb-4"
+            >
               Why MusicBizQR?
             </h2>
-            <p class="max-w-3xl mx-auto lg:mx-0 text-lg text-white/90 leading-relaxed">
-              MusicBizQR turns every poster, merch tag, and bio link into a <strong>trackable marketing channel</strong>.
-              Create dynamic QR codes, launch mobile <strong>smart link splash pages</strong>, embed music &amp; video, sell tickets and merch,
-              and measure fan engagement in real time—built specifically for independent artists, touring bands, and music marketers.
+            <p
+              class="max-w-3xl mx-auto lg:mx-0 text-lg text-white/90 leading-relaxed"
+            >
+              MusicBizQR turns every poster, merch tag, and bio link into a
+              <strong>trackable marketing channel</strong>. Create dynamic QR
+              codes, launch mobile <strong>smart link splash pages</strong>,
+              embed music &amp; video, sell tickets and merch, and measure fan
+              engagement in real time—built specifically for independent
+              artists, touring bands, and music marketers.
             </p>
           </div>
 
-          <div class="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto text-center lg:text-left">
+          <div
+            class="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto text-center lg:text-left"
+          >
             <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">Dynamic QR Codes</h3>
-              <p class="text-gray-300 text-base leading-relaxed">Print once, update anytime. Switch from a pre-save to tour dates or merch without reprinting your codes.</p>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Dynamic QR Codes
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                Print once, update anytime. Switch from a pre-save to tour dates
+                or merch without reprinting your codes.
+              </p>
             </article>
             <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">Smart Link Splash Pages</h3>
-              <p class="text-gray-300 text-base leading-relaxed">Pull in Spotify, Apple Music, YouTube, TikTok &amp; socials—give fans everything in one tap-friendly page.</p>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Smart Link Splash Pages
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                Pull in Spotify, Apple Music, YouTube, TikTok &amp; socials—give
+                fans everything in one tap-friendly page.
+              </p>
             </article>
             <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">Music, Video &amp; Sales</h3>
-              <p class="text-gray-300 text-base leading-relaxed">Feature a track or video, collect emails, and add ticket &amp; merch purchase links fans can use at the show.</p>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Music, Video &amp; Sales
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                Feature a track or video, collect emails, and add ticket &amp;
+                merch purchase links fans can use at the show.
+              </p>
             </article>
             <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">Real-Time Scan Analytics</h3>
-              <p class="text-gray-300 text-base leading-relaxed">See scans by city, device &amp; time of day. Route tours smarter, measure promo impact, and grow what works.</p>
+              <h3 class="font-semibold text-xl mb-2 text-pink-400">
+                Real-Time Scan Analytics
+              </h3>
+              <p class="text-gray-300 text-base leading-relaxed">
+                See scans by city, device &amp; time of day. Route tours
+                smarter, measure promo impact, and grow what works.
+              </p>
             </article>
           </div>
 
-          <div class="mt-16 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start max-w-6xl mx-auto">
-            <NuxtLink to="/signup" class="cta-button-no w-full sm:w-auto text-center" aria-label="Start free 30 day MusicBizQR trial">
-              <span v-if="!isTH">Start Free 30-Day Trial</span>
-              <span v-else>เริ่มทดลองใช้ฟรี 30 วัน</span>
-            </NuxtLink>
-            <NuxtLink to="/article/qr-code-strategy" class="mdc-button w-full sm:w-auto text-center">
-              <span v-if="!isTH">Learn QR Strategy</span>
-              <span v-else>เรียนรู้กลยุทธ์ QR</span>
-            </NuxtLink>
+          <div
+            class="mt-16 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start max-w-6xl mx-auto"
+          >
+<NuxtLink
+  to="/signup"
+  class="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 
+         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
+         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
+         px-6 py-3 font-semibold text-white shadow-lg transition duration-200
+         text-center"
+>
+  🚀 Free 30 Day Trial – <span class="text-white/80 font-normal">No Credit Card Required</span>
+</NuxtLink>
+
+<NuxtLink
+  to="/article/qr-code-strategy"
+  class="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 
+         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
+         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
+         px-6 py-3 font-semibold text-white shadow-lg transition duration-200
+         text-center w-full sm:w-auto"
+>
+  <span v-if="!isTH">Learn QR Strategy</span>
+  <span v-else>เรียนรู้กลยุทธ์ QR</span>
+</NuxtLink>
+
+
+
           </div>
 
           <span class="sr-only">
-            QR code generator for musicians, smart link pages for bands, music marketing analytics
+            QR code generator for musicians, smart link pages for bands, music
+            marketing analytics
           </span>
         </section>
 
         <!-- Embed section (unchanged) -->
-        <section class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient">
+        <section
+          class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient"
+        >
           <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row">
             <div class="w-full md:w-3/5 flex flex-col justify-between px-6">
               <div class="flex-grow flex flex-col justify-start">
-                <h2 class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl">
+                <h2
+                  class="text-white text-center md:text-left font-bold text-4xl mb-4 lg:text-6xl"
+                >
                   Embed Music from your streaming platform
                 </h2>
-                <p class="text-white text-lg text-center md:text-left pb-10 md:pb-0 leading-relaxed max-w-xl">
-                  Drop a live streaming player—<strong>Spotify</strong>, <strong>Apple Music</strong>, <strong>YouTube</strong>, whatever you use—directly into your MusicBizQR smart link page. Fans scan at shows and tap to play, boosting streams, followers &amp; pre-saves on the spot.
-                  <span class="sr-only">embed music players qr code music marketing for artists and bands</span>
+                <p
+                  class="text-white text-lg text-center md:text-left pb-10 md:pb-0 leading-relaxed max-w-xl"
+                >
+                  Drop a live streaming player—<strong>Spotify</strong>,
+                  <strong>Apple Music</strong>, <strong>YouTube</strong>,
+                  whatever you use—directly into your MusicBizQR smart link
+                  page. Fans scan at shows and tap to play, boosting streams,
+                  followers &amp; pre-saves on the spot.
+                  <span class="sr-only"
+                    >embed music players qr code music marketing for artists and
+                    bands</span
+                  >
                 </p>
               </div>
             </div>
@@ -252,43 +563,90 @@
           </div>
 
           <div class="left-0 w-auto">
-            <div class="flex items-center px-6 md:px-0 pb-10 md:py-20 justify-around space-x-6">
-              <Icon v-for="icon in streamingIcons" :key="icon.name" :icon="icon.icon" class="w-10 h-10 text-white hover:text-green-500 transition" />
+            <div
+              class="flex items-center px-6 md:px-0 pb-10 md:py-20 justify-around space-x-6"
+            >
+              <Icon
+                v-for="icon in streamingIcons"
+                :key="icon.name"
+                :icon="icon.icon"
+                class="w-10 h-10 text-white hover:text-green-500 transition"
+              />
             </div>
           </div>
         </section>
 
         <!-- Video section (unchanged) -->
-        <section class="min-h-screen flex flex-col items-center justify-center pt-10 md:py-24">
+        <section
+          class="min-h-screen flex flex-col items-center justify-center pt-10 md:py-24"
+        >
           <div class="text-center px-6 max-w-4xl">
-            <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">Showcase Your Music Videos &amp; Live Clips</h2>
+            <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
+              Showcase Your Music Videos &amp; Live Clips
+            </h2>
             <p class="text-white text-lg mb-10 leading-relaxed">
-              Embed a new single, lyric video, rehearsal clip or full playlist in your MusicBizQR smart link. Fans scan a poster, merch tag or bio link, tap play, and share—no searching, no typing.
-              <span class="sr-only">music video embed qr smart link for artists bands musicians</span>
+              Embed a new single, lyric video, rehearsal clip or full playlist
+              in your MusicBizQR smart link. Fans scan a poster, merch tag or
+              bio link, tap play, and share—no searching, no typing.
+              <span class="sr-only"
+                >music video embed qr smart link for artists bands
+                musicians</span
+              >
             </p>
           </div>
 
           <div class="w-full flex justify-center">
             <div class="relative w-[90vw] md:w-[80vw] max-w-4xl">
-              <div v-if="!isPlaying" class="relative cursor-pointer" @click="isPlaying = true">
-                <img :src="thumbnail" alt="Video Thumbnail" class="rounded-lg shadow-lg w-full h-auto" />
+              <div
+                v-if="!isPlaying"
+                class="relative cursor-pointer"
+                @click="isPlaying = true"
+              >
+                <img
+                  :src="thumbnail"
+                  alt="Video Thumbnail"
+                  class="rounded-lg shadow-lg w-full h-auto"
+                />
                 <div class="absolute inset-0 flex items-center justify-center">
-                  <Icon icon="mdi:play-circle" class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition" />
+                  <Icon
+                    icon="mdi:play-circle"
+                    class="text-white w-20 h-20 opacity-80 hover:opacity-100 transition"
+                  />
                 </div>
               </div>
-              <iframe v-if="isPlaying" class="w-full h-64 md:h-96 rounded-lg shadow-lg" :src="videoUrl" frameborder="0" allowfullscreen></iframe>
+              <iframe
+                v-if="isPlaying"
+                class="w-full h-64 md:h-96 rounded-lg shadow-lg"
+                :src="videoUrl"
+                frameborder="0"
+                allowfullscreen
+              ></iframe>
             </div>
           </div>
         </section>
 
         <!-- Analytics chart (unchanged) -->
         <section class="w-[100vw] mx-auto">
-          <section class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20">
+          <section
+            class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20"
+          >
             <div class="container mx-auto text-center px-4">
-              <h2 class="text-4xl md:text-4xl lg:text-6xl pb-10 text-center font-extrabold text-white">QR Scan Analytics for Musicians</h2>
-              <p class="text-white text-lg lg:text-2xl mb-14 text-center leading-relaxed max-w-3xl mx-auto">
-                See where, when &amp; how fans engage with your QR codes. Track scans by city, device &amp; time, spot your hottest markets, and double down on campaigns that drive streams, signups, tickets &amp; merch.
-                <span class="sr-only">music marketing analytics for artists bands qr code data</span>
+              <h2
+                class="text-4xl md:text-4xl lg:text-6xl pb-10 text-center font-extrabold text-white"
+              >
+                QR Scan Analytics for Musicians
+              </h2>
+              <p
+                class="text-white text-lg lg:text-2xl mb-14 text-center leading-relaxed max-w-3xl mx-auto"
+              >
+                See where, when &amp; how fans engage with your QR codes. Track
+                scans by city, device &amp; time, spot your hottest markets, and
+                double down on campaigns that drive streams, signups, tickets
+                &amp; merch.
+                <span class="sr-only"
+                  >music marketing analytics for artists bands qr code
+                  data</span
+                >
               </p>
               <BarChart />
             </div>
@@ -299,59 +657,103 @@
         <section class="py-10 md:py-20 text-white">
           <div class="max-w-7xl mx-auto text-center"></div>
 
-          <div class="grid gap-8 mt-12 max-w-5xl mx-auto grid-cols-1 md:grid-cols-1">
+          <div
+            class="grid gap-8 mt-12 max-w-5xl mx-auto grid-cols-1 md:grid-cols-1"
+          >
             <div class="pricing-card text-center">
-              <h2 class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500">
+              <h2
+                class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
+              >
                 <span v-if="!isTH">Simple Pricing</span>
                 <span v-else>แพ็กเกจราคาง่าย ๆ</span>
               </h2>
 
               <p class="text-4xl font-extrabold mt-6">
                 ${{ USD_PRICE }}<span class="text-lg">/mo</span>
-                <span v-if="isTH" class="ml-2 text-2xl text-white/70"> (~฿{{ approxTHB }}/เดือน)</span>
+                <span v-if="isTH" class="ml-2 text-2xl text-white/70">
+                  (~฿{{ approxTHB }}/เดือน)</span
+                >
               </p>
 
               <ul class="pricing-features pb-6">
-                <li>✔ 1 <strong>Dynamic QR Code</strong> (edit destination anytime)</li>
-                <li>✔ All scans tracked in your <strong>Analytics Dashboard</strong></li>
+                <li>
+                  ✔ 1 <strong>Dynamic QR Code</strong> (edit destination
+                  anytime)
+                </li>
+                <li>
+                  ✔ All scans tracked in your
+                  <strong>Analytics Dashboard</strong>
+                </li>
                 <li>✔ 1 <strong>Artist Smart Link / Splash Page</strong></li>
-                <li>✔ Streaming Buttons: Spotify, Apple Music, YouTube &amp; more</li>
+                <li>
+                  ✔ Streaming Buttons: Spotify, Apple Music, YouTube &amp; more
+                </li>
                 <li>✔ Embed 1 Featured Track &amp; 1 Video</li>
                 <li>✔ Merch &amp; Ticket Purchase Links</li>
                 <li>✔ Print-ready PNG / SVG QR downloads</li>
                 <li>✔ Email Support • Cancel anytime</li>
               </ul>
 
-              <NuxtLink  to="/signup" class="pricing-button mt-10">
-                <span v-if="!isTH">Sign Up for a 30 day free trial</span>
-                <span v-else>สมัครใช้งานฟรี 30 วัน</span>
-              </NuxtLink>
+              <NuxtLink
+  to="/signup"
+  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 
+         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
+         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
+         px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+>
+  <span>🚀 Free 30 Day Trial</span>
+  <span class="text-white/80 font-normal">No Credit Card Required</span>
+</NuxtLink>
             </div>
           </div>
         </section>
 
-<TutorialsSection
-  id="videos"
-  heading="🎥 Video Tutorials"
-  :videos="[
-    { id: 'BmdNv51ORVA', title: 'How to Create a QR Code in Under 2 Minutes' },
-    { id: 'h7AacQWKQtc', title: 'How to Create a Artist Smart Link Page in Under 2 Minutes' }
-  ]"
-/>
+        <TutorialsSection
+          id="videos"
+          heading="🎥 Video Tutorials"
+          :videos="[
+            {
+              id: 'BmdNv51ORVA',
+              title: 'How to Create a QR Code in Under 2 Minutes',
+            },
+            {
+              id: 'h7AacQWKQtc',
+              title:
+                'How to Create a Artist Smart Link Page in Under 2 Minutes',
+            },
+          ]"
+        />
 
         <!-- CTA repeat -->
-        <div ref="parallaxRef" class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50">
-          <div class="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div class="text-center h-full flex flex-col justify-center items-center md:text-left">
-              <h2 class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+        <div
+          ref="parallaxRef"
+          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
+        >
+          <div
+            class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+            <div
+              class="text-center h-full flex flex-col justify-center items-center md:text-left"
+            >
+              <h2
+                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+              >
                 <span v-if="!isTH">Create Your Profile</span>
                 <span v-else>เริ่มสร้างโปรไฟล์ของคุณ</span>
               </h2>
-              <div class="flex w-full justify-center md:justify-start px-2 gap-6 mt-10 text-white">
-                <NuxtLink to="/signup" class="cta-button-no w-auto mx-auto">
-                  <span v-if="!isTH">Sign Up For A Free 30 day Trial</span>
-                  <span v-else>สมัครใช้งานฟรี 30 วัน</span>
-                </NuxtLink>
+              <div
+                class="flex w-full justify-center md:justify-center px-2 gap-6 mt-10 text-white"
+              >
+                <NuxtLink
+  to="/signup"
+  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 
+         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
+         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
+         px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+>
+  <span>🚀 Free 30 Day Trial</span>
+  <span class="text-white/80 font-normal">No Credit Card Required</span>
+</NuxtLink>
               </div>
             </div>
           </div>
@@ -359,30 +761,47 @@
 
         <!-- Articles (unchanged) -->
         <section class="bg-black text-white px-4 py-16 max-w-5xl mx-auto">
-          <h2 class="text-3xl font-extrabold mb-6 text-gradient">Featured Articles</h2>
+          <h2 class="text-3xl font-extrabold mb-6 text-gradient">
+            Featured Articles
+          </h2>
 
-          <div v-if="featuredRes?.data?.length" class="grid gap-8 md:grid-cols-1">
-            <div v-for="post in featuredRes.data" :key="post.id" class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition">
+          <div
+            v-if="featuredRes?.data?.length"
+            class="grid gap-8 md:grid-cols-1"
+          >
+            <div
+              v-for="post in featuredRes.data"
+              :key="post.id"
+              class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition"
+            >
               <NuxtLink
                 :to="`/article/${post.attributes.category}/${post.attributes.slug}`"
                 class="block mb-2 text-xl font-bold text-pink-400 hover:underline"
               >
                 {{ post.attributes.title }}
               </NuxtLink>
-              <p class="text-sm text-gray-400">{{ post.attributes.metaDescription }}</p>
+              <p class="text-sm text-gray-400">
+                {{ post.attributes.metaDescription }}
+              </p>
             </div>
           </div>
         </section>
 
         <!-- FAQ (unchanged copy) -->
         <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
-          <h2 class="text-3xl font-bold text-center md:text-left text-white mb-8">Frequently Asked Questions</h2>
+          <h2
+            class="text-3xl font-bold text-center md:text-left text-white mb-8"
+          >
+            Frequently Asked Questions
+          </h2>
           <FaqAccordion :faqs="faqItems" />
         </div>
       </main>
 
       <div class="h-40 flex flex-col justify-center items-center">
-        <NuxtLink to="/"><img src="@/assets/musicbizlogo.png" class="h-12" /></NuxtLink>
+        <NuxtLink to="/"
+          ><img src="@/assets/musicbizlogo.png" class="h-12"
+        /></NuxtLink>
       </div>
     </div>
   </div>
@@ -394,17 +813,54 @@ import { Thumbs } from "swiper/modules";
 import { EffectCards } from "swiper/modules";
 import type { Swiper as SwiperInstance } from "swiper/types";
 import { Icon } from "@iconify/vue";
-import { ref, computed, onMounted, onUnmounted, useRuntimeConfig } from "#imports";
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  useRuntimeConfig,
+} from "#imports";
+import { defineComponent } from "vue";
 
 import deezer from "@/assets/dezzer.svg";
 
 const isTH = ref(false);
 const USD_PRICE = 7;
 const FX_THB_PER_USD = 36; // simple, stable approx for marketing display
-const approxTHB = computed(() => Math.round((USD_PRICE * FX_THB_PER_USD) / 10) * 10); // round to nearest ฿10
+const approxTHB = computed(
+  () => Math.round((USD_PRICE * FX_THB_PER_USD) / 10) * 10
+); // round to nearest ฿10
+
+/**
+ * Props let you pass in the screenshot images for the phone mockups.
+ * Use high-res PNG/JPG. The image will be contained within a 19.5:9 screen.
+ */
+/**
+ * Pass your screenshot images via props (optional).
+ * Defaults are safe placeholders—replace with your own assets.
+ */
+const props = defineProps<{
+  leftPhoneSrc?: string;
+  rightPhoneSrc?: string;
+  leftPhoneAlt?: string;
+  rightPhoneAlt?: string;
+}>();
+
+const leftPhoneSrcResolved =
+  props.leftPhoneSrc || "/images/improvescreenshot.png";
+const rightPhoneSrcResolved =
+  props.rightPhoneSrc || "/images/screentopdannynova.png";
+const leftPhoneAltResolved =
+  props.leftPhoneAlt || "/images/screentopdannynova.png";
+const rightPhoneAltResolved =
+  props.rightPhoneAlt || "/images/improvescreenshot.png";
 
 onMounted(() => {
-  const locale = (navigator.language || (navigator.languages && navigator.languages[0]) || "").toLowerCase();
+  const locale = (
+    navigator.language ||
+    (navigator.languages && navigator.languages[0]) ||
+    ""
+  ).toLowerCase();
   if (locale.startsWith("th")) {
     isTH.value = true;
     document.documentElement.classList.add("th-font");
@@ -413,13 +869,41 @@ onMounted(() => {
 
 const parallaxBg = ref(null);
 const faqItems = ref([
-  { question: "❓ What is a “dynamic QR code”?", answer: "A dynamic QR code points to a short redirect URL on our server. You can update its destination at any time without reprinting the QR. All scans are tracked, and you can edit or delete it from your dashboard." },
-  { question: "🔄 Can I create and delete QR codes as I like?", answer: "Yes. You can generate unlimited dynamic QR codes. At any point, delete any existing QR and create a fresh one. Old scans remain in analytics, but new scans use the new QR link." },
-  { question: "📈 How many scans can a dynamic QR code handle?", answer: "Unlimited. Every scan (regardless of volume) gets logged. You’ll see real-time counts of total scans, location data, and device types on your analytics page." },
-  { question: "📊 What analytics are provided?", answer: "Our analytics dashboard tracks engagement by time of day, including page views, song plays, video views, and event interactions. You can view data by day, week, month, or year. We also track interactions with social links and streaming platforms, giving you a full picture of fan behavior — all without tracking user location." },
-  { question: "🔒 Is my data private?", answer: "Absolutely. Only you (and team members you invite) can view your QR code analytics. We do not share your scan data with third parties, and all connections are encrypted." },
-  { question: "💳 How do I cancel my subscription?", answer: "You can cancel at any time by visiting your Account page > Subscription > Cancel. Once canceled, you retain dashboard access until the end of your billing cycle. No additional charges apply." },
-  { question: "🔧 How do I update the destination URL of a QR code?", answer: "Go to Dashboard > My QR Codes, click “Edit” beside the QR you want to change, enter the new destination URL, and save. The code’s design stays the same—only the redirect target updates." },
+  {
+    question: "❓ What is a “dynamic QR code”?",
+    answer:
+      "A dynamic QR code points to a short redirect URL on our server. You can update its destination at any time without reprinting the QR. All scans are tracked, and you can edit or delete it from your dashboard.",
+  },
+  {
+    question: "🔄 Can I create and delete QR codes as I like?",
+    answer:
+      "Yes. You can generate unlimited dynamic QR codes. At any point, delete any existing QR and create a fresh one. Old scans remain in analytics, but new scans use the new QR link.",
+  },
+  {
+    question: "📈 How many scans can a dynamic QR code handle?",
+    answer:
+      "Unlimited. Every scan (regardless of volume) gets logged. You’ll see real-time counts of total scans, location data, and device types on your analytics page.",
+  },
+  {
+    question: "📊 What analytics are provided?",
+    answer:
+      "Our analytics dashboard tracks engagement by time of day, including page views, song plays, video views, and event interactions. You can view data by day, week, month, or year. We also track interactions with social links and streaming platforms, giving you a full picture of fan behavior — all without tracking user location.",
+  },
+  {
+    question: "🔒 Is my data private?",
+    answer:
+      "Absolutely. Only you (and team members you invite) can view your QR code analytics. We do not share your scan data with third parties, and all connections are encrypted.",
+  },
+  {
+    question: "💳 How do I cancel my subscription?",
+    answer:
+      "You can cancel at any time by visiting your Account page > Subscription > Cancel. Once canceled, you retain dashboard access until the end of your billing cycle. No additional charges apply.",
+  },
+  {
+    question: "🔧 How do I update the destination URL of a QR code?",
+    answer:
+      "Go to Dashboard > My QR Codes, click “Edit” beside the QR you want to change, enter the new destination URL, and save. The code’s design stays the same—only the redirect target updates.",
+  },
 ]);
 
 const handleScroll = () => {
@@ -460,7 +944,9 @@ const streamingIcons = [
 ];
 
 const thumbsSwiper = ref<SwiperInstance | null>(null);
-const setThumbsSwiper = (swiper: SwiperInstance) => { thumbsSwiper.value = swiper; };
+const setThumbsSwiper = (swiper: SwiperInstance) => {
+  thumbsSwiper.value = swiper;
+};
 
 import musicSvg from "@/assets/music.svg";
 import microphoneSvg from "@/assets/microphone.svg";
@@ -479,10 +965,23 @@ import videoScreen from "@/assets/vidgrid.jpg";
 import aisix from "@/assets/aisix.webp";
 
 import { defineComponent, h } from "vue";
-import { Dialog, DialogPanel, RadioGroup, RadioGroupOption } from "@headlessui/vue";
-import { Bars3Icon, XMarkIcon as XMarkIconOutline } from "@heroicons/vue/24/outline";
+import {
+  Dialog,
+  DialogPanel,
+  RadioGroup,
+  RadioGroupOption,
+} from "@headlessui/vue";
+import {
+  Bars3Icon,
+  XMarkIcon as XMarkIconOutline,
+} from "@heroicons/vue/24/outline";
 import { CheckIcon, XMarkIcon as XMarkIconMini } from "@heroicons/vue/20/solid";
-import { ChevronRightIcon, CloudArrowUpIcon, LockClosedIcon, ServerIcon } from "@heroicons/vue/20/solid";
+import {
+  ChevronRightIcon,
+  CloudArrowUpIcon,
+  LockClosedIcon,
+  ServerIcon,
+} from "@heroicons/vue/20/solid";
 
 import { loadFull } from "tsparticles";
 import { tsParticles } from "@tsparticles/engine";
@@ -494,9 +993,14 @@ const config = useRuntimeConfig();
 
 const { data: featuredRes, error: featuredError } = await useAsyncData(
   "featured-articles",
-  () => $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
-    params: { populate: "*", sort: ["publishedAt:desc"], "filters[featured][$eq]": true },
-  })
+  () =>
+    $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+      params: {
+        populate: "*",
+        sort: ["publishedAt:desc"],
+        "filters[featured][$eq]": true,
+      },
+    })
 );
 
 if (featuredError.value) {
@@ -504,7 +1008,7 @@ if (featuredError.value) {
 }
 
 // Structured data (unchanged)
-const socialLinks:string[] = [].filter(Boolean);
+const socialLinks: string[] = [].filter(Boolean);
 const orgId = "https://musicbizqr.com/#organization";
 const appId = "https://musicbizqr.com/#software";
 const siteId = "https://musicbizqr.com/#website";
@@ -515,7 +1019,8 @@ const webSiteLd = {
   "@id": siteId,
   url: "https://musicbizqr.com",
   name: "MusicBizQR",
-  description: "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.",
+  description:
+    "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics.",
   publisher: { "@id": orgId },
   potentialAction: {
     "@type": "SearchAction",
@@ -544,7 +1049,8 @@ const appLd = {
   applicationSubCategory: "MusicMarketing",
   operatingSystem: "Web",
   image: "https://musicbizqr.com/og-image.jpg",
-  description: "Dynamic QR code & smart link platform for musicians. Create trackable QR campaigns, embed streaming & video, sell merch & tickets, and view scan analytics.",
+  description:
+    "Dynamic QR code & smart link platform for musicians. Create trackable QR campaigns, embed streaming & video, sell merch & tickets, and view scan analytics.",
   publisher: { "@id": orgId },
   offers: {
     "@type": "Offer",
@@ -572,17 +1078,42 @@ const faqLd = computed(() => ({
 useHead({
   title: "MusicBizQR | Smart QR Codes & Link-in-Bio Tools for Artists",
   meta: [
-    { name: "description", content: "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today." },
-    { name: "keywords", content: "QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool" },
+    {
+      name: "description",
+      content:
+        "Create dynamic QR codes, artist splash pages, and embed music and video with advanced analytics. Start your 30-day free trial today.",
+    },
+    {
+      name: "keywords",
+      content:
+        "QR code for musicians, artist smart link, dynamic QR code, music QR, MusicBizQR, band splash page, music link tree, streaming links, music marketing tool",
+    },
     { name: "robots", content: "index, follow" },
-    { property: "og:title", content: "MusicBizQR | QR Codes + Smart Links for Artists" },
-    { property: "og:description", content: "Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters." },
-    { property: "og:image", content: "https://musicbizqr.com/musicbizlogo.png" },
+    {
+      property: "og:title",
+      content: "MusicBizQR | QR Codes + Smart Links for Artists",
+    },
+    {
+      property: "og:description",
+      content:
+        "Build a powerful music profile with embedded songs, videos, and trackable QR codes. Perfect for touring artists and music promoters.",
+    },
+    {
+      property: "og:image",
+      content: "https://musicbizqr.com/musicbizlogo.png",
+    },
     { property: "og:url", content: "https://musicbizqr.com" },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: "MusicBizQR | QR Codes + Smart Links for Artists" },
-    { name: "twitter:description", content: "All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement." },
+    {
+      name: "twitter:title",
+      content: "MusicBizQR | QR Codes + Smart Links for Artists",
+    },
+    {
+      name: "twitter:description",
+      content:
+        "All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.",
+    },
     { name: "twitter:image", content: "https://musicbizqr.com/og-image.jpg" },
   ],
   link: [
@@ -590,13 +1121,32 @@ useHead({
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
     // Thai font (safe to load; only applied when .th-font is present)
-    { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap",
+    },
   ],
   script: [
-    { type: "application/ld+json", children: JSON.stringify(webSiteLd), key: "ld-website" },
-    { type: "application/ld+json", children: JSON.stringify(faqLd.value), key: "ld-faq" },
-    { type: "application/ld+json", children: JSON.stringify(orgLd), key: "ld-org" },
-    { type: "application/ld+json", children: JSON.stringify(appLd), key: "ld-app" },
+    {
+      type: "application/ld+json",
+      children: JSON.stringify(webSiteLd),
+      key: "ld-website",
+    },
+    {
+      type: "application/ld+json",
+      children: JSON.stringify(faqLd.value),
+      key: "ld-faq",
+    },
+    {
+      type: "application/ld+json",
+      children: JSON.stringify(orgLd),
+      key: "ld-org",
+    },
+    {
+      type: "application/ld+json",
+      children: JSON.stringify(appLd),
+      key: "ld-app",
+    },
   ],
   __dangerouslyDisableSanitizersByTagID: {
     "ld-website": ["children"],
@@ -607,8 +1157,22 @@ useHead({
 });
 
 const show = ref(false);
-const splashPages = ref(["Artist Page", "Music Player", "Streaming Links", "Social Media Links", "Website Url", "Video Grid"]);
-const splashImages = ref([musicSvg, recordSvg, streamingSvg, facebookSvg, websiteSvg, videoSvg]);
+const splashPages = ref([
+  "Artist Page",
+  "Music Player",
+  "Streaming Links",
+  "Social Media Links",
+  "Website Url",
+  "Video Grid",
+]);
+const splashImages = ref([
+  musicSvg,
+  recordSvg,
+  streamingSvg,
+  facebookSvg,
+  websiteSvg,
+  videoSvg,
+]);
 const selectedPage = ref(0);
 
 const pricing = {
@@ -617,32 +1181,98 @@ const pricing = {
     { value: "annually", label: "Annually" },
   ],
   tiers: [
-    { name: "Starter", id: "tier-starter", href: "#", featured: false, description: "write a descripton .", price: { monthly: "$15", annually: "$100" }, mainFeatures: ["feature one", "feature one", "feature one"] },
-    { name: "Pro", id: "tier-starter", href: "#", featured: false, description: "write a descripton .", price: { monthly: "$30", annually: "$250" }, mainFeatures: ["feature one", "feature one", "feature one"] },
+    {
+      name: "Starter",
+      id: "tier-starter",
+      href: "#",
+      featured: false,
+      description: "write a descripton .",
+      price: { monthly: "$15", annually: "$100" },
+      mainFeatures: ["feature one", "feature one", "feature one"],
+    },
+    {
+      name: "Pro",
+      id: "tier-starter",
+      href: "#",
+      featured: false,
+      description: "write a descripton .",
+      price: { monthly: "$30", annually: "$250" },
+      mainFeatures: ["feature one", "feature one", "feature one"],
+    },
   ],
   sections: [
     {
       name: "Catered for business",
       features: [
-        { name: "Tax Savings", tiers: { Starter: true, Scale: true, Growth: true } },
-        { name: "Easy to use accounting", tiers: { Starter: true, Scale: true, Growth: true } },
-        { name: "Multi-accounts", tiers: { Starter: "3 accounts", Scale: "Unlimited accounts", Growth: "7 accounts" } },
-        { name: "Invoicing", tiers: { Starter: "3 invoices", Scale: "Unlimited invoices", Growth: "10 invoices" } },
-        { name: "Exclusive offers", tiers: { Starter: false, Scale: true, Growth: true } },
-        { name: "6 months free advisor", tiers: { Starter: false, Scale: true, Growth: true } },
-        { name: "Mobile and web access", tiers: { Starter: false, Scale: true, Growth: false } },
+        {
+          name: "Tax Savings",
+          tiers: { Starter: true, Scale: true, Growth: true },
+        },
+        {
+          name: "Easy to use accounting",
+          tiers: { Starter: true, Scale: true, Growth: true },
+        },
+        {
+          name: "Multi-accounts",
+          tiers: {
+            Starter: "3 accounts",
+            Scale: "Unlimited accounts",
+            Growth: "7 accounts",
+          },
+        },
+        {
+          name: "Invoicing",
+          tiers: {
+            Starter: "3 invoices",
+            Scale: "Unlimited invoices",
+            Growth: "10 invoices",
+          },
+        },
+        {
+          name: "Exclusive offers",
+          tiers: { Starter: false, Scale: true, Growth: true },
+        },
+        {
+          name: "6 months free advisor",
+          tiers: { Starter: false, Scale: true, Growth: true },
+        },
+        {
+          name: "Mobile and web access",
+          tiers: { Starter: false, Scale: true, Growth: false },
+        },
       ],
     },
     {
       name: "Other perks",
       features: [
-        { name: "24/7 customer support", tiers: { Starter: true, Scale: true, Growth: true } },
-        { name: "Instant notifications", tiers: { Starter: true, Scale: true, Growth: true } },
-        { name: "Budgeting tools", tiers: { Starter: true, Scale: true, Growth: true } },
-        { name: "Digital receipts", tiers: { Starter: true, Scale: true, Growth: true } },
-        { name: "Pots to separate money", tiers: { Starter: false, Scale: true, Growth: true } },
-        { name: "Free bank transfers", tiers: { Starter: false, Scale: true, Growth: false } },
-        { name: "Business debit card", tiers: { Starter: false, Scale: true, Growth: false } },
+        {
+          name: "24/7 customer support",
+          tiers: { Starter: true, Scale: true, Growth: true },
+        },
+        {
+          name: "Instant notifications",
+          tiers: { Starter: true, Scale: true, Growth: true },
+        },
+        {
+          name: "Budgeting tools",
+          tiers: { Starter: true, Scale: true, Growth: true },
+        },
+        {
+          name: "Digital receipts",
+          tiers: { Starter: true, Scale: true, Growth: true },
+        },
+        {
+          name: "Pots to separate money",
+          tiers: { Starter: false, Scale: true, Growth: true },
+        },
+        {
+          name: "Free bank transfers",
+          tiers: { Starter: false, Scale: true, Growth: false },
+        },
+        {
+          name: "Business debit card",
+          tiers: { Starter: false, Scale: true, Growth: false },
+        },
       ],
     },
   ],
@@ -652,8 +1282,21 @@ const frequency = ref(pricing.frequencies[0]);
 
 const options = {
   fullScreen: { enable: false },
-  style: { position: "absolute", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: -1, pointerEvents: "none" },
-  particles: { color: { value: "#fff" }, links: { color: "#fff", enable: true }, move: { enable: true }, number: { value: 50 } },
+  style: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    zIndex: -1,
+    pointerEvents: "none",
+  },
+  particles: {
+    color: { value: "#fff" },
+    links: { color: "#fff", enable: true },
+    move: { enable: true },
+    number: { value: 50 },
+  },
 };
 
 function getRandomColor() {
@@ -664,26 +1307,65 @@ function getRandomColor() {
 }
 function changeColors() {
   const paths = document.querySelectorAll(".animated-path");
-  paths.forEach((path) => { (path as HTMLElement).style.fill = getRandomColor(); });
+  paths.forEach((path) => {
+    (path as HTMLElement).style.fill = getRandomColor();
+  });
 }
-function animateColors() { setInterval(changeColors, 2000); }
+function animateColors() {
+  setInterval(changeColors, 2000);
+}
 
 onMounted(() => {
   animateColors();
   window.addEventListener("scroll", handleScroll);
 });
-onUnmounted(() => { window.removeEventListener("scroll", handleScroll); });
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 
 const primaryFeatures = [
-  { name: "Push to deploy.", description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit aute id magna.", icon: CloudArrowUpIcon },
-  { name: "SSL certificates.", description: "Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo.", icon: LockClosedIcon },
-  { name: "Database backups.", description: "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.", icon: ServerIcon },
+  {
+    name: "Push to deploy.",
+    description:
+      "Lorem ipsum, dolor sit amet consectetur adipisicing elit aute id magna.",
+    icon: CloudArrowUpIcon,
+  },
+  {
+    name: "SSL certificates.",
+    description:
+      "Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo.",
+    icon: LockClosedIcon,
+  },
+  {
+    name: "Database backups.",
+    description:
+      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.",
+    icon: ServerIcon,
+  },
 ];
 
 const secondaryFeatures = [
-  { name: "Push to deploy", description: "Commodo nec sagittis tortor mauris sed. Turpis tortor quis scelerisque diam id accumsan nullam tempus. Pulvinar etiam lacus volutpat eu. Phasellus praesent ligula sit faucibus.", href: "#", icon: CloudArrowUpIcon },
-  { name: "SSL certificates", description: "Pellentesque enim a commodo malesuada turpis eleifend risus. Facilisis donec placerat sapien consequat tempor fermentum nibh.", href: "#", icon: LockClosedIcon },
-  { name: "Simple queues", description: "Pellentesque sit elit congue ante nec amet. Dolor aenean curabitur viverra suspendisse iaculis eget. Nec mollis placerat ultricies euismod ut condimentum.", href: "#", icon: ServerIcon },
+  {
+    name: "Push to deploy",
+    description:
+      "Commodo nec sagittis tortor mauris sed. Turpis tortor quis scelerisque diam id accumsan nullam tempus. Pulvinar etiam lacus volutpat eu. Phasellus praesent ligula sit faucibus.",
+    href: "#",
+    icon: CloudArrowUpIcon,
+  },
+  {
+    name: "SSL certificates",
+    description:
+      "Pellentesque enim a commodo malesuada turpis eleifend risus. Facilisis donec placerat sapien consequat tempor fermentum nibh.",
+    href: "#",
+    icon: LockClosedIcon,
+  },
+  {
+    name: "Simple queues",
+    description:
+      "Pellentesque sit elit congue ante nec amet. Dolor aenean curabitur viverra suspendisse iaculis eget. Nec mollis placerat ultricies euismod ut condimentum.",
+    href: "#",
+    icon: ServerIcon,
+  },
 ];
 
 const featuredTestimonial = {
@@ -691,52 +1373,145 @@ const featuredTestimonial = {
   author: {
     name: "Brenna Goyette",
     handle: "brennagoyette",
-    imageUrl: "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=1024&h=1024&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=1024&h=1024&q=80",
     logoUrl: "https://tailwindui.com/img/logos/savvycal-logo-gray-900.svg",
   },
 };
 
 const testimonials = [
-  [[{ body: "Laborum quis quam. Dolorum et ut quod quia. Voluptas numquam delectus nihil. Aut enim doloremque et ipsam.", author: { name: "Leslie Alexander", handle: "lesliealexander", imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" } }]],
-  [[{ body: "Aut reprehenderit voluptatem eum asperiores beatae id. Iure molestiae ipsam ut officia rem nulla blanditiis.", author: { name: "Lindsay Walton", handle: "lindsaywalton", imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" } }]],
+  [
+    [
+      {
+        body: "Laborum quis quam. Dolorum et ut quod quia. Voluptas numquam delectus nihil. Aut enim doloremque et ipsam.",
+        author: {
+          name: "Leslie Alexander",
+          handle: "lesliealexander",
+          imageUrl:
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+        },
+      },
+    ],
+  ],
+  [
+    [
+      {
+        body: "Aut reprehenderit voluptatem eum asperiores beatae id. Iure molestiae ipsam ut officia rem nulla blanditiis.",
+        author: {
+          name: "Lindsay Walton",
+          handle: "lindsaywalton",
+          imageUrl:
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+        },
+      },
+    ],
+  ],
 ];
 </script>
 
 <!-- Global font toggle for Thai visitors -->
 <style>
 html.th-font {
-  font-family: 'Noto Sans Thai', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+  font-family:
+    "Noto Sans Thai",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    "Noto Sans",
+    "Liberation Sans",
+    sans-serif;
 }
 </style>
 
 <style scoped>
-#tsparticles { z-index: -1; }
-.relative { position: relative; z-index: 2; }
+#tsparticles {
+  z-index: -1;
+}
+.relative {
+  position: relative;
+  z-index: 2;
+}
 
-.pricing-card { @apply bg-black border py-24 rounded-lg p-8 transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50; }
-.premium { @apply bg-gradient-to-br from-indigo-700 to-purple-700 border-purple-500 shadow-purple-500/50; }
-.pricing-features { @apply mt-6 space-y-2 text-gray-300; }
-.pricing-button { @apply mt-6 w-full py-3 px-6 text-lg font-semibold rounded-lg bg-indigo-600 hover:bg-purple-600 transition-all duration-300; }
+.pricing-card {
+  @apply bg-black border py-24 rounded-lg p-8 transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50;
+}
+.premium {
+  @apply bg-gradient-to-br from-indigo-700 to-purple-700 border-purple-500 shadow-purple-500/50;
+}
+.pricing-features {
+  @apply mt-6 space-y-2 text-gray-300;
+}
+.pricing-button {
+  @apply mt-6 w-full py-3 px-6 text-lg font-semibold rounded-lg bg-indigo-600 hover:bg-purple-600 transition-all duration-300;
+}
 
-@keyframes gradient { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}}
-.animate-gradient { background-size:200% 200%; animation:gradient 5s ease infinite; }
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 5s ease infinite;
+}
 
-.cta-button { @apply py-3 px-6 w-full md:w-[25%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50; }
-.cta-button-full { @apply py-3 px-6 w-full md:w-[100%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50; }
-.cta-button-no { @apply py-3 px-6 text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50; }
+.cta-button {
+  @apply py-3 px-6 w-full md:w-[25%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
+}
+.cta-button-full {
+  @apply py-3 px-6 w-full md:w-[100%] text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
+}
+.cta-button-no {
+  @apply py-3 px-6 text-center font-semibold rounded-lg shadow-2xl bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 ease-in-out hover:from-pink-600 hover:to-purple-600 hover:scale-105 hover:shadow-purple-500/50;
+}
 
 .custom-gradient {
   background: linear-gradient(to right, #78ffd6, #a8ff78);
 }
 
-.element_scroll { scrollbar-width: none; -ms-overflow-style: none; }
-.element_scroll::-webkit-scrollbar { display: none; }
-.animated-path { transition: fill 1s ease; }
+.element_scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.element_scroll::-webkit-scrollbar {
+  display: none;
+}
+.animated-path {
+  transition: fill 1s ease;
+}
 
-.bar-chart { display:flex; gap:15px; align-items:flex-end; }
+.bar-chart {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+}
 
-.image_gradient { background: linear-gradient(to right, #ec4899, #8b5cf6); }
+.image_gradient {
+  background: linear-gradient(to right, #ec4899, #8b5cf6);
+}
 
-.bar { width:40px; background-color:#4caf50; height:20%; animation: grow-bar 2s ease-in-out infinite; }
-@keyframes grow-bar { 0%,100%{height:20%} 50%{height:var(--bar-height)} }
+.bar {
+  width: 40px;
+  background-color: #4caf50;
+  height: 20%;
+  animation: grow-bar 2s ease-in-out infinite;
+}
+@keyframes grow-bar {
+  0%,
+  100% {
+    height: 20%;
+  }
+  50% {
+    height: var(--bar-height);
+  }
+}
 </style>
