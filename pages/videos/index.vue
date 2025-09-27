@@ -57,8 +57,8 @@ useHead({
 
 <template>
   <section class="bg-black min-h-screen pt-[var(--header-height)] py-10">
-    <div class="container mx-auto px-6">
-      <header class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-8">
+    <div class="container max-w-7xl mx-auto px-6">
+      <header class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
         <div>
           <h1 class="text-3xl md:text-4xl font-extrabold text-white">🎥 Tutorials</h1>
           <p class="text-white/70 mt-1">Learn QR codes, smart links, and growth tactics with MusicBizQR.</p>
@@ -77,18 +77,38 @@ useHead({
 
       <div v-else>
         <div v-if="!filtered.length" class="text-white/70">No videos found.</div>
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-         <NuxtLink
-  v-for="v in filtered"
-  :key="v.slug"
-  :to="`/videos/${v.slug}`"
-  class="block group"
->
-  <VideoCard v-if="v.id" :video-id="v.id" :title="v.title" :thumb="v.thumb" />
-  <div v-else class="text-red-400 text-sm">No YouTubeID set</div>
-</NuxtLink>
+
+        <!-- Balanced grid with generous vertical rhythm -->
+        <div
+          v-else
+          class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12"
+        >
+          <NuxtLink
+            v-for="v in filtered"
+            :key="v.slug"
+            :to="`/videos/${v.slug}`"
+            class="block group"
+          >
+            <!-- Card wrapper adds separation & polish -->
+            <div
+              class="h-full rounded-2xl border border-white/10 bg-white/5 p-3 md:p-4
+                     transition-transform hover:scale-[1.01] hover:bg-white/10"
+            >
+              <VideoCard
+                v-if="v.id"
+                :video-id="v.id"
+                :title="v.title"
+                :thumb="v.thumb"
+                :autoplay="false"
+                aspect="aspect-[16/9]"
+                class="rounded-xl overflow-hidden"
+              />
+              <div v-else class="text-red-400 text-sm mt-2">No YouTubeID set</div>
+            </div>
+          </NuxtLink>
         </div>
       </div>
     </div>
   </section>
 </template>
+

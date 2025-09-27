@@ -93,58 +93,37 @@ useHead(() => ({
   title: video.value?.title ? `${video.value.title} – MusicBizQR` : 'Video – MusicBizQR',
 }))
 </script>
-
 <template>
   <section class="bg-black min-h-screen pt-[var(--header-height)] py-10 text-white">
-    <div class="container mx-auto px-6">
-      <NuxtLink to="/videos" class="text-white/70 hover:text-white">← Back to videos</NuxtLink>
+    <div class="container mx-auto px-6 text-center">
+      <NuxtLink to="/videos" class="text-white/70 hover:text-white block mb-6 text-left">
+        ← Back to videos
+      </NuxtLink>
 
-      <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <div class="lg:col-span-2">
-          <h1 class="text-3xl font-extrabold mb-4">
-            {{ video?.title || 'Video not found' }}
-          </h1>
+      <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-extrabold mb-4">
+          {{ video?.title || 'Video not found' }}
+        </h1>
 
-          <!-- Player -->
-          <VideoCard
-            v-if="video && video.id"
-            :video-id="video.id"
-            :title="video.title"
-            :thumb="video.thumb"
-            :autoplay="false"
-            aspect="aspect-[5/4] md:aspect-[4/3] lg:aspect-[16/9]"
-          />
-          <p v-else class="text-red-400 mt-4 text-sm">
-            Missing or invalid YouTube ID. Check the “YouTubeID” field in Strapi and republish.
-          </p>
+        <!-- Player -->
+        <VideoCard
+          v-if="video && video.id"
+          :video-id="video.id"
+          :title="video.title"
+          :thumb="video.thumb"
+          :autoplay="false"
+          aspect="aspect-[5/4] md:aspect-[4/3] lg:aspect-[16/9]"
+          class="mx-auto"
+        />
+        <p v-else class="text-red-400 mt-4 text-sm">
+          Missing or invalid YouTube ID. Check the “YouTubeID” field in Strapi and republish.
+        </p>
 
-          <p v-if="video?.description" class="mt-4 text-white/80 whitespace-pre-line">
-            {{ video.description }}
-          </p>
-        </div>
-
-        <aside>
-          <h2 class="text-xl font-bold mb-4">Related videos</h2>
-          <div class="space-y-6">
-            <NuxtLink
-              v-for="r in related"
-              :key="r.slug"
-              :to="`/videos/${r.slug}`"
-              class="block group"
-            >
-              <VideoCard
-                v-if="r.id"
-                :video-id="r.id"
-                :title="r.title"
-                :thumb="r.thumb"
-                :autoplay="false"
-                aspect="aspect-[4/3]"
-              />
-              <div v-else class="text-red-400 text-xs">Invalid YouTube ID</div>
-            </NuxtLink>
-          </div>
-        </aside>
+        <p v-if="video?.description" class="mt-6 text-white/80 whitespace-pre-line text-left">
+          {{ video.description }}
+        </p>
       </div>
     </div>
   </section>
 </template>
+
