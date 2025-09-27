@@ -329,6 +329,24 @@
             </div>
           </div>
         </section>
+        <h1 class="text-red-800 text-xl font-bold">this is test raw iframe</h1>
+        <iframe
+  width="560" height="315"
+  src="https://www.youtube-nocookie.com/embed/BmdNv51ORVA?rel=0&modestbranding=1&playsinline=1"
+  title="Test"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+<TutorialsSection
+  id="videos"
+  heading="🎥 Video Tutorials"
+  :videos="[
+    { id: 'BmdNv51ORVA', title: 'How to Create a QR Code in Under 2 Minutes' },
+    { id: 'BmdNv51ORVA', title: 'How to Create a QR Code in Under 2 Minutes' }
+  ]"
+/>
 
         <!-- CTA repeat -->
         <div ref="parallaxRef" class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50">

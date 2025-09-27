@@ -32,6 +32,8 @@
       </client-only>
         <NuxtLink v-if="!user" to="/signup" class="nav-link">Signup</NuxtLink>
         <NuxtLink v-if="!user" to="/login" class="nav-link">Login</NuxtLink>
+        <NuxtLink to="/videos" class="nav-link">Tutorials</NuxtLink>
+
         <p v-if="user" @click="logoutUser" class="nav-link cursor-pointer">
           Logout
         </p>
@@ -99,6 +101,8 @@
           class="mobile-nav-link"
           >Dashboard</NuxtLink
         >
+        <NuxtLink to="/videos" class="mobile-nav-link">Tutorials</NuxtLink>
+
         <NuxtLink
           v-if="!user"
           to="/signup"
