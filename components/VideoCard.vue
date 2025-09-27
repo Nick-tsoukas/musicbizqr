@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 
 const props = defineProps({
   videoId: { type: String, required: true },
+  hideDescription: { type: Boolean, default: false },
+
   title: { type: String, default: '' },
   /**
    * Optional custom thumbnail URL. If not provided,
@@ -78,9 +80,9 @@ const embedUrl = computed(() => {
 
         <!-- Title on thumbnail -->
         <div class="absolute bottom-0 left-0 right-0 p-4">
-          <h3 class="text-white font-semibold text-lg drop-shadow-md">
+          <!-- <h3 class="text-white font-semibold text-lg drop-shadow-md">
             {{ title }}
-          </h3>
+          </h3> -->
         </div>
       </button>
 
@@ -98,6 +100,6 @@ const embedUrl = computed(() => {
     </div>
 
     <!-- Caption (optional) -->
-    <p v-if="title" class="text-white/90 text-sm mt-3">{{ title }}</p>
+    <p v-if="title" class="text-white/90 text-lg font-bold mt-3">{{ title }}</p>
   </div>
 </template>

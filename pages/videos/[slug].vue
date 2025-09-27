@@ -176,14 +176,15 @@ useHead(() => {
       </NuxtLink>
 
       <div class="max-w-3xl mx-auto">
-        <h1 class="text-3xl font-extrabold mb-4">
+        <!-- <h1 class="text-3xl font-extrabold mb-4">
           {{ video?.title || 'Video not found' }}
-        </h1>
+        </h1> -->
 
         <!-- Player -->
         <VideoCard
           v-if="video && video.id"
           :video-id="video.id"
+          :hideDescription="true"
           :title="video.title"
           :thumb="video.thumb"
           :autoplay="false"
@@ -194,9 +195,9 @@ useHead(() => {
           Missing or invalid YouTube ID. Check the “YouTubeID” field in Strapi and republish.
         </p>
 
-        <p v-if="video?.description" class="mt-6 text-white/80 whitespace-pre-line text-left">
+        <!-- <p v-if="video?.description" class="mt-6 text-white/80 whitespace-pre-line text-left">
           {{ video.description }}
-        </p>
+        </p> -->
       </div>
     </div>
   </section>
