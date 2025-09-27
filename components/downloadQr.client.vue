@@ -13,7 +13,9 @@
         @keydown.esc="close"
       >
         <!-- Header -->
-        <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-neutral-900/90 backdrop-blur border-b border-white/10">
+        <div
+          class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-neutral-900/90 backdrop-blur border-b border-white/10"
+        >
           <h2 class="text-lg font-semibold">Download QR</h2>
           <button
             @click="close"
@@ -35,12 +37,17 @@
         </div>
 
         <!-- Body -->
-        <div class="h-[calc(100vh-56px)] grid sm:grid-cols-2 gap-6 p-5 overflow-y-auto">
+        <div
+          class="h-[calc(100vh-56px)] grid sm:grid-cols-2 gap-6 p-5 overflow-y-auto"
+        >
           <!-- Preview (centered; borderless) -->
           <div class="flex items-center justify-center">
             <div
               class="aspect-square w-[min(90vw,80vh)]"
-              :style="{ transform: `scale(${previewZoom/100})`, transformOrigin: 'center' }"
+              :style="{
+                transform: `scale(${previewZoom / 100})`,
+                transformOrigin: 'center'
+              }"
             >
               <div
                 ref="previewEl"
@@ -86,7 +93,11 @@
                   v-for="s in [512, 1024, 2048]"
                   :key="s"
                   class="px-3 py-2 rounded-md border border-white/10"
-                  :class="exportSize === s ? 'bg-white text-black' : 'bg-neutral-800 hover:bg-neutral-700'"
+                  :class="
+                    exportSize === s
+                      ? 'bg-white text-black'
+                      : 'bg-neutral-800 hover:bg-neutral-700'
+                  "
                   @click="exportSize = s"
                 >
                   {{ s }}px
@@ -112,17 +123,22 @@
               <label class="block text-sm mb-1">Format</label>
               <div class="flex gap-2 flex-wrap">
                 <button
-                  v-for="ext in ['png','jpeg','svg']"
+                  v-for="ext in ['png', 'jpeg', 'svg']"
                   :key="ext"
                   @click="format = ext"
                   class="px-3 py-2 rounded-md border border-white/10"
-                  :class="format === ext ? 'bg-white text-black' : 'bg-neutral-800 hover:bg-neutral-700'"
+                  :class="
+                    format === ext
+                      ? 'bg-white text-black'
+                      : 'bg-neutral-800 hover:bg-neutral-700'
+                  "
                 >
                   {{ ext.toUpperCase() }}
                 </button>
               </div>
               <p class="text-xs text-white/60 mt-2">
-                SVG scales cleanly in editors. If your QR has a raster logo, that part won’t upscale beyond its original resolution.
+                SVG scales cleanly in editors. If your QR has a raster logo,
+                that part won’t upscale beyond its original resolution.
               </p>
             </div>
 
@@ -176,21 +192,25 @@ import { ref, watch, onMounted } from 'vue'
 // Props from parent
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
-  qrInstance: { type: Object, default: null },  // optional external instance
-  qrOptions:  { type: Object, default: null },  // options to build internal instance
-  defaultName:{ type: String, default: 'qr-code' },
+  qrInstance: { type: Object, default: null }, // optional external instance
+  qrOptions: { type: Object, default: null },  // options to build internal instance
+  defaultName: { type: String, default: 'qr-code' },
 })
 const emit = defineEmits(['update:modelValue'])
 
 // UI state
 const modal = ref(null)
 const previewEl = ref(null)
+
+// Holds style bits so we can re-apply them on preview/export (prevents color loss)
+const styleOpts = ref(null)
+
 const fileName = ref(props.defaultName)
 const previewZoom = ref(100)     // % (CSS scale only)
-const exportSize  = ref(1024)    // pixels for the actual file
-const customSize  = ref(null)
+const exportSize = ref(1024)     // pixels for the actual file
+const customSize = ref(null)
 const format = ref('png')        // 'png' | 'jpeg' | 'svg'
-const transparentBg = ref(false) // ⬅️ DEFAULT UNCHECKED
+const transparentBg = ref(false) // default unchecked
 const bgColor = ref('#FFFFFF')
 const downloading = ref(false)
 const errorMsg = ref('')
@@ -198,7 +218,7 @@ const errorMsg = ref('')
 // Internal QR instance (if parent didn’t pass one)
 let qr = null
 let appended = false
-const PREVIEW_SIZE = 512  // fast render size for on-screen preview
+const PREVIEW_SIZE = 512 // fast render size for on-screen preview
 
 // Normalize options: ensure imageOptions.src mirrors image if needed, and set preview size
 function withImageNormalized(opts) {
@@ -209,7 +229,7 @@ function withImageNormalized(opts) {
   if (!copy.image && copy.imageOptions?.src) copy.image = copy.imageOptions.src
 
   // force preview size (actual export size is handled at download time)
-  copy.width  = copy.width  || PREVIEW_SIZE
+  copy.width = copy.width || PREVIEW_SIZE
   copy.height = copy.height || PREVIEW_SIZE
 
   return copy
@@ -223,20 +243,33 @@ async function mountQr() {
   if (typeof window === 'undefined' || !previewEl.value) return
 
   // Build options (fallback if none)
-  const hasOpts = !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))
+  const hasOpts =
+    !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))
   const fallbackOpts = {
     data: 'https://example.com',
     width: PREVIEW_SIZE,
     height: PREVIEW_SIZE,
     backgroundOptions: { color: '#FFFFFF' },
-    dotsOptions: { type: 'square', color: '#000000' }
+    dotsOptions: { type: 'square', color: '#000000' },
   }
   const baseOpts = hasOpts ? withImageNormalized(props.qrOptions) : fallbackOpts
 
+  // Capture style for reuse (colors, corners, logo)
+  styleOpts.value = {
+    dotsOptions: baseOpts?.dotsOptions,
+    cornersSquareOptions: baseOpts?.cornersSquareOptions,
+    cornersDotOptions: baseOpts?.cornersDotOptions,
+    image: baseOpts?.image,
+    imageOptions: baseOpts?.imageOptions,
+  }
+
   try {
     if (props.qrInstance) {
+      // Use the external instance but make sure full options (incl. colors) are applied at least once
       qr = props.qrInstance
-      try { await qr.update({ width: PREVIEW_SIZE, height: PREVIEW_SIZE }) } catch {}
+      try {
+        await qr.update({ ...baseOpts })
+      } catch {}
     } else {
       const { default: QRCodeStyling } = await import('qr-code-styling')
       qr = new QRCodeStyling(baseOpts)
@@ -263,21 +296,26 @@ async function mountQr() {
   await refreshPreview()
 }
 
+function computeBgColor() {
+  // For PNG/JPEG, use hex or transparent; for SVG, 'transparent' usually works too
+  if (transparentBg.value) return 'transparent'
+  return bgColor.value || '#FFFFFF'
+}
+
 async function refreshPreview() {
   if (!qr) return
-  const bg =
-    format.value === 'svg'
-      ? (transparentBg.value ? 'transparent' : bgColor.value)
-      : (transparentBg.value ? 'transparent' : (bgColor.value || '#FFFFFF'))
+  const bg = computeBgColor()
 
   try {
     await qr.update({
       width: PREVIEW_SIZE,
       height: PREVIEW_SIZE,
       backgroundOptions: { color: bg },
+      // 👇 re-apply full style so preview reflects saved DB design
+      ...styleOpts.value,
     })
   } catch (e) {
-    // noop for older versions
+    // no-op for older versions
   }
 }
 
@@ -289,31 +327,35 @@ async function download() {
   errorMsg.value = ''
   downloading.value = true
 
-  // Apply export-size + background just for the file
-  const bg =
-    format.value === 'svg'
-      ? (transparentBg.value ? 'transparent' : bgColor.value)
-      : (transparentBg.value ? 'transparent' : (bgColor.value || '#FFFFFF'))
-
+  const bg = computeBgColor()
   const targetSize = Math.max(64, Number(exportSize.value) || 1024)
   const ext = format.value
-  const name = (fileName.value || 'qr-code').replace(/\s+/g, '-').toLowerCase()
+  const name = (fileName.value || 'qr-code')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
   const quality = 1
 
   try {
-    // Update to export size for the actual file
+    // Update to export size + style for the actual file
     await qr.update({
       width: targetSize,
       height: targetSize,
       backgroundOptions: { color: bg },
+      // 👇 critical: keep dots/corners/logo so export matches preview/DB
+      ...styleOpts.value,
     })
 
     await qr.download({ name, extension: ext, quality })
 
     // Return preview back to fast size (keep UI snappy)
-    await qr.update({ width: PREVIEW_SIZE, height: PREVIEW_SIZE })
+    await qr.update({
+      width: PREVIEW_SIZE,
+      height: PREVIEW_SIZE,
+      backgroundOptions: { color: bg },
+      ...styleOpts.value,
+    })
   } catch (e) {
-    // Fallbacks
+    // Fallback paths for some library versions
     try {
       if (qr.getRawData) {
         const blob = await qr.getRawData(ext)
@@ -350,15 +392,18 @@ watch([format, transparentBg, bgColor], () => {
   if (props.modelValue) refreshPreview()
 })
 
-watch(() => props.modelValue, async (open) => {
-  if (open) {
-    fileName.value = props.defaultName || 'qr-code'
-    errorMsg.value = ''
-    appended = false // allow append if remounting
-    await mountQr()
-    setTimeout(() => modal.value?.focus?.(), 0)
+watch(
+  () => props.modelValue,
+  async (open) => {
+    if (open) {
+      fileName.value = props.defaultName || 'qr-code'
+      errorMsg.value = ''
+      appended = false // allow append if remounting
+      await mountQr()
+      setTimeout(() => modal.value?.focus?.(), 0)
+    }
   }
-})
+)
 
 onMounted(() => {
   if (props.modelValue) mountQr()
@@ -367,5 +412,7 @@ onMounted(() => {
 
 <style scoped>
 /* Allow focusing the container for Esc key */
-div[role="dialog"] { outline: none; }
+div[role="dialog"] {
+  outline: none;
+}
 </style>

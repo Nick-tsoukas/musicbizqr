@@ -433,7 +433,6 @@ function openDownloadForQr(raw) {
   activeQrName.value = raw?.attributes?.name || `qr-${raw?.id || ""}`;
   showDownload.value = true;
 }
-
 function buildQrOptionsFromStrapi(raw) {
   const a = raw?.attributes || {};
   const saved = a.options || {};
@@ -441,23 +440,41 @@ function buildQrOptionsFromStrapi(raw) {
 
   const logo = saved.image || saved.imageOptions?.src || a.logo?.url || null;
 
-  // mirror the shape from your Edit page’s getQRCodeOptions()
+  // Pull color from multiple possible keys (old/new shapes)
+  const dotColor =
+    saved.dotsOptions?.color ||
+    a.qrColor ||
+    a.colorDark ||
+    saved.colorDark ||
+    "#000000";
+
+  const cornersSqColor =
+    saved.cornersSquareOptions?.color || a.cornersSquareColor || dotColor;
+
+  const cornersDotColor =
+    saved.cornersDotOptions?.color || a.cornersDotColor || dotColor;
+
+  const bg =
+    saved.backgroundOptions?.color ||
+    a.backgroundColor ||
+    "#FFFFFF";
+
   const opts = {
     data: dataValue || "https://musicbizqr.com",
     width: Number(saved.size || saved.width || 300),
     height: Number(saved.size || saved.height || 300),
-    backgroundOptions: { color: saved.backgroundOptions?.color || "#FFFFFF" },
+    backgroundOptions: { color: bg },
     dotsOptions: {
       type: saved.dotsOptions?.type || "square",
-      color: saved.dotsOptions?.color || "#000000",
+      color: dotColor,
       gradient: saved.dotsOptions?.gradient ?? null,
     },
     cornersSquareOptions: {
-      color: saved.cornersSquareOptions?.color || "#000000",
+      color: cornersSqColor,
       type: saved.cornersSquareOptions?.type || "square",
     },
     cornersDotOptions: {
-      color: saved.cornersDotOptions?.color || "#000000",
+      color: cornersDotColor,
       type: saved.cornersDotOptions?.type || "square",
     },
     imageOptions: {
@@ -472,6 +489,7 @@ function buildQrOptionsFromStrapi(raw) {
   if (logo) opts.image = logo;
   return opts;
 }
+
 
 function copyToClipboard(text) {
   navigator.clipboard
