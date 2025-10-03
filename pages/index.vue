@@ -241,10 +241,10 @@
                   to="/signup"
                   class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-violet-600/80 hover:bg-violet-600 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
                 >
-                  <span>🚀 Free 30 Day Trial</span>
-                  <span class="text-white/80 font-normal"
+                  <span> Free 30 Day Trial</span>
+                  <!-- <span class="text-white/80 font-normal"
                     >No Credit Card Required</span
-                  >
+                  > -->
                 </NuxtLink>
               </div>
 
@@ -321,7 +321,7 @@
         </section>
 
         <!-- CTA block -->
-        <div
+        <!-- <div
           ref="parallaxRef"
           class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
         >
@@ -352,7 +352,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Example section (unchanged content, global) -->
         <div class="flex flex-col justify-center">
@@ -401,16 +401,15 @@
                   >
                     Preview Page
                   </NuxtLink>
-                  <NuxtLink
+                  <!-- <NuxtLink
   to="/signup"
   class="mt-8 w-full inline-flex items-center gap-3 rounded-2xl border border-white/15 
          bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
          hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
          px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
 >
-  <span>🚀 Free 30 Day Trial</span>
-  <span class="text-white/80 font-normal">No Credit Card Required</span>
-</NuxtLink>
+  <span> Free 30 Day Trial</span>
+</NuxtLink> -->
                 </div>
 
                 <div class="flex justify-center image_gradient p-10 rounded-lg">
@@ -490,7 +489,7 @@
           <div
             class="mt-16 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start max-w-6xl mx-auto"
           >
-<NuxtLink
+<!-- <NuxtLink
   to="/signup"
   class="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 
          bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
@@ -499,7 +498,7 @@
          text-center"
 >
   🚀 Free 30 Day Trial – <span class="text-white/80 font-normal">No Credit Card Required</span>
-</NuxtLink>
+</NuxtLink> -->
 
 <NuxtLink
   to="/article/qr-code-strategy"
@@ -701,8 +700,7 @@
          hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
          px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
 >
-  <span>🚀 Free 30 Day Trial</span>
-  <span class="text-white/80 font-normal">No Credit Card Required</span>
+  <span> Free 30 Day Trial</span>
 </NuxtLink>
             </div>
           </div>
@@ -751,8 +749,7 @@
          hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
          px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
 >
-  <span>🚀 Free 30 Day Trial</span>
-  <span class="text-white/80 font-normal">No Credit Card Required</span>
+  <span> Free 30 Day Trial</span>
 </NuxtLink>
               </div>
             </div>
