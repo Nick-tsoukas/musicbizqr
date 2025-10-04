@@ -16,25 +16,14 @@
             <div
               class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
             >
-              <!-- TH greeting ribbon -->
-              <div
-                v-if="isTH"
-                class="mb-4 flex items-center justify-center lg:justify-start"
-              >
-                <span
-                  class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-600/90 px-4 py-2 text-sm font-semibold"
-                >
-                  🎬 สวัสดีครับ/ค่ะ Thailand! — ใช้ MusicBizQR กับเพลง ภาพยนตร์
-                  และซีรีส์ได้เลย
-                </span>
-              </div>
+      
 
               <h1
                 data-aos="fade-up"
                 class="font-extrabold tracking-tight leading-none text-center lg:text-left"
               >
                 <span
-                  class="block text-7xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+                  class="block text-4xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
                 >
                   MusicBizQR
                 </span>
@@ -373,46 +362,11 @@
             layout you can update anytime and track in real time.
           </p>
 
-          <div class="w-full max-w-md md:max-w-5xl mx-auto">
+          <div class="w-full max-w-md md:max-w-2xl mx-auto">
             <section class="max-w-5xl mx-auto text-white my-12 overflow-hidden">
-              <div class="grid md:grid-cols-2 gap-6 p-6 md:p-10 items-center">
-                <div>
-                  <h2
-                    class="text-3xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500"
-                  >
-                    Built for Musicians. Powered by Smart Links.
-                  </h2>
-                  <p class="text-lg mb-4">
-                    MusicBizQR gives you a powerful landing page with streaming
-                    links, videos, social buttons, and real-time fan analytics —
-                    all from a single QR code.
-                  </p>
-                  <ul class="space-y-2 mb-6">
-                    <li>🎯 Unlimited link clicks & analytics</li>
-                    <li>
-                      📈 Track Spotify streams, YouTube plays, and QR scans
-                    </li>
-                    <li>📱 Mobile-optimized artist pages</li>
-                    <li>🚀 Create your first Smart Link in seconds</li>
-                  </ul>
-                  <NuxtLink
-                    to="/burningthunder"
-                    class="mb-8 inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
-                  >
-                    Preview Page
-                  </NuxtLink>
-                  <!-- <NuxtLink
-  to="/signup"
-  class="mt-8 w-full inline-flex items-center gap-3 rounded-2xl border border-white/15 
-         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
-         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
-         px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
->
-  <span> Free 30 Day Trial</span>
-</NuxtLink> -->
-                </div>
+              <div class="grid md:grid-cols-1 gap-6 p-6 md:p-10 items-center">
 
-                <div class="flex justify-center image_gradient p-10 rounded-lg">
+                <div class="flex justify-center w-auto  image_gradient p-10 rounded-lg">
                   <img
                     src="public/screenshotappnovideo.png"
                     alt="MusicBizQR dashboard"
@@ -420,107 +374,17 @@
                     loading="lazy"
                   />
                 </div>
+                 <NuxtLink
+                    to="/burningthunder"
+                    class="mb-8 inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
+                  >
+                    Preview Page
+                  </NuxtLink>
               </div>
             </section>
           </div>
         </div>
 
-        <!-- Why section (kept English) -->
-        <section class="py-24 px-6 text-white">
-          <div class="max-w-6xl mx-auto text-center lg:text-left">
-            <h2
-              class="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500 mb-4"
-            >
-              Why MusicBizQR?
-            </h2>
-            <p
-              class="max-w-3xl mx-auto lg:mx-0 text-lg text-white/90 leading-relaxed"
-            >
-              MusicBizQR turns every poster, merch tag, and bio link into a
-              <strong>trackable marketing channel</strong>. Create dynamic QR
-              codes, launch mobile <strong>smart link splash pages</strong>,
-              embed music &amp; video, sell tickets and merch, and measure fan
-              engagement in real time—built specifically for independent
-              artists, touring bands, and music marketers.
-            </p>
-          </div>
-
-          <div
-            class="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto text-center lg:text-left"
-          >
-            <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">
-                Dynamic QR Codes
-              </h3>
-              <p class="text-gray-300 text-base leading-relaxed">
-                Print once, update anytime. Switch from a pre-save to tour dates
-                or merch without reprinting your codes.
-              </p>
-            </article>
-            <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">
-                Smart Link Splash Pages
-              </h3>
-              <p class="text-gray-300 text-base leading-relaxed">
-                Pull in Spotify, Apple Music, YouTube, TikTok &amp; socials—give
-                fans everything in one tap-friendly page.
-              </p>
-            </article>
-            <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">
-                Music, Video &amp; Sales
-              </h3>
-              <p class="text-gray-300 text-base leading-relaxed">
-                Feature a track or video, collect emails, and add ticket &amp;
-                merch purchase links fans can use at the show.
-              </p>
-            </article>
-            <article>
-              <h3 class="font-semibold text-xl mb-2 text-pink-400">
-                Real-Time Scan Analytics
-              </h3>
-              <p class="text-gray-300 text-base leading-relaxed">
-                See scans by city, device &amp; time of day. Route tours
-                smarter, measure promo impact, and grow what works.
-              </p>
-            </article>
-          </div>
-
-          <div
-            class="mt-16 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start max-w-6xl mx-auto"
-          >
-<!-- <NuxtLink
-  to="/signup"
-  class="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 
-         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
-         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
-         px-6 py-3 font-semibold text-white shadow-lg transition duration-200
-         text-center"
->
-  🚀 Free 30 Day Trial – <span class="text-white/80 font-normal">No Credit Card Required</span>
-</NuxtLink> -->
-
-<NuxtLink
-  to="/article/qr-code-strategy"
-  class="mt-8 inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 
-         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
-         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
-         px-6 py-3 font-semibold text-white shadow-lg transition duration-200
-         text-center w-full sm:w-auto"
->
-  <span v-if="!isTH">Learn QR Strategy</span>
-  <span v-else>เรียนรู้กลยุทธ์ QR</span>
-</NuxtLink>
-
-
-
-          </div>
-
-          <span class="sr-only">
-            QR code generator for musicians, smart link pages for bands, music
-            marketing analytics
-          </span>
-        </section>
 
         <!-- Embed section (unchanged) -->
         <section
@@ -706,21 +570,7 @@
           </div>
         </section>
 
-        <TutorialsSection
-          id="videos"
-          heading="🎥 Video Tutorials"
-          :videos="[
-            {
-              id: 'BmdNv51ORVA',
-              title: 'How to Create a QR Code in Under 2 Minutes',
-            },
-            {
-              id: 'h7AacQWKQtc',
-              title:
-                'How to Create a Artist Smart Link Page in Under 2 Minutes',
-            },
-          ]"
-        />
+       
 
         <!-- CTA repeat -->
         <div
@@ -783,6 +633,21 @@
             </div>
           </div>
         </section>
+         <TutorialsSection
+          id="videos"
+          heading="Video Tutorials"
+          :videos="[
+            {
+              id: 'BmdNv51ORVA',
+              title: 'How to Create a QR Code in Under 2 Minutes',
+            },
+            {
+              id: 'h7AacQWKQtc',
+              title:
+                'How to Create a Artist Smart Link Page in Under 2 Minutes',
+            },
+          ]"
+        />
 
         <!-- FAQ (unchanged copy) -->
         <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
