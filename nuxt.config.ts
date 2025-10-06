@@ -46,6 +46,7 @@ export default defineNuxtConfig({
     resendKey: process.env.RESEND_API_KEY,
     contactTo: process.env.CONTACT_TO,
     contactFrom: process.env.CONTACT_FROM,
+     strapiApiToken: process.env.STRAPI_API_TOKEN,
     public: {
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
         baseUrl: process.env.BASE_URL || 'https://musicbizqr.com',

@@ -1,88 +1,152 @@
-<!-- pages/admin.vue -->
 <template>
   <section class="min-h-screen bg-black text-white">
-    <div class="w-[90vw] mx-auto py-10 space-y-6">
-      <h1 class="text-3xl font-extrabold">Admin (bootstrap)</h1>
-      <p class="text-white/70">Open the browser console — we’re logging Strapi responses.</p>
+    <div class="w-[90vw] mx-auto py-10 space-y-10">
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-extrabold">Admin Dashboard</h1>
+          <p class="text-white/60">Overview and quick actions</p>
+        </div>
 
-      <div class="rounded-xl border border-white/10 p-4">
-        <div class="text-sm text-white/60">Users fetch status</div>
-        <div class="mt-1">
-          <code class="text-xs">
-            pending: {{ usersPending }} |
-            error: {{ !!usersError }}
-          </code>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="rounded-2xl border border-white/10 p-4">
+            <div class="text-sm text-white/60">Total Users</div>
+            <div class="text-3xl font-bold">
+              <span v-if="!usersPending">{{ usersTotal }}</span>
+              <span v-else class="opacity-60">…</span>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 p-4">
+            <div class="text-sm text-white/60">Promo QR Scans (ID 46)</div>
+            <div class="text-3xl font-bold">
+              <span v-if="!promoPending">{{ promo?.scansCount ?? '—' }}</span>
+              <span v-else class="opacity-60">…</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="rounded-xl border border-white/10 p-4">
-        <div class="text-sm text-white/60">QR #46 fetch status</div>
-        <div class="mt-1">
-          <code class="text-xs">
-            pending: {{ qrPending }} |
-            error: {{ !!qrError }}
-          </code>
+      <!-- Promo QR Card -->
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div class="space-y-3">
+          <h2 class="text-2xl font-extrabold">Promo QR (ID 46)</h2>
+          <p class="text-white/70">
+            {{ promo?.name || 'Promo QR' }} —
+            Scans: <span class="font-semibold text-white">{{ promo?.scansCount ?? '—' }}</span>
+          </p>
+          <div class="flex gap-3">
+            <NuxtLink
+              v-if="promo?.analyticsUrl"
+              :to="promo.analyticsUrl"
+              class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-violet-600/90 hover:bg-violet-600 px-5 py-2.5 font-semibold shadow-lg ring-1 ring-white/10 transition"
+            >
+              Open Analytics
+            </NuxtLink>
+            <a
+              v-if="promo?.url"
+              :href="promo.url"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 hover:bg-white/15 px-5 py-2.5 font-semibold transition"
+            >
+              Visit Target
+            </a>
+          </div>
         </div>
+
+        <div class="flex items-center justify-center">
+          <div class="p-4 rounded-3xl border border-white/10 bg-neutral-900 w-fit">
+            <img
+              v-if="promo?.imageUrl"
+              :src="promo.imageUrl"
+              alt="Promo QR Code (ID 46)"
+              class="w-56 h-56 md:w-64 md:h-64 object-contain"
+              decoding="async"
+              loading="lazy"
+            />
+            <div v-else class="text-white/60 text-sm">No image</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users table -->
+      <div class="rounded-2xl border border-white/10 overflow-hidden">
+        <div class="px-4 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
+          <h2 class="font-semibold">Users</h2>
+          <span class="text-sm text-white/60">Total: {{ usersTotal }}</span>
+        </div>
+
+        <div class="overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-white/5 text-white/70">
+              <tr>
+                <th class="text-left px-4 py-2">ID</th>
+                <th class="text-left px-4 py-2">Email</th>
+              </tr>
+            </thead>
+
+            <tbody v-if="!usersPending && users.length">
+              <tr v-for="u in users" :key="u.id" class="border-t border-white/10">
+                <td class="px-4 py-2">{{ u.id }}</td>
+                <td class="px-4 py-2">{{ u.email }}</td>
+              </tr>
+            </tbody>
+
+            <tbody v-else-if="usersPending">
+              <tr>
+                <td class="px-4 py-6 text-white/60" colspan="2">Loading users…</td>
+              </tr>
+            </tbody>
+
+            <tbody v-else>
+              <tr>
+                <td class="px-4 py-6 text-white/60" colspan="2">No users found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Errors (if any) -->
+      <div v-if="usersError || promoError" class="rounded-xl border border-red-500/40 bg-red-500/10 p-4">
+        <div class="font-semibold text-red-300 mb-1">Errors</div>
+        <pre class="text-xs text-red-200 whitespace-pre-wrap">
+usersError: {{ usersError?.data || usersError?.message || usersError || '—' }}
+promoError: {{ promoError?.data || promoError?.message || promoError || '—' }}
+        </pre>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig()
-const base = config.public.strapiUrl
-const token = config.public.strapiToken
+type UserLite = { id: number; email: string }
+type PromoQR = {
+  id: number
+  name: string | null
+  url: string | null
+  link: string | null
+  q_type: string | null
+  slugId: string | null
+  imageUrl: string | null
+  scansCount: number
+  analyticsUrl: string | null
+}
 
-const headers = computed(() =>
-  token ? { Authorization: `Bearer ${token}` } : undefined
-)
-
-/**
- * Strapi v4 notes:
- * - If your "users" are the Users & Permissions plugin users, the endpoint is `/api/users`
- *   (requires proper permissions or an admin/user token).
- * - If you have your own collection type (e.g. "users" or "user-profiles"), use that path instead:
- *   `/api/user-profiles` etc.
- * Adjust the path below to match your Strapi.
- */
-
-// FETCH: users (client-side so logs show in browser console)
 const {
   data: usersRes,
   pending: usersPending,
   error: usersError,
-} = await useFetch(`${base}/api/users`, {
-  headers: headers.value,
-  server: false, // run on client so console.log is visible in your devtools
-})
+} = await useFetch<{ users: UserLite[]; total: number }>('/api/admin/users', { server: true })
 
-// FETCH: QR with id 46 (populate if you need relations)
 const {
-  data: qrRes,
-  pending: qrPending,
-  error: qrError,
-} = await useFetch(`${base}/api/qrs/46?populate=*`, {
-  headers: headers.value,
-  server: false,
-})
+  data: promoRes,
+  pending: promoPending,
+  error: promoError,
+} = await useFetch<PromoQR>('/api/admin/promo-qr', { server: true })
 
-// Log results whenever they arrive
-watchEffect(() => {
-  if (usersRes.value) {
-    console.log('[ADMIN] usersRes:', usersRes.value)
-    // Example helpers you may want next:
-    // const emails = Array.isArray(usersRes.value) ? usersRes.value.map(u => u.email) : []
-    // console.log('[ADMIN] emails:', emails, 'total:', emails.length)
-  }
-  if (qrRes.value) {
-    console.log('[ADMIN] qrRes (id=46):', qrRes.value)
-    // Example access pattern if it's a collection type:
-    // const entity = qrRes.value.data
-    // const scans = entity?.attributes?.scans
-    // console.log('[ADMIN] qr scans:', scans)
-  }
-
-  if (usersError.value) console.error('[ADMIN] usersError:', usersError.value)
-  if (qrError.value) console.error('[ADMIN] qrError:', qrError.value)
-})
+const users = computed(() => usersRes.value?.users ?? [])
+const usersTotal = computed(() => usersRes.value?.total ?? 0)
+const promo = computed(() => promoRes.value ?? null)
 </script>
