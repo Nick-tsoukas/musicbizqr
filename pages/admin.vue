@@ -38,7 +38,7 @@
           <div class="flex gap-3">
             <NuxtLink
               v-if="promo?.analyticsUrl"
-              :to="promo.analyticsUrl"
+              to="/analyticsqr/46"
               class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-violet-600/90 hover:bg-violet-600 px-5 py-2.5 font-semibold shadow-lg ring-1 ring-white/10 transition"
             >
               Open Analytics

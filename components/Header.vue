@@ -101,7 +101,7 @@
           class="mobile-nav-link"
           >Dashboard</NuxtLink
         >
-        <NuxtLink to="/videos" class="mobile-nav-link">Videos</NuxtLink>
+        <NuxtLink to="/videos" class="mobile-nav-link"  @click="toggleMenu">Videos</NuxtLink>
 
         <NuxtLink
           v-if="!user"
