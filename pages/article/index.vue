@@ -68,27 +68,7 @@ useHead({
 
     <div v-else class="text-gray-400 italic">No categories found.</div>
      <!-- Videos Section -->
-  <div class="bg-black text-white py-16 px-6 max-w-5xl mx-auto">
-    <h2 class="text-3xl font-extrabold mb-8">Videos</h2>
-    <div class="grid gap-6 md:grid-cols-2">
-      <!-- QR Code Tutorial -->
-      <div>
-        <video controls class="w-full rounded-lg shadow-lg mb-4">
-          <source src="/howtocreateqr.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <h3 class="text-xl font-semibold">How to Create a QR Code</h3>
-      </div>
-      <!-- Smart Link Tutorial -->
-      <div>
-        <video controls class="w-full rounded-lg shadow-lg mb-4">
-          <source src="/howtocreateartistpage.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <h3 class="text-xl font-semibold">How to Create an Artist Smart Link Page</h3>
-      </div>
-    </div>
-  </div>
+ 
   </div>
 </template>
 
