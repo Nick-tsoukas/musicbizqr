@@ -77,7 +77,7 @@
 import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick } from "vue";
 import { useRoute, useRuntimeConfig } from "#imports";
 import { Chart, registerables } from "chart.js";
-import { format, subDays } from "date-fns";
+import { format, subDays, parseISO } from "date-fns";
 
 Chart.register(...registerables);
 
@@ -129,20 +129,27 @@ async function fetchAnalyticsData() {
 const totalScans = computed(() => analyticsData.value.length);
 
 function buildDailySeries() {
-  const lastDates = getLastNDates(selectedRange.value);
+  const lastDates = getLastNDates(selectedRange.value); // LOCAL days (yyyy-MM-dd)
   const counts: Record<string, number> = Object.fromEntries(
     lastDates.map((d) => [d, 0])
   );
 
   analyticsData.value.forEach((scan) => {
-    const dateStr = scan.attributes.createdAt.slice(0, 10); // ISO date part
-    if (counts[dateStr] !== undefined) counts[dateStr]++;
+    // Prefer your explicit scan.attributes.date (what you POST), else fallback to createdAt
+    const ts: string | undefined =
+      scan.attributes?.date ?? scan.attributes?.createdAt;
+    if (!ts) return;
+
+    // Convert ISO → LOCAL yyyy-MM-dd so it matches lastDates keys
+    const localKey = format(parseISO(ts), "yyyy-MM-dd");
+    if (counts[localKey] !== undefined) counts[localKey]++;
   });
 
   const labels = lastDates.map((d) => format(new Date(d), "MMM d, yyyy"));
   const data = lastDates.map((d) => counts[d]);
   return { labels, data, mode: "daily" as const };
 }
+
 
 function buildHourlySeries(dayStr: string) {
   const hours = Array.from({ length: 24 }, (_, i) => i); // 0..23
@@ -151,9 +158,15 @@ function buildHourlySeries(dayStr: string) {
   );
 
   analyticsData.value.forEach((scan) => {
-    const ts = scan.attributes.createdAt; // ISO
-    if (ts.slice(0, 10) === dayStr) {
-      const hour = new Date(ts).getHours(); // local hour
+    const ts: string | undefined =
+      scan.attributes?.date ?? scan.attributes?.createdAt;
+    if (!ts) return;
+
+    // LOCAL day check
+    const localDayKey = format(parseISO(ts), "yyyy-MM-dd");
+    if (localDayKey === dayStr) {
+      // LOCAL hour
+      const hour = parseISO(ts).getHours();
       counts[hour] = (counts[hour] ?? 0) + 1;
     }
   });
@@ -162,6 +175,7 @@ function buildHourlySeries(dayStr: string) {
   const data = hours.map((h) => counts[h] ?? 0);
   return { labels, data, mode: "hourly" as const };
 }
+
 
 function buildTimeSeries() {
   // precedence: explicit date -> hourly; else "today" -> hourly; else daily range
