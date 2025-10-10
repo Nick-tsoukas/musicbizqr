@@ -262,7 +262,7 @@
                       <img
                         :src="leftPhoneSrcResolved"
                         :alt="leftPhoneAltResolved"
-                        class="h-full w-full object-cover"
+                        class="h-full w-full object-contain p-[.5em]"
                         style="aspect-ratio: 9/19.5"
                       />
                     </div>
@@ -295,7 +295,7 @@
                       <img
                         :src="rightPhoneSrcResolved"
                         :alt="rightPhoneAltResolved"
-                        class="h-full w-full object-cover"
+                        class="h-full w-full object-contain p-[.5em]"
                         style="aspect-ratio: 9/19.5"
                       />
                     </div>
