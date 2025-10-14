@@ -17,18 +17,18 @@
             </div>
           </div>
 
-          <div class="rounded-2xl border border-white/10 p-4">
+          <!-- <div class="rounded-2xl border border-white/10 p-4">
             <div class="text-sm text-white/60">Promo QR Scans (ID 46)</div>
             <div class="text-3xl font-bold">
               <span v-if="!promoPending">{{ promo?.scansCount ?? '—' }}</span>
               <span v-else class="opacity-60">…</span>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
 
       <!-- Promo QR Card -->
-      <div class="grid md:grid-cols-2 gap-8 items-center">
+      <!-- <div class="grid md:grid-cols-2 gap-8 items-center">
         <div class="space-y-3">
           <h2 class="text-2xl font-extrabold">Promo QR (ID 46)</h2>
           <p class="text-white/70">
@@ -68,7 +68,7 @@
             <div v-else class="text-white/60 text-sm">No image</div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- GA: Home views by City -->
       <div class="rounded-2xl border border-white/10 overflow-hidden">
@@ -262,11 +262,12 @@ const gaData = ref<GAByCityPayload | null>(null)
 
 // Form controls
 // admin page – safer defaults
-const gaStart = ref<string>('')            // let server default if blank
-const gaEnd   = ref<string>('')            // '' -> server uses "today"
-const gaHostInput  = ref<string>('musicbizqr.com')
-const gaPathsInput = ref<string>('/')      // avoid ",,"
-const gaNoCache    = ref<boolean>(false)
+// Form controls — new defaults
+const gaStart = ref<string>('')           // let server default
+const gaEnd   = ref<string>('')           // server -> "today"
+const gaHostInput  = ref<string>('all')   // ← all hosts by default
+const gaPathsInput = ref<string>('')      // ← blank => server homepage regex
+const gaNoCache    = ref<boolean>(true)   // ← default nocache ON
 
 const gaTotals = computed(() => gaData.value?.totals ?? { users: 0, pageViews: 0 })
 const gaRows   = computed(() => gaData.value?.rows ?? [])
