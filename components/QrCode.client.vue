@@ -583,34 +583,54 @@ const saveQrCode = async () => {
   try {
     loading.value = true
 
-    const form = {
-      url: qrValue.value,
+    // 1) Create with a temporary tracker (uuid) just to get a record
+    const initialForm = {
+      url: qrValue.value, // temp uuid tracker; will be replaced
       users_permissions_user: { id: user.value.id },
       q_type: route.query.type,
-      link: normalizeLink(link.value),
+      link: normalizeLink(link.value),  // the external destination (if any)
       name: name.value,
       options: getQRCodeOptions()
     }
 
     if (route.query.type === 'bandProfile') {
-      form.band = selectedBand.value !== 'createNew' ? selectedBand.value : null
+      initialForm.band = selectedBand.value !== 'createNew' ? selectedBand.value : null
     }
 
-    const blob = await qrCode.value.getRawData('png')
-    const file = new File([blob], 'qrcode.png')
+    const tempBlob = await qrCode.value.getRawData('png')
+    const tempFile = new File([tempBlob], 'qrcode.png')
     const formData = new FormData()
-    formData.append('files.q_image', file, 'qrcode.png')
-    formData.append('data', JSON.stringify(form))
+    formData.append('files.q_image', tempFile, 'qrcode.png')
+    formData.append('data', JSON.stringify(initialForm))
 
-    const { data } = await client('/qrs', {
+    const { data: created } = await client('/qrs', {
       method: 'POST',
       body: formData
     })
+    if (!created?.id) throw new Error('QR code was not saved (no ID returned).')
 
-    if (!data?.id) throw new Error('QR code was not saved (no ID returned).')
+    // 2) Build the **final** tracker using the DB id
+    const finalTracker = `https://musicbizqr.com/directqr?id=${created.id}`
 
+    // 3) Re-render the QR with the final tracker, so scans always hit /directqr
+    qrValue.value = finalTracker
+    await new Promise(r => setTimeout(r)) // let watchers apply
+    qrCode.value.update(getQRCodeOptions())
+
+    const finalBlob = await qrCode.value.getRawData('png')
+    const finalFile = new File([finalBlob], 'qrcode.png')
+    const patch = new FormData()
+    patch.append('files.q_image', finalFile, 'qrcode.png')
+    patch.append('data', JSON.stringify({
+      url: finalTracker,
+      options: { ...getQRCodeOptions(), data: finalTracker }
+    }))
+
+    await client(`/qrs/${created.id}`, { method: 'PUT', body: patch })
+
+    // 4) Navigate away
     if (route.query.type === 'bandProfile' && selectedBand.value === 'createNew') {
-      router.push({ name: 'createband', query: { qrId: data.id } })
+      router.push({ name: 'createband', query: { qrId: created.id } })
     } else {
       router.push('/dashboard')
     }
@@ -620,6 +640,7 @@ const saveQrCode = async () => {
     loading.value = false
   }
 }
+
 </script>
 
 <style scoped>
