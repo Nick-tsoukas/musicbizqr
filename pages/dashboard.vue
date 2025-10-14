@@ -38,20 +38,21 @@
             QR Codes
           </h2>
           <NuxtLink
-            v-if="qrItems.length === 0 || isSpecialUser"
+            v-if="canCreateMoreQrs"
             to="/createqr"
             class="mdc-button flex justify-between w-full md:w-[300px]"
           >
             <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
             Create QR
           </NuxtLink>
+
           <button
             v-else
             class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
             disabled
           >
             <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
-            Only one QR allowed
+            Only {{ maxQrAllowed }} QR{{ maxQrAllowed > 1 ? "s" : "" }} allowed
           </button>
         </div>
 
@@ -368,8 +369,21 @@ import { useRuntimeConfig } from "#imports";
 // rebuild
 
 // special user override
-const specialEmail = "mjc773@gmail.com";
-const isSpecialUser = computed(() => user.value?.email === specialEmail);
+// with this:
+const specialEmails = [
+  "mjc773@gmail.com",
+  "nick.tsoukas101@gmail.com",
+  "partner@musicbizqr.com",
+];
+const isSpecialUser = computed(() => {
+  const e = (user.value?.email || "").toLowerCase();
+  return specialEmails.includes(e);
+});
+
+const maxQrAllowed = computed(() => (isSpecialUser.value ? 10 : 1));
+
+const canCreateMoreQrs = computed(() => qrItems.value.length < maxQrAllowed.value);
+
 
 const token = useStrapiToken();
 const loadingPortal = ref(false);
@@ -454,10 +468,7 @@ function buildQrOptionsFromStrapi(raw) {
   const cornersDotColor =
     saved.cornersDotOptions?.color || a.cornersDotColor || dotColor;
 
-  const bg =
-    saved.backgroundOptions?.color ||
-    a.backgroundColor ||
-    "#FFFFFF";
+  const bg = saved.backgroundOptions?.color || a.backgroundColor || "#FFFFFF";
 
   const opts = {
     data: dataValue || "https://musicbizqr.com",
@@ -489,7 +500,6 @@ function buildQrOptionsFromStrapi(raw) {
   if (logo) opts.image = logo;
   return opts;
 }
-
 
 function copyToClipboard(text) {
   navigator.clipboard
