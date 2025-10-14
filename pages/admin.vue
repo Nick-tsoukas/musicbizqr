@@ -261,10 +261,11 @@ const gaError = ref<any>(null)
 const gaData = ref<GAByCityPayload | null>(null)
 
 // Form controls
-const gaStart = ref<string>('')           // leave blank to use IEBA_START default
-const gaEnd   = ref<string>('today')
-const gaHostInput  = ref<string>('musicbizqr.com') // 'all' to remove host filter, or comma-separated
-const gaPathsInput = ref<string>('/,,/home')       // common variants for homepage
+// admin page – safer defaults
+const gaStart = ref<string>('')            // let server default if blank
+const gaEnd   = ref<string>('')            // '' -> server uses "today"
+const gaHostInput  = ref<string>('musicbizqr.com')
+const gaPathsInput = ref<string>('/')      // avoid ",,"
 const gaNoCache    = ref<boolean>(false)
 
 const gaTotals = computed(() => gaData.value?.totals ?? { users: 0, pageViews: 0 })
