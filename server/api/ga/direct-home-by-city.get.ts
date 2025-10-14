@@ -15,12 +15,41 @@ function toDateStr(s?: string): string | null {
 const parseList = (v?: string) => (v ? v.split(',').map(s => decodeURIComponent(s.trim())).filter(Boolean) : [])
 
 function buildFilter(hosts: string[], paths: string[]) {
-  const ex: any[] = []
-  if (hosts.length) ex.push({ filter: { fieldName: 'hostName',  inListFilter: { values: hosts } } })
-  if (paths.length) ex.push({ filter: { fieldName: 'pagePath', inListFilter: { values: paths } } })
-  if (!ex.length) return undefined
-  return ex.length === 1 ? ex[0] : { andGroup: { expressions: ex } }
+  const expressions: any[] = []
+
+  // Host filter (only if explicitly provided)
+  if (hosts.length) {
+    expressions.push({
+      filter: { fieldName: 'hostName', inListFilter: { values: hosts } },
+    })
+  }
+
+  // Path filter — use homepage regex by default if none provided
+  if (paths.length) {
+    expressions.push({
+      filter: { fieldName: 'pagePath', inListFilter: { values: paths } },
+    })
+  } else {
+    // Catch all homepage variants: "/", "/home", "/index", "/index.html"
+    const homeRegex = '^(?:/|/home|/index(?:\\.html)?)$'
+    expressions.push({
+      filter: {
+        fieldName: 'pagePath',
+        stringFilter: {
+          value: homeRegex,
+          matchType: 'FULL_REGEXP',
+          caseSensitive: false,
+        },
+      },
+    })
+  }
+
+  if (!expressions.length) return undefined
+  return expressions.length === 1
+    ? expressions[0]
+    : { andGroup: { expressions } }
 }
+
 
 async function runReport(client: BetaAnalyticsDataClient, propertyId: string, start: string, end: string, filter?: any) {
   const metricOptions = [
@@ -60,8 +89,12 @@ async function runReport(client: BetaAnalyticsDataClient, propertyId: string, st
 export default defineEventHandler(async (event) => {
   try {
     const q = getQuery(event)
-    if (q.nocache === '1') setResponseHeader(event, 'cache-control', 'no-store, must-revalidate')
-    else setResponseHeader(event, 'cache-control', 'public, max-age=300')
+   // Default = no-cache, unless explicitly told to cache
+if ((q.cache as string) === '1') {
+  setResponseHeader(event, 'cache-control', 'public, max-age=300')
+} else {
+  setResponseHeader(event, 'cache-control', 'no-store, must-revalidate')
+}
 
     const defaultStart = process.env.IEBA_START || '2025-10-01'
     const start = toDateStr((q.start as string) || defaultStart)
@@ -70,7 +103,6 @@ export default defineEventHandler(async (event) => {
 
     const hosts = ((q.host as string) || '').toLowerCase() === 'all' ? [] : parseList(q.host as string)
     const paths = parseList(q.paths as string)
-    if (!paths.length) paths.push('/')
 
     const propertyId = process.env.GA4_PROPERTY_ID
     if (!propertyId) throw createError({ statusCode: 500, message: 'Missing GA4_PROPERTY_ID env.' })
