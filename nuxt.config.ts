@@ -40,6 +40,8 @@ export default defineNuxtConfig({
   css: ['@/assets/css/tailwind.css', 'animate.css/animate.min.css', '@fortawesome/fontawesome-free/css/all.css'],
 
   runtimeConfig: {
+     gaPropertyId: process.env.GA_PROPERTY_ID,
+    gaServiceAccountJson: process.env.GA_SERVICE_ACCOUNT_JSON,
      // ✅ Your Stripe secret config
   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
   stripeDefaultPriceId: process.env.STRIPE_DEFAULT_PRICE_ID,

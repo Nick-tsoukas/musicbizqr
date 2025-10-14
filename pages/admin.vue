@@ -70,6 +70,98 @@
         </div>
       </div>
 
+      <!-- GA: Home views by City -->
+      <div class="rounded-2xl border border-white/10 overflow-hidden">
+        <div class="px-4 py-3 bg-white/5 border-b border-white/10 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <h2 class="font-semibold">Print Analytics — Home Views by City</h2>
+            <p class="text-white/60 text-sm">
+              Hosts:
+              <span class="font-mono">
+                {{ (gaData?.hosts && gaData.hosts.join(', ')) || gaHostInput || '(all)' }}
+              </span>
+              <span v-if="gaData?.startDate && gaData?.endDate" class="ml-2">
+                • Range: <strong>{{ gaData.startDate }}</strong> → <strong>{{ gaData.endDate }}</strong>
+              </span>
+              <span v-if="gaData?.paths?.length" class="ml-2">
+                • Paths: <span class="font-mono">{{ gaData.paths.join(', ') }}</span>
+              </span>
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-end gap-3">
+            <div>
+              <label class="text-xs block mb-1 opacity-70">Start (YYYY-MM-DD)</label>
+              <input v-model.trim="gaStart" placeholder="(defaults to IEBA start)" class="bg-zinc-900 rounded px-3 py-2 w-56" />
+            </div>
+            <div>
+              <label class="text-xs block mb-1 opacity-70">End</label>
+              <input v-model.trim="gaEnd" placeholder="today" class="bg-zinc-900 rounded px-3 py-2 w-40" />
+            </div>
+            <div>
+              <label class="text-xs block mb-1 opacity-70">Hosts (comma, or 'all')</label>
+              <input v-model.trim="gaHostInput" placeholder="musicbizqr.com" class="bg-zinc-900 rounded px-3 py-2 w-64" />
+            </div>
+            <div>
+              <label class="text-xs block mb-1 opacity-70">Paths (comma)</label>
+              <input v-model.trim="gaPathsInput" placeholder="/, ,/home" class="bg-zinc-900 rounded px-3 py-2 w-48" />
+            </div>
+            <label class="flex items-center gap-2 text-xs mb-1">
+              <input type="checkbox" v-model="gaNoCache" class="accent-white" />
+              nocache
+            </label>
+            <button @click="loadGA" :disabled="gaLoading" class="bg-white/10 hover:bg-white/15 disabled:opacity-60 rounded px-4 py-2">
+              Apply
+            </button>
+          </div>
+        </div>
+
+        <div v-if="gaLoading" class="px-4 py-6 text-white/60">Loading GA data…</div>
+        <div v-else-if="gaError" class="px-4 py-6 text-red-300">
+          Error: {{ gaError?.data?.message || gaError?.message || gaError }}
+        </div>
+        <div v-else-if="gaData" class="p-4 space-y-4">
+          <!-- Totals -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-zinc-900 p-3 rounded-xl">
+              <div class="text-xs opacity-70">Page Views</div>
+              <div class="text-xl font-semibold">{{ gaTotals.pageViews }}</div>
+            </div>
+            <div class="bg-zinc-900 p-3 rounded-xl">
+              <div class="text-xs opacity-70">Users</div>
+              <div class="text-xl font-semibold">{{ gaTotals.users }}</div>
+            </div>
+          </div>
+
+          <!-- City table -->
+          <div class="bg-zinc-900 rounded-xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-white/5">
+                <tr>
+                  <th class="text-left px-4 py-2 font-semibold">City</th>
+                  <th class="text-right px-4 py-2 font-semibold">Page Views</th>
+                  <th class="text-right px-4 py-2 font-semibold">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in gaRows" :key="row.city || Math.random()" class="border-t border-white/5">
+                  <td class="px-4 py-2">{{ row.city || '(unknown)' }}</td>
+                  <td class="px-4 py-2 text-right">{{ row.pageViews }}</td>
+                  <td class="px-4 py-2 text-right">{{ row.users }}</td>
+                </tr>
+                <tr v-if="!gaRows.length">
+                  <td colspan="3" class="px-4 py-6 text-white/60">No rows.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="text-xs opacity-60">
+            * Showing **all homepage views** for the selected host(s) and path(s); no source/medium filters.
+          </p>
+        </div>
+      </div>
+
       <!-- Users table -->
       <div class="rounded-2xl border border-white/10 overflow-hidden">
         <div class="px-4 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
@@ -149,4 +241,60 @@ const {
 const users = computed(() => usersRes.value?.users ?? [])
 const usersTotal = computed(() => usersRes.value?.total ?? 0)
 const promo = computed(() => promoRes.value ?? null)
+
+/**
+ * GA — Home views by city
+ * Endpoint: /api/ga/home-views-by-city
+ */
+type GAByCityRow = { city: string; pageViews: number; users: number }
+type GAByCityPayload = {
+  startDate: string
+  endDate: string
+  hosts: string[]
+  paths: string[]
+  totals: { pageViews: number; users: number }
+  rows: GAByCityRow[]
+}
+
+const gaLoading = ref(false)
+const gaError = ref<any>(null)
+const gaData = ref<GAByCityPayload | null>(null)
+
+// Form controls
+const gaStart = ref<string>('')           // leave blank to use IEBA_START default
+const gaEnd   = ref<string>('today')
+const gaHostInput  = ref<string>('musicbizqr.com') // 'all' to remove host filter, or comma-separated
+const gaPathsInput = ref<string>('/,,/home')       // common variants for homepage
+const gaNoCache    = ref<boolean>(false)
+
+const gaTotals = computed(() => gaData.value?.totals ?? { users: 0, pageViews: 0 })
+const gaRows   = computed(() => gaData.value?.rows ?? [])
+
+async function loadGA() {
+  gaLoading.value = true
+  gaError.value = null
+  try {
+    const params: Record<string, string> = {}
+    if (gaStart.value) params.start = gaStart.value
+    if (gaEnd.value) params.end = gaEnd.value
+    if (gaHostInput.value) params.host = gaHostInput.value
+    if (gaPathsInput.value) params.paths = gaPathsInput.value
+    if (gaNoCache.value) params.nocache = '1'
+
+gaData.value = await $fetch<GAByCityPayload>('/api/ga/direct-home-by-city', { params })
+  } catch (e: any) {
+    gaError.value = e
+  } finally {
+    gaLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadGA()
+})
 </script>
+
+<style scoped>
+table { border-collapse: collapse; }
+th, td { border-color: rgba(255,255,255,0.08); }
+</style>
