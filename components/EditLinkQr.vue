@@ -56,76 +56,115 @@
 </template>
 
 <script setup>
+import { ref, watch, onMounted, computed } from 'vue'
+import { useRuntimeConfig } from '#app'
 
-const { update } = useStrapi()
+const config = useRuntimeConfig()
+const baseUrl = (config.public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/,'')
+
 const router = useRouter()
-// Initialize form data with the provided props
+const { findOne, update } = useStrapi()
+
+/* ---------- Props from parent ---------- */
 const props = defineProps({
-  name: {
-    type: String,
-    default: 'Default Title'
-  },
-  qr: {
-    type: Object
-  },
-  url: {
-    type: String,
-    default: ''
-  },
-  q_image: {
-    type: String,
-    default: 'https://via.placeholder.com/300'
-  },
-  q_type: {
-    type: String
-  },
-  link: {
-    type: String,
-    default: null
-  },
-  qrId: {
-    type: Number
+  name: { type: String, default: 'Default Title' },
+  qr:   { type: Object,  default: null },
+  url:  { type: String,  default: '' },
+  q_image: { type: String, default: 'https://via.placeholder.com/300' },
+  q_type: { type: String, default: '' },
+  link:  { type: String, default: '' },
+  qrId:  { type: Number, required: true }
+})
+
+/* ---------- Helpers ---------- */
+const normalizeLink = (val) => {
+  if (!val) return ''
+  const s = String(val).trim()
+  if (/^https?:\/\//i.test(s)) return s
+  if (/^www\./i.test(s)) return `https://${s}`
+  return `https://www.${s}`
+}
+
+const isDirectQrUrl = (u) => /\/directqr\?id=/.test(String(u || ''))
+
+/* ---------- Form state ---------- */
+const formData = ref({
+  name:  props.name || '',
+  link:  props.link || '',
+  q_type: props.q_type || 'externalURL', // sensible default
+})
+
+/* Keep form in sync if parent props change */
+watch(() => props.name, (v) => { formData.value.name  = v ?? '' })
+watch(() => props.link, (v) => { formData.value.link  = v ?? '' })
+watch(() => props.q_type, (v) => { formData.value.q_type = v || 'externalURL' })
+
+/* ---------- Derived + loaded data ---------- */
+const existing = ref(null)       // full Strapi record
+const existingUrl = ref(props.url || '')
+const existingSlugId = ref(null)
+
+/* Load current QR (to get slugId or derive it) */
+onMounted(async () => {
+  try {
+    const res = await findOne('qrs', props.qrId, { populate: '*' })
+    existing.value = res?.data || null
+    const a = existing.value?.attributes || {}
+    existingSlugId.value = a.slugId || a.slug || String(existing.value?.id || '')
+    existingUrl.value = a.url || props.url || ''
+
+    // If parent only provided a raw link for very old items, keep it visible:
+    if (!formData.value.link && a.link) formData.value.link = a.link
+    if (!formData.value.name && a.name) formData.value.name = a.name
+    if (!formData.value.q_type && a.q_type) formData.value.q_type = a.q_type
+  } catch (e) {
+    // non-blocking
+    // console.warn('Failed to fetch QR for edit:', e)
   }
 })
 
+/* ---------- Submit (repair + update) ---------- */
+const updating = ref(false)
 
-
-const formData = ref({
-  link: props.link,
-  name: props.name,
-  q_type: props.q_type
-})
-
-// Function to handle form submission
 const updateLink = async () => {
   try {
-    const data = await update('qrs', props.qrId, {
-      link: formData.value.link,
-      name: formData.value.name,
-      q_type: formData.value.q_type
-    })
+    updating.value = true
+
+    // Always keep external destination in `link`
+    const safeLink = normalizeLink(formData.value.link)
+
+    // Ensure we have a slug id to point the QR to
+    const slug = existingSlugId.value || String(props.qrId)
+
+    // FORCE the QR's scannable URL to go through /directqr
+    const directUrl = `${baseUrl}/directqr?id=${encodeURIComponent(slug)}`
+
+    // If this is an older record whose url points directly to an external site,
+    // this will REPAIR it by rewriting url -> /directqr?id=slug and storing
+    // the destination in `link`.
+    const payload = {
+      name: formData.value.name || '',
+      q_type: formData.value.q_type || 'externalURL',
+      link: safeLink || null,
+      url: directUrl,
+      // also persist slugId if your content-type has it
+      ...(existingSlugId.value ? {} : { slugId: slug }),
+    }
+
+    await update('qrs', props.qrId, payload)
     router.push('/dashboard')
-    console.log(data)
   } catch (error) {
-    console.log('There was an error:', error)
+    console.error('There was an error:', error)
+    alert(error?.message || 'Failed to update QR')
+  } finally {
+    updating.value = false
   }
 }
 
-const clearInput = () => {
-  formData.value.link = ''
-}
-const clearInputName = () => {
-  formData.value.name = ''
-}
-
-watch(() => props.link, (newLink) => {
-  formData.value.link = newLink
-})
-
-watch(() => props.name, (newName) => {
-  formData.value.name = newName
-})
+/* ---------- Expose to template (if needed for disabled states) ---------- */
+const isUpdating = computed(() => updating.value)
 </script>
+
 
 <style scoped>
 /* Basic Container Styling */
