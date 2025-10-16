@@ -19,7 +19,7 @@
         <!-- Sign Up Form -->
         <form @submit.prevent="handleSignup">
           <!-- Name input -->
-          <div class="mdc-text-field mdc-text-field--filled mb-4">
+          <!-- <div class="mdc-text-field mdc-text-field--filled mb-4">
             <input
               id="name"
               v-model="formData.name"
@@ -29,10 +29,10 @@
             />
             <label for="name" class="mdc-floating-label">Name</label>
             <span class="mdc-line-ripple"></span>
-          </div>
+          </div> -->
 
           <!-- Email input -->
-          <div class="mdc-text-field mdc-text-field--filled mb-4">
+          <div class="mdc-text-field mdc-text-field--filled mb-4 mt-2">
             <input
               id="email"
               v-model="formData.email"
@@ -106,7 +106,6 @@ const loading = ref(false);
 const errorMessage = ref("");
 
 const formData = ref({
-  name: "",
   email: "",
   password: "",
 });
@@ -126,9 +125,11 @@ const handleSignup = async () => {
   console.log("[handleSignup] payload →", JSON.stringify(formData.value));
 
   try {
+     // Default name = email
+    const name = formData.value.email;
     // 1️⃣ Register user & start 30-day trial in one call
     const user = await registerUser(
-      formData.value.name,
+      name,
       formData.value.email,
       formData.value.password
     );
