@@ -315,7 +315,7 @@ const qrCode = ref(null)
 
 const uuid = uuidv4()
 const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`)
-const qrSize = ref(1024)
+const qrSize = ref(300)
 
 const name = ref('name')
 const link = ref(null)
