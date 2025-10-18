@@ -202,6 +202,8 @@ const emit = defineEmits(['update:modelValue'])
 const modal = ref(null)
 const previewEl = ref(null)
 
+const currentData = ref('')
+
 // Holds style bits so we can re-apply them on preview/export (prevents color loss)
 const styleOpts = ref(null)
 
@@ -242,21 +244,38 @@ function close() {
 async function mountQr() {
   if (typeof window === 'undefined' || !previewEl.value) return
 
-  // Build options (fallback if none)
-  const hasOpts =
-    !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))
-  const fallbackOpts = {
-    data: 'https://example.com',
+  const FALLBACK_DATA = 'https://example.com'
+
+  // Do we have usable options?
+  const hasOpts = !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))
+
+  // Base options (respect incoming options but force preview size)
+  const rawOpts = hasOpts ? withImageNormalized(props.qrOptions) : {
+    data: FALLBACK_DATA,
     width: PREVIEW_SIZE,
     height: PREVIEW_SIZE,
     backgroundOptions: { color: '#FFFFFF' },
     dotsOptions: { type: 'square', color: '#000000' },
   }
-  const baseOpts = hasOpts ? withImageNormalized(props.qrOptions) : fallbackOpts
 
-  // Capture style for reuse (colors, corners, logo)
+  // Capture and lock the encoded string we want to use everywhere
+  currentData.value =
+    (props.qrOptions && props.qrOptions.data) ||
+    (props.qrInstance && props.qrInstance?._options?.data) ||
+    rawOpts.data ||
+    FALLBACK_DATA
+
+  // Ensure data + preview dimensions are present
+  const baseOpts = {
+    ...rawOpts,
+    data: currentData.value,
+    width: PREVIEW_SIZE,
+    height: PREVIEW_SIZE,
+  }
+
+  // Save style bits so preview/export re-use the exact look
   styleOpts.value = {
-    margin: 16,
+    margin: baseOpts?.margin ?? 16,
     dotsOptions: baseOpts?.dotsOptions,
     cornersSquareOptions: baseOpts?.cornersSquareOptions,
     cornersDotOptions: baseOpts?.cornersDotOptions,
@@ -266,14 +285,12 @@ async function mountQr() {
 
   try {
     if (props.qrInstance) {
-      // Use the external instance but make sure full options (incl. colors) are applied at least once
+      // Use external instance but enforce full options once (incl. data)
       qr = props.qrInstance
-      try {
-        await qr.update({ ...baseOpts })
-      } catch {}
+      try { await qr.update({ ...baseOpts }) } catch { /* noop for older builds */ }
     } else {
       const { default: QRCodeStyling } = await import('qr-code-styling')
-      qr = new QRCodeStyling(baseOpts)
+      qr = new QRCodeStyling({ ...baseOpts })
     }
   } catch (e) {
     console.error('[DownloadQr] Failed to create QR instance:', e)
@@ -293,9 +310,33 @@ async function mountQr() {
     return
   }
 
-  // Sync preview background etc.
-  await refreshPreview()
+  // Final sync to ensure preview uses locked data + styles
+  try {
+    await qr.update({
+      width: PREVIEW_SIZE,
+      height: PREVIEW_SIZE,
+      backgroundOptions: { color: computeBgColor() },
+      data: currentData.value,
+      ...styleOpts.value,
+    })
+  } catch { /* older versions may ignore partial updates */ }
+
+  await refreshPreview() // keeps your existing flow; safe to call
 }
+console.log('[DownloadQr] PROPS:', {
+  modelValue: props.modelValue,
+  qrInstance: props.qrInstance,
+  qrOptions: props.qrOptions,
+  defaultName: props.defaultName
+})
+
+watch(
+  () => props.qrOptions,
+  (val) => {
+    console.log('[DownloadQr] qrOptions changed:', val)
+  },
+  { deep: true }
+)
 
 function computeBgColor() {
   // For PNG/JPEG, use hex or transparent; for SVG, 'transparent' usually works too
@@ -312,6 +353,7 @@ async function refreshPreview() {
       width: PREVIEW_SIZE,
       height: PREVIEW_SIZE,
       backgroundOptions: { color: bg },
+      data: currentData.value, 
       // 👇 re-apply full style so preview reflects saved DB design
       ...styleOpts.value,
     })
@@ -342,6 +384,7 @@ async function download() {
       width: targetSize,
       height: targetSize,
       backgroundOptions: { color: bg },
+      data: currentData.value, 
       // 👇 critical: keep dots/corners/logo so export matches preview/DB
       ...styleOpts.value,
     })
@@ -352,6 +395,7 @@ async function download() {
     await qr.update({
       width: PREVIEW_SIZE,
       height: PREVIEW_SIZE,
+       data: currentData.value, 
       backgroundOptions: { color: bg },
       ...styleOpts.value,
     })

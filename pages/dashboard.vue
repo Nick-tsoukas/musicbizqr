@@ -449,11 +449,22 @@ function openDownloadForQr(raw) {
 function buildQrOptionsFromStrapi(raw) {
   const a = raw?.attributes || {};
   const saved = a.options || {};
-  const dataValue = a.url || a.qrValue || a.link || a.data || "";
 
-  const logo = saved.image || saved.imageOptions?.src || a.logo?.url || null;
+  // ✅ pull the encoded URL from the saved options first
+  const dataValue =
+    saved.data ||                 // ← the one you saved on create/update
+    a.url ||                      // optional extra field on the model
+    a.qrValue ||                  // historical fallback names
+    a.link ||
+    a.data ||
+    "";
 
-  // Pull color from multiple possible keys (old/new shapes)
+  const logo =
+    saved.image ||
+    saved.imageOptions?.src ||
+    a.logo?.url ||
+    null;
+
   const dotColor =
     saved.dotsOptions?.color ||
     a.qrColor ||
@@ -470,7 +481,7 @@ function buildQrOptionsFromStrapi(raw) {
   const bg = saved.backgroundOptions?.color || a.backgroundColor || "#FFFFFF";
 
   const opts = {
-    data: dataValue || "https://musicbizqr.com",
+    data: (dataValue || "").trim() || "https://musicbizqr.com", // final safety
     width: Number(saved.size || saved.width || 300),
     height: Number(saved.size || saved.height || 300),
     backgroundOptions: { color: bg },
@@ -492,13 +503,20 @@ function buildQrOptionsFromStrapi(raw) {
       imageSize: saved.imageOptions?.imageSize ?? 0.4,
       margin: saved.imageOptions?.margin ?? 0,
       crossOrigin:
-        logo && !String(logo).startsWith("data:") ? "anonymous" : "anonymous",
+        logo && !String(logo).startsWith("data:")
+          ? "anonymous"
+          : "anonymous",
     },
   };
 
   if (logo) opts.image = logo;
+
+  // 🔎 debug exactly what will be passed to the Download modal
+  console.log("[buildQrOptionsFromStrapi] opts.data =", opts.data);
+
   return opts;
 }
+
 
 function copyToClipboard(text) {
   navigator.clipboard
@@ -620,6 +638,8 @@ async function fetchQrsLite() {
   });
   return Array.isArray(resp.data) ? resp.data : [];
 }
+
+
 
 async function fetchBandsLite() {
   const resp = await find("bands", {
