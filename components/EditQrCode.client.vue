@@ -287,65 +287,7 @@
           </div>
         </div>
 
-        <!-- QR Encoding Options -->
-        <div class="bg-white rounded-md">
-          <div
-            class="flex flex-col bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-xl">
-              QR Encoding Options
-            </h2>
-          </div>
-          <div class="p-4 grid gap-4 md:grid-cols-3">
-            <!-- Type Number -->
-            <label class="mdc-text-field">
-              <span class="mb-1 text-gray-700 block">Type Number (0–40)</span>
-              <input
-                v-model.number="qrTypeNumber"
-                type="number"
-                min="0"
-                max="40"
-                class="mdc-text-field__input"
-                placeholder="0 (auto)"
-              />
-              <span class="mdc-line-ripple"></span>
-              <small class="text-gray-500 block mt-1">
-                0 = auto. Higher = more modules (denser dots).
-              </small>
-            </label>
-
-            <!-- Error Correction -->
-            <label class="mdc-text-field">
-              <span class="mb-1 text-gray-700 block">Error Correction</span>
-              <select v-model="qrEcLevel" class="mdc-text-field__input">
-                <option value="L">L (Low)</option>
-                <option value="M">M (Medium)</option>
-                <option value="Q">Q (Quartile)</option>
-                <option value="H">H (High)</option>
-              </select>
-              <span class="mdc-line-ripple"></span>
-              <small class="text-gray-500 block mt-1">
-                Higher = more redundancy (slightly denser).
-              </small>
-            </label>
-
-            <!-- Quiet Zone / Margin -->
-            <label class="mdc-text-field">
-              <span class="mb-1 text-gray-700 block">Quiet Zone (margin)</span>
-              <input
-                v-model.number="qrMargin"
-                type="number"
-                min="0"
-                class="mdc-text-field__input"
-                placeholder="4"
-              />
-              <span class="mdc-line-ripple"></span>
-              <small class="text-gray-500 block mt-1">
-                White border (modules) around the code.
-              </small>
-            </label>
-          </div>
-        </div>
+      
 
         <!-- Dots Options -->
         <div class="bg-white rounded-md">
@@ -506,12 +448,12 @@ const q_type = ref(null)
 
 // qrOptions controls
 const qrTypeNumber = ref(0)  // 0 = auto, 1–40 fixed
-const qrEcLevel = ref("Q")   // L, M, Q, H
+const qrEcLevel = ref("H")   // L, M, Q, H
 const qrMargin = ref(4)      // quiet zone (modules)
 
 const imageSettings = reactive({
   src: "",
-  imageSize: 0.4,
+  imageSize: 0.2,
   margin: 0,
   crossOrigin: "anonymous",
 })
