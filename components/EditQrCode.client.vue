@@ -601,7 +601,7 @@ function getQRCodeOptions() {
   const opts = {
     qrOptions: {
       errorCorrectionLevel: 'H',
-      margin: 24,
+      margin: 4,
     },
    
     width: qrSize.value,

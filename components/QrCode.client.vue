@@ -315,7 +315,7 @@ const qrCode = ref(null)
 
 const uuid = uuidv4()
 const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`)
-const qrSize = ref(300)
+const qrSize = ref(1024)
 
 const name = ref('name')
 const link = ref(null)
@@ -381,7 +381,7 @@ const lastColorOptions = reactive({
 /* ---------------------------- QR Builders ---------------------------- */
 function getQRCodeOptions() {
   const options = {
-    margin: 24,
+    margin: 4,
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value,
