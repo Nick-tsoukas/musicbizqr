@@ -446,19 +446,42 @@ function openDownloadForQr(raw) {
   activeQrName.value = raw?.attributes?.name || `qr-${raw?.id || ""}`;
   showDownload.value = true;
 }
+
 function buildQrOptionsFromStrapi(raw) {
   const a = raw?.attributes || {};
   const saved = a.options || {};
 
-  // ✅ pull the encoded URL from the saved options first
-  const dataValue =
-    saved.data ||                 // ← the one you saved on create/update
-    a.url ||                      // optional extra field on the model
-    a.qrValue ||                  // historical fallback names
-    a.link ||
-    a.data ||
-    "";
+  // prefer the exact string you saved in options.data
+  let encoded =
+    (saved.data && String(saved.data).trim()) ||
+    (a.url && String(a.url).trim()) ||
+    (a.qrValue && String(a.qrValue).trim()) ||
+    (a.link && String(a.link).trim()) ||
+    (a.data && String(a.data).trim()) ||
+    '';
 
+  // helpers
+  const isOriginOnly = (s) => /^https?:\/\/[^/]+\/?$/i.test(s || '');
+  const toAbsHttps = (s) => {
+    if (!s) return '';
+    return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+  };
+  const base = (useRuntimeConfig().public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/,'');
+  const buildDirect = (id) => `${base}/directqr?id=${id}`;
+
+  // if we only got the bare domain, try to rebuild a proper /directqr?id=...
+  if (isOriginOnly(encoded)) {
+    if (a.url && /\bid=/.test(a.url)) {
+      encoded = toAbsHttps(a.url.trim());
+    } else if (raw?.id) {
+      encoded = buildDirect(raw.id);
+    }
+  }
+
+  // Final safety: normalize scheme
+  encoded = toAbsHttps(encoded);
+
+  // ---- the rest is styling ----
   const logo =
     saved.image ||
     saved.imageOptions?.src ||
@@ -470,7 +493,7 @@ function buildQrOptionsFromStrapi(raw) {
     a.qrColor ||
     a.colorDark ||
     saved.colorDark ||
-    "#000000";
+    '#000000';
 
   const cornersSqColor =
     saved.cornersSquareOptions?.color || a.cornersSquareColor || dotColor;
@@ -478,44 +501,41 @@ function buildQrOptionsFromStrapi(raw) {
   const cornersDotColor =
     saved.cornersDotOptions?.color || a.cornersDotColor || dotColor;
 
-  const bg = saved.backgroundOptions?.color || a.backgroundColor || "#FFFFFF";
+  const bg = saved.backgroundOptions?.color || a.backgroundColor || '#FFFFFF';
 
   const opts = {
-    data: (dataValue || "").trim() || "https://musicbizqr.com", // final safety
+    data: encoded || base,               // <— will now be the full /directqr?id=... string
     width: Number(saved.size || saved.width || 300),
     height: Number(saved.size || saved.height || 300),
     backgroundOptions: { color: bg },
     dotsOptions: {
-      type: saved.dotsOptions?.type || "square",
+      type: saved.dotsOptions?.type || 'square',
       color: dotColor,
       gradient: saved.dotsOptions?.gradient ?? null,
     },
     cornersSquareOptions: {
       color: cornersSqColor,
-      type: saved.cornersSquareOptions?.type || "square",
+      type: saved.cornersSquareOptions?.type || 'square',
     },
     cornersDotOptions: {
       color: cornersDotColor,
-      type: saved.cornersDotOptions?.type || "square",
+      type: saved.cornersDotOptions?.type || 'square',
     },
     imageOptions: {
-      src: logo || "",
+      src: logo || '',
       imageSize: saved.imageOptions?.imageSize ?? 0.4,
       margin: saved.imageOptions?.margin ?? 0,
       crossOrigin:
-        logo && !String(logo).startsWith("data:")
-          ? "anonymous"
-          : "anonymous",
+        logo && !String(logo).startsWith('data:') ? 'anonymous' : 'anonymous',
     },
   };
 
   if (logo) opts.image = logo;
 
-  // 🔎 debug exactly what will be passed to the Download modal
-  console.log("[buildQrOptionsFromStrapi] opts.data =", opts.data);
-
+  console.log('[buildQrOptionsFromStrapi] FINAL opts.data =', opts.data);
   return opts;
 }
+
 
 
 function copyToClipboard(text) {
@@ -631,7 +651,7 @@ const fetchData = async () => {
 async function fetchQrsLite() {
   const resp = await find("qrs", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name","id", "options"],
+    fields: ["name","id", "options", "url"],
     populate: { q_image: { fields: ["url"] } },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },
