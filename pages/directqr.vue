@@ -97,7 +97,7 @@ onMounted(async () => {
       return;
     } else {
       console.warn('[QR PAGE] No matching QR type—sending to /dashboard');
-      return router.push('/dashboard');
+      return router.push('/');
     }
 
   } catch (error) {
