@@ -442,7 +442,6 @@ console.log(qrs.value, "this is the qrs");
 
 function openDownloadForQr(raw) {
   const built = buildQrOptionsFromStrapi(raw);
-  console.log("[Dashboard] built options:", built); // ← must show { data: '...', ... }
   activeQrOptions.value = built;
   activeQrName.value = raw?.attributes?.name || `qr-${raw?.id || ""}`;
   showDownload.value = true;
@@ -582,60 +581,82 @@ watch(
 
 const fetchData = async () => {
   if (!user.value) return;
+  loading.value = true;
+
   try {
-    await fetchQrs();
-    await fetchScans();
-    await Promise.all([fetchBands(), fetchEvents()]);
+    // Stage 1: run independent queries in parallel
+    const [qrsArr, bandsArr, eventsArr] = await Promise.all([
+      fetchQrsLite(),
+      fetchBandsLite(),
+      fetchEventsLite(),
+    ]);
+
+    // Set state in one go (minimize reactive churn)
+    qrs.value    = qrsArr;
+    bands.value  = bandsArr;
+    events.value = eventsArr;
+
+    // Stage 2: scans depend on QR IDs
+    const qrIds = qrsArr.map(q => q.id);
+    const scansArr = await fetchScansForQrIds(qrIds);
+    scans.value = scansArr;
+
   } catch (e) {
-    console.error(e);
+    console.error("[Dashboard] fetchData error:", e);
   } finally {
     loading.value = false;
   }
 };
 
-const fetchQrs = async () => {
+
+// Return-only helpers (no state mutation)
+async function fetchQrsLite() {
   const resp = await find("qrs", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    populate: "*",
+    fields: ["name"],
+    populate: { q_image: { fields: ["url"] } },
+    sort: ["updatedAt:desc"],
+    pagination: { pageSize: 50 },
   });
-  qrs.value = resp.data;
-};
+  return Array.isArray(resp.data) ? resp.data : [];
+}
 
-const fetchScans = async () => {
-  const qrIds = qrs.value.map((q) => q.id);
-  if (!qrIds.length) {
-    scans.value = [];
-    return;
-  }
-  const resp = await find("scans", {
-    filters: { qr: { id: { $in: qrIds } } },
-    pagination: { pageSize: 1000 },
-    populate: "*",
-  });
-  scans.value = resp.data;
-};
-
-const fetchBands = async () => {
+async function fetchBandsLite() {
   const resp = await find("bands", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    populate: "*",
+    fields: ["name", "slug"],
+    populate: { bandImg: { fields: ["url", "formats"] } },
+    sort: ["updatedAt:desc"],
+    pagination: { pageSize: 50 },
   });
-  bands.value = Array.isArray(resp.data) ? resp.data : [];
-};
+  return Array.isArray(resp.data) ? resp.data : [];
+}
 
-const fetchEvents = async () => {
+async function fetchEventsLite() {
   const resp = await find("events", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
+    fields: ["title", "slug"],
     populate: {
-      image: true,
-      band: {
-        fields: ["slug"],
-      },
-      fields: ["title", "slug"],
+      image: { fields: ["url", "formats"] },
+      band:  { fields: ["slug"] },
     },
+    sort: ["updatedAt:desc"],
+    pagination: { pageSize: 50 },
   });
-  events.value = resp.data || [];
-};
+  return Array.isArray(resp.data) ? resp.data : [];
+}
+
+// Keep your existing scans fetch (ideally replace with a /scans/count route)
+async function fetchScansForQrIds(qrIds) {
+  if (!qrIds.length) return [];
+  const resp = await find("scans", {
+    filters: { qr: { id: { $in: qrIds } } },
+    pagination: { pageSize: 250 }, // reduce from 1000 for now
+    populate: [],                  // no deep populate
+  });
+  return Array.isArray(resp.data) ? resp.data : [];
+}
+
 
 const deleteItem = async (id, type) => {
   if (!confirm(`Delete this ${type}?`)) return;
@@ -660,7 +681,7 @@ const qrItems = computed(() =>
     id: qr.id,
     title: qr.attributes.name,
     imageUrl: qr.attributes.q_image?.data?.attributes?.url || "",
-    scans: qr.attributes.scans,
+    // scans: qr.attributes.scans,
     raw: qr, // ← keep the full Strapi row so we can build QR options later
   }))
 );
@@ -705,28 +726,21 @@ const qrView = ref(false);
 
 onMounted(async () => {
   // ——— 1) Handle email-confirm token in URL
+   // Handle confirm token as you do now...
   const tok = route.query.token;
   if (typeof tok === "string") {
-    console.debug("[Dashboard] found token in URL:", tok);
-    setToken(tok); // save into Nuxt-Strapi
-    await fetchUser(); // populate strapiUser.value
-    console.debug("[Dashboard] fetched user after confirm:", user);
-    // clean URL so token isn’t visible
+    setToken(tok);
+    await fetchUser();
     router.replace({ path: route.path, query: {} });
   }
 
-  await fetchBillingInfo();
+  // Parallelize independent calls
+  await Promise.all([
+    fetchBillingInfo(),
+    fetchTrialInfo(),
+  ]);
 
-  await fetchTrialInfo();
-  console.log("Full history stack:", historyStack.value);
-  console.log("Previous route:", previousRoute.value);
-
-  if (previousRoute.value?.path === "/createband") {
-    // do the full reload
-    window.location.reload();
-    return;
-  }
-
+  // Then dashboard data
   await fetchData();
 });
 
