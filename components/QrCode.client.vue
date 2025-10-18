@@ -381,6 +381,7 @@ const lastColorOptions = reactive({
 /* ---------------------------- QR Builders ---------------------------- */
 function getQRCodeOptions() {
   const options = {
+    margin: 24,
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value,

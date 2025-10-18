@@ -600,10 +600,10 @@ function getQRCodeOptions() {
 
   const opts = {
     qrOptions: {
-      typeNumber: qrTypeNumber.value,
-      errorCorrectionLevel: qrEcLevel.value,
-      margin: qrMargin.value,
+      errorCorrectionLevel: 'H',
+      margin: 24,
     },
+   
     width: qrSize.value,
     height: qrSize.value,
     data: directUrl.value, // ✅ ALWAYS the redirect URL
