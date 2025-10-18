@@ -10,7 +10,7 @@
       <!-- QR Code Wrapper with local re-render spinner -->
       <transition name="fade">
         <div
-          class="relative inline-block p-4 sticky top-20 rounded-lg shadow-md"
+          class=" inline-block  sticky top-20 rounded-lg shadow-md "
           style="z-index: 999999 !important"
         >
           <!-- Local overlay while the QR is re-rendering -->
@@ -381,12 +381,12 @@ const lastColorOptions = reactive({
 /* ---------------------------- QR Builders ---------------------------- */
 function getQRCodeOptions() {
   const options = {
-    margin: 4,
+    margin: 16,
     width: qrSize.value,
     height: qrSize.value,
     data: qrValue.value,
     errorCorrectionLevel: 'H',
-    dotsOptions: { type: dotsType.value },
+    dotsOptions: { type: dotsType.value, roundSize: false },
     cornersSquareOptions: {
       color: cornersSquareColor.value,
       type: cornersSquareType.value
@@ -456,6 +456,7 @@ const updateColourFast = useThrottleFn(() => {
 
   qrCode.value.update({
     backgroundOptions: { color: bgColor.value },
+    margin: 16,
     dotsOptions: {
       type: dotsType.value,
       ...(gradient.value

@@ -599,9 +599,10 @@ function getQRCodeOptions() {
   const baseDots = { type: dotsType.value }
 
   const opts = {
+    margin: 16,
     qrOptions: {
       errorCorrectionLevel: 'H',
-      margin: 4,
+      
     },
    
     width: qrSize.value,

@@ -598,8 +598,8 @@ const fetchData = async () => {
 
     // Stage 2: scans depend on QR IDs
     const qrIds = qrsArr.map(q => q.id);
-    const scansArr = await fetchScansForQrIds(qrIds);
-    scans.value = scansArr;
+    // const scansArr = await fetchScansForQrIds(qrIds);
+    // scans.value = scansArr;
 
   } catch (e) {
     console.error("[Dashboard] fetchData error:", e);
@@ -613,7 +613,7 @@ const fetchData = async () => {
 async function fetchQrsLite() {
   const resp = await find("qrs", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name"],
+    fields: ["name","id", "options"],
     populate: { q_image: { fields: ["url"] } },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },

@@ -256,6 +256,7 @@ async function mountQr() {
 
   // Capture style for reuse (colors, corners, logo)
   styleOpts.value = {
+    margin: 16,
     dotsOptions: baseOpts?.dotsOptions,
     cornersSquareOptions: baseOpts?.cornersSquareOptions,
     cornersDotOptions: baseOpts?.cornersDotOptions,
