@@ -97,6 +97,31 @@ export default defineNuxtConfig({
     '@nuxtjs/seo'
   ],
 
+   image: {
+    // Allow your S3 bucket host
+    domains: [
+      'qrcode101.s3.us-east-1.amazonaws.com',
+    ],
+
+    // Optional alias if you want to prefix short names later
+    alias: {
+      s3: 'https://qrcode101.s3.us-east-1.amazonaws.com',
+    },
+
+    // Preset for small dashboard thumbnails
+    presets: {
+      dashboardThumb: {
+        modifiers: {
+          width: 100,
+          height: 100,
+          fit: 'cover',
+          format: 'webp',
+          quality: 60,
+        },
+      },
+    },
+  },
+
   site: {
     url: 'https://musicbizqr.com',
       name: 'MusicBizQR',

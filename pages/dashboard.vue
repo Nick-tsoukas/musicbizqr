@@ -63,10 +63,17 @@
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
             <!-- simple preview image -->
-            <img
-              :src="qr.imageUrl"
-              alt=""
-              class="mx-auto h-full w-[100%] md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+            <NuxtImg
+              provider="ipx"
+              format="webp"
+              :src="normalizeImg(qr.imageUrl)"
+              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+              width="100"
+              height="100"
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
+              :modifiers="{ fit: 'cover' }"
             />
 
             <div class="flex-grow">
@@ -156,10 +163,17 @@
             :key="band.id"
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
-            <img
-              :src="band.imageUrl"
-              alt=""
+            <NuxtImg
+              provider="ipx"
+              format="webp"
+              :src="normalizeImg(band.imageUrl)"
               class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+              width="100"
+              height="100"
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
+              :modifiers="{ fit: 'cover' }"
             />
 
             <div class="flex-grow">
@@ -250,10 +264,22 @@
             :key="ev.id"
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
-            <img
+            <!-- <img
               :src="ev.imageUrl"
               alt=""
               class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+            /> -->
+            <NuxtImg
+              provider="ipx"
+              format="webp"
+              :src="normalizeImg(ev.imageUrl)"
+              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
+              width="100"
+              height="100"
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
+              :modifiers="{ fit: 'cover' }"
             />
 
             <div class="flex-grow">
@@ -319,12 +345,14 @@
       </div>
       <!-- Download modal (client-only component) -->
 
-      <DownloadQr
-        v-model="showDownload"
-        :qr-options="activeQrOptions"
-        :default-name="activeQrName"
-        :key="showDownload ? activeQrName : 'closed'"
-      />
+      <ClientOnly>
+        <LazyDownloadQr
+          v-model="showDownload"
+          :qr-options="activeQrOptions"
+          :default-name="activeQrName"
+          :key="showDownload ? activeQrName : 'closed'"
+        />
+      </ClientOnly>
       <!-- VIEW QR Popup -->
       <!-- <div
         v-if="qrView"
@@ -362,7 +390,14 @@
 
 <script setup>
 import { useNuxtApp } from "#app";
-import { ref, onMounted, computed, inject, watch } from "vue";
+import {
+  ref,
+  onMounted,
+  computed,
+  inject,
+  watch,
+  defineAsyncComponent,
+} from "vue";
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
 
@@ -382,13 +417,12 @@ const isSpecialUser = computed(() => {
 
 const maxQrAllowed = computed(() => (isSpecialUser.value ? 10 : 1));
 
-const canCreateMoreQrs = computed(() => qrItems.value.length < maxQrAllowed.value);
-
+const canCreateMoreQrs = computed(
+  () => qrItems.value.length < maxQrAllowed.value
+);
 
 const token = useStrapiToken();
 const loadingPortal = ref(false);
-
-console.log("My JWT is:", token.value); // undefined until you log in
 
 const config = useRuntimeConfig();
 
@@ -422,11 +456,6 @@ const qrs = ref([]);
 const scans = ref([]);
 const bands = ref([]);
 const events = ref([]);
-const tours = ref([]);
-const albums = ref([]);
-const streams = ref([]);
-const socials = ref([]);
-const videos = ref([]);
 
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
@@ -438,7 +467,13 @@ const showDownload = ref(false);
 const activeQrOptions = ref(null);
 const activeQrName = ref("qr-code");
 
-console.log(qrs.value, "this is the qrs");
+const normalizeImg = (u) => {
+  if (!u) return "";
+  // Your bucket is S3; if Strapi gives relative paths, prefix with alias (optional).
+  // For fully-qualified S3 URLs, just return as-is.
+  if (u.startsWith("http")) return u;
+  return `s3:${u}`; // only if you ever store relative keys like /qrcode_abc.png
+};
 
 function openDownloadForQr(raw) {
   const built = buildQrOptionsFromStrapi(raw);
@@ -458,15 +493,17 @@ function buildQrOptionsFromStrapi(raw) {
     (a.qrValue && String(a.qrValue).trim()) ||
     (a.link && String(a.link).trim()) ||
     (a.data && String(a.data).trim()) ||
-    '';
+    "";
 
   // helpers
-  const isOriginOnly = (s) => /^https?:\/\/[^/]+\/?$/i.test(s || '');
+  const isOriginOnly = (s) => /^https?:\/\/[^/]+\/?$/i.test(s || "");
   const toAbsHttps = (s) => {
-    if (!s) return '';
+    if (!s) return "";
     return /^https?:\/\//i.test(s) ? s : `https://${s}`;
   };
-  const base = (useRuntimeConfig().public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/,'');
+  const base = (
+    useRuntimeConfig().public?.baseUrl || "https://musicbizqr.com"
+  ).replace(/\/+$/, "");
   const buildDirect = (id) => `${base}/directqr?id=${id}`;
 
   // if we only got the bare domain, try to rebuild a proper /directqr?id=...
@@ -482,18 +519,14 @@ function buildQrOptionsFromStrapi(raw) {
   encoded = toAbsHttps(encoded);
 
   // ---- the rest is styling ----
-  const logo =
-    saved.image ||
-    saved.imageOptions?.src ||
-    a.logo?.url ||
-    null;
+  const logo = saved.image || saved.imageOptions?.src || a.logo?.url || null;
 
   const dotColor =
     saved.dotsOptions?.color ||
     a.qrColor ||
     a.colorDark ||
     saved.colorDark ||
-    '#000000';
+    "#000000";
 
   const cornersSqColor =
     saved.cornersSquareOptions?.color || a.cornersSquareColor || dotColor;
@@ -501,42 +534,39 @@ function buildQrOptionsFromStrapi(raw) {
   const cornersDotColor =
     saved.cornersDotOptions?.color || a.cornersDotColor || dotColor;
 
-  const bg = saved.backgroundOptions?.color || a.backgroundColor || '#FFFFFF';
+  const bg = saved.backgroundOptions?.color || a.backgroundColor || "#FFFFFF";
 
   const opts = {
-    data: encoded || base,               // <— will now be the full /directqr?id=... string
+    data: encoded || base, // <— will now be the full /directqr?id=... string
     width: Number(saved.size || saved.width || 300),
     height: Number(saved.size || saved.height || 300),
     backgroundOptions: { color: bg },
     dotsOptions: {
-      type: saved.dotsOptions?.type || 'square',
+      type: saved.dotsOptions?.type || "square",
       color: dotColor,
       gradient: saved.dotsOptions?.gradient ?? null,
     },
     cornersSquareOptions: {
       color: cornersSqColor,
-      type: saved.cornersSquareOptions?.type || 'square',
+      type: saved.cornersSquareOptions?.type || "square",
     },
     cornersDotOptions: {
       color: cornersDotColor,
-      type: saved.cornersDotOptions?.type || 'square',
+      type: saved.cornersDotOptions?.type || "square",
     },
     imageOptions: {
-      src: logo || '',
+      src: logo || "",
       imageSize: saved.imageOptions?.imageSize ?? 0.4,
       margin: saved.imageOptions?.margin ?? 0,
       crossOrigin:
-        logo && !String(logo).startsWith('data:') ? 'anonymous' : 'anonymous',
+        logo && !String(logo).startsWith("data:") ? "anonymous" : "anonymous",
     },
   };
 
   if (logo) opts.image = logo;
 
-  console.log('[buildQrOptionsFromStrapi] FINAL opts.data =', opts.data);
   return opts;
 }
-
-
 
 function copyToClipboard(text) {
   navigator.clipboard
@@ -569,7 +599,6 @@ async function fetchBillingInfo() {
       headers: { Authorization: `Bearer ${token.value}` },
     });
     billingInfo.value = result;
-    console.debug("[Dashboard] billingInfo =", billingInfo.value);
   } catch (err) {
     console.warn("[Dashboard] Failed to fetch billing info:", err);
   }
@@ -582,7 +611,6 @@ async function fetchTrialInfo() {
       method: "GET",
       headers: { Authorization: `Bearer ${useStrapiToken().value}` },
     });
-    console.debug("[Dashboard] subscription-status response:", subscription);
 
     subscriptionStatus.value =
       subscription && subscription.status ? subscription.status : null;
@@ -599,7 +627,6 @@ async function fetchTrialInfo() {
       daysLeft.value = null;
     }
   } catch (err) {
-    console.error("[Dashboard] fetchTrialInfo error:", err);
     trialError.value = err.message || "Unknown error fetching trial info";
   } finally {
     loadingTrial.value = false;
@@ -630,36 +657,31 @@ const fetchData = async () => {
     ]);
 
     // Set state in one go (minimize reactive churn)
-    qrs.value    = qrsArr;
-    bands.value  = bandsArr;
+    qrs.value = qrsArr;
+    bands.value = bandsArr;
     events.value = eventsArr;
 
     // Stage 2: scans depend on QR IDs
-    const qrIds = qrsArr.map(q => q.id);
+    const qrIds = qrsArr.map((q) => q.id);
     // const scansArr = await fetchScansForQrIds(qrIds);
     // scans.value = scansArr;
-
   } catch (e) {
-    console.error("[Dashboard] fetchData error:", e);
   } finally {
     loading.value = false;
   }
 };
 
-
 // Return-only helpers (no state mutation)
 async function fetchQrsLite() {
   const resp = await find("qrs", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name","id", "options", "url"],
+    fields: ["name", "id", "options", "url"],
     populate: { q_image: { fields: ["url"] } },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },
   });
   return Array.isArray(resp.data) ? resp.data : [];
 }
-
-
 
 async function fetchBandsLite() {
   const resp = await find("bands", {
@@ -678,7 +700,7 @@ async function fetchEventsLite() {
     fields: ["title", "slug"],
     populate: {
       image: { fields: ["url", "formats"] },
-      band:  { fields: ["slug"] },
+      band: { fields: ["slug"] },
     },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },
@@ -692,11 +714,10 @@ async function fetchScansForQrIds(qrIds) {
   const resp = await find("scans", {
     filters: { qr: { id: { $in: qrIds } } },
     pagination: { pageSize: 250 }, // reduce from 1000 for now
-    populate: [],                  // no deep populate
+    populate: [], // no deep populate
   });
   return Array.isArray(resp.data) ? resp.data : [];
 }
-
 
 const deleteItem = async (id, type) => {
   if (!confirm(`Delete this ${type}?`)) return;
@@ -765,8 +786,6 @@ const imageURL = ref("");
 const qrView = ref(false);
 
 onMounted(async () => {
-  // ——— 1) Handle email-confirm token in URL
-   // Handle confirm token as you do now...
   const tok = route.query.token;
   if (typeof tok === "string") {
     setToken(tok);
@@ -774,14 +793,13 @@ onMounted(async () => {
     router.replace({ path: route.path, query: {} });
   }
 
-  // Parallelize independent calls
-  await Promise.all([
-    fetchBillingInfo(),
-    fetchTrialInfo(),
-  ]);
+  await fetchData(); // show lists first
 
-  // Then dashboard data
-  await fetchData();
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+  idle(() => {
+    fetchBillingInfo();
+    fetchTrialInfo();
+  });
 });
 
 const editItem = (id, page) => {
@@ -806,17 +824,6 @@ async function goToBillingPortal() {
     loadingPortal.value = false;
   }
 }
-
-watch(
-  () => route.query.portal,
-  async (flag) => {
-    if (flag === "returned") {
-      // they just came back from Stripe’s portal
-      await fetchTrialInfo(); // re-fetch daysLeft
-      router.replace({ path: route.path, query: {} });
-    }
-  }
-);
 </script>
 
 <style scoped lang="css">
