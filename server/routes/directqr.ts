@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const fullUrl = reqUrl.toString()
 
   const cfg = useRuntimeConfig()
-  const strapiBase = cfg.public?.strapiURL
+  const strapiBase = cfg.public?.strapiUrl
   if (!strapiBase) {
     // Misconfig → avoid blank page
     return sendRedirect(event, 'https://musicbizqr.com', 302)
