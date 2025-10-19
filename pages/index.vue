@@ -417,7 +417,7 @@
             <div class="w-full mb-16 md:mb-0 md:w-2/5 flex justify-center">
               <iframe
                 class="w-[90%] h-[400px] md:w-[80%] md:h-[450px] rounded-lg shadow-lg"
-                src="https://open.spotify.com/embed/album/1ATL5GLyefJaxhQzSPVrLX?utm_source=generator"
+                src="https://open.spotify.com/embed/album/3q4BkDV5B7sczFcfrIl2a2?utm_source=generator&theme=0"
                 frameborder="0"
                 allowtransparency="true"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -776,8 +776,8 @@ const handleScroll = () => {
 };
 
 const isPlaying = ref(false);
-const videoUrl = "https://www.youtube.com/embed/NU9JoFKlaZ0?autoplay=1";
-const thumbnail = "https://img.youtube.com/vi/NU9JoFKlaZ0/maxresdefault.jpg";
+const videoUrl = "https://www.youtube.com/embed/cUR4LFl_UME?si=n91skAv82Us3YZkY";
+const thumbnail = "https://img.youtube.com/vi/cUR4LFl_UME/maxresdefault.jpg";
 
 // mockups/assets (unchanged)
 import videoMobilePage from "@/assets/mainbainwithvideo.webp";

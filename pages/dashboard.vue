@@ -92,7 +92,7 @@
               </button> -->
 
               <!-- NEW: open the download modal (PNG/JPEG/SVG) -->
-              <button @click="openDownloadForQr(qr.raw)" class="action-button">
+              <button @click="openDownloadForQr(qr.id)" class="action-button">
                 <img src="@/assets/view-icon.svg" class="h-5 w-5" />
                 <span>Download</span>
               </button>
@@ -431,7 +431,7 @@ const router = useRouter();
 const route = useRoute();
 const client = useStrapiClient();
 import { useStrapi } from "#imports";
-const { find } = useStrapi();
+const { find, findOne  } = useStrapi();
 const strapi = useStrapi();
 
 const { setToken, fetchUser } = useStrapiAuth();
@@ -475,16 +475,35 @@ const normalizeImg = (u) => {
   return `s3:${u}`; // only if you ever store relative keys like /qrcode_abc.png
 };
 
-function openDownloadForQr(raw) {
-  const built = buildQrOptionsFromStrapi(raw);
-  activeQrOptions.value = built;
-  activeQrName.value = raw?.attributes?.name || `qr-${raw?.id || ""}`;
-  showDownload.value = true;
+async function openDownloadForQr(rawOrId) {
+  try {
+    const id = typeof rawOrId === 'object' ? rawOrId.id : rawOrId
+
+    // Show the modal immediately with a lightweight "loading" state
+    activeQrOptions.value = null
+    activeQrName.value = 'Loading…'
+    showDownload.value = true
+
+    // Fetch detailed row with options (cached)
+    const full = await fetchQrOptionsById(id)
+    const row = full?.data || rawOrId // fallback to existing if something odd
+
+    // Build the QR options for the component
+    const built = buildQrOptionsFromStrapi(row)
+    activeQrOptions.value = built
+    activeQrName.value = row?.attributes?.name || `qr-${id}`
+  } catch (e) {
+    console.error('[Download] failed to load options', e)
+    showDownload.value = false
+    alert('Could not load QR options. Please try again.')
+  }
 }
 
+
 function buildQrOptionsFromStrapi(raw) {
-  const a = raw?.attributes || {};
-  const saved = a.options || {};
+  const node = raw?.data ? raw.data : raw     // normalize
+  const a = node?.attributes || {}
+  const saved = a.options || {}               // ✅ you were missing this
 
   // prefer the exact string you saved in options.data
   let encoded =
@@ -493,80 +512,74 @@ function buildQrOptionsFromStrapi(raw) {
     (a.qrValue && String(a.qrValue).trim()) ||
     (a.link && String(a.link).trim()) ||
     (a.data && String(a.data).trim()) ||
-    "";
+    ''
 
-  // helpers
-  const isOriginOnly = (s) => /^https?:\/\/[^/]+\/?$/i.test(s || "");
-  const toAbsHttps = (s) => {
-    if (!s) return "";
-    return /^https?:\/\//i.test(s) ? s : `https://${s}`;
-  };
-  const base = (
-    useRuntimeConfig().public?.baseUrl || "https://musicbizqr.com"
-  ).replace(/\/+$/, "");
-  const buildDirect = (id) => `${base}/directqr?id=${id}`;
+  const isOriginOnly = (s) => /^https?:\/\/[^/]+\/?$/i.test(s || '')
+  const toAbsHttps = (s) => (!s ? '' : /^https?:\/\//i.test(s) ? s : `https://${s}`)
+  const base = (useRuntimeConfig().public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/, '')
+  const buildDirect = (id) => `${base}/directqr?id=${id}`
 
-  // if we only got the bare domain, try to rebuild a proper /directqr?id=...
   if (isOriginOnly(encoded)) {
     if (a.url && /\bid=/.test(a.url)) {
-      encoded = toAbsHttps(a.url.trim());
-    } else if (raw?.id) {
-      encoded = buildDirect(raw.id);
+      encoded = toAbsHttps(a.url.trim())
+    } else if (node?.id) {                   // ✅ use node.id (not raw.id)
+      encoded = buildDirect(node.id)
     }
   }
 
-  // Final safety: normalize scheme
-  encoded = toAbsHttps(encoded);
+  encoded = toAbsHttps(encoded)
 
-  // ---- the rest is styling ----
-  const logo = saved.image || saved.imageOptions?.src || a.logo?.url || null;
+  const logo =
+    saved.image ||
+    saved.imageOptions?.src ||
+    a.logo?.url ||
+    null
 
   const dotColor =
     saved.dotsOptions?.color ||
     a.qrColor ||
     a.colorDark ||
     saved.colorDark ||
-    "#000000";
+    '#000000'
 
   const cornersSqColor =
-    saved.cornersSquareOptions?.color || a.cornersSquareColor || dotColor;
+    saved.cornersSquareOptions?.color || a.cornersSquareColor || dotColor
 
   const cornersDotColor =
-    saved.cornersDotOptions?.color || a.cornersDotColor || dotColor;
+    saved.cornersDotOptions?.color || a.cornersDotColor || dotColor
 
-  const bg = saved.backgroundOptions?.color || a.backgroundColor || "#FFFFFF";
+  const bg = saved.backgroundOptions?.color || a.backgroundColor || '#FFFFFF'
 
   const opts = {
-    data: encoded || base, // <— will now be the full /directqr?id=... string
+    data: encoded || base,
     width: Number(saved.size || saved.width || 300),
     height: Number(saved.size || saved.height || 300),
     backgroundOptions: { color: bg },
     dotsOptions: {
-      type: saved.dotsOptions?.type || "square",
+      type: saved.dotsOptions?.type || 'square',
       color: dotColor,
       gradient: saved.dotsOptions?.gradient ?? null,
     },
     cornersSquareOptions: {
       color: cornersSqColor,
-      type: saved.cornersSquareOptions?.type || "square",
+      type: saved.cornersSquareOptions?.type || 'square',
     },
     cornersDotOptions: {
       color: cornersDotColor,
-      type: saved.cornersDotOptions?.type || "square",
+      type: saved.cornersDotOptions?.type || 'square',
     },
     imageOptions: {
-      src: logo || "",
+      src: logo || '',
       imageSize: saved.imageOptions?.imageSize ?? 0.4,
       margin: saved.imageOptions?.margin ?? 0,
-      crossOrigin:
-        logo && !String(logo).startsWith("data:") ? "anonymous" : "anonymous",
+      crossOrigin: 'anonymous',
     },
-  };
+  }
 
-  if (logo) opts.image = logo;
-
-  return opts;
+  if (logo) opts.image = logo
+  return opts
 }
+
 
 function copyToClipboard(text) {
   navigator.clipboard
@@ -671,11 +684,34 @@ const fetchData = async () => {
   }
 };
 
+const qrDetailCache = new Map() // id -> full row with options
+
+
+
+async function fetchQrOptionsById(id) {
+  if (qrDetailCache.has(id)) return qrDetailCache.get(id)
+
+  // ask ONLY for fields your builder reads, and that exist in your CT
+  const row = await findOne('qrs', id, {
+    fields: ['name','url','link','template','arEnabled','options'],
+    populate: {
+      // only if you really store a media relation named "logo"
+      logo: { fields: ['url'] },
+      // if your preview image is called q_image and you want it too:
+      // q_image: { fields: ['url'] }
+    },
+    // publicationState: 'live', // add if you use draft/publish
+  })
+
+  qrDetailCache.set(id, row)
+  return row
+}
+
 // Return-only helpers (no state mutation)
 async function fetchQrsLite() {
   const resp = await find("qrs", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name", "id", "options", "url"],
+    fields: ["name", "id", ],
     populate: { q_image: { fields: ["url"] } },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },
