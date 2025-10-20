@@ -334,7 +334,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import { useRoute, useRouter } from "vue-router";
@@ -565,7 +565,47 @@ const socialPlatforms = [
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
 
+// in the band page <script setup>
+onMounted(() => {
+  try {
+    const body = {
+      bandId: band.value?.data?.id,
+      path: location.pathname,
+      title: document.title
+    }
+    const blob = new Blob([JSON.stringify(body)], { type:'application/json' })
+    navigator.sendBeacon?.('/api/track/band-view', blob)
+    if (!navigator.sendBeacon) {
+      fetch('/api/track/band-view', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+    }
+  } catch {}
+})
+
+
 onMounted(fetchBandData);
+
+watch([loading, band], ([isLoading, bandVal]) => {
+  if (isLoading) return
+  const id = bandVal?.data?.id
+  if (!id) return
+  try {
+    const payload = {
+      bandId: id,
+      path: location.pathname,
+      title: document.title
+    }
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/track/band-view', blob)
+    } else {
+      fetch('/api/track/band-view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+    }
+  } catch {}
+}, { immediate: true })
 </script>
 
 <style scoped>
