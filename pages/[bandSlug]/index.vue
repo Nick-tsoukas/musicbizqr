@@ -1,37 +1,32 @@
 <template>
   <div>
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-    </div>
+     <div v-if="!showPage" class="loading-container">
+    <div class="spinner"></div>
+  </div>
 
     <div
       v-else
-      class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)]"
+      class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)] fade-in"
     >
       <!-- Hero Section -->
-      <div class="relative w-full h-[35vh] md:h-[60vh]">
-        <!-- <img
-          v-if="band.data.bandImg"
-          :src="band.data.bandImg.url"
-          :alt="`${band.data.name} image`"
-          class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
-        /> -->
-        <NuxtImg
-          v-if="band.data.bandImg"
-          provider="ipx"
-          :src="band.data.bandImg.url"
-          alt=""
-           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
-          format="webp"
-          placeholder="blur"
-          :modifiers="{ fit: 'cover', quality: 60 }"
-            
-          preload
-          fetchpriority="high"
-          decoding="async"
-        />
-        <div class="absolute inset-0 bg-black bg-opacity-0"></div>
-      </div>
+       <div class="relative w-full h-[35vh] md:h-[60vh]">
+      <NuxtImg
+        v-if="band.data.bandImg"
+        provider="ipx"
+        :src="band.data.bandImg.url"
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover"
+        format="webp"
+        placeholder="blur"
+        :modifiers="{ fit: 'cover', quality: 60 }"
+        preload
+        fetchpriority="high"
+        @load="heroLoaded = true"
+        @error="heroLoaded = true"
+        sizes="sm:100vw md:100vw"
+      />
+      <div class="absolute inset-0 bg-black/0"></div>
+    </div>
 
       <!-- Band Name -->
       <div
@@ -366,7 +361,15 @@ const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 
-const loading = ref(true);
+// replace: const loading = ref(true);
+const loadingData = ref(true)
+const heroLoaded = ref(false)
+
+const showPage = computed(() => {
+  // Render when data is ready AND (no hero image) OR hero finished loading
+  const hasHero = !!band.value?.data?.bandImg?.url
+  return !loadingData.value && (!hasHero || heroLoaded.value)
+})
 const band = ref(null);
 const events = ref([]);
 
@@ -520,14 +523,14 @@ async function fetchBandData() {
     `&populate[events][fields][0]=date&populate[events][fields][1]=slug&populate[events][fields][2]=city&populate[events][fields][3]=state&populate[events][fields][4]=venue`;
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
-    const data = await res.json();
-    band.value = data;
-    events.value = data?.data?.events || [];
+    const res = await fetch(url, { cache: "no-store" })
+    const data = await res.json()
+    band.value = data
+    events.value = data?.data?.events || []
   } catch (e) {
-    console.error("Fetch band error:", e);
+    console.error("Fetch band error:", e)
   } finally {
-    loading.value = false;
+    loadingData.value = false
   }
 }
 
@@ -613,6 +616,14 @@ watch([loading, band], ([isLoading, bandVal]) => {
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
+}
+
+.fade-in {
+  animation: fadeIn .25s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
 }
 .embed-container iframe {
   position: absolute;
