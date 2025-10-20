@@ -10,11 +10,25 @@
     >
       <!-- Hero Section -->
       <div class="relative w-full h-[35vh] md:h-[60vh]">
-        <img
+        <!-- <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
           :alt="`${band.data.name} image`"
           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
+        /> -->
+        <NuxtImg
+          v-if="band.data.bandImg"
+          provider="ipx"
+          :src="band.data.bandImg.url"
+          alt=""
+           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
+          format="webp"
+          placeholder="blur"
+          :modifiers="{ fit: 'cover', quality: 60 }"
+            
+          preload
+          fetchpriority="high"
+          decoding="async"
         />
         <div class="absolute inset-0 bg-black bg-opacity-0"></div>
       </div>
@@ -104,7 +118,9 @@
               :alt="`${band.data.name} video thumbnail`"
               class="absolute inset-0 w-full h-full object-cover"
             />
-            <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"></div>
+            <div
+              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            ></div>
           </div>
 
           <div v-else class="embed-container rounded-lg overflow-hidden">
@@ -140,7 +156,13 @@
             <span v-if="band.data[platform.name]">
               <a
                 :href="band.data[platform.name]"
-                @click.prevent="handleClick(band.data.id, platform.name, band.data[platform.name])"
+                @click.prevent="
+                  handleClick(
+                    band.data.id,
+                    platform.name,
+                    band.data[platform.name]
+                  )
+                "
               >
                 <button
                   class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
@@ -166,7 +188,13 @@
             <span v-if="band.data[platform.name]">
               <a
                 :href="band.data[platform.name]"
-                @click.prevent="handleClick(band.data.id, platform.name, band.data[platform.name])"
+                @click.prevent="
+                  handleClick(
+                    band.data.id,
+                    platform.name,
+                    band.data[platform.name]
+                  )
+                "
               >
                 <button
                   class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
@@ -184,12 +212,20 @@
         </section>
 
         <!-- Upcoming Events -->
-        <section v-if="upcomingEvents.length" id="upcoming-events" class="mt-10">
+        <section
+          v-if="upcomingEvents.length"
+          id="upcoming-events"
+          class="mt-10"
+        >
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Upcoming Events
           </h2>
-          <div class="overflow-x-scroll md:overflow-hidden relative no-scrollbar">
-            <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
+          <div
+            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
+          >
+            <table
+              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
+            >
               <thead>
                 <tr class="border-b border-purple-500 border-opacity-30">
                   <th class="px-2 py-2 text-left">Date</th>
@@ -203,7 +239,9 @@
                   v-for="event in upcomingEvents"
                   :key="event.id"
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+                  @click.stop="
+                    router.push(`/${route.params.bandSlug}/event/${event.slug}`)
+                  "
                 >
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ formatDate(event.date) }}
@@ -216,7 +254,11 @@
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
-                      @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+                      @click.stop="
+                        router.push(
+                          `/${route.params.bandSlug}/event/${event.slug}`
+                        )
+                      "
                       class="text-purple-400"
                     >
                       View Event
@@ -233,8 +275,12 @@
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Past Events
           </h2>
-          <div class="overflow-x-scroll md:overflow-hidden relative no-scrollbar">
-            <table class="w-full table-auto bg-black text-white rounded-md shadow-lg">
+          <div
+            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
+          >
+            <table
+              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
+            >
               <thead>
                 <tr class="border-b border-purple-500 border-opacity-30">
                   <th class="px-2 py-2 text-left">Date</th>
@@ -248,7 +294,9 @@
                   v-for="event in pastEvents"
                   :key="event.id"
                   class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+                  @click.stop="
+                    router.push(`/${route.params.bandSlug}/event/${event.slug}`)
+                  "
                 >
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     {{ formatDate(event.date) }}
@@ -261,7 +309,11 @@
                   </td>
                   <td class="px-2 py-1 whitespace-nowrap text-purple-400">
                     <button
-                      @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+                      @click.stop="
+                        router.push(
+                          `/${route.params.bandSlug}/event/${event.slug}`
+                        )
+                      "
                       class="text-purple-400"
                     >
                       View Event
@@ -303,9 +355,7 @@ import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
 
-import "swiper/css";
-import "swiper/css/thumbs";
-import "swiper/css/effect-cards";
+
 
 const embedClickCaptured = ref(false);
 const hasTrackedEmbedClick = ref(false);
@@ -336,7 +386,9 @@ function sanitizeEmbed(html) {
 }
 
 /* ---------- embed & featured song ---------- */
-const rawEmbedHtml = computed(() => band.value?.data?.singlesong?.embedHtml || "");
+const rawEmbedHtml = computed(
+  () => band.value?.data?.singlesong?.embedHtml || ""
+);
 const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
 
 const hasFeaturedSong = computed(() => {
@@ -434,7 +486,9 @@ async function playVideo() {
   isVideoPlaying.value = true;
   const bandId = band.value?.data?.id;
   const title =
-    band.value?.data?.singlevideo?.title || band.value?.data?.singlesong?.title || "video";
+    band.value?.data?.singlevideo?.title ||
+    band.value?.data?.singlesong?.title ||
+    "video";
   try {
     await trackMediaPlay(bandId, "video", title);
   } catch (err) {
@@ -449,32 +503,27 @@ function handleClick(bandId, platform, url) {
 /* ---------- data fetch ---------- */
 async function fetchBandData() {
   const slug = route.params.bandSlug?.toLowerCase() || "";
-  const apiUrl = config.public.strapiUrl;
+  const api = config.public.strapiUrl;
 
-  // Expanded populate to ensure singlesong -> song/cover file URLs are present
+  // Ask ONLY for fields used on the page
   const url =
-    `${apiUrl}/api/bands/slug/${slug}` +
-    `?populate[bandImg]=*` +
-    `&populate[events]=*` +
-    `&populate[tours]=*` +
-    `&populate[albums]=*` +
-    `&populate[singlevideo]=*` +
-    `&populate[singlesong][populate]=song,cover`;
+    `${api}/api/bands/slug/${slug}` +
+    `?fields[0]=name&fields[1]=isBandNameInLogo&fields[2]=bio&fields[3]=biotagline` +
+    `&fields[4]=websitelink&fields[5]=websitelinktext` +
+    `&fields[6]=youtube&fields[7]=youtubeMusic&fields[8]=spotify&fields[9]=appleMusic` + // streaming
+    `&fields[10]=reverbnation&fields[11]=soundcloud&fields[12]=bandcamp&fields[13]=twitch&fields[14]=deezer` +
+    `&fields[15]=facebook&fields[16]=instagram&fields[17]=twitter&fields[18]=tiktok` + // social
+    `&populate[bandImg][fields][0]=url` +
+    `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
+    `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +
+    `&populate[singlesong][populate][song][fields][0]=url&populate[singlesong][populate][cover][fields][0]=url` +
+    `&populate[events][fields][0]=date&populate[events][fields][1]=slug&populate[events][fields][2]=city&populate[events][fields][3]=state&populate[events][fields][4]=venue`;
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
     band.value = data;
     events.value = data?.data?.events || [];
-
-    // quick visibility logs (helps diagnose silent failures)
-    const s = band.value?.data?.singlesong;
-    console.log("Singlesong:", s);
-    console.log("Embed?", s?.isEmbed, "Valid iframe?", !!safeEmbedHtml.value);
-    console.log(
-      "Audio URL:",
-      s?.song?.data?.attributes?.url || s?.song?.url || null
-    );
   } catch (e) {
     console.error("Fetch band error:", e);
   } finally {
@@ -519,7 +568,6 @@ const socialPlatforms = [
 onMounted(fetchBandData);
 </script>
 
-
 <style scoped>
 .embed-container {
   position: relative;
@@ -557,8 +605,12 @@ onMounted(fetchBandData);
   margin-top: 2rem;
 }
 @keyframes spin {
-  0% { transform: rotate(0); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 /* testing */
 </style>
