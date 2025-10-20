@@ -587,8 +587,8 @@ onMounted(() => {
 
 onMounted(fetchBandData);
 
-watch([loading, band], ([isLoading, bandVal]) => {
-  if (isLoading) return
+watch([loadingData, band], ([loadingData, bandVal]) => {
+  if (loadingData) return
   const id = bandVal?.data?.id
   if (!id) return
   try {
