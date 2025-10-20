@@ -1,37 +1,24 @@
 <template>
   <div>
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
-    </div>
+     <div v-if="!showPage" class="loading-container">
+    <div class="spinner"></div>
+  </div>
 
     <div
       v-else
-      class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)]"
+      class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)] fade-in"
     >
       <!-- Hero Section -->
-      <div class="relative w-full h-[35vh] md:h-[60vh]">
-        <!-- <img
+       <div class="relative w-full h-[35vh] md:h-[60vh]">
+        <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
           :alt="`${band.data.name} image`"
           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
-        /> -->
-        <NuxtImg
-          v-if="band.data.bandImg"
-          provider="ipx"
-          :src="band.data.bandImg.url"
-          alt=""
-           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
-          format="webp"
-          placeholder="blur"
-          :modifiers="{ fit: 'cover', quality: 60 }"
-            
-          preload
-          fetchpriority="high"
-          decoding="async"
         />
-        <div class="absolute inset-0 bg-black bg-opacity-0"></div>
-      </div>
+     
+      <div class="absolute inset-0 bg-black/0"></div>
+    </div>
 
       <!-- Band Name -->
       <div
@@ -366,9 +353,38 @@ const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 
-const loading = ref(true);
+// replace: const loading = ref(true);
+const loadingData = ref(true)
+const heroReady   = ref(false)
+
+
+const showPage = computed(() => {
+  const url = band.value?.data?.bandImg?.url
+  // show when data is fetched AND either no hero or hero preloaded
+  return !loadingData.value && (!url || heroReady.value)
+})
 const band = ref(null);
 const events = ref([]);
+
+function preloadHero(src) {
+  return new Promise((resolve) => {
+    if (!src) return resolve(true)        // nothing to wait on
+    const img = new Image()
+    // ask browser to prioritize this
+    img.loading = 'eager'
+    img.decoding = 'sync'
+    // if you serve from a different origin and need it later on canvas, uncomment:
+    // img.crossOrigin = 'anonymous'
+    const done = () => resolve(true)
+    img.onload = done
+    img.onerror = done   // don’t hang the UI if it fails
+    img.src = src
+    if (img.complete) return resolve(true) // cached path
+    // final guard so we never spin forever (network weirdness)
+    setTimeout(done, 3000)
+  })
+}
+
 
 const isVideoPlaying = ref(false);
 
@@ -520,15 +536,28 @@ async function fetchBandData() {
     `&populate[events][fields][0]=date&populate[events][fields][1]=slug&populate[events][fields][2]=city&populate[events][fields][3]=state&populate[events][fields][4]=venue`;
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
-    const data = await res.json();
-    band.value = data;
-    events.value = data?.data?.events || [];
+    const res = await fetch(url, { cache: "no-store" })
+    const data = await res.json()
+    band.value = data
+
+    // build the exact URL you’ll render for the hero
+    const raw = band.value?.data?.bandImg?.url || null
+
+    // If you want to be 100% identical to <NuxtImg>, generate the same URL:
+    // const img = useImage()            // import { useImage } from '#imports'
+    // const heroUrl = raw ? img(raw, { format:'webp', modifiers:{ fit:'cover', quality:60 } }) : null
+    // await preloadHero(heroUrl)
+
+    await preloadHero(raw)              // (works fine — the transformed NuxtImg URL will use the cache)
+
+    heroReady.value = true
   } catch (e) {
-    console.error("Fetch band error:", e);
+    console.error('Fetch band error:', e)
+    heroReady.value = true              // don’t hang the page on errors
   } finally {
-    loading.value = false;
+    loadingData.value = false
   }
+
 }
 
 /* ---------- events ---------- */
@@ -584,8 +613,8 @@ onMounted(() => {
 
 onMounted(fetchBandData);
 
-watch([loading, band], ([isLoading, bandVal]) => {
-  if (isLoading) return
+watch([loadingData, band], ([loadingData, bandVal]) => {
+  if (loadingData) return
   const id = bandVal?.data?.id
   if (!id) return
   try {
