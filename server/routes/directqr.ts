@@ -99,7 +99,7 @@ export default defineEventHandler(async (event) => {
       dest = toAbsoluteHttps(link)
     } else {
       // fallback
-      dest = `${reqUrl.protocol}//${reqUrl.host}/dashboard`
+      dest = `${reqUrl.protocol}//${reqUrl.host}`
     }
 
     // 6) Preserve UTMs from the incoming request when redirecting externally
