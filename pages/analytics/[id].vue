@@ -1,18 +1,18 @@
 <template>
-  <div class="px-6 py-8 bg-black min-h-screen pt-[var(--header-height)] max-w-5xl m-auto">
+  <div class="px-4 sm:px-6 py-8 bg-black min-h-screen pt-[var(--header-height)] max-w-5xl mx-auto">
     <h2 class="text-2xl font-bold mb-6 text-white">Analytics Dashboard</h2>
 
     <!-- Tabs -->
-    <div class="flex space-x-4 mb-6">
+    <div class="flex gap-2 mb-4">
       <button
         v-for="tab in tabs"
         :key="tab"
         @click="selectedTab = tab"
         :class="[
-          'px-4 py-2 font-medium rounded',
+          'px-3 py-1.5 text-sm rounded-full transition-colors',
           selectedTab === tab
             ? 'bg-purple-600 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
         ]"
       >
         {{ tab }}
@@ -20,16 +20,16 @@
     </div>
 
     <!-- Range Selector -->
-    <div class="flex space-x-2 mb-4">
+    <div class="flex gap-2 mb-4">
       <button
         v-for="(label, days) in rangeOptions"
         :key="days"
         @click="selectedRange = Number(days)"
         :class="[
-          'px-3 py-1 text-sm rounded',
+          'px-3 py-1 text-sm rounded-full transition-colors',
           selectedRange === Number(days)
             ? 'bg-purple-500 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
         ]"
       >
         {{ label }}
@@ -48,112 +48,148 @@
 
     <div v-if="isLoading" class="text-white">🔄 Loading data…</div>
 
-    <div v-else class="space-y-8">
-      <div class="bg-gray-900 rounded-lg p-4 shadow-lg">
-        <canvas ref="lineChartCanvas" class="w-full h-64"></canvas>
+    <div v-else class="space-y-6">
+      <!-- Page Views -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-white text-lg font-semibold">Page Views</h3>
+          <span class="text-gray-400 text-xs">
+            {{ selectedRange === 1 ? humanDayLabel(selectedDate) : `Last ${selectedRange} days` }}
+          </span>
+        </div>
+        <div class="chart-wrap ratio-16x9">
+          <canvas ref="viewsCanvas" class="chart-canvas"></canvas>
+        </div>
       </div>
 
       <!-- Top Cities -->
-      <div class="bg-gray-900 rounded-lg p-4 shadow-lg mt-6">
-        <h3 class="text-white text-lg font-semibold mb-2">🌎 Top Cities</h3>
-        <ul class="text-gray-300 space-y-1">
-          <li v-for="[city, count] in topCities" :key="city">
-            <span class="font-medium text-white">{{ city }}</span>
-            <span class="text-gray-400"> — {{ count }} views</span>
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-white text-lg font-semibold">🌎 Top Cities</h3>
+        </div>
+
+        <ul v-if="topCities.length" class="text-gray-200 text-sm space-y-2">
+          <li
+            v-for="[city, count] in topCities"
+            :key="city"
+            class="flex items-center gap-2"
+          >
+            <div class="flex-1 flex items-center gap-2">
+              <span class="inline-block w-28 truncate text-white">{{ city }}</span>
+              <div class="h-2 bg-gray-800 rounded w-full">
+                <div
+                  class="h-2 bg-emerald-500 rounded"
+                  :style="{ width: Math.min(100, Math.round((count / topCities[0][1]) * 100)) + '%' }"
+                ></div>
+              </div>
+            </div>
+            <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
           </li>
         </ul>
+        <p v-else class="text-gray-400 text-sm">No city data yet.</p>
       </div>
 
-      <!-- Devices Pie -->
-    <!-- Devices -->
-<!-- Devices -->
-<div class="bg-gray-900 rounded-lg p-4 shadow-lg mt-6">
-  <div class="flex items-center justify-between mb-3">
-    <h3 class="text-white text-lg font-semibold">Devices</h3>
-    <span class="text-gray-400 text-sm">{{ totalDeviceViews }} total</span>
-  </div>
+      <!-- Devices -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-white text-lg font-semibold">Devices</h3>
+          <span class="text-gray-400 text-xs">{{ totalDeviceViews }} total</span>
+        </div>
 
-  <!-- If no data yet -->
-  <div v-if="totalDeviceViews === 0" class="text-gray-400 text-sm mb-3">
-    No device data yet — visit the band page to generate some views.
-  </div>
+        <ul v-if="totalDeviceViews > 0" class="text-gray-200 text-sm divide-y divide-gray-800 mb-3">
+          <li
+            v-for="item in deviceBreakdown"
+            :key="item.key"
+            class="flex items-center justify-between py-2"
+          >
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }"></span>
+              <span class="text-white">{{ item.label }}</span>
+            </div>
+            <div class="tabular-nums">
+              <span class="text-white font-medium mr-2">{{ item.count }}</span>
+              <span class="text-gray-400">({{ item.pct }}%)</span>
+            </div>
+          </li>
+        </ul>
+        <div v-else class="text-gray-400 text-sm mb-3">No device data yet.</div>
 
-  <!-- Readable list -->
-  <ul v-else class="text-gray-200 text-sm divide-y divide-gray-800 mb-4">
-    <li v-for="item in deviceBreakdown" :key="item.key" class="flex items-center justify-between py-2">
-      <div class="flex items-center gap-2">
-        <span class="inline-block w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }"></span>
-        <span class="text-white">{{ item.label }}</span>
+        <div class="chart-wrap square">
+          <canvas ref="deviceCanvas" class="chart-canvas" aria-label="Device distribution" role="img"></canvas>
+        </div>
       </div>
-      <div class="tabular-nums">
-        <span class="text-white font-medium mr-2">{{ item.count }}</span>
-        <span class="text-gray-400">({{ item.pct }}%)</span>
-      </div>
-    </li>
-  </ul>
-
-  <!-- Pie chart -->
-  <canvas ref="devicePieCanvas" class="w-full h-64" aria-label="Device distribution chart" role="img"></canvas>
-</div>
-
-
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, watch, onMounted, nextTick, onBeforeUnmount } from "vue";
-import { useRoute, useStrapiClient } from "#imports";
+<script setup lang="ts">
+import { ref, watch, onMounted, nextTick, onBeforeUnmount, computed } from 'vue'
+import { useRoute, useStrapiClient } from '#imports'
 import {
   Chart,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement,
-} from "chart.js";
-import { parseISO, format, subDays, getHours } from "date-fns";
+  ArcElement
+} from 'chart.js'
+import { format as fmt, parseISO, isValid, subDays, getHours } from 'date-fns'
 
 Chart.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
   ArcElement
-);
+)
 
-const client = useStrapiClient();
-const route = useRoute();
+/* ---------- data / state ---------- */
+const client = useStrapiClient()
+const route = useRoute()
 
-const tabs = ["Page Views", "Link Clicks", "Songs", "Videos"];
-const selectedTab = ref("Page Views");
-const rangeOptions = {
-  1: "Daily",
-  7: "Last 7 Days",
-  30: "Last 30 Days",
-  365: "Last 1 Year",
-};
-const selectedRange = ref(1);
-const selectedDate = ref(format(new Date(), "yyyy-MM-dd"));
+const tabs = ['Page Views', 'Link Clicks', 'Songs', 'Videos'] as const
+const selectedTab = ref<typeof tabs[number]>('Page Views')
 
-const isLoading = ref(true);
-const rawPageViews = ref([]);
-const rawLinkClicks = ref([]);
-const rawMediaPlays = ref([]);
+const rangeOptions: Record<number, string> = {
+  1: 'Daily',
+  7: 'Last 7 Days',
+  30: 'Last 30 Days',
+  365: 'Last 1 Year'
+}
+const selectedRange = ref<number>(1)
+const selectedDate = ref(fmt(new Date(), 'yyyy-MM-dd'))
 
-const lineChartCanvas = ref(null);
-let lineChartInstance = null;
+const isLoading = ref(true)
+const rawPageViews = ref<any[]>([])
+const rawLinkClicks = ref<any[]>([])
+const rawMediaPlays = ref<any[]>([])
 
-const devicePieCanvas = ref(null);
-let devicePieInstance = null;
+/* ---------- canvases ---------- */
+const viewsCanvas = ref<HTMLCanvasElement | null>(null)
+let viewsChart: Chart | null = null
 
-// put near your other helpers
+const deviceCanvas = ref<HTMLCanvasElement | null>(null)
+let deviceChart: Chart | null = null
+
+/* ---------- helpers (format) ---------- */
+function humanDayLabel(yyyy_mm_dd: string) {
+  const d = parseISO(`${yyyy_mm_dd}T00:00:00`)
+  return isValid(d) ? fmt(d, 'EEE, MMM d') : ''
+}
+function fmtHour12(ts: string) {
+  const d = parseISO(ts)
+  return isValid(d) ? fmt(d, 'h a') : ''
+}
+
+/* ---------- device breakdown ---------- */
 function classifyUA(ua = '') {
   const s = ua.toLowerCase().trim()
   if (!s) return 'unknown'
@@ -164,25 +200,23 @@ function classifyUA(ua = '') {
   return 'desktop'
 }
 
-const deviceCounts = computed(() => {
-  const counts = { desktop: 0, mobile: 0, tablet: 0, bot: 0, unknown: 0 }
-  for (const v of rawPageViews.value || []) {
-    const ua = v?.attributes?.userAgent || ''
-    counts[classifyUA(ua)]++
-  }
-  return counts
-})
-
 const deviceLegend = [
   { key: 'desktop', label: 'Desktop', color: '#8B5CF6' },
   { key: 'mobile',  label: 'Mobile',  color: '#10B981' },
   { key: 'tablet',  label: 'Tablet',  color: '#F59E0B' },
   { key: 'bot',     label: 'Bot',     color: '#6B7280' },
   { key: 'unknown', label: 'Unknown', color: '#9CA3AF' }
-]
+] as const
 
+const deviceCounts = computed(() => {
+  const c: Record<string, number> = { desktop:0, mobile:0, tablet:0, bot:0, unknown:0 }
+  for (const v of rawPageViews.value || []) {
+    const ua = v?.attributes?.userAgent || ''
+    c[classifyUA(ua)]++
+  }
+  return c
+})
 const totalDeviceViews = computed(() => rawPageViews.value?.length || 0)
-
 const deviceBreakdown = computed(() => {
   const counts = deviceCounts.value
   const total = totalDeviceViews.value || 1
@@ -193,308 +227,247 @@ const deviceBreakdown = computed(() => {
   }))
 })
 
-
-const topCities = computed(() => {
-  const counts = {};
-  rawPageViews.value.forEach((v) => {
-    const city = v?.attributes?.city || "Unknown";
-    counts[city] = (counts[city] || 0) + 1;
-  });
+/* ---------- cities ---------- */
+const topCities = computed<[string, number][]>(() => {
+  const counts: Record<string, number> = {}
+  rawPageViews.value.forEach(v => {
+    const city = v?.attributes?.city || 'Unknown'
+    counts[city] = (counts[city] || 0) + 1
+  })
   return Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
-});
+    .slice(0, 10) as [string, number][]
+})
 
-function getLastNDates(n) {
-  const today = new Date();
-  return Array.from({ length: n }, (_, i) => {
-    const d = subDays(today, n - 1 - i);
-    return format(d, "yyyy-MM-dd");
-  });
+/* ---------- fetch ---------- */
+async function fetchAndRender() {
+  isLoading.value = true
+  const [viewsRes, clicksRes, mediaRes] = await Promise.all([
+    client('/band-page-views', {
+      params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'] }
+    }),
+    client(`/link-clicks/band/${route.params.id}`),
+    client('/media-plays', {
+      params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'] }
+    })
+  ])
+  rawPageViews.value = viewsRes.data || []
+  rawLinkClicks.value = clicksRes.data || []
+  rawMediaPlays.value = mediaRes.data || []
+
+  isLoading.value = false
+  await nextTick()
+  renderViewsChart()
+  renderDeviceDoughnut()
 }
 
-function renderDevicePie() {
-  const canvas = devicePieCanvas.value
+/* ---------- HiDPI canvas ---------- */
+function prepHiDPICanvas(canvas: HTMLCanvasElement) {
+  const dpr = Math.max(1, window.devicePixelRatio || 1)
+  const rect = canvas.getBoundingClientRect()
+  canvas.width = Math.round(rect.width * dpr)
+  canvas.height = Math.round(rect.height * dpr)
+  const ctx = canvas.getContext('2d')!
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  return ctx
+}
+
+/* ---------- charts ---------- */
+function renderViewsChart() {
+  const canvas = viewsCanvas.value
   if (!canvas) return
-  const ctx = canvas.getContext('2d'); if (!ctx) return
+  const ctx = prepHiDPICanvas(canvas)
+
+  let labels: string[] = []
+  let data: number[] = []
+  let chartType: 'bar' | 'line' = 'bar'
+  let title = ''
+
+  if (selectedTab.value === 'Page Views') {
+    if (selectedRange.value === 1) {
+      // hourly -> BAR
+      const hours = Array.from({ length: 24 }, (_, i) => i)
+      const counts: Record<number, number> = Object.fromEntries(hours.map(h => [h, 0]))
+      const dayISO = selectedDate.value
+
+      for (const v of rawPageViews.value) {
+        const ts = v?.attributes?.timestamp; if (!ts) continue
+        const d = parseISO(ts); if (!isValid(d)) continue
+        if (fmt(d, 'yyyy-MM-dd') !== dayISO) continue
+        counts[getHours(d)]++
+      }
+
+      labels = hours.map(h => fmt(new Date(2000,0,1,h), 'h a')) // 12h
+      data = hours.map(h => counts[h] || 0)
+      chartType = 'bar'
+      title = 'Page Views (Hourly)'
+    } else {
+      // daily -> LINE
+      const days = Array.from({ length: selectedRange.value }, (_, i) => {
+        const d = subDays(new Date(), selectedRange.value - 1 - i)
+        return fmt(d, 'yyyy-MM-dd')
+      })
+      const counts: Record<string, number> = Object.fromEntries(days.map(d => [d, 0]))
+      for (const v of rawPageViews.value) {
+        const ts = v?.attributes?.timestamp; if (!ts) continue
+        const d = parseISO(ts); if (!isValid(d)) continue
+        const key = fmt(d, 'yyyy-MM-dd')
+        if (counts[key] !== undefined) counts[key]++
+      }
+      labels = days.map(d => fmt(parseISO(`${d}T00:00:00`), 'MMM d'))
+      data = days.map(d => counts[d] || 0)
+      chartType = 'line'
+      title = `Page Views (Last ${selectedRange.value} Days)`
+    }
+  } else {
+    // keep simple: show empty chart for other tabs (or wire similarly as needed)
+    labels = []
+    data = []
+    chartType = 'line'
+    title = `${selectedTab.value}`
+  }
+
+  viewsChart?.destroy()
+  viewsChart = new Chart(ctx, {
+    type: chartType,
+    data: {
+      labels,
+      datasets: [{
+        label: selectedRange.value === 1 ? 'Views' : 'Page Views',
+        data,
+        borderWidth: 2,
+        borderColor: '#10B981',
+        backgroundColor: chartType === 'bar' ? '#10B981' : 'rgba(16,185,129,.25)',
+        tension: 0.3,
+        pointRadius: chartType === 'line' ? 3 : 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: 6 },
+      scales: {
+        x: {
+          ticks: { color: '#E5E7EB', maxRotation: 0, autoSkip: true, autoSkipPadding: 8 },
+          grid: { color: '#30343b', drawTicks: false }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#E5E7EB', precision: 0 },
+          grid: { color: '#30343b' }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#E5E7EB', usePointStyle: true, pointStyle: 'circle' },
+          position: 'bottom'
+        },
+        title: {
+          display: true,
+          text: title,
+          color: 'white',
+          font: { size: 16, weight: '600' }
+        },
+        tooltip: {
+          callbacks: {
+            title(items) { return items[0]?.label || '' },
+            label(ctx) {
+              const v = ctx.raw as number
+              return `${v} ${v === 1 ? 'view' : 'views'}`
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+function renderDeviceDoughnut() {
+  const canvas = deviceCanvas.value
+  if (!canvas) return
+  const ctx = prepHiDPICanvas(canvas)
 
   const counts = deviceCounts.value
   const labels = deviceLegend.map(x => x.label)
   const data   = deviceLegend.map(x => counts[x.key] || 0)
   const colors = deviceLegend.map(x => x.color)
 
-  devicePieInstance?.destroy()
-  devicePieInstance = new Chart(ctx, {
-    type: 'pie',
+  deviceChart?.destroy()
+  deviceChart = new Chart(ctx, {
+    type: 'doughnut',
     data: {
       labels,
-      datasets: [{ data, backgroundColor: colors, borderColor: '#111827', borderWidth: 1 }]
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderColor: '#0B1220',
+        borderWidth: 1
+      }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      devicePixelRatio: window.devicePixelRatio || 1,
+      cutout: '60%',
       plugins: {
-        legend: { labels: { color: 'white' } },
-        title: { display: true, text: 'Devices', color: 'white', font: { size: 16 } }
+        legend: {
+          labels: { color: '#E5E7EB', usePointStyle: true, pointStyle: 'circle' },
+          position: 'top'
+        },
+        title: { display: false },
+        tooltip: {
+          callbacks: {
+            label(ctx) {
+              const v = ctx.raw as number
+              const label = ctx.label || ''
+              return `${label}: ${v}`
+            }
+          }
+        }
       }
     }
   })
 }
 
+/* ---------- lifecycle ---------- */
+onMounted(fetchAndRender)
 
-function renderLineChart() {
-  const canvas = lineChartCanvas.value;
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  let labels = [];
-  let datasets = [];
-  let title = "";
-  const day = selectedDate.value;
-
-  const hourlyLabels = Array.from(
-    { length: 24 },
-    (_, i) => `${String(i).padStart(2, "0")}:00`
-  );
-  const dailyLabels = getLastNDates(selectedRange.value);
-
-  if (selectedTab.value === "Page Views") {
-    if (selectedRange.value === 1) {
-      const counts = Object.fromEntries(hourlyLabels.map((h) => [h, 0]));
-      rawPageViews.value.forEach((view) => {
-        const ts = view?.attributes?.timestamp;
-        if (!ts) return;
-        const date = format(parseISO(ts), "yyyy-MM-dd");
-        if (date !== day) return;
-        const hour = `${String(getHours(parseISO(ts))).padStart(2, "0")}:00`;
-        if (counts[hour] !== undefined) counts[hour]++;
-      });
-      labels = hourlyLabels;
-      datasets = [
-        {
-          label: `Page Views (${day})`,
-          data: labels.map((h) => counts[h]),
-          borderColor: "#10B981",
-          backgroundColor: "#10B981",
-          fill: false,
-          tension: 0.3,
-          pointRadius: 3,
-        },
-      ];
-      title = `Page Views (Hourly)`;
-    } else {
-      const counts = Object.fromEntries(dailyLabels.map((d) => [d, 0]));
-      rawPageViews.value.forEach((view) => {
-        const ts = view?.attributes?.timestamp;
-        if (!ts) return;
-        const date = format(parseISO(ts), "yyyy-MM-dd");
-        if (counts[date] !== undefined) counts[date]++;
-      });
-      labels = dailyLabels;
-      datasets = [
-        {
-          label: "Page Views",
-          data: labels.map((d) => counts[d]),
-          borderColor: "#10B981",
-          backgroundColor: "#10B981",
-          fill: false,
-          tension: 0.3,
-          pointRadius: 3,
-        },
-      ];
-      title = `Page Views (Last ${selectedRange.value} Days)`;
-    }
-  }
-
-  if (selectedTab.value === "Link Clicks") {
-    if (selectedRange.value === 1) {
-      const counts = {};
-      rawLinkClicks.value.forEach((item) => {
-        const { platform, timestamp } = item;
-        const date = format(parseISO(timestamp), "yyyy-MM-dd");
-        const hour = `${String(getHours(parseISO(timestamp))).padStart(2, "0")}:00`;
-        if (date === day && platform) {
-          counts[platform] ??= Object.fromEntries(
-            hourlyLabels.map((h) => [h, 0])
-          );
-          counts[platform][hour]++;
-        }
-      });
-      labels = hourlyLabels;
-      datasets = Object.entries(counts).map(([plat, data], idx) => ({
-        label: plat,
-        data: labels.map((h) => data[h]),
-        borderColor: ["#8B5CF6", "#EC4899", "#10B981"][idx % 3],
-        backgroundColor: ["#8B5CF6", "#EC4899", "#10B981"][idx % 3],
-        fill: false,
-        tension: 0.3,
-        pointRadius: 3,
-      }));
-      title = `Link Clicks (Hourly)`;
-    } else {
-      const platforms = [
-        ...new Set(rawLinkClicks.value.map((c) => c.platform)),
-      ];
-      const counts = Object.fromEntries(
-        platforms.map((p) => [
-          p,
-          Object.fromEntries(dailyLabels.map((d) => [d, 0])),
-        ])
-      );
-      rawLinkClicks.value.forEach((c) => {
-        const date = format(parseISO(c.timestamp), "yyyy-MM-dd");
-        if (counts[c.platform]?.[date] !== undefined) {
-          counts[c.platform][date]++;
-        }
-      });
-      labels = dailyLabels;
-      datasets = platforms.map((p, idx) => ({
-        label: p,
-        data: labels.map((d) => counts[p][d]),
-        borderColor: ["#8B5CF6", "#EC4899", "#10B981"][idx % 3],
-        backgroundColor: ["#8B5CF6", "#EC4899", "#10B981"][idx % 3],
-        fill: false,
-        tension: 0.3,
-        pointRadius: 3,
-      }));
-      title = `Link Clicks (Last ${selectedRange.value} Days)`;
-    }
-  }
-
-  if (selectedTab.value === "Songs" || selectedTab.value === "Videos") {
-    const type = selectedTab.value === "Songs" ? "song" : "video";
-    const filtered = rawMediaPlays.value.filter((m) => m.mediaType === type);
-    if (selectedRange.value === 1) {
-      const counts = {};
-      filtered.forEach((m) => {
-        const hour = `${String(getHours(parseISO(m.timestamp))).padStart(2, "0")}:00`;
-        const date = format(parseISO(m.timestamp), "yyyy-MM-dd");
-        if (date === day) {
-          counts[m.title] ??= Object.fromEntries(
-            hourlyLabels.map((h) => [h, 0])
-          );
-          counts[m.title][hour]++;
-        }
-      });
-      labels = hourlyLabels;
-      datasets = Object.entries(counts).map(([title, data], idx) => ({
-        label: title,
-        data: labels.map((h) => data[h]),
-        borderColor: ["#3B82F6", "#EC4899", "#10B981"][idx % 3],
-        backgroundColor: ["#3B82F6", "#EC4899", "#10B981"][idx % 3],
-        fill: false,
-        tension: 0.3,
-        pointRadius: 3,
-      }));
-      title = `${selectedTab.value} Plays (Hourly)`;
-    } else {
-      const titles = [...new Set(filtered.map((m) => m.title))];
-      const counts = Object.fromEntries(
-        titles.map((t) => [
-          t,
-          Object.fromEntries(dailyLabels.map((d) => [d, 0])),
-        ])
-      );
-      filtered.forEach((m) => {
-        const date = format(parseISO(m.timestamp), "yyyy-MM-dd");
-        if (counts[m.title]?.[date] !== undefined) {
-          counts[m.title][date]++;
-        }
-      });
-      labels = dailyLabels;
-      datasets = titles.map((t, idx) => ({
-        label: t,
-        data: labels.map((d) => counts[t][d]),
-        borderColor: ["#3B82F6", "#EC4899", "#10B981"][idx % 3],
-        backgroundColor: ["#3B82F6", "#EC4899", "#10B981"][idx % 3],
-        fill: false,
-        tension: 0.3,
-        pointRadius: 3,
-      }));
-      title = `${selectedTab.value} Plays (Last ${selectedRange.value} Days)`;
-    }
-  }
-
-  lineChartInstance?.destroy();
-  lineChartInstance = new Chart(ctx, {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: { ticks: { color: "white" }, grid: { color: "#444" } },
-        y: {
-          ticks: { color: "white" },
-          grid: { color: "#444" },
-          beginAtZero: true,
-        },
-      },
-      plugins: {
-        legend: { labels: { color: "white" } },
-        title: {
-          display: true,
-          text: title,
-          color: "white",
-          font: { size: 18 },
-        },
-      },
-    },
-  });
-}
-
-async function fetchAndRender() {
-  isLoading.value = true;
-
-  const [viewsRes, clicksRes, mediaRes] = await Promise.all([
-    client("/band-page-views", {
-      params: {
-        filters: { band: { id: route.params.id } },
-        sort: ["timestamp:desc"],
-      },
-    }),
-    client(`/link-clicks/band/${route.params.id}`),
-    client("/media-plays", {
-      params: {
-        filters: { band: { id: route.params.id } },
-        sort: ["timestamp:desc"],
-      },
-    }),
-  ]);
-
-  rawPageViews.value = viewsRes.data;
-  rawLinkClicks.value = clicksRes.data;
-  rawMediaPlays.value = mediaRes.data;
-
-  isLoading.value = false;
-  await nextTick();
-  renderLineChart();
-  renderDevicePie();
-}
-
-onMounted(fetchAndRender);
-watch([selectedTab, selectedRange, selectedDate], () => {
+watch([selectedTab, selectedRange, selectedDate, rawPageViews], () => {
   if (!isLoading.value) {
-    renderLineChart();
-    renderDevicePie();
+    renderViewsChart()
+    renderDeviceDoughnut()
   }
-});
+})
 
 onBeforeUnmount(() => {
-  lineChartInstance?.destroy();
-  devicePieInstance?.destroy(); // ⬅️ add this
-});
+  viewsChart?.destroy()
+  deviceChart?.destroy()
+})
 </script>
 
 <style scoped>
-canvas {
-  width: 100% !important;
-  height: 600px !important;
+.chart-card {
+  background: #111827; /* gray-900 */
+  border-radius: 0.75rem; /* rounded-lg */
+  padding: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,.25);
 }
 
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+.chart-wrap.ratio-16x9 { aspect-ratio: 16 / 9; }
+.chart-wrap.square      { aspect-ratio: 1 / 1; }
+
+.chart-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* date picker icon on dark bg */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* makes black icons white */
+  filter: invert(1);
 }
 </style>
