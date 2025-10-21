@@ -595,20 +595,45 @@ const socialPlatforms = [
 ];
 
 // in the band page <script setup>
-onMounted(() => {
+// onMounted(() => {
+//   try {
+//     const body = {
+//       bandId: band.value?.data?.id,
+//       path: location.pathname,
+//       title: document.title
+//     }
+//     const blob = new Blob([JSON.stringify(body)], { type:'application/json' })
+//     navigator.sendBeacon?.('/api/track/band-view', blob)
+//     if (!navigator.sendBeacon) {
+//       fetch('/api/track/band-view', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+//     }
+//   } catch {}
+// })
+
+const beaconSent = ref(false)
+
+watch(() => band.value?.data?.id, async (id) => {
+  if (!id || beaconSent.value) return
+  beaconSent.value = true
+
+  const payload = { bandId: id, path: location.pathname, title: document.title }
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
+
   try {
-    const body = {
-      bandId: band.value?.data?.id,
-      path: location.pathname,
-      title: document.title
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/track/band-view', blob)
+    } else {
+      await fetch('/api/track/band-view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
     }
-    const blob = new Blob([JSON.stringify(body)], { type:'application/json' })
-    navigator.sendBeacon?.('/api/track/band-view', blob)
-    if (!navigator.sendBeacon) {
-      fetch('/api/track/band-view', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
-    }
-  } catch {}
+  } catch (err) {
+    console.error('band-view beacon error:', err)
+  }
 })
+
 
 
 onMounted(fetchBandData);
