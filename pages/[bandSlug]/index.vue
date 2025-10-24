@@ -1,24 +1,24 @@
 <template>
   <div>
-     <div v-if="!showPage" class="loading-container">
-    <div class="spinner"></div>
-  </div>
+    <div v-if="!showPage" class="loading-container">
+      <div class="spinner"></div>
+    </div>
 
     <div
       v-else
       class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)] fade-in"
     >
       <!-- Hero Section -->
-       <div class="relative w-full h-[35vh] md:h-[60vh]">
+      <div class="relative w-full h-[35vh] md:h-[60vh]">
         <img
           v-if="band.data.bandImg"
           :src="band.data.bandImg.url"
           :alt="`${band.data.name} image`"
           class="absolute inset-0 w-auto m-auto h-[35vh] md:h-2/3 object-cover"
         />
-     
-      <div class="absolute inset-0 bg-black/0"></div>
-    </div>
+
+        <div class="absolute inset-0 bg-black/0"></div>
+      </div>
 
       <!-- Band Name -->
       <div
@@ -342,8 +342,6 @@ import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
 
-
-
 const embedClickCaptured = ref(false);
 const hasTrackedEmbedClick = ref(false);
 const nuxtApp = useNuxtApp();
@@ -354,37 +352,35 @@ const route = useRoute();
 const router = useRouter();
 
 // replace: const loading = ref(true);
-const loadingData = ref(true)
-const heroReady   = ref(false)
-
+const loadingData = ref(true);
+const heroReady = ref(false);
 
 const showPage = computed(() => {
-  const url = band.value?.data?.bandImg?.url
+  const url = band.value?.data?.bandImg?.url;
   // show when data is fetched AND either no hero or hero preloaded
-  return !loadingData.value && (!url || heroReady.value)
-})
+  return !loadingData.value && (!url || heroReady.value);
+});
 const band = ref(null);
 const events = ref([]);
 
 function preloadHero(src) {
   return new Promise((resolve) => {
-    if (!src) return resolve(true)        // nothing to wait on
-    const img = new Image()
+    if (!src) return resolve(true); // nothing to wait on
+    const img = new Image();
     // ask browser to prioritize this
-    img.loading = 'eager'
-    img.decoding = 'sync'
+    img.loading = "eager";
+    img.decoding = "sync";
     // if you serve from a different origin and need it later on canvas, uncomment:
     // img.crossOrigin = 'anonymous'
-    const done = () => resolve(true)
-    img.onload = done
-    img.onerror = done   // don’t hang the UI if it fails
-    img.src = src
-    if (img.complete) return resolve(true) // cached path
+    const done = () => resolve(true);
+    img.onload = done;
+    img.onerror = done; // don’t hang the UI if it fails
+    img.src = src;
+    if (img.complete) return resolve(true); // cached path
     // final guard so we never spin forever (network weirdness)
-    setTimeout(done, 3000)
-  })
+    setTimeout(done, 3000);
+  });
 }
-
 
 const isVideoPlaying = ref(false);
 
@@ -536,28 +532,29 @@ async function fetchBandData() {
     `&populate[events][fields][0]=date&populate[events][fields][1]=slug&populate[events][fields][2]=city&populate[events][fields][3]=state&populate[events][fields][4]=venue`;
 
   try {
-    const res = await fetch(url, { cache: "no-store" })
-    const data = await res.json()
-    band.value = data
+    const res = await fetch(url, { cache: "no-store" });
+    const data = await res.json();
+    band.value = data;
 
     // build the exact URL you’ll render for the hero
-    const raw = band.value?.data?.bandImg?.url || null
+    const raw = band.value?.data?.bandImg?.url || null;
 
     // If you want to be 100% identical to <NuxtImg>, generate the same URL:
     // const img = useImage()            // import { useImage } from '#imports'
     // const heroUrl = raw ? img(raw, { format:'webp', modifiers:{ fit:'cover', quality:60 } }) : null
     // await preloadHero(heroUrl)
 
-    await preloadHero(raw)              // (works fine — the transformed NuxtImg URL will use the cache)
+    await preloadHero(raw); // (works fine — the transformed NuxtImg URL will use the cache)
 
-    heroReady.value = true
+    heroReady.value = true;
+    // ✅ Fire exactly once when the page is actually ready
+    await sendPageView();
   } catch (e) {
-    console.error('Fetch band error:', e)
-    heroReady.value = true              // don’t hang the page on errors
+    console.error("Fetch band error:", e);
+    heroReady.value = true; // don’t hang the page on errors
   } finally {
-    loadingData.value = false
+    loadingData.value = false;
   }
-
 }
 
 /* ---------- events ---------- */
@@ -609,57 +606,82 @@ const socialPlatforms = [
 //     }
 //   } catch {}
 // })
+async function sendPageView() {
+  const id = band.value?.data?.id;
+  if (!id) {
+    console.warn("[page-view] no band id yet");
+    return;
+  }
 
-const beaconSent = ref(false)
+  const payload = {
+    bandId: id,
+    path: location.pathname,
+    title: document.title,
+  };
 
-watch(() => band.value?.data?.id, async (id) => {
-  if (!id || beaconSent.value) return
-  beaconSent.value = true
-
-  const payload = { bandId: id, path: location.pathname, title: document.title }
-  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
+  console.log("[page-view] → POST /api/track/band-view", payload);
 
   try {
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track/band-view', blob)
-    } else {
-      await fetch('/api/track/band-view', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-    }
+    const res = await fetch("/api/track/band-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    console.log("[page-view] ←", res.status, json);
   } catch (err) {
-    console.error('band-view beacon error:', err)
+    console.error("[page-view] ERROR", err);
   }
-})
+}
 
+const beaconSent = ref(false);
 
+// watch(() => band.value?.data?.id, async (id) => {
+//   if (!id || beaconSent.value) return
+//   beaconSent.value = true
+
+//   const payload = { bandId: id, path: location.pathname, title: document.title }
+//   const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
+
+//   try {
+//     if (navigator.sendBeacon) {
+//       navigator.sendBeacon('/api/track/band-view', blob)
+//     } else {
+//       await fetch('/api/track/band-view', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(payload)
+//       })
+//     }
+//   } catch (err) {
+//     console.error('band-view beacon error:', err)
+//   }
+// })
 
 onMounted(fetchBandData);
 
-watch([loadingData, band], ([loadingData, bandVal]) => {
-  if (loadingData) return
-  const id = bandVal?.data?.id
-  if (!id) return
-  try {
-    const payload = {
-      bandId: id,
-      path: location.pathname,
-      title: document.title
-    }
-    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track/band-view', blob)
-    } else {
-      fetch('/api/track/band-view', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-    }
-  } catch {}
-}, { immediate: true })
+// watch([loadingData, band], ([loadingData, bandVal]) => {
+//   if (loadingData) return
+//   const id = bandVal?.data?.id
+//   if (!id) return
+//   try {
+//     const payload = {
+//       bandId: id,
+//       path: location.pathname,
+//       title: document.title
+//     }
+//     const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
+//     if (navigator.sendBeacon) {
+//       navigator.sendBeacon('/api/track/band-view', blob)
+//     } else {
+//       fetch('/api/track/band-view', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(payload)
+//       })
+//     }
+//   } catch {}
+// }, { immediate: true })
 </script>
 
 <style scoped>
@@ -670,11 +692,15 @@ watch([loadingData, band], ([loadingData, bandVal]) => {
 }
 
 .fade-in {
-  animation: fadeIn .25s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 @keyframes fadeIn {
-  from { opacity: 0 }
-  to { opacity: 1 }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .embed-container iframe {
   position: absolute;

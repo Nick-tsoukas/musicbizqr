@@ -233,6 +233,10 @@ export default defineNuxtConfig({
     cookieName: 'strapi_jwt'
   },
 
+    nitro: {
+    externals: { inline: ['geoip-lite'] },
+  },
+
   plugins: [
     '~/plugins/chart.js',
     '~/plugins/fontawesome.js',
