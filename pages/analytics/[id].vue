@@ -73,6 +73,36 @@
         </div>
       </div>
 
+      <!-- Link Clicks: Top Platforms -->
+<div v-if="selectedTab === 'Link Clicks'" class="chart-card">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-white text-lg font-semibold">Top Platforms</h3>
+    <span class="text-gray-400 text-xs">{{ totalClicksInRange }} in range</span>
+  </div>
+
+  <ul v-if="topClickPlatforms.length" class="text-gray-200 text-sm space-y-2">
+    <li
+      v-for="[name, count] in topClickPlatforms"
+      :key="name"
+      class="flex items-center gap-2"
+    >
+      <span class="inline-block w-28 truncate text-white capitalize">{{ name }}</span>
+      <div class="h-2 bg-gray-800 rounded w-full">
+        <div
+          class="h-2 bg-purple-500 rounded"
+          :style="{
+            width: Math.min(100, Math.round((count / topClickPlatforms[0][1]) * 100)) + '%'
+          }"
+        />
+      </div>
+      <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+    </li>
+  </ul>
+
+  <p v-else class="text-gray-400 text-sm">No clicks in this range.</p>
+</div>
+
+
       <!-- Top Cities -->
       <div class="chart-card">
         <div class="flex items-center justify-between mb-2">
@@ -240,6 +270,49 @@ const insightBullets = computed(() => {
 
   return out
 })
+
+/* ----- Link Clicks: filter by current range/date ----- */
+function clicksInSelectedRange() {
+  const rows = rawLinkClicks.value || []
+  if (selectedRange.value === 1) {
+    const dayISO = selectedDate.value
+    return rows.filter((r) => {
+      const ts = tsOf(r)
+      if (!ts) return false
+      const d = parseISO(ts)
+      return isValid(d) && fmt(d, 'yyyy-MM-dd') === dayISO
+    })
+  } else {
+    const start = subDays(new Date(), selectedRange.value - 1)
+    const startKey = fmt(start, 'yyyy-MM-dd')
+    const endKey = fmt(new Date(), 'yyyy-MM-dd')
+    return rows.filter((r) => {
+      const ts = tsOf(r)
+      if (!ts) return false
+      const d = parseISO(ts)
+      if (!isValid(d)) return false
+      const key = fmt(d, 'yyyy-MM-dd')
+      return key >= startKey && key <= endKey
+    })
+  }
+}
+
+/* ----- Top platforms (weighted if clickCount exists) ----- */
+const topClickPlatforms = computed<[string, number][]>(() => {
+  const rows = clicksInSelectedRange()
+  const counts: Record<string, number> = {}
+  for (const r of rows) {
+    const platform = (r?.attributes?.platform || 'unknown').toLowerCase()
+    const w = Number(r?.attributes?.clickCount ?? 1)
+    counts[platform] = (counts[platform] || 0) + (isFinite(w) ? w : 1)
+  }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]) as [string, number][]
+})
+
+const totalClicksInRange = computed(() =>
+  topClickPlatforms.value.reduce((sum, [, n]) => sum + n, 0)
+)
+
 
 
 // Normalize timestamp access (defensive to name changes)
