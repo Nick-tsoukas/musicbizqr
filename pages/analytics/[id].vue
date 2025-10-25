@@ -242,6 +242,39 @@ const insightBullets = computed(() => {
 })
 
 
+// Normalize timestamp access (defensive to name changes)
+function tsOf(row: any): string | null {
+  const a = row?.attributes || row || {}
+  return a.timestamp || a.createdAt || a.updatedAt || null
+}
+
+// Return the correct raw rows for the current tab
+function rowsForSelectedTab() {
+  if (selectedTab.value === 'Page Views') return rawPageViews.value || []
+
+  if (selectedTab.value === 'Link Clicks') return rawLinkClicks.value || []
+
+  // Media plays may include multiple kinds; filter
+const plays = rawMediaPlays.value || []
+if (selectedTab.value === 'Songs') {
+  return plays.filter((r: any) => {
+    const a = r?.attributes || r || {}
+    const k = String(a.kind ?? a.type ?? a.mediaType ?? '').toLowerCase()
+    return k.includes('song') || k.includes('audio') || k === 'music'
+  })
+}
+if (selectedTab.value === 'Videos') {
+  return plays.filter((r: any) => {
+    const a = r?.attributes || r || {}
+    const k = String(a.kind ?? a.type ?? a.mediaType ?? '').toLowerCase()
+    return k.includes('video') || k.includes('youtube') || k.includes('mp4')
+  })
+}
+
+  return []
+}
+
+
 async function fetchMuse() {
   const bandId = Number(route.params.id)
   const query = qs.stringify(
@@ -292,7 +325,9 @@ const rangeOptions: Record<number, string> = {
   30: 'Last 30 Days',
   365: 'Last 1 Year'
 }
-const selectedRange = ref<number>(1)
+// was: const selectedRange = ref<number>(1)
+const selectedRange = ref<number>(30)
+
 const selectedDate = ref(fmt(new Date(), 'yyyy-MM-dd'))
 
 const isLoading = ref(true)
@@ -444,23 +479,78 @@ async function fetchAndRender() {
       params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'], pagination: { limit: 500 } }
     }),
     client(`/link-clicks/band/${route.params.id}`),
-    client('/media-plays', {
-      params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'], pagination: { limit: 500 } }
-    })
+    // Try custom; fall back to collection
+    client(`/media-plays/band/${route.params.id}`).catch(() =>
+      client('/media-plays', {
+        params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'], pagination: { limit: 500 } }
+      })
+    )
   ])
 
-  rawPageViews.value = viewsRes.data || []
-  rawLinkClicks.value = clicksRes.data || []
-  rawMediaPlays.value = mediaRes.data || []
+  console.log('[ANALYTICS] raw responses:', { viewsRes, clicksRes, mediaRes })
+
+  const toArray = (res: any) => {
+    if (!res) return []
+    if (Array.isArray(res)) return res
+    if (Array.isArray(res.data)) return res.data
+    if (Array.isArray(res.results)) return res.results
+    if (res.data && !Array.isArray(res.data)) return [res.data]
+    return []
+  }
+
+  // Unifiers: make everything look like { id, attributes:{...} }
+  const unifyMedia = (rows: any[]) =>
+    rows.map((r) => {
+      const a = r?.attributes || r || {}
+      return {
+        id: r?.id ?? a?.id,
+        attributes: {
+          ...a,
+          // timestamps
+          timestamp: a.timestamp || a.createdAt || a.updatedAt || r?.timestamp || r?.createdAt || r?.updatedAt || null,
+          // kind: accept mediaType/type/kind
+          kind: String(a.kind ?? a.type ?? a.mediaType ?? '').toLowerCase(),
+          // title fallback
+          title: a.title ?? r?.title ?? ''
+        }
+      }
+    })
+
+  const unifyClicks = (rows: any[]) =>
+    rows.map((r) => {
+      const a = r?.attributes || r || {}
+      return {
+        id: r?.id ?? a?.id,
+        attributes: {
+          ...a,
+          timestamp: a.timestamp || a.createdAt || r?.timestamp || r?.createdAt || null,
+          platform: a.platform ?? a.provider ?? a.source ?? r?.platform ?? r?.provider ?? r?.source ?? '',
+          url: a.url ?? r?.url ?? ''
+        }
+      }
+    })
+
+  rawPageViews.value  = toArray(viewsRes) // already attributes-shaped from Strapi
+  rawLinkClicks.value = unifyClicks(toArray(clicksRes))
+  rawMediaPlays.value = unifyMedia(toArray(mediaRes))
+
+  console.log('[ANALYTICS] counts:', {
+    pageViews: rawPageViews.value.length,
+    linkClicks: rawLinkClicks.value.length,
+    mediaPlays: rawMediaPlays.value.length
+  })
+  console.log('[ANALYTICS] sample click:', rawLinkClicks.value[0])
+  console.log('[ANALYTICS] sample play:',  rawMediaPlays.value[0])
 
   isLoading.value = false
 
-  // Ensure Chart.js is ready before rendering
   await ensureChart()
   await nextTick()
   renderViewsChart()
   renderDeviceDoughnut()
 }
+
+
 
 /* ---------- HiDPI canvas ---------- */
 function prepHiDPICanvas(canvas: HTMLCanvasElement) {
@@ -485,53 +575,69 @@ function renderViewsChart() {
   let chartType: 'bar' | 'line' = 'bar'
   let title = ''
 
-  if (selectedTab.value === 'Page Views') {
-    if (selectedRange.value === 1) {
-      // hourly -> BAR
-      const hours = Array.from({ length: 24 }, (_, i) => i)
-      const counts: Record<number, number> = Object.fromEntries(hours.map((h) => [h, 0]))
-      const dayISO = selectedDate.value
+  // Choose which rows to summarize based on tab
+  const rows = rowsForSelectedTab()
 
-      for (const v of rawPageViews.value) {
-        const ts = v?.attributes?.timestamp
-        if (!ts) continue
-        const d = parseISO(ts)
-        if (!isValid(d)) continue
-        if (fmt(d, 'yyyy-MM-dd') !== dayISO) continue
-        counts[getHours(d)]++
-      }
-
-      labels = hours.map((h) => fmt(new Date(2000, 0, 1, h), 'h a')) // 12h
-      data = hours.map((h) => counts[h] || 0)
-      chartType = 'bar'
-      title = 'Page Views (Hourly)'
-    } else {
-      // daily -> LINE
-      const days = Array.from({ length: selectedRange.value }, (_, i) => {
-        const d = subDays(new Date(), selectedRange.value - 1 - i)
-        return fmt(d, 'yyyy-MM-dd')
-      })
-      const counts: Record<string, number> = Object.fromEntries(days.map((d) => [d, 0]))
-      for (const v of rawPageViews.value) {
-        const ts = v?.attributes?.timestamp
-        if (!ts) continue
-        const d = parseISO(ts)
-        if (!isValid(d)) continue
-        const key = fmt(d, 'yyyy-MM-dd')
-        if (counts[key] !== undefined) counts[key]++
-      }
-      labels = days.map((d) => fmt(parseISO(`${d}T00:00:00`), 'MMM d'))
-      data = days.map((d) => counts[d] || 0)
-      chartType = 'line'
-      title = `Page Views (Last ${selectedRange.value} Days)`
+  // Helper to iterate timestamps safely
+  const iter = (fn: (d: Date) => void) => {
+    for (const v of rows) {
+      const ts = tsOf(v)
+      if (!ts) continue
+      const d = parseISO(ts)
+      if (!isValid(d)) continue
+      fn(d)
     }
-  } else {
-    // empty for other tabs for now
-    labels = []
-    data = []
-    chartType = 'line'
-    title = `${selectedTab.value}`
   }
+
+  // Hourly (Daily range)
+  if (selectedRange.value === 1) {
+    const hours = Array.from({ length: 24 }, (_, i) => i)
+    const counts: Record<number, number> = Object.fromEntries(hours.map((h) => [h, 0]))
+    const dayISO = selectedDate.value
+
+    iter((d) => {
+      if (fmt(d, 'yyyy-MM-dd') !== dayISO) return
+      counts[getHours(d)]++
+    })
+
+    labels = hours.map((h) => fmt(new Date(2000, 0, 1, h), 'h a'))
+    data = hours.map((h) => counts[h] || 0)
+    chartType = 'bar'
+    title =
+      selectedTab.value === 'Page Views'
+        ? 'Page Views (Hourly)'
+        : `${selectedTab.value} (Hourly)`
+  } else {
+    // Daily (Last N Days)
+    const days = Array.from({ length: selectedRange.value }, (_, i) => {
+      const d = subDays(new Date(), selectedRange.value - 1 - i)
+      return fmt(d, 'yyyy-MM-dd')
+    })
+    const counts: Record<string, number> = Object.fromEntries(days.map((d) => [d, 0]))
+
+    iter((d) => {
+      const key = fmt(d, 'yyyy-MM-dd')
+      if (counts[key] !== undefined) counts[key]++
+    })
+
+    labels = days.map((d) => fmt(parseISO(`${d}T00:00:00`), 'MMM d'))
+    data = days.map((d) => counts[d] || 0)
+    chartType = 'line'
+    title =
+      selectedTab.value === 'Page Views'
+        ? `Page Views (Last ${selectedRange.value} Days)`
+        : `${selectedTab.value} (Last ${selectedRange.value} Days)`
+  }
+
+  const datasetLabel = (() => {
+    switch (selectedTab.value) {
+      case 'Page Views': return selectedRange.value === 1 ? 'Views' : 'Page Views'
+      case 'Link Clicks': return 'Link Clicks'
+      case 'Songs': return 'Song Plays'
+      case 'Videos': return 'Video Plays'
+      default: return selectedTab.value
+    }
+  })()
 
   viewsChart?.destroy()
   viewsChart = new ChartJs(ctx, {
@@ -540,7 +646,7 @@ function renderViewsChart() {
       labels,
       datasets: [
         {
-          label: selectedRange.value === 1 ? 'Views' : 'Page Views',
+          label: datasetLabel,
           data,
           borderWidth: 2,
           borderColor: '#10B981',
@@ -573,12 +679,14 @@ function renderViewsChart() {
         title: { display: true, text: title, color: 'white', font: { size: 16, weight: '600' } },
         tooltip: {
           callbacks: {
-            title(items) {
-              return items[0]?.label || ''
-            },
+            title(items) { return items[0]?.label || '' },
             label(ctx) {
               const v = ctx.raw as number
-              return `${v} ${v === 1 ? 'view' : 'views'}`
+              const noun =
+                selectedTab.value === 'Page Views' ? 'view'
+                : selectedTab.value === 'Link Clicks' ? 'click'
+                : 'play'
+              return `${v} ${v === 1 ? noun : noun + 's'}`
             }
           }
         }
@@ -586,6 +694,7 @@ function renderViewsChart() {
     }
   })
 }
+
 
 function renderDeviceDoughnut() {
   if (!ChartJs) return
@@ -643,7 +752,7 @@ onMounted(async () => {
   await fetchMuse()        // fetch daily insights (Muse)
 })
 
-watch([selectedTab, selectedRange, selectedDate, rawPageViews], async () => {
+watch([selectedTab, selectedRange, selectedDate, rawPageViews, rawLinkClicks, rawMediaPlays], async () => {
   if (!isLoading.value) {
     await ensureChart()
     renderViewsChart()
