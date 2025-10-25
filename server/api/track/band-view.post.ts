@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
       bandId?: number | string;
       path?: string;
       title?: string;
+      url?: string; // full landing URL (window.location.href)
     };
     if (!body?.bandId) {
       setResponseStatus(event, 400);
@@ -73,6 +74,40 @@ export default defineEventHandler(async (event) => {
     const ua = getRequestHeader(event, "user-agent") || "";
     const ip = getClientIp(event);
 
+    // [NEW] safe URL helpers (local, no deps)
+    const safeURL = (u?: string) => {
+      try { return u ? new URL(u) : null; } catch { return null; }
+    };
+    const qParams = (u?: string) => {
+      const out: Record<string, string> = {};
+      const url = safeURL(u);
+      if (!url) return out;
+      url.searchParams.forEach((v, k) => (out[k] = v));
+      return out;
+    };
+
+    // [NEW] landing page + referrer normalization
+    const pageUrl = body.url || "";
+    const pageU = safeURL(pageUrl);
+    const landingPath = pageU?.pathname || "";
+    const landingQuery = pageU?.search || "";
+
+    const refererHeader = getRequestHeader(event, "referer") || "";
+    const refU = safeURL(refererHeader);
+    const refDomain = refU?.hostname?.toLowerCase?.() || "";
+
+    // [NEW] pull UTM/CLID from landing URL (Strapi lifecycle can also re-parse)
+    const qp = qParams(pageUrl);
+    const utmSource   = qp.utm_source || "";
+    const utmMedium   = qp.utm_medium || "";
+    const utmCampaign = qp.utm_campaign || "";
+    const utmTerm     = qp.utm_term || "";
+    const utmContent  = qp.utm_content || "";
+    const gclid       = qp.gclid || "";
+    const fbclid      = qp.fbclid || "";
+    const ttclid      = qp.ttclid || "";
+    const twclid      = qp.twclid || "";
+
     // 2) dev overrides for local testing
     const q = getQuery(event);
     let city = (q.city as string) || null;
@@ -81,8 +116,7 @@ export default defineEventHandler(async (event) => {
     let lat: number | null = q.lat ? Number(q.lat) : null;
     let lon: number | null = q.lon ? Number(q.lon) : null;
 
-    let geoSource: "override" | "cloudflare" | "geoip" | "external" | "none" =
-      "none";
+    let geoSource: "override" | "cloudflare" | "geoip" | "external" | "none" = "none";
     if (city || region || country || lat || lon) {
       geoSource = "override";
     }
@@ -169,6 +203,7 @@ export default defineEventHandler(async (event) => {
       process.env.NUXT_PUBLIC_STRAPI_URL ||
       "http://localhost:1337";
     const nowIso = new Date().toISOString();
+
     const payload = {
       data: {
         band: bandId,
@@ -179,10 +214,29 @@ export default defineEventHandler(async (event) => {
         city,
         region,
         country,
-        referrer: getRequestHeader(event, "referer") || "",
+        referrer: refererHeader,          // [kept]
         lat,
         lon,
         timestamp: nowIso,
+
+        // [NEW] landing context
+        pageUrl,
+        landingPath,
+        landingQuery,
+
+        // [NEW] normalized referrer
+        refDomain,
+
+        // [NEW] marketing params
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmTerm,
+        utmContent,
+        gclid,
+        fbclid,
+        ttclid,
+        twclid
       },
     };
 
@@ -205,3 +259,4 @@ export default defineEventHandler(async (event) => {
     return { ok: false, error: err?.message || String(err) };
   }
 });
+

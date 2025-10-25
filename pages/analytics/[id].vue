@@ -96,6 +96,64 @@
         <p v-else class="text-gray-400 text-sm">No city data yet.</p>
       </div>
 
+            <!-- Sources -->
+<div class="chart-card">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-white text-lg font-semibold">Sources</h3>
+    <span class="text-gray-400 text-xs">{{ totalFilteredViews }} in range</span>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <!-- By Source -->
+    <div>
+      <h4 class="text-white font-medium mb-2">By Source</h4>
+      <ul v-if="sourceCounts.length" class="text-gray-200 text-sm space-y-2">
+        <li v-for="[src, count] in sourceCounts" :key="src" class="flex items-center gap-2">
+          <span class="inline-block w-28 truncate text-white capitalize">{{ src }}</span>
+          <div class="h-2 bg-gray-800 rounded w-full">
+            <div
+              class="h-2 bg-purple-500 rounded"
+              :style="{ width: Math.min(100, Math.round((count / sourceCounts[0][1]) * 100)) + '%' }"
+            />
+          </div>
+          <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+        </li>
+      </ul>
+      <p v-else class="text-gray-400 text-sm">No source data yet.</p>
+    </div>
+
+    <!-- By Medium -->
+    <div>
+      <h4 class="text-white font-medium mb-2">By Medium</h4>
+      <ul v-if="mediumCounts.length" class="text-gray-200 text-sm space-y-2">
+        <li v-for="[m, count] in mediumCounts" :key="m" class="flex items-center gap-2">
+          <span class="inline-block w-28 truncate text-white capitalize">{{ m }}</span>
+          <div class="h-2 bg-gray-800 rounded w-full">
+            <div
+              class="h-2 bg-emerald-500 rounded"
+              :style="{ width: Math.min(100, Math.round((count / mediumCounts[0][1]) * 100)) + '%' }"
+            />
+          </div>
+          <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+        </li>
+      </ul>
+      <p v-else class="text-gray-400 text-sm">No medium data yet.</p>
+    </div>
+
+    <!-- Top Referrers -->
+    <div>
+      <h4 class="text-white font-medium mb-2">Top Referrers</h4>
+      <ul v-if="topRefDomains.length" class="text-gray-200 text-sm space-y-2">
+        <li v-for="[d, count] in topRefDomains" :key="d" class="flex items-center justify-between">
+          <span class="truncate w-40 text-white">{{ d }}</span>
+          <span class="text-gray-400 tabular-nums">{{ count }}</span>
+        </li>
+      </ul>
+      <p v-else class="text-gray-400 text-sm">No referrer domains yet.</p>
+    </div>
+  </div>
+</div>
+
       <!-- Devices -->
       <div class="chart-card">
         <div class="flex items-center justify-between mb-2">
@@ -123,6 +181,11 @@
           </ClientOnly>
         </div>
       </div>
+
+\
+
+
+
     </div>
   </div>
 </template>
@@ -291,6 +354,74 @@ const deviceBreakdown = computed(() => {
     pct: Math.round(((counts[x.key] || 0) / total) * 1000) / 10
   }))
 })
+
+
+
+
+
+/* ---------- filter views by current range/date ---------- */
+function viewsInSelectedRange() {
+  const rows = rawPageViews.value || [];
+  if (selectedRange.value === 1) {
+    // Daily (hourly view) — keep only the chosen date (yyyy-MM-dd)
+    const dayISO = selectedDate.value;
+    return rows.filter((v) => {
+      const ts = v?.attributes?.timestamp;
+      if (!ts) return false;
+      const d = parseISO(ts);
+      return isValid(d) && fmt(d, 'yyyy-MM-dd') === dayISO;
+    });
+  } else {
+    // Last N days (inclusive of today, N-1 days back)
+    const start = subDays(new Date(), selectedRange.value - 1);
+    const startKey = fmt(start, 'yyyy-MM-dd');
+    const endKey = fmt(new Date(), 'yyyy-MM-dd');
+    return rows.filter((v) => {
+      const ts = v?.attributes?.timestamp;
+      if (!ts) return false;
+      const d = parseISO(ts);
+      if (!isValid(d)) return false;
+      const key = fmt(d, 'yyyy-MM-dd');
+      return key >= startKey && key <= endKey;
+    });
+  }
+}
+
+
+/* ---------- SOURCE / MEDIUM / REFERRER ---------- */
+const sourceCounts = computed<[string, number][]>(() => {
+  const rows = viewsInSelectedRange();
+  const c: Record<string, number> = {};
+  for (const v of rows) {
+    const src = (v?.attributes?.refSource || 'unknown').toLowerCase();
+    c[src] = (c[src] || 0) + 1;
+  }
+  return Object.entries(c).sort((a, b) => b[1] - a[1]) as [string, number][];
+});
+
+const mediumCounts = computed<[string, number][]>(() => {
+  const rows = viewsInSelectedRange();
+  const c: Record<string, number> = {};
+  for (const v of rows) {
+    const m = (v?.attributes?.refMedium || 'unknown').toLowerCase();
+    c[m] = (c[m] || 0) + 1;
+  }
+  return Object.entries(c).sort((a, b) => b[1] - a[1]) as [string, number][];
+});
+
+const topRefDomains = computed<[string, number][]>(() => {
+  const rows = viewsInSelectedRange();
+  const c: Record<string, number> = {};
+  for (const v of rows) {
+    const d = (v?.attributes?.refDomain || 'unknown').toLowerCase();
+    c[d] = (c[d] || 0) + 1;
+  }
+  return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 10) as [string, number][];
+});
+
+// convenience total after filtering (used in headers)
+const totalFilteredViews = computed(() => viewsInSelectedRange().length);
+
 
 /* ---------- top cities ---------- */
 const topCities = computed<[string, number][]>(() => {

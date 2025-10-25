@@ -607,6 +607,9 @@ const socialPlatforms = [
 //   } catch {}
 // })
 async function sendPageView() {
+  // Don’t run on server
+  if (typeof window === 'undefined') return;
+
   const id = band.value?.data?.id;
   if (!id) {
     console.warn("[page-view] no band id yet");
@@ -616,7 +619,8 @@ async function sendPageView() {
   const payload = {
     bandId: id,
     path: location.pathname,
-    title: document.title,
+    title: document?.title || "",
+    url: window.location.href, // ← NEW: full landing URL (UTMs included)
   };
 
   console.log("[page-view] → POST /api/track/band-view", payload);
@@ -626,6 +630,7 @@ async function sendPageView() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      // Note: the browser will send the Referer header automatically
     });
     const json = await res.json();
     console.log("[page-view] ←", res.status, json);
@@ -633,6 +638,7 @@ async function sendPageView() {
     console.error("[page-view] ERROR", err);
   }
 }
+
 
 const beaconSent = ref(false);
 
