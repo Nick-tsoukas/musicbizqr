@@ -133,10 +133,21 @@
     <span class="text-gray-400 text-xs">{{ totalFilteredViews }} in range</span>
   </div>
 
+  <!-- Short Explanation -->
+  <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+    <span class="text-emerald-400 font-semibold">Where your fans are coming from.</span>
+    This shows how listeners found your band page — whether from social media, search,
+    QR codes, or other sites. “Source” means the platform or website; “Medium” means
+    the type of traffic (social, search, direct, or referral).
+  </p>
+
   <div class="grid md:grid-cols-3 gap-4">
     <!-- By Source -->
     <div>
-      <h4 class="text-white font-medium mb-2">By Source</h4>
+      <h4 class="text-white font-medium mb-2 flex items-center gap-1">
+        By Source
+        <span class="text-gray-500 text-xs">(platform or website)</span>
+      </h4>
       <ul v-if="sourceCounts.length" class="text-gray-200 text-sm space-y-2">
         <li v-for="[src, count] in sourceCounts" :key="src" class="flex items-center gap-2">
           <span class="inline-block w-28 truncate text-white capitalize">{{ src }}</span>
@@ -144,7 +155,7 @@
             <div
               class="h-2 bg-purple-500 rounded"
               :style="{ width: Math.min(100, Math.round((count / sourceCounts[0][1]) * 100)) + '%' }"
-            />
+            ></div>
           </div>
           <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
         </li>
@@ -154,7 +165,10 @@
 
     <!-- By Medium -->
     <div>
-      <h4 class="text-white font-medium mb-2">By Medium</h4>
+      <h4 class="text-white font-medium mb-2 flex items-center gap-1">
+        By Medium
+        <span class="text-gray-500 text-xs">(traffic type)</span>
+      </h4>
       <ul v-if="mediumCounts.length" class="text-gray-200 text-sm space-y-2">
         <li v-for="[m, count] in mediumCounts" :key="m" class="flex items-center gap-2">
           <span class="inline-block w-28 truncate text-white capitalize">{{ m }}</span>
@@ -162,7 +176,7 @@
             <div
               class="h-2 bg-emerald-500 rounded"
               :style="{ width: Math.min(100, Math.round((count / mediumCounts[0][1]) * 100)) + '%' }"
-            />
+            ></div>
           </div>
           <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
         </li>
@@ -172,7 +186,10 @@
 
     <!-- Top Referrers -->
     <div>
-      <h4 class="text-white font-medium mb-2">Top Referrers</h4>
+      <h4 class="text-white font-medium mb-2 flex items-center gap-1">
+        Top Referrers
+        <span class="text-gray-500 text-xs">(websites linking to you)</span>
+      </h4>
       <ul v-if="topRefDomains.length" class="text-gray-200 text-sm space-y-2">
         <li v-for="[d, count] in topRefDomains" :key="d" class="flex items-center justify-between">
           <span class="truncate w-40 text-white">{{ d }}</span>
@@ -183,6 +200,7 @@
     </div>
   </div>
 </div>
+
 
       <!-- Devices -->
       <div class="chart-card">
