@@ -27,12 +27,12 @@ function cacheSet(key: string, v: any) {
 // Normalize client IP (strip IPv6 mapped prefix, handle comma chains)
 function getClientIp(event: H3Event) {
   const q = getQuery(event);
-  const devIp = (q.ip as string) || (q.devIp as string) || null; // allow ?ip=1.2.3.4 in dev
+  const devIp = (q.ip as string) || (q.devIp as string) || null;
 
   const hdr = (n: string) => (getRequestHeader(event, n) || "").trim();
-  const xff = hdr("x-forwarded-for"); // "client, proxy1, proxy2"
-  const cf = hdr("cf-connecting-ip"); // Cloudflare
-  const real = hdr("x-real-ip"); // nginx/other
+  const xff = hdr("x-forwarded-for");
+  const cf = hdr("cf-connecting-ip");
+  const real = hdr("x-real-ip");
   const sock = (event.node.req.socket as any)?.remoteAddress || "";
 
   let ip =
@@ -55,6 +55,32 @@ function isPrivateIp(ip: string) {
   return /^(::1|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(ip);
 }
 
+function inferSourceMedium(refDomain: string, utmSource: string, utmMedium: string) {
+  let source = (utmSource || '').toLowerCase();
+  let medium = (utmMedium || '').toLowerCase();
+
+  if (!source) {
+    const d = (refDomain || '').toLowerCase();
+    if (!d) {
+      source = '';
+      medium = medium || 'direct';
+    } else if (d.includes('google')) {
+      source = 'google'; medium = medium || 'search';
+    } else if (d.includes('facebook')) {
+      source = 'facebook'; medium = medium || 'social';
+    } else if (d.includes('instagram')) {
+      source = 'instagram'; medium = medium || 'social';
+    } else if (d.includes('twitter') || d.includes('x.com') || d === 't.co') {
+      source = 'twitter'; medium = medium || 'social';
+    } else {
+      source = d.split('.').slice(-2).join('.');
+      medium = medium || 'referral';
+    }
+  }
+
+  return { refSource: source || 'unknown', refMedium: medium || 'unknown' };
+}
+
 export default defineEventHandler(async (event) => {
   try {
     // 1) input
@@ -74,7 +100,7 @@ export default defineEventHandler(async (event) => {
     const ua = getRequestHeader(event, "user-agent") || "";
     const ip = getClientIp(event);
 
-    // [NEW] safe URL helpers (local, no deps)
+    // safe URL helpers
     const safeURL = (u?: string) => {
       try { return u ? new URL(u) : null; } catch { return null; }
     };
@@ -86,7 +112,7 @@ export default defineEventHandler(async (event) => {
       return out;
     };
 
-    // [NEW] landing page + referrer normalization
+    // landing page + referrer normalization
     const pageUrl = body.url || "";
     const pageU = safeURL(pageUrl);
     const landingPath = pageU?.pathname || "";
@@ -96,7 +122,7 @@ export default defineEventHandler(async (event) => {
     const refU = safeURL(refererHeader);
     const refDomain = refU?.hostname?.toLowerCase?.() || "";
 
-    // [NEW] pull UTM/CLID from landing URL (Strapi lifecycle can also re-parse)
+    // pull UTM/CLID from landing URL (define BEFORE using)
     const qp = qParams(pageUrl);
     const utmSource   = qp.utm_source || "";
     const utmMedium   = qp.utm_medium || "";
@@ -107,6 +133,9 @@ export default defineEventHandler(async (event) => {
     const fbclid      = qp.fbclid || "";
     const ttclid      = qp.ttclid || "";
     const twclid      = qp.twclid || "";
+
+    // compute source/medium
+    const { refSource, refMedium } = inferSourceMedium(refDomain, utmSource, utmMedium);
 
     // 2) dev overrides for local testing
     const q = getQuery(event);
@@ -121,7 +150,7 @@ export default defineEventHandler(async (event) => {
       geoSource = "override";
     }
 
-    // 3) Cloudflare headers (best if you’re behind CF)
+    // 3) Cloudflare headers
     if (geoSource === "none") {
       const cfCity =
         getRequestHeader(event, "cf-ipcity") ||
@@ -149,7 +178,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // 4) geoip-lite (what you already use)
+    // 4) geoip-lite
     if (geoSource === "none" && !isPrivateIp(ip)) {
       try {
         const { createRequire } = await import("module");
@@ -171,12 +200,11 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // 5) External IP API fallback (ipapi.co here; swap as you prefer)
+    // 5) External IP API fallback
     if (geoSource === "none" && !isPrivateIp(ip)) {
       const cacheKey = `ipapi:${ip}`;
       let data = cacheGet(cacheKey);
       if (!data) {
-        // You can switch to ipinfo/ipdata and use a token via runtime config
         const url = `https://ipapi.co/${encodeURIComponent(ip)}/json/`;
         try {
           data = await $fetch(url, { timeout: 3000 });
@@ -190,8 +218,7 @@ export default defineEventHandler(async (event) => {
         region = region || data.region || data.region_code || null;
         country = country || data.country || data.country_name || null;
         lat = lat ?? (typeof data.latitude === "number" ? data.latitude : null);
-        lon =
-          lon ?? (typeof data.longitude === "number" ? data.longitude : null);
+        lon = lon ?? (typeof data.longitude === "number" ? data.longitude : null);
         if (city || region || country) geoSource = "external";
       }
     }
@@ -214,20 +241,19 @@ export default defineEventHandler(async (event) => {
         city,
         region,
         country,
-        referrer: refererHeader,          // [kept]
+        referrer: refererHeader,
         lat,
         lon,
         timestamp: nowIso,
 
-        // [NEW] landing context
         pageUrl,
         landingPath,
         landingQuery,
 
-        // [NEW] normalized referrer
         refDomain,
+        refSource,
+        refMedium,
 
-        // [NEW] marketing params
         utmSource,
         utmMedium,
         utmCampaign,
@@ -259,4 +285,3 @@ export default defineEventHandler(async (event) => {
     return { ok: false, error: err?.message || String(err) };
   }
 });
-
