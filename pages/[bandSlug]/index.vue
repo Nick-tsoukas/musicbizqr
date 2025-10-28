@@ -535,6 +535,35 @@ async function fetchBandData() {
     const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
     band.value = data;
+    // Peek at shape so we know how to unwrap
+console.log('[BAND PAYLOAD]', band.value);
+
+
+// Support BOTH shapes (flattened via custom slug route, or Strapi default)
+let evts = [];
+const maybeFlat = band.value?.data?.events;                // e.g. [{ id, date, city, ... }]
+const maybeStrapi = band.value?.data?.events?.data;        // e.g. [{ id, attributes: {...}}]
+
+if (Array.isArray(maybeFlat)) {
+  evts = maybeFlat.filter(Boolean);
+} else if (Array.isArray(maybeStrapi)) {
+  evts = maybeStrapi
+    .filter(Boolean)
+    .map(({ id, attributes }) => ({ id, ...(attributes || {}) }));
+} else {
+  evts = [];
+}
+
+// Normalize minimal fields the template expects
+events.value = evts.map(e => ({
+  id: e.id,
+  date: e.date || e.eventDate || e.startDate || null,
+  city: e.city ?? null,
+  state: e.state ?? null,
+  venue: e.venue ?? null,
+  slug: e.slug ?? null,
+})).filter(e => !!e.date);
+
 
     // build the exact URL you’ll render for the hero
     const raw = band.value?.data?.bandImg?.url || null;
@@ -553,6 +582,7 @@ async function fetchBandData() {
     console.error("Fetch band error:", e);
     heroReady.value = true; // don’t hang the page on errors
   } finally {
+    console.log(events.value, band.value , 'bandpayload')
     loadingData.value = false;
   }
 }
