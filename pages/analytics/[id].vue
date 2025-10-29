@@ -19,7 +19,7 @@
       <div v-else class="text-gray-400 text-sm">No insights yet.</div>
     </div>
 
-    <!-- Muse Summary (Phase 2 aggregate) -->
+<!-- Muse Summary (Phase 2.5 aggregate) -->
 <div class="chart-card mb-6">
   <div class="flex items-center justify-between mb-2">
     <h3 class="text-white text-lg font-semibold">Muse Summary</h3>
@@ -29,35 +29,75 @@
   <div v-if="museSummaryLoading" class="text-gray-400 text-sm">Loading summary…</div>
 
   <div v-else-if="museSummary">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+    <!-- Metric grid -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
       <div class="bg-neutral-900 rounded-lg p-3">
         <p class="text-gray-400 text-xs">Page Views</p>
         <p class="text-2xl font-semibold text-white">{{ museSummary.pageViews }}</p>
+        <p
+          v-if="museSummary.prevComparison !== undefined"
+          :class="[
+            'text-xs font-medium',
+            museSummary.prevComparison > 0
+              ? 'text-emerald-400'
+              : museSummary.prevComparison < 0
+              ? 'text-red-400'
+              : 'text-gray-400'
+          ]"
+        >
+          {{ museSummary.prevComparison > 0 ? '+' : '' }}{{ museSummary.prevComparison }} % vs prev
+        </p>
       </div>
+
       <div class="bg-neutral-900 rounded-lg p-3">
         <p class="text-gray-400 text-xs">Link Clicks</p>
         <p class="text-2xl font-semibold text-white">{{ museSummary.linkClicks }}</p>
       </div>
+
       <div class="bg-neutral-900 rounded-lg p-3">
         <p class="text-gray-400 text-xs">Song Plays</p>
         <p class="text-2xl font-semibold text-white">{{ museSummary.songPlays }}</p>
       </div>
+
       <div class="bg-neutral-900 rounded-lg p-3">
         <p class="text-gray-400 text-xs">Video Plays</p>
         <p class="text-2xl font-semibold text-white">{{ museSummary.videoPlays }}</p>
       </div>
+
+      <div class="bg-neutral-900 rounded-lg p-3">
+        <p class="text-gray-400 text-xs">Engagement Rate</p>
+        <p class="text-2xl font-semibold text-white">
+          {{ museSummary.engagementRate }}%
+        </p>
+      </div>
     </div>
 
-    <p class="text-gray-300 text-sm">
-      Growth: <span class="text-pink-400 font-bold">{{ museSummary.growthPct }}%</span>  
-      • Top City: <span class="font-semibold">{{ museSummary.topCity || 'N/A' }}</span>  
-      • Source: <span class="font-semibold">{{ museSummary.topSource || 'N/A' }}</span>  
-      • Platform: <span class="font-semibold">{{ museSummary.topPlatform || 'N/A' }}</span>
+    <!-- Highlights -->
+    <p class="text-gray-300 text-sm mb-2">
+      Growth:
+      <span class="text-pink-400 font-bold">{{ museSummary.growthPct }}%</span>
     </p>
+
+    <!-- Top lists -->
+    <div class="grid sm:grid-cols-3 gap-3 text-gray-300 text-sm">
+      <div>
+        <span class="font-semibold text-white">Top Cities:</span><br />
+        <span>{{ (museSummary.topCities || []).map(c => c[0]).join(', ') || 'N/A' }}</span>
+      </div>
+      <div>
+        <span class="font-semibold text-white">Top Sources:</span><br />
+        <span>{{ (museSummary.topSources || []).map(s => s[0]).join(', ') || 'N/A' }}</span>
+      </div>
+      <div>
+        <span class="font-semibold text-white">Top Platforms:</span><br />
+        <span>{{ (museSummary.topPlatforms || []).map(p => p[0]).join(', ') || 'N/A' }}</span>
+      </div>
+    </div>
   </div>
 
   <div v-else class="text-gray-400 text-sm">No summary data yet.</div>
 </div>
+
 
 
     <!-- Tabs -->
@@ -777,6 +817,10 @@ onBeforeUnmount(() => {
   padding: 1rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
+
+.text-emerald-400 { transition: color 0.4s, transform 0.4s; }
+.text-emerald-400:hover { transform: scale(1.05); }
+
 
 .chart-wrap {
   position: relative;
