@@ -20,5 +20,9 @@ export function useMuse() {
       params: { bandId, range },
     });
 
-  return { getRollups, getGeo, getTransitions };
+
+    const getMuseSummary = (bandId: number, range = '7d') =>
+  client('/muse/aggregate', { params: { bandId, range } })
+
+  return { getRollups, getGeo, getTransitions, getMuseSummary  };
 }

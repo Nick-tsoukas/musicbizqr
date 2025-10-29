@@ -19,6 +19,47 @@
       <div v-else class="text-gray-400 text-sm">No insights yet.</div>
     </div>
 
+    <!-- Muse Summary (Phase 2 aggregate) -->
+<div class="chart-card mb-6">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-white text-lg font-semibold">Muse Summary</h3>
+    <span class="text-gray-400 text-xs">Last {{ museRangeLabel }}</span>
+  </div>
+
+  <div v-if="museSummaryLoading" class="text-gray-400 text-sm">Loading summary…</div>
+
+  <div v-else-if="museSummary">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div class="bg-neutral-900 rounded-lg p-3">
+        <p class="text-gray-400 text-xs">Page Views</p>
+        <p class="text-2xl font-semibold text-white">{{ museSummary.pageViews }}</p>
+      </div>
+      <div class="bg-neutral-900 rounded-lg p-3">
+        <p class="text-gray-400 text-xs">Link Clicks</p>
+        <p class="text-2xl font-semibold text-white">{{ museSummary.linkClicks }}</p>
+      </div>
+      <div class="bg-neutral-900 rounded-lg p-3">
+        <p class="text-gray-400 text-xs">Song Plays</p>
+        <p class="text-2xl font-semibold text-white">{{ museSummary.songPlays }}</p>
+      </div>
+      <div class="bg-neutral-900 rounded-lg p-3">
+        <p class="text-gray-400 text-xs">Video Plays</p>
+        <p class="text-2xl font-semibold text-white">{{ museSummary.videoPlays }}</p>
+      </div>
+    </div>
+
+    <p class="text-gray-300 text-sm">
+      Growth: <span class="text-pink-400 font-bold">{{ museSummary.growthPct }}%</span>  
+      • Top City: <span class="font-semibold">{{ museSummary.topCity || 'N/A' }}</span>  
+      • Source: <span class="font-semibold">{{ museSummary.topSource || 'N/A' }}</span>  
+      • Platform: <span class="font-semibold">{{ museSummary.topPlatform || 'N/A' }}</span>
+    </p>
+  </div>
+
+  <div v-else class="text-gray-400 text-sm">No summary data yet.</div>
+</div>
+
+
     <!-- Tabs -->
     <div class="flex gap-2 mb-4">
       <button
@@ -242,6 +283,40 @@ const museLoading = ref(false)
 const museError = ref<any>(null)
 
 const latestMuse = computed(() => museRows.value?.[0]?.attributes || null)
+
+const { getMuseSummary } = useMuse()
+const museSummary = ref<any|null>(null)
+const museSummaryLoading = ref(false)
+const museRange = ref('7d')
+
+const museRangeLabel = computed(() =>
+  museRange.value === '7d' ? '7 Days'
+  : museRange.value === '30d' ? '30 Days'
+  : museRange.value === '365d' ? '1 Year'
+  : museRange.value
+)
+
+async function fetchMuseSummary() {
+  museSummaryLoading.value = true
+  try {
+    const bandId = Number(route.params.id)
+    console.log('[Muse] Fetching summary for band:', bandId, 'range:', museRange.value)
+
+    const res = await getMuseSummary(bandId, museRange.value)
+    console.log('[Muse] Raw response:', res)
+
+    museSummary.value = res?.summary || null
+    console.log('[Muse] Parsed summary:', museSummary.value)
+  } catch (err) {
+    console.error('[Muse] Error fetching summary:', err)
+  } finally {
+    museSummaryLoading.value = false
+  }
+}
+
+
+onMounted(fetchMuseSummary)
+
 
 const insightBullets = computed(() => {
   const m = latestMuse.value
