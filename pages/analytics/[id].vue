@@ -6,9 +6,9 @@
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-white text-lg font-semibold">Insights (Muse)</h3>
-        <span v-if="latestMuse" class="text-gray-400 text-xs">
-          {{ humanDayLabel(latestMuse.date) }}
-        </span>
+        <span class="text-gray-400 text-xs">
+  {{ humanDayLabel(museDisplayDate) }}
+</span>
       </div>
 
       <div v-if="museLoading" class="text-gray-300 text-sm">Analyzing…</div>
@@ -656,7 +656,36 @@ watch(
 )
 
 /* ---------- Insight bullets (top box) ---------- */
+const serverMuse = computed(() => rollups.value?.muse || null)
+
+const museDisplayDate = computed(() => {
+  // 1) prefer rollups → latest day in series
+  const s = rollups.value?.series
+  if (Array.isArray(s) && s.length) {
+    const last = s[s.length - 1]
+    if (last?.date) return last.date
+  }
+
+  // 2) fallback to stored muse
+  const m = latestMuse.value
+  if (m?.date) return m.date
+
+  // 3) fallback to today
+  return fmt(new Date(), 'yyyy-MM-dd')
+})
+
 const insightBullets = computed(() => {
+  // 1) prefer live server muse (today)
+  const serverList = serverMuse.value?.insights
+  if (Array.isArray(serverList) && serverList.length) {
+    // hard cap to 3 for UX
+    return serverList
+      .slice(0, 3)
+      .map((i: any) => i?.title)
+      .filter(Boolean)
+  }
+
+  // 2) fallback to stored /band-insights-daily
   const m = latestMuse.value
   if (!m) return []
   const out: string[] = []
@@ -666,27 +695,10 @@ const insightBullets = computed(() => {
   else if (g < 0) out.push(`Traffic fell ${Math.abs(g)}% vs. yesterday.`)
   else out.push(`Traffic is flat vs. yesterday.`)
 
-  const topCity = Array.isArray(m.topCities) && m.topCities[0]?.[0] ? m.topCities[0][0] : null
-  if (topCity) out.push(`Most visits came from ${topCity || 'Unknown'}.`)
-  else out.push(`No location data yet.`)
-
-  const clicks = m.linkClicks || 0
-  const songs = m.songPlays || 0
-  const vids = m.videoPlays || 0
-  const qr = m.qrScans || 0
-  if (clicks > 0 || songs > 0 || vids > 0 || qr > 0) {
-    const parts: string[] = []
-    if (clicks) parts.push(`${clicks} link ${clicks === 1 ? 'click' : 'clicks'}`)
-    if (songs) parts.push(`${songs} song ${songs === 1 ? 'play' : 'plays'}`)
-    if (vids) parts.push(`${vids} video ${vids === 1 ? 'play' : 'plays'}`)
-    if (qr) parts.push(`${qr} QR ${qr === 1 ? 'scan' : 'scans'}`)
-    out.push(`Engagement: ${parts.join(', ')}.`)
-  } else {
-    out.push(`No downstream engagement yet (links/songs/videos/qr).`)
-  }
-
-  return out
+  return out.slice(0, 3)
 })
+
+
 
 /* ---------- Chart.js: client-only lazy load ---------- */
 let ChartJs: any = null
