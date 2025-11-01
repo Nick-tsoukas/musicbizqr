@@ -19,86 +19,113 @@
       <div v-else class="text-gray-400 text-sm">No insights yet.</div>
     </div>
 
-<!-- Muse Summary (Phase 2.5 aggregate) -->
-<div class="chart-card mb-6">
-  <div class="flex items-center justify-between mb-2">
-    <h3 class="text-white text-lg font-semibold">Muse Summary</h3>
-    <span class="text-gray-400 text-xs">Last {{ museRangeLabel }}</span>
-  </div>
-
-  <div v-if="museSummaryLoading" class="text-gray-400 text-sm">Loading summary…</div>
-
-  <div v-else-if="museSummary">
-    <!-- Metric grid -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-      <div class="bg-neutral-900 rounded-lg p-3">
-        <p class="text-gray-400 text-xs">Page Views</p>
-        <p class="text-2xl font-semibold text-white">{{ museSummary.pageViews }}</p>
-        <p
-          v-if="museSummary.prevComparison !== undefined"
-          :class="[
-            'text-xs font-medium',
-            museSummary.prevComparison > 0
-              ? 'text-emerald-400'
-              : museSummary.prevComparison < 0
-              ? 'text-red-400'
-              : 'text-gray-400'
-          ]"
-        >
-          {{ museSummary.prevComparison > 0 ? '+' : '' }}{{ museSummary.prevComparison }} % vs prev
-        </p>
+    <!-- Muse Summary (derived from rollups) -->
+    <div class="chart-card mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-white text-lg font-semibold">Muse Summary</h3>
+        <span class="text-gray-400 text-xs">Last {{ museRangeLabel }}</span>
       </div>
 
-      <div class="bg-neutral-900 rounded-lg p-3">
-        <p class="text-gray-400 text-xs">Link Clicks</p>
-        <p class="text-2xl font-semibold text-white">{{ museSummary.linkClicks }}</p>
+      <div v-if="!liveMuseSummary" class="text-gray-400 text-sm">
+        No summary data yet.
       </div>
 
-      <div class="bg-neutral-900 rounded-lg p-3">
-        <p class="text-gray-400 text-xs">Song Plays</p>
-        <p class="text-2xl font-semibold text-white">{{ museSummary.songPlays }}</p>
-      </div>
+      <div v-else>
+        <!-- Metric grid -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+          <!-- Page Views -->
+          <div class="bg-neutral-900 rounded-lg p-3">
+            <p class="text-gray-400 text-xs">Page Views</p>
+            <p class="text-2xl font-semibold text-white">
+              {{ liveMuseSummary.pageViews ?? 0 }}
+            </p>
+            <p
+              :class="[
+                'text-xs font-medium',
+                liveMuseSummary.growthPct > 0
+                  ? 'text-emerald-400'
+                  : liveMuseSummary.growthPct < 0
+                    ? 'text-red-400'
+                    : 'text-gray-400'
+              ]"
+            >
+              {{ liveMuseSummary.growthPct > 0 ? '+' : '' }}{{ liveMuseSummary.growthPct ?? 0 }}% vs last day
+            </p>
+          </div>
 
-      <div class="bg-neutral-900 rounded-lg p-3">
-        <p class="text-gray-400 text-xs">Video Plays</p>
-        <p class="text-2xl font-semibold text-white">{{ museSummary.videoPlays }}</p>
-      </div>
+          <!-- Link Clicks -->
+          <div class="bg-neutral-900 rounded-lg p-3">
+            <p class="text-gray-400 text-xs">Link Clicks</p>
+            <p class="text-2xl font-semibold text-white">
+              {{ liveMuseSummary.linkClicks ?? 0 }}
+            </p>
+          </div>
 
-      <div class="bg-neutral-900 rounded-lg p-3">
-        <p class="text-gray-400 text-xs">Engagement Rate</p>
-        <p class="text-2xl font-semibold text-white">
-          {{ museSummary.engagementRate }}%
-        </p>
+          <!-- Song Plays -->
+          <div class="bg-neutral-900 rounded-lg p-3">
+            <p class="text-gray-400 text-xs">Song Plays</p>
+            <p class="text-2xl font-semibold text-white">
+              {{ liveMuseSummary.songPlays ?? 0 }}
+            </p>
+          </div>
+
+          <!-- Video Plays -->
+          <div class="bg-neutral-900 rounded-lg p-3">
+            <p class="text-gray-400 text-xs">Video Plays</p>
+            <p class="text-2xl font-semibold text-white">
+              {{ liveMuseSummary.videoPlays ?? 0 }}
+            </p>
+          </div>
+
+          <!-- Engagement -->
+          <div class="bg-neutral-900 rounded-lg p-3">
+            <p class="text-gray-400 text-xs">Engagement Rate</p>
+            <p class="text-2xl font-semibold text-white">
+              {{ liveMuseSummary.engagementRate ?? 0 }}%
+            </p>
+          </div>
+        </div>
+
+        <!-- Top lists -->
+        <div class="grid sm:grid-cols-3 gap-3 text-gray-300 text-sm">
+          <!-- Top Cities -->
+          <div>
+            <p class="font-semibold text-white mb-1">Top Cities:</p>
+            <p>
+              {{
+                (liveMuseSummary.topCities && liveMuseSummary.topCities.length)
+                  ? liveMuseSummary.topCities.map(c => c[0]).join(', ')
+                  : 'N/A'
+              }}
+            </p>
+          </div>
+
+          <!-- Top Sources -->
+          <div>
+            <p class="font-semibold text-white mb-1">Top Sources:</p>
+            <p>
+              {{
+                (liveMuseSummary.topSources && liveMuseSummary.topSources.length)
+                  ? liveMuseSummary.topSources.map(s => s[0]).join(', ')
+                  : 'N/A'
+              }}
+            </p>
+          </div>
+
+          <!-- Top Platforms -->
+          <div>
+            <p class="font-semibold text-white mb-1">Top Platforms:</p>
+            <p>
+              {{
+                (liveMuseSummary.topPlatforms && liveMuseSummary.topPlatforms.length)
+                  ? liveMuseSummary.topPlatforms.map(p => p[0]).join(', ')
+                  : 'N/A'
+              }}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Highlights -->
-    <p class="text-gray-300 text-sm mb-2">
-      Growth:
-      <span class="text-pink-400 font-bold">{{ museSummary.growthPct }}%</span>
-    </p>
-
-    <!-- Top lists -->
-    <div class="grid sm:grid-cols-3 gap-3 text-gray-300 text-sm">
-      <div>
-        <span class="font-semibold text-white">Top Cities:</span><br />
-        <span>{{ (museSummary.topCities || []).map(c => c[0]).join(', ') || 'N/A' }}</span>
-      </div>
-      <div>
-        <span class="font-semibold text-white">Top Sources:</span><br />
-        <span>{{ (museSummary.topSources || []).map(s => s[0]).join(', ') || 'N/A' }}</span>
-      </div>
-      <div>
-        <span class="font-semibold text-white">Top Platforms:</span><br />
-        <span>{{ (museSummary.topPlatforms || []).map(p => p[0]).join(', ') || 'N/A' }}</span>
-      </div>
-    </div>
-  </div>
-
-  <div v-else class="text-gray-400 text-sm">No summary data yet.</div>
-</div>
-
-
 
     <!-- Tabs -->
     <div class="flex gap-2 mb-4">
@@ -136,23 +163,36 @@
       <input type="date" v-model="selectedDate" class="bg-gray-800 text-white rounded px-2 py-1" />
     </div>
 
-    <div v-if="isLoading" class="text-white">🔄 Loading data…</div>
+  <!-- only for first load -->
+<div v-if="isInitialLoading" class="text-white">🔄 Loading data…</div>
 
-    <div v-else class="space-y-6">
-      <!-- Page Views / Clicks / Plays -->
-      <div class="chart-card">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">Page Views</h3>
-          <span class="text-gray-400 text-xs">
-            {{ selectedRange === 1 ? humanDayLabel(selectedDate) : `Last ${selectedRange} days` }}
-          </span>
-        </div>
-        <div class="chart-wrap ratio-16x9">
-          <ClientOnly>
-            <canvas ref="viewsCanvas" class="chart-canvas" />
-          </ClientOnly>
-        </div>
-      </div>
+<!-- after first load, never collapse -->
+<div v-else class="space-y-6">
+  <!-- Page Views / Clicks / Plays -->
+  <div class="chart-card relative">
+    <!-- small overlay while refreshing (range change) -->
+    <div
+      v-if="isRefreshing"
+      class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg"
+    >
+      <span class="text-gray-200 text-sm">Refreshing…</span>
+    </div>
+
+    <div class="flex items-center justify-between mb-2">
+     <h3 class="text-white text-lg font-semibold">{{ chartTitle }}</h3>
+
+      <span class="text-gray-400 text-xs">
+        {{ selectedRange === 1 ? humanDayLabel(selectedDate) : `Last ${selectedRange} days` }}
+      </span>
+    </div>
+    <div class="chart-wrap ratio-16x9">
+      <ClientOnly>
+        <canvas ref="viewsCanvas" class="chart-canvas" />
+      </ClientOnly>
+    </div>
+  </div>
+
+
 
       <!-- Link Clicks: Top Platforms (from server rollups) -->
       <div v-if="selectedTab === 'Link Clicks'" class="chart-card">
@@ -302,7 +342,6 @@
           </ClientOnly>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -310,86 +349,20 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick, onBeforeUnmount, computed } from 'vue'
 import { useRoute, useStrapiClient } from '#imports'
-import { format as fmt, parseISO, isValid, subDays, getHours } from 'date-fns'
+import { format as fmt, parseISO, isValid, getHours } from 'date-fns'
 import qs from 'qs'
 
 /* ---------- Strapi client / route ---------- */
 const client = useStrapiClient()
 const route = useRoute()
 
-/* ---------- Muse (daily insights) ---------- */
+/* ---------- Muse (daily insights list — the top “Insights (Muse)” box) ---------- */
 const museRows = ref<any[]>([])
 const museLoading = ref(false)
 const museError = ref<any>(null)
-
 const latestMuse = computed(() => museRows.value?.[0]?.attributes || null)
 
-const { getMuseSummary } = useMuse()
-const museSummary = ref<any|null>(null)
-const museSummaryLoading = ref(false)
-const museRange = ref('7d')
-
-const museRangeLabel = computed(() =>
-  museRange.value === '7d' ? '7 Days'
-  : museRange.value === '30d' ? '30 Days'
-  : museRange.value === '365d' ? '1 Year'
-  : museRange.value
-)
-
-async function fetchMuseSummary() {
-  museSummaryLoading.value = true
-  try {
-    const bandId = Number(route.params.id)
-    console.log('[Muse] Fetching summary for band:', bandId, 'range:', museRange.value)
-
-    const res = await getMuseSummary(bandId, museRange.value)
-    console.log('[Muse] Raw response:', res)
-
-    museSummary.value = res?.summary || null
-    console.log('[Muse] Parsed summary:', museSummary.value)
-  } catch (err) {
-    console.error('[Muse] Error fetching summary:', err)
-  } finally {
-    museSummaryLoading.value = false
-  }
-}
-
-
-onMounted(fetchMuseSummary)
-
-
-const insightBullets = computed(() => {
-  const m = latestMuse.value
-  if (!m) return []
-  const out: string[] = []
-
-  const g = Math.round((m.growthPct || 0) * 10) / 10
-  if (g > 0) out.push(`Traffic grew ${g}% vs. yesterday.`)
-  else if (g < 0) out.push(`Traffic fell ${Math.abs(g)}% vs. yesterday.`)
-  else out.push(`Traffic is flat vs. yesterday.`)
-
-  const topCity = Array.isArray(m.topCities) && m.topCities[0]?.[0] ? m.topCities[0][0] : null
-  if (topCity) out.push(`Most visits came from ${topCity || 'Unknown'}.`)
-  else out.push(`No location data yet.`)
-
-  const clicks = m.linkClicks || 0
-  const songs  = m.songPlays  || 0
-  const vids   = m.videoPlays || 0
-  if (clicks > 0 || songs > 0 || vids > 0) {
-    const parts:string[] = []
-    if (clicks) parts.push(`${clicks} link ${clicks === 1 ? 'click' : 'clicks'}`)
-    if (songs)  parts.push(`${songs} song ${songs === 1 ? 'play' : 'plays'}`)
-    if (vids)   parts.push(`${vids} video ${vids === 1 ? 'play' : 'plays'}`)
-    out.push(`Engagement: ${parts.join(', ')}.`)
-  } else {
-    out.push(`No downstream engagement yet (links/songs/videos).`)
-  }
-
-  return out
-})
-
-/* ---------- Muse/Analytics composable ---------- */
-// Auto-imported in Nuxt 3 if file is /composables/useMuse.ts
+/* ---------- Analytics composable (rollups, geo, transitions) ---------- */
 const { getRollups, getGeo, getTransitions } = useMuse()
 
 /* ---------- UI state ---------- */
@@ -406,16 +379,17 @@ const selectedRange = ref<number>(30)
 const selectedDate = ref(fmt(new Date(), 'yyyy-MM-dd'))
 
 /* ---------- server rollup state ---------- */
-const rollups = ref<any|null>(null)
-const geo = ref<any|null>(null)
-const transitions = ref<any|null>(null)
+const rollups = ref<any | null>(null)
+const geo = ref<any | null>(null)
+const transitions = ref<any | null>(null)
 
-/* ---------- raw events (only used for hourly chart) ---------- */
+/* ---------- raw events (only used for hourly chart + daily muse split) ---------- */
 const rawPageViews = ref<any[]>([])
 const rawLinkClicks = ref<any[]>([])
 const rawMediaPlays = ref<any[]>([])
 
-const isLoading = ref(true)
+const isInitialLoading = ref(true)
+const isRefreshing = ref(false)
 
 /* ---------- canvases / chart handles ---------- */
 const viewsCanvas = ref<HTMLCanvasElement | null>(null)
@@ -429,46 +403,285 @@ function humanDayLabel(yyyy_mm_dd: string) {
   const d = parseISO(`${yyyy_mm_dd}T00:00:00`)
   return isValid(d) ? fmt(d, 'EEE, MMM d') : ''
 }
-function fmtHour12(ts: string) {
-  const d = parseISO(ts)
-  return isValid(d) ? fmt(d, 'h a') : ''
-}
 
 /* ---------- computed from server rollups ---------- */
-const totalViewsInRange   = computed(() => rollups.value?.totals?.views  ?? 0)
-const totalClicksInRange  = computed(() => rollups.value?.totals?.clicks ?? 0)
+const totalViewsInRange = computed(() => rollups.value?.totals?.views ?? 0)
+const totalClicksInRange = computed(() => rollups.value?.totals?.clicks ?? 0)
 
-const sourceCounts   = computed<[string, number][]>(() => rollups.value?.sources    ?? [])
-const mediumCounts   = computed<[string, number][]>(() => rollups.value?.mediums    ?? [])
-const topRefDomains  = computed<[string, number][]>(() => rollups.value?.refDomains ?? [])
+const sourceCounts = computed<[string, number][]>(() => rollups.value?.sources ?? [])
+const mediumCounts = computed<[string, number][]>(() => rollups.value?.mediums ?? [])
+const topRefDomains = computed<[string, number][]>(() => rollups.value?.refDomains ?? [])
 const topClickPlatforms = computed<[string, number][]>(() => rollups.value?.platforms ?? [])
 
+/* ---------- Top cities (from /analytics/geo) ---------- */
 const topCities = computed<[string, number][]>(() => {
   const list = geo.value?.list ?? []
-  return list.map((r:any) => [r.city || 'Unknown', r.count]) as [string, number][]
+  return list.map((r: any) => [r.city || 'Unknown', r.count]) as [string, number][]
 })
 
 /* ---------- devices (from rollups) ---------- */
 const deviceLegend = [
   { key: 'desktop', label: 'Desktop', color: '#8B5CF6' },
-  { key: 'mobile',  label: 'Mobile',  color: '#10B981' },
-  { key: 'tablet',  label: 'Tablet',  color: '#F59E0B' },
-  { key: 'bot',     label: 'Bot',     color: '#6B7280' },
+  { key: 'mobile', label: 'Mobile', color: '#10B981' },
+  { key: 'tablet', label: 'Tablet', color: '#F59E0B' },
+  { key: 'bot', label: 'Bot', color: '#6B7280' },
   { key: 'unknown', label: 'Unknown', color: '#9CA3AF' }
 ] as const
 
-const deviceCounts = computed(() => rollups.value?.devices ?? { desktop:0, mobile:0, tablet:0, bot:0, unknown:0 })
+const deviceCounts = computed(
+  () => rollups.value?.devices ?? { desktop: 0, mobile: 0, tablet: 0, bot: 0, unknown: 0 }
+)
 const totalDeviceViews = computed(() =>
-  Object.values(deviceCounts.value).reduce((a:any, b:any) => a + (Number.isFinite(b) ? b : 0), 0)
+  Object.values(deviceCounts.value).reduce(
+    (a: any, b: any) => a + (Number.isFinite(b) ? b : 0),
+    0
+  )
 )
 const deviceBreakdown = computed(() => {
-  const counts:any = deviceCounts.value
+  const counts: any = deviceCounts.value
   const total = totalDeviceViews.value || 1
   return deviceLegend.map((x) => ({
     ...x,
     count: counts[x.key] || 0,
     pct: Math.round(((counts[x.key] || 0) / total) * 1000) / 10
   }))
+})
+
+/* ---------- Muse range label (for the card) ---------- */
+const museRangeLabel = computed(() => {
+  if (selectedRange.value === 7) return 'Last 7 Days'
+  if (selectedRange.value === 30) return 'Last 30 Days'
+  if (selectedRange.value === 365) return 'Last 1 Year'
+  if (selectedRange.value === 1) return 'Today'
+  return `Last ${selectedRange.value} Days`
+})
+
+const chartTitle = computed(() => {
+  // selectedTab: 'Page Views' | 'Link Clicks' | 'Songs' | 'Videos'
+  if (selectedRange.value === 1) {
+    // daily / hourly view
+    if (selectedTab.value === 'Page Views') return 'Page Views (Hourly)'
+    if (selectedTab.value === 'Link Clicks') return 'Link Clicks (Hourly)'
+    if (selectedTab.value === 'Songs') return 'Song Plays (Hourly)'
+    if (selectedTab.value === 'Videos') return 'Video Plays (Hourly)'
+  } else {
+    // 7 / 30 / 365
+    if (selectedTab.value === 'Page Views') return `Page Views (Last ${selectedRange.value} Days)`
+    if (selectedTab.value === 'Link Clicks') return `Link Clicks (Last ${selectedRange.value} Days)`
+    if (selectedTab.value === 'Songs') return `Song Plays (Last ${selectedRange.value} Days)`
+    if (selectedTab.value === 'Videos') return `Video Plays (Last ${selectedRange.value} Days)`
+  }
+  return 'Analytics'
+})
+
+
+/* ---------------- helper: count songs/videos from RAW media (STRICT) ---------------- */
+function countMediaFromRaw(rows: any[], yyyymmdd: string) {
+  let songs = 0
+  let videos = 0
+
+  for (const r of rows) {
+    const a = r?.attributes || r || {}
+    const ts = a.timestamp || a.createdAt || a.updatedAt
+    if (!ts) continue
+
+    // make sure it's REALLY the selected day
+    const d = parseISO(ts)
+    if (!isValid(d)) continue
+    const day = fmt(d, 'yyyy-MM-dd')
+    if (day !== yyyymmdd) continue
+
+    const kind = String(a.kind || a.mediaType || a.type || '').toLowerCase().trim()
+
+    const isSong =
+      kind.includes('song') ||
+      kind.includes('audio') ||
+      kind.includes('spotify') ||
+      kind.includes('apple') ||
+      kind.includes('music') ||
+      kind.includes('soundcloud')
+
+    const isVideo =
+      kind.includes('video') ||
+      kind.includes('youtube') ||
+      kind.includes('vimeo') ||
+      kind.includes('tiktok')
+
+    if (isSong) {
+      songs++
+    } else if (isVideo) {
+      videos++
+    } else {
+      // unknown → ignore
+    }
+  }
+
+  return { songs, videos }
+}
+
+/* ---------------- core media splitter (with big debugs) ---------------- */
+function deriveSongVideoSplit(opts: {
+  selectedRange: number
+  rollups: any
+  transitions: any
+  rawMediaPlays: any[]
+  selectedDate: string
+}) {
+  const { selectedRange, rollups, transitions, rawMediaPlays, selectedDate } = opts
+
+  const totals = rollups?.totals || {}
+  const totalPlays = totals.plays ?? 0
+  const totalSongPlays = totals.songPlays ?? 0
+  const totalVideoPlays = totals.videoPlays ?? 0
+
+  // 1) DAILY → trust RAW first (because you actually fetched it)
+  if (selectedRange === 1) {
+    const fromRaw = countMediaFromRaw(rawMediaPlays, selectedDate)
+    if (fromRaw.songs > 0 || fromRaw.videos > 0) {
+      return {
+        songPlays: fromRaw.songs,
+        videoPlays: fromRaw.videos,
+        source: 'raw-daily'
+      }
+    }
+
+    // daily fallback → use backend totals (they will usually be right now)
+    return {
+      songPlays: totalSongPlays,
+      videoPlays: totalVideoPlays,
+      source: 'rollups-daily-fallback'
+    }
+  }
+
+  // 2) NON-DAILY → FIRST: trust backend totals (we fixed the controller for this)
+  if (typeof totalSongPlays === 'number' || typeof totalVideoPlays === 'number') {
+    return {
+      songPlays: totalSongPlays,
+      videoPlays: totalVideoPlays,
+      source: 'rollups-range'
+    }
+  }
+
+  // 3) NON-DAILY → THEN: if transitions ever starts sending media, we can use it
+  const tMedia = transitions?.media
+  if (tMedia && (typeof tMedia.songs === 'number' || typeof tMedia.videos === 'number')) {
+    return {
+      songPlays: tMedia.songs ?? 0,
+      videoPlays: tMedia.videos ?? 0,
+      source: 'transitions-range'
+    }
+  }
+
+  // 4) last fallback: don't lie — keep it as plays, 0 videos
+  return {
+    songPlays: totalPlays,
+    videoPlays: 0,
+    source: 'range-last-fallback'
+  }
+}
+
+
+/* ============================================================================
+   OPTION A (fixed): build Muse summary from rollups + transitions + raw
+============================================================================ */
+const liveMuseSummary = computed(() => {
+  const r = rollups.value
+  if (!r) return null
+
+  const views = r.totals?.views ?? 0
+  const clicks = r.totals?.clicks ?? 0
+  const plays = r.totals?.plays ?? 0
+
+  const split = deriveSongVideoSplit({
+    selectedRange: selectedRange.value,
+    rollups: r,
+    transitions: transitions.value,
+    rawMediaPlays: rawMediaPlays.value,
+    selectedDate: selectedDate.value
+  })
+
+  const engagementRate =
+    views > 0 ? Math.round(((clicks + plays) / views) * 1000) / 10 : 0
+
+  // growth
+  const series = Array.isArray(r.series) ? r.series : []
+  let growthPct = 0
+  if (series.length >= 2) {
+    const last = series[series.length - 1]?.views || 0
+    const prev = series[series.length - 2]?.views || 0
+    if (prev > 0) {
+      growthPct = Math.round(((last - prev) / prev) * 1000) / 10
+    } else if (last > 0) {
+      growthPct = 100
+    }
+  }
+
+  const topCities = Array.isArray(geo.value?.list)
+    ? geo.value!.list.map((r: any) => [r.city || 'unknown', r.count]).slice(0, 3)
+    : []
+
+  const topSources = Array.isArray(r.sources) ? r.sources.slice(0, 3) : []
+  const topPlatforms = Array.isArray(r.platforms) ? r.platforms.slice(0, 3) : []
+
+  const summary = {
+    pageViews: views,
+    linkClicks: clicks,
+    songPlays: split.songPlays,
+    videoPlays: split.videoPlays,
+    engagementRate,
+    growthPct,
+    prevComparison: 0,
+    topCities,
+    topSources,
+    topPlatforms,
+    days: selectedRange.value,
+    mediaSource: split.source
+  }
+
+  console.log('[muse] liveMuseSummary →', summary)
+  return summary
+})
+
+// when <canvas> actually mounts inside <ClientOnly>, render the chart
+watch(
+  () => viewsCanvas.value,
+  async (canvas) => {
+    if (!canvas) return
+    await ensureChart()
+    renderViewsChart()
+    renderDeviceDoughnut()
+  }
+)
+
+/* ---------- Insight bullets (top box) ---------- */
+const insightBullets = computed(() => {
+  const m = latestMuse.value
+  if (!m) return []
+  const out: string[] = []
+
+  const g = Math.round((m.growthPct || 0) * 10) / 10
+  if (g > 0) out.push(`Traffic grew ${g}% vs. yesterday.`)
+  else if (g < 0) out.push(`Traffic fell ${Math.abs(g)}% vs. yesterday.`)
+  else out.push(`Traffic is flat vs. yesterday.`)
+
+  const topCity = Array.isArray(m.topCities) && m.topCities[0]?.[0] ? m.topCities[0][0] : null
+  if (topCity) out.push(`Most visits came from ${topCity || 'Unknown'}.`)
+  else out.push(`No location data yet.`)
+
+  const clicks = m.linkClicks || 0
+  const songs = m.songPlays || 0
+  const vids = m.videoPlays || 0
+  if (clicks > 0 || songs > 0 || vids > 0) {
+    const parts: string[] = []
+    if (clicks) parts.push(`${clicks} link ${clicks === 1 ? 'click' : 'clicks'}`)
+    if (songs) parts.push(`${songs} song ${songs === 1 ? 'play' : 'plays'}`)
+    if (vids) parts.push(`${vids} video ${vids === 1 ? 'play' : 'plays'}`)
+    out.push(`Engagement: ${parts.join(', ')}.`)
+  } else {
+    out.push(`No downstream engagement yet (links/songs/videos).`)
+  }
+
+  return out
 })
 
 /* ---------- Chart.js: client-only lazy load ---------- */
@@ -487,7 +700,7 @@ function tsOf(row: any): string | null {
   return a.timestamp || a.createdAt || a.updatedAt || null
 }
 
-/* ---------- fetch Muse daily insights ---------- */
+/* ---------- fetch Muse daily insights (for the “Insights (Muse)” list) ---------- */
 async function fetchMuse() {
   const bandId = Number(route.params.id)
   const query = qs.stringify(
@@ -505,7 +718,7 @@ async function fetchMuse() {
   try {
     const res = await client(url)
     museRows.value = res?.data ?? []
-  } catch (e:any) {
+  } catch (e: any) {
     museError.value = e?.response?._data || e
   } finally {
     museLoading.value = false
@@ -513,36 +726,51 @@ async function fetchMuse() {
 }
 
 /* ---------- fetch rollups + (raw if hourly) ---------- */
-async function fetchAndRender() {
-  isLoading.value = true
+async function fetchAndRender(silent = false) {
+  if (silent) {
+    isRefreshing.value = true
+  } else {
+    isInitialLoading.value = true
+  }
+
   const bandId = Number(route.params.id)
   const rangeKey = `${selectedRange.value}d`
 
-  // 1) server aggregations
+  console.log('[analytics] fetching rollups for', { bandId, rangeKey })
+
   const [r, g, t] = await Promise.all([
     getRollups(bandId, rangeKey),
     getGeo(bandId, rangeKey),
-    getTransitions(bandId, rangeKey),
+    getTransitions(bandId, rangeKey)
   ])
+
   rollups.value = r
   geo.value = g
   transitions.value = t
 
-  // 2) only fetch raw if we need hourly chart
+  // daily raw fetch
   if (selectedRange.value === 1) {
     const [viewsRes, clicksRes, mediaRes] = await Promise.all([
       client('/band-page-views', {
-        params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'], pagination: { limit: 500 } }
+        params: {
+          filters: { band: { id: route.params.id } },
+          sort: ['timestamp:desc'],
+          pagination: { limit: 500 }
+        }
       }),
       client(`/link-clicks/band/${route.params.id}`),
       client(`/media-plays/band/${route.params.id}`).catch(() =>
         client('/media-plays', {
-          params: { filters: { band: { id: route.params.id } }, sort: ['timestamp:desc'], pagination: { limit: 500 } }
+          params: {
+            filters: { band: { id: route.params.id } },
+            sort: ['timestamp:desc'],
+            pagination: { limit: 500 }
+          }
         })
       )
     ])
 
-    const toArray = (res:any) => {
+    const toArray = (res: any) => {
       if (!res) return []
       if (Array.isArray(res)) return res
       if (Array.isArray(res.data)) return res.data
@@ -551,21 +779,28 @@ async function fetchAndRender() {
       return []
     }
 
-    const unifyMedia = (rows:any[]) =>
+    const unifyMedia = (rows: any[]) =>
       rows.map((r) => {
         const a = r?.attributes || r || {}
         return {
           id: r?.id ?? a?.id,
           attributes: {
             ...a,
-            timestamp: a.timestamp || a.createdAt || a.updatedAt || r?.timestamp || r?.createdAt || r?.updatedAt || null,
+            timestamp:
+              a.timestamp ||
+              a.createdAt ||
+              a.updatedAt ||
+              r?.timestamp ||
+              r?.createdAt ||
+              r?.updatedAt ||
+              null,
             kind: String(a.kind ?? a.type ?? a.mediaType ?? '').toLowerCase(),
             title: a.title ?? r?.title ?? ''
           }
         }
       })
 
-    const unifyClicks = (rows:any[]) =>
+    const unifyClicks = (rows: any[]) =>
       rows.map((r) => {
         const a = r?.attributes || r || {}
         return {
@@ -573,13 +808,20 @@ async function fetchAndRender() {
           attributes: {
             ...a,
             timestamp: a.timestamp || a.createdAt || r?.timestamp || r?.createdAt || null,
-            platform: a.platform ?? a.provider ?? a.source ?? r?.platform ?? r?.provider ?? r?.source ?? '',
+            platform:
+              a.platform ??
+              a.provider ??
+              a.source ??
+              r?.platform ??
+              r?.provider ??
+              r?.source ??
+              '',
             url: a.url ?? r?.url ?? ''
           }
         }
       })
 
-    rawPageViews.value  = toArray(viewsRes)
+    rawPageViews.value = toArray(viewsRes)
     rawLinkClicks.value = unifyClicks(toArray(clicksRes))
     rawMediaPlays.value = unifyMedia(toArray(mediaRes))
   } else {
@@ -588,13 +830,19 @@ async function fetchAndRender() {
     rawMediaPlays.value = []
   }
 
-  isLoading.value = false
-
   await ensureChart()
   await nextTick()
   renderViewsChart()
   renderDeviceDoughnut()
+
+ // ✅ only now say "initial load is done"
+if (!silent) {
+  isInitialLoading.value = false
+} else {
+  isRefreshing.value = false
 }
+}
+
 
 /* ---------- HiDPI canvas ---------- */
 function prepHiDPICanvas(canvas: HTMLCanvasElement) {
@@ -619,32 +867,54 @@ function renderViewsChart() {
   let chartType: 'bar' | 'line' = 'bar'
   let title = ''
 
-  // Hourly (Daily range) — use raw events
   if (selectedRange.value === 1) {
-    let rows:any[] = []
-    if (selectedTab.value === 'Page Views') rows = rawPageViews.value
-    else if (selectedTab.value === 'Link Clicks') rows = rawLinkClicks.value
-    else rows = rawMediaPlays.value
-
-    const iter = (fn: (d: Date, k?: string) => void) => {
-      for (const v of rows) {
-        const a = v?.attributes || v || {}
-        const ts = tsOf(v)
-        if (!ts) continue
-        const d = parseISO(ts)
-        if (!isValid(d)) continue
-        fn(d, a?.kind)
-      }
+    // DAILY / HOURLY
+    let rows: any[] = []
+    if (selectedTab.value === 'Page Views') {
+      rows = rawPageViews.value
+    } else if (selectedTab.value === 'Link Clicks') {
+      rows = rawLinkClicks.value
+    } else {
+      // Songs OR Videos → work off media, but filter by kind
+      rows = rawMediaPlays.value
     }
 
     const hours = Array.from({ length: 24 }, (_, i) => i)
     const counts: Record<number, number> = Object.fromEntries(hours.map((h) => [h, 0]))
     const dayISO = selectedDate.value
 
-    iter((d) => {
-      if (fmt(d, 'yyyy-MM-dd') !== dayISO) return
+    for (const v of rows) {
+      const ts = tsOf(v)
+      if (!ts) continue
+      const d = parseISO(ts)
+      if (!isValid(d)) continue
+      if (fmt(d, 'yyyy-MM-dd') !== dayISO) continue
+
+      // 🔑 filter by media kind ONLY for Songs / Videos
+      if (selectedTab.value === 'Songs' || selectedTab.value === 'Videos') {
+        const a = v?.attributes || v || {}
+        const kind = String(a.kind || a.mediaType || a.type || '').toLowerCase().trim()
+
+        const isSong =
+          kind.includes('song') ||
+          kind.includes('audio') ||
+          kind.includes('spotify') ||
+          kind.includes('apple') ||
+          kind.includes('music') ||
+          kind.includes('soundcloud')
+
+        const isVideo =
+          kind.includes('video') ||
+          kind.includes('youtube') ||
+          kind.includes('vimeo') ||
+          kind.includes('tiktok')
+
+        if (selectedTab.value === 'Songs' && !isSong) continue
+        if (selectedTab.value === 'Videos' && !isVideo) continue
+      }
+
       counts[getHours(d)]++
-    })
+    }
 
     labels = hours.map((h) => fmt(new Date(2000, 0, 1, h), 'h a'))
     data = hours.map((h) => counts[h] || 0)
@@ -654,14 +924,18 @@ function renderViewsChart() {
         ? 'Page Views (Hourly)'
         : `${selectedTab.value} (Hourly)`
   } else {
-    // Multi-day line — use server rollups.series
-    const s = rollups.value?.series ?? [] // [{date, views, clicks, plays}]
-    labels = s.map((d:any) => fmt(parseISO(`${d.date}T00:00:00`), 'MMM d'))
-    data = s.map((d:any) => {
+    // RANGE (7/30/365) — already good
+    const s = rollups.value?.series ?? []
+    labels = s.map((d: any) => fmt(parseISO(`${d.date}T00:00:00`), 'MMM d'))
+
+    data = s.map((d: any) => {
       if (selectedTab.value === 'Page Views') return d.views
       if (selectedTab.value === 'Link Clicks') return d.clicks
-      return d.plays // Songs/Videos aggregated together (can split later)
+      if (selectedTab.value === 'Songs') return d.songPlays ?? 0
+      if (selectedTab.value === 'Videos') return d.videoPlays ?? 0
+      return d.plays ?? 0
     })
+
     chartType = 'line'
     title =
       selectedTab.value === 'Page Views'
@@ -669,15 +943,16 @@ function renderViewsChart() {
         : `${selectedTab.value} (Last ${selectedRange.value} Days)`
   }
 
-  const datasetLabel = (() => {
-    switch (selectedTab.value) {
-      case 'Page Views': return selectedRange.value === 1 ? 'Views' : 'Page Views'
-      case 'Link Clicks': return 'Link Clicks'
-      case 'Songs': return 'Song Plays'
-      case 'Videos': return 'Video Plays'
-      default: return selectedTab.value
-    }
-  })()
+  const datasetLabel =
+    selectedTab.value === 'Page Views'
+      ? selectedRange.value === 1
+        ? 'Views'
+        : 'Page Views'
+      : selectedTab.value === 'Link Clicks'
+        ? 'Link Clicks'
+        : selectedTab.value === 'Songs'
+          ? 'Song Plays'
+          : 'Video Plays'
 
   viewsChart?.destroy()
   viewsChart = new ChartJs(ctx, {
@@ -714,18 +989,22 @@ function renderViewsChart() {
       plugins: {
         legend: {
           labels: { color: '#E5E7EB', usePointStyle: true, pointStyle: 'circle' },
-        position: 'bottom'
+          position: 'bottom'
         },
         title: { display: true, text: title, color: 'white', font: { size: 16, weight: '600' } },
         tooltip: {
           callbacks: {
-            title(items) { return items[0]?.label || '' },
+            title(items) {
+              return items[0]?.label || ''
+            },
             label(ctx) {
               const v = ctx.raw as number
               const noun =
-                selectedTab.value === 'Page Views' ? 'view'
-                : selectedTab.value === 'Link Clicks' ? 'click'
-                : 'play'
+                selectedTab.value === 'Page Views'
+                  ? 'view'
+                  : selectedTab.value === 'Link Clicks'
+                    ? 'click'
+                    : 'play'
               return `${v} ${v === 1 ? noun : noun + 's'}`
             }
           }
@@ -734,6 +1013,7 @@ function renderViewsChart() {
     }
   })
 }
+
 
 function renderDeviceDoughnut() {
   if (!ChartJs) return
@@ -784,25 +1064,56 @@ function renderDeviceDoughnut() {
   })
 }
 
+/* ---------- DEBUG WATCHES ---------- */
+watch(
+  () => [selectedRange.value, selectedDate.value],
+  ([r, d]) => {
+    console.log('[watch] selectedRange/date →', { r, d })
+  }
+)
+
+watch(
+  () => rawMediaPlays.value,
+  (val) => {
+    console.log('[watch] rawMediaPlays changed →', val.map((v: any) => v?.attributes ?? v))
+  }
+)
+
+watch(
+  () => transitions.value,
+  (val) => {
+    console.log('[watch] transitions changed →', val)
+  }
+)
+
+watch(
+  () => rollups.value,
+  (val) => {
+    console.log('[watch] rollups changed →', val)
+  }
+)
+
 /* ---------- lifecycle ---------- */
 onMounted(async () => {
   await ensureChart()
-  await fetchAndRender()   // server rollups (+ raw if daily)
-  await fetchMuse()        // daily insights
+  await fetchAndRender(false) // first load
+  await fetchMuse()
 })
 
-// Re-fetch when range changes; re-render when tab/date changes
+// when range changes → silent refresh (don't collapse layout)
 watch(selectedRange, async () => {
-  await fetchAndRender()
+  await fetchAndRender(true)
 })
 
+// when tab/date/rollups change → just re-render, no layout shift
 watch([selectedTab, selectedDate, rollups], async () => {
-  if (!isLoading.value) {
+  if (!isInitialLoading.value) {
     await ensureChart()
     renderViewsChart()
     renderDeviceDoughnut()
   }
 })
+
 
 onBeforeUnmount(() => {
   viewsChart?.destroy()
@@ -810,17 +1121,14 @@ onBeforeUnmount(() => {
 })
 </script>
 
+
 <style scoped>
 .chart-card {
-  background: #111827; /* gray-900 */
-  border-radius: 0.75rem; /* rounded-lg */
+  background: #111827;
+  border-radius: 0.75rem;
   padding: 1rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
-
-.text-emerald-400 { transition: color 0.4s, transform 0.4s; }
-.text-emerald-400:hover { transform: scale(1.05); }
-
 
 .chart-wrap {
   position: relative;
@@ -836,7 +1144,6 @@ onBeforeUnmount(() => {
   height: 100%;
 }
 
-/* date picker icon on dark bg */
 input[type='date']::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
