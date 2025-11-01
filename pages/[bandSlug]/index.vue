@@ -363,6 +363,27 @@ const showPage = computed(() => {
 const band = ref(null);
 const events = ref([]);
 
+// ⬇️ add this small helper near the top of <script setup>
+function readQrStampFromCookie() {
+  if (typeof document === 'undefined') return null
+  const raw = document.cookie
+    .split('; ')
+    .find((c) => c.startsWith('mbq_qr_src='))
+  if (!raw) return null
+  try {
+    const json = decodeURIComponent(raw.split('=')[1] || '')
+    return JSON.parse(json)
+  } catch {
+    return null
+  }
+}
+
+function clearQrStampCookie() {
+  if (typeof document === 'undefined') return
+  document.cookie = `mbq_qr_src=; path=/; max-age=0; sameSite=lax`
+}
+
+
 function preloadHero(src) {
   return new Promise((resolve) => {
     if (!src) return resolve(true); // nothing to wait on

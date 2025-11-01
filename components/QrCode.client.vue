@@ -315,17 +315,17 @@ const qrCode = ref(null)
 
 const uuid = uuidv4()
 const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`)
+// const qrValue = ref(`http//localhost:3000/directqr?id=${uuid}`)
+
 const qrSize = ref(300)
 
 const name = ref('name')
 const link = ref(null)
 
-// Full-screen while saving:
 const loading = ref(false)
-
-// Local spinner while QR re-renders:
 const isRendering = ref(false)
 let renderTimer = null
+
 function startRender(minMs = 250) {
   if (renderTimer) {
     isRendering.value = true
@@ -337,6 +337,7 @@ function startRender(minMs = 250) {
     renderTimer = null
   }, minMs)
 }
+
 function endRenderSoon(extraMs = 150) {
   if (renderTimer) window.clearTimeout(renderTimer)
   renderTimer = window.setTimeout(() => {
@@ -345,7 +346,7 @@ function endRenderSoon(extraMs = 150) {
   }, extraMs)
 }
 
-// Style options
+/* ---------------------------- Style Options --------------------------- */
 const bgColor = ref('#FFFFFF')
 const dotsColor = ref('#000000')
 const cornersSquareColor = ref('#000000')
@@ -378,7 +379,7 @@ const lastColorOptions = reactive({
   gradientEndColor: ''
 })
 
-/* ---------------------------- QR Builders ---------------------------- */
+/* ---------------------------- QR Options ---------------------------- */
 function getQRCodeOptions() {
   const options = {
     margin: 16,
@@ -425,7 +426,6 @@ function getQRCodeOptions() {
 }
 
 /* -------------------------- Update Strategies ------------------------- */
-// Throttled color-only update (fast)
 const updateColourFast = useThrottleFn(() => {
   if (!qrCode.value) return
 
@@ -477,9 +477,8 @@ const updateColourFast = useThrottleFn(() => {
   })
 
   endRenderSoon()
-}, 33) // ~30 FPS
+}, 33)
 
-// Debounced full update (size, data, type, image, etc.)
 const updateQRCodeSlow = useDebounceFn(() => {
   if (!qrCode.value) return
   startRender()
@@ -487,29 +486,21 @@ const updateQRCodeSlow = useDebounceFn(() => {
   endRenderSoon()
 }, 150)
 
-// Watchers for non-color changes
 function initializeWatcher() {
   watch(
-    [
-      qrValue,
-      qrSize,
-      dotsType,
-      cornersSquareType,
-      cornersDotType,
-      () => imageSettings.src
-    ],
+    [qrValue, qrSize, dotsType, cornersSquareType, cornersDotType, () => imageSettings.src],
     updateQRCodeSlow,
     { deep: true }
   )
 }
 
 /* --------------------------- Image Handling --------------------------- */
-const handleImageUpload = (event) => {
+function handleImageUpload(event) {
   const file = event.target.files[0]
   if (file) {
     const reader = new FileReader()
     reader.onload = (e) => {
-      imageSettings.src = e.target.result
+      imageSettings.src = e.target && e.target.result ? e.target.result : ''
       startRender()
       updateQRCodeSlow()
     }
@@ -518,18 +509,14 @@ const handleImageUpload = (event) => {
 }
 
 /* ----------------------- Routing & Strapi wiring ---------------------- */
-const props = defineProps({ type: String })
 const { find } = useStrapi()
 const user = useStrapiUser()
 const router = useRouter()
 const route = useRoute()
 const client = useStrapiClient()
 
-const selectedBand = ref(null)
-
-const {
-  data: bandsData,
-} = useAsyncData(
+const selectedBand = ref('')
+const { data: bandsData } = useAsyncData(
   'user-bands',
   async () => {
     if (!user.value?.id) return []
@@ -543,19 +530,16 @@ const {
 
 const bands = computed(() => bandsData.value || [])
 
-/* -------------------------------- Mount -------------------------------- */
+/* ---------------- Defaulting logic ---------------- */
 onMounted(async () => {
   if (process.client) {
     const { default: QRCodeStyling } = await import('qr-code-styling')
     qrCode.value = new QRCodeStyling(getQRCodeOptions())
-
     startRender()
     qrCode.value.append(qrcodeWrapper.value)
     endRenderSoon()
-
     initializeWatcher()
 
-    // Real-time color updates
     watch(
       [
         bgColor,
@@ -572,31 +556,69 @@ onMounted(async () => {
       { deep: true }
     )
   }
+
+  // 1) ensure we always have a type
+  if (!route.query.type) {
+    router.replace({
+      query: { ...route.query, type: 'bandProfile' }
+    })
+  }
+
+  // 2) once bands are loaded, auto-select
+  watch(
+    () => bands.value,
+    (list) => {
+      if (!list) return
+
+      const currentType = route.query.type || 'bandProfile'
+      if (currentType !== 'bandProfile') return
+
+      if (list.length === 1) {
+        selectedBand.value = list[0].id
+      } else if (list.length === 0) {
+        selectedBand.value = 'createNew'
+      } else {
+        selectedBand.value = list[0].id
+      }
+    },
+    { immediate: true }
+  )
 })
 
 /* ------------------------------ Actions -------------------------------- */
-const selectType = (selected) => {
-  router.push({
-    query: { ...route.query, type: selected }
-  })
+function selectType(selected) {
+  router.push({ query: { ...route.query, type: selected } })
+
+  if (selected === 'bandProfile') {
+    const list = bands.value
+    if (list && list.length === 1) {
+      selectedBand.value = list[0].id
+    } else if (!list || list.length === 0) {
+      selectedBand.value = 'createNew'
+    }
+  }
 }
 
-const saveQrCode = async () => {
+async function saveQrCode() {
   try {
     loading.value = true
+    const qType = route.query.type || 'bandProfile'
 
-    // 1) Create with a temporary tracker (uuid) just to get a record
     const initialForm = {
-      url: qrValue.value, // temp uuid tracker; will be replaced
+      url: qrValue.value,
       users_permissions_user: { id: user.value.id },
-      q_type: route.query.type,
-      link: normalizeLink(link.value),  // the external destination (if any)
+      q_type: qType,
+      link: normalizeLink(link.value),
       name: name.value,
       options: getQRCodeOptions()
     }
 
-    if (route.query.type === 'bandProfile') {
-      initialForm.band = selectedBand.value !== 'createNew' ? selectedBand.value : null
+    if (qType === 'bandProfile') {
+      if (selectedBand.value && selectedBand.value !== 'createNew') {
+        initialForm.band = selectedBand.value
+      } else {
+        initialForm.band = null
+      }
     }
 
     const tempBlob = await qrCode.value.getRawData('png')
@@ -610,28 +632,30 @@ const saveQrCode = async () => {
       body: formData
     })
     if (!created?.id) throw new Error('QR code was not saved (no ID returned).')
-
-    // 2) Build the **final** tracker using the DB id
+  //  production 
     const finalTracker = `https://musicbizqr.com/directqr?id=${created.id}`
+// local 
+// const finalTracker = `http://localhost:3000/directqr?id=${created.id}`
 
-    // 3) Re-render the QR with the final tracker, so scans always hit /directqr
     qrValue.value = finalTracker
-    await new Promise(r => setTimeout(r)) // let watchers apply
+    await new Promise((r) => setTimeout(r))
     qrCode.value.update(getQRCodeOptions())
 
     const finalBlob = await qrCode.value.getRawData('png')
     const finalFile = new File([finalBlob], 'qrcode.png')
     const patch = new FormData()
     patch.append('files.q_image', finalFile, 'qrcode.png')
-    patch.append('data', JSON.stringify({
-      url: finalTracker,
-      options: { ...getQRCodeOptions(), data: finalTracker }
-    }))
+    patch.append(
+      'data',
+      JSON.stringify({
+        url: finalTracker,
+        options: { ...getQRCodeOptions(), data: finalTracker }
+      })
+    )
 
     await client(`/qrs/${created.id}`, { method: 'PUT', body: patch })
 
-    // 4) Navigate away
-    if (route.query.type === 'bandProfile' && selectedBand.value === 'createNew') {
+    if (qType === 'bandProfile' && selectedBand.value === 'createNew') {
       router.push({ name: 'createband', query: { qrId: created.id } })
     } else {
       router.push('/dashboard')
@@ -642,8 +666,9 @@ const saveQrCode = async () => {
     loading.value = false
   }
 }
-
 </script>
+
+
 
 <style scoped>
 /* Container top spacing */

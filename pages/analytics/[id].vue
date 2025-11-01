@@ -32,7 +32,7 @@
 
       <div v-else>
         <!-- Metric grid -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
           <!-- Page Views -->
           <div class="bg-neutral-900 rounded-lg p-3">
             <p class="text-gray-400 text-xs">Page Views</p>
@@ -74,6 +74,14 @@
             <p class="text-gray-400 text-xs">Video Plays</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.videoPlays ?? 0 }}
+            </p>
+          </div>
+
+          <!-- ✅ QR Scans -->
+          <div class="bg-neutral-900 rounded-lg p-3">
+            <p class="text-gray-400 text-xs">QR Scans</p>
+            <p class="text-2xl font-semibold text-white">
+              {{ liveMuseSummary.qrScans ?? 0 }}
             </p>
           </div>
 
@@ -163,36 +171,34 @@
       <input type="date" v-model="selectedDate" class="bg-gray-800 text-white rounded px-2 py-1" />
     </div>
 
-  <!-- only for first load -->
-<div v-if="isInitialLoading" class="text-white">🔄 Loading data…</div>
+    <!-- only for first load -->
+    <div v-if="isInitialLoading" class="text-white">🔄 Loading data…</div>
 
-<!-- after first load, never collapse -->
-<div v-else class="space-y-6">
-  <!-- Page Views / Clicks / Plays -->
-  <div class="chart-card relative">
-    <!-- small overlay while refreshing (range change) -->
-    <div
-      v-if="isRefreshing"
-      class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg"
-    >
-      <span class="text-gray-200 text-sm">Refreshing…</span>
-    </div>
+    <!-- after first load, never collapse -->
+    <div v-else class="space-y-6">
+      <!-- Page Views / Clicks / Plays / QR -->
+      <div class="chart-card relative">
+        <!-- small overlay while refreshing (range change) -->
+        <div
+          v-if="isRefreshing"
+          class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg"
+        >
+          <span class="text-gray-200 text-sm">Refreshing…</span>
+        </div>
 
-    <div class="flex items-center justify-between mb-2">
-     <h3 class="text-white text-lg font-semibold">{{ chartTitle }}</h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-white text-lg font-semibold">{{ chartTitle }}</h3>
 
-      <span class="text-gray-400 text-xs">
-        {{ selectedRange === 1 ? humanDayLabel(selectedDate) : `Last ${selectedRange} days` }}
-      </span>
-    </div>
-    <div class="chart-wrap ratio-16x9">
-      <ClientOnly>
-        <canvas ref="viewsCanvas" class="chart-canvas" />
-      </ClientOnly>
-    </div>
-  </div>
-
-
+          <span class="text-gray-400 text-xs">
+            {{ selectedRange === 1 ? humanDayLabel(selectedDate) : `Last ${selectedRange} days` }}
+          </span>
+        </div>
+        <div class="chart-wrap ratio-16x9">
+          <ClientOnly>
+            <canvas ref="viewsCanvas" class="chart-canvas" />
+          </ClientOnly>
+        </div>
+      </div>
 
       <!-- Link Clicks: Top Platforms (from server rollups) -->
       <div v-if="selectedTab === 'Link Clicks'" class="chart-card">
@@ -366,7 +372,8 @@ const latestMuse = computed(() => museRows.value?.[0]?.attributes || null)
 const { getRollups, getGeo, getTransitions } = useMuse()
 
 /* ---------- UI state ---------- */
-const tabs = ['Page Views', 'Link Clicks', 'Songs', 'Videos'] as const
+// ✅ added "QR Scans" here
+const tabs = ['Page Views', 'Link Clicks', 'Songs', 'Videos', 'QR Scans'] as const
 const selectedTab = ref<typeof tabs[number]>('Page Views')
 
 const rangeOptions: Record<number, string> = {
@@ -387,6 +394,8 @@ const transitions = ref<any | null>(null)
 const rawPageViews = ref<any[]>([])
 const rawLinkClicks = ref<any[]>([])
 const rawMediaPlays = ref<any[]>([])
+// ✅ new: raw QR scans
+const rawQrScans = ref<any[]>([])
 
 const isInitialLoading = ref(true)
 const isRefreshing = ref(false)
@@ -407,6 +416,8 @@ function humanDayLabel(yyyy_mm_dd: string) {
 /* ---------- computed from server rollups ---------- */
 const totalViewsInRange = computed(() => rollups.value?.totals?.views ?? 0)
 const totalClicksInRange = computed(() => rollups.value?.totals?.clicks ?? 0)
+// ✅ total QR in range (for later if we want to show)
+const totalQrInRange = computed(() => rollups.value?.totals?.qrScans ?? 0)
 
 const sourceCounts = computed<[string, number][]>(() => rollups.value?.sources ?? [])
 const mediumCounts = computed<[string, number][]>(() => rollups.value?.mediums ?? [])
@@ -457,23 +468,21 @@ const museRangeLabel = computed(() => {
 })
 
 const chartTitle = computed(() => {
-  // selectedTab: 'Page Views' | 'Link Clicks' | 'Songs' | 'Videos'
   if (selectedRange.value === 1) {
-    // daily / hourly view
     if (selectedTab.value === 'Page Views') return 'Page Views (Hourly)'
     if (selectedTab.value === 'Link Clicks') return 'Link Clicks (Hourly)'
     if (selectedTab.value === 'Songs') return 'Song Plays (Hourly)'
     if (selectedTab.value === 'Videos') return 'Video Plays (Hourly)'
+    if (selectedTab.value === 'QR Scans') return 'QR Scans (Hourly)'
   } else {
-    // 7 / 30 / 365
     if (selectedTab.value === 'Page Views') return `Page Views (Last ${selectedRange.value} Days)`
     if (selectedTab.value === 'Link Clicks') return `Link Clicks (Last ${selectedRange.value} Days)`
     if (selectedTab.value === 'Songs') return `Song Plays (Last ${selectedRange.value} Days)`
     if (selectedTab.value === 'Videos') return `Video Plays (Last ${selectedRange.value} Days)`
+    if (selectedTab.value === 'QR Scans') return `QR Scans (Last ${selectedRange.value} Days)`
   }
   return 'Analytics'
 })
-
 
 /* ---------------- helper: count songs/videos from RAW media (STRICT) ---------------- */
 function countMediaFromRaw(rows: any[], yyyymmdd: string) {
@@ -485,7 +494,6 @@ function countMediaFromRaw(rows: any[], yyyymmdd: string) {
     const ts = a.timestamp || a.createdAt || a.updatedAt
     if (!ts) continue
 
-    // make sure it's REALLY the selected day
     const d = parseISO(ts)
     if (!isValid(d)) continue
     const day = fmt(d, 'yyyy-MM-dd')
@@ -511,15 +519,13 @@ function countMediaFromRaw(rows: any[], yyyymmdd: string) {
       songs++
     } else if (isVideo) {
       videos++
-    } else {
-      // unknown → ignore
     }
   }
 
   return { songs, videos }
 }
 
-/* ---------------- core media splitter (with big debugs) ---------------- */
+/* ---------------- core media splitter ---------------- */
 function deriveSongVideoSplit(opts: {
   selectedRange: number
   rollups: any
@@ -534,7 +540,6 @@ function deriveSongVideoSplit(opts: {
   const totalSongPlays = totals.songPlays ?? 0
   const totalVideoPlays = totals.videoPlays ?? 0
 
-  // 1) DAILY → trust RAW first (because you actually fetched it)
   if (selectedRange === 1) {
     const fromRaw = countMediaFromRaw(rawMediaPlays, selectedDate)
     if (fromRaw.songs > 0 || fromRaw.videos > 0) {
@@ -545,7 +550,6 @@ function deriveSongVideoSplit(opts: {
       }
     }
 
-    // daily fallback → use backend totals (they will usually be right now)
     return {
       songPlays: totalSongPlays,
       videoPlays: totalVideoPlays,
@@ -553,7 +557,6 @@ function deriveSongVideoSplit(opts: {
     }
   }
 
-  // 2) NON-DAILY → FIRST: trust backend totals (we fixed the controller for this)
   if (typeof totalSongPlays === 'number' || typeof totalVideoPlays === 'number') {
     return {
       songPlays: totalSongPlays,
@@ -562,7 +565,6 @@ function deriveSongVideoSplit(opts: {
     }
   }
 
-  // 3) NON-DAILY → THEN: if transitions ever starts sending media, we can use it
   const tMedia = transitions?.media
   if (tMedia && (typeof tMedia.songs === 'number' || typeof tMedia.videos === 'number')) {
     return {
@@ -572,7 +574,6 @@ function deriveSongVideoSplit(opts: {
     }
   }
 
-  // 4) last fallback: don't lie — keep it as plays, 0 videos
   return {
     songPlays: totalPlays,
     videoPlays: 0,
@@ -580,10 +581,9 @@ function deriveSongVideoSplit(opts: {
   }
 }
 
-
-/* ============================================================================
-   OPTION A (fixed): build Muse summary from rollups + transitions + raw
-============================================================================ */
+/* ============================================================================ */
+/*   Build Muse summary from rollups + transitions + raw                        */
+/* ============================================================================ */
 const liveMuseSummary = computed(() => {
   const r = rollups.value
   if (!r) return null
@@ -591,6 +591,7 @@ const liveMuseSummary = computed(() => {
   const views = r.totals?.views ?? 0
   const clicks = r.totals?.clicks ?? 0
   const plays = r.totals?.plays ?? 0
+  const qrScans = r.totals?.qrScans ?? 0   // ✅ NEW
 
   const split = deriveSongVideoSplit({
     selectedRange: selectedRange.value,
@@ -601,7 +602,7 @@ const liveMuseSummary = computed(() => {
   })
 
   const engagementRate =
-    views > 0 ? Math.round(((clicks + plays) / views) * 1000) / 10 : 0
+    views > 0 ? Math.round(((clicks + plays + qrScans) / views) * 1000) / 10 : 0
 
   // growth
   const series = Array.isArray(r.series) ? r.series : []
@@ -628,6 +629,7 @@ const liveMuseSummary = computed(() => {
     linkClicks: clicks,
     songPlays: split.songPlays,
     videoPlays: split.videoPlays,
+    qrScans,                            // ✅ expose to template
     engagementRate,
     growthPct,
     prevComparison: 0,
@@ -671,14 +673,16 @@ const insightBullets = computed(() => {
   const clicks = m.linkClicks || 0
   const songs = m.songPlays || 0
   const vids = m.videoPlays || 0
-  if (clicks > 0 || songs > 0 || vids > 0) {
+  const qr = m.qrScans || 0
+  if (clicks > 0 || songs > 0 || vids > 0 || qr > 0) {
     const parts: string[] = []
     if (clicks) parts.push(`${clicks} link ${clicks === 1 ? 'click' : 'clicks'}`)
     if (songs) parts.push(`${songs} song ${songs === 1 ? 'play' : 'plays'}`)
     if (vids) parts.push(`${vids} video ${vids === 1 ? 'play' : 'plays'}`)
+    if (qr) parts.push(`${qr} QR ${qr === 1 ? 'scan' : 'scans'}`)
     out.push(`Engagement: ${parts.join(', ')}.`)
   } else {
-    out.push(`No downstream engagement yet (links/songs/videos).`)
+    out.push(`No downstream engagement yet (links/songs/videos/qr).`)
   }
 
   return out
@@ -725,7 +729,7 @@ async function fetchMuse() {
   }
 }
 
-/* ---------- fetch rollups + (raw if hourly) ---------- */
+
 async function fetchAndRender(silent = false) {
   if (silent) {
     isRefreshing.value = true
@@ -748,28 +752,73 @@ async function fetchAndRender(silent = false) {
   geo.value = g
   transitions.value = t
 
-  // daily raw fetch
+  // ✅ daily raw fetch (1 day → we want raw rows)
   if (selectedRange.value === 1) {
-    const [viewsRes, clicksRes, mediaRes] = await Promise.all([
+    // build the 2 scan URLs with qs so deep filters actually work
+    const scansDirectQuery = qs.stringify(
+      {
+        filters: {
+          band: {
+            id: { $eq: bandId }
+          }
+        },
+        sort: ['date:desc'],
+        pagination: { limit: 500 },
+        populate: { qr: { populate: ['band'] } }
+      },
+      { encodeValuesOnly: true }
+    )
+
+    const scansViaQrQuery = qs.stringify(
+      {
+        filters: {
+          qr: {
+            band: {
+              id: { $eq: bandId }
+            }
+          }
+        },
+        sort: ['date:desc'],
+        pagination: { limit: 500 },
+        populate: { qr: { populate: ['band'] } }
+      },
+      { encodeValuesOnly: true }
+    )
+
+    const [
+      viewsRes,
+      clicksRes,
+      mediaRes,
+      scansDirectRes,
+      scansViaQrRes
+    ] = await Promise.all([
+      // page views (by band)
       client('/band-page-views', {
         params: {
-          filters: { band: { id: route.params.id } },
+          filters: { band: { id: bandId } },
           sort: ['timestamp:desc'],
           pagination: { limit: 500 }
         }
       }),
-      client(`/link-clicks/band/${route.params.id}`),
-      client(`/media-plays/band/${route.params.id}`).catch(() =>
+      // link clicks (you already expose /link-clicks/band/:id)
+      client(`/link-clicks/band/${bandId}`),
+      // media plays (two styles, keep your fallback)
+      client(`/media-plays/band/${bandId}`).catch(() =>
         client('/media-plays', {
           params: {
-            filters: { band: { id: route.params.id } },
+            filters: { band: { id: bandId } },
             sort: ['timestamp:desc'],
             pagination: { limit: 500 }
           }
         })
-      )
+      ),
+      // ✅ scans with band directly on scan
+      client(`/scans?${scansDirectQuery}`),
+      // ✅ scans where scan.qr.band = bandId
+      client(`/scans?${scansViaQrQuery}`)
     ])
 
+    // helpers (same as before)
     const toArray = (res: any) => {
       if (!res) return []
       if (Array.isArray(res)) return res
@@ -821,13 +870,47 @@ async function fetchAndRender(silent = false) {
         }
       })
 
+    const unifyScans = (rows: any[]) =>
+      rows.map((r) => {
+        const a = r?.attributes || r || {}
+        return {
+          id: r?.id ?? a?.id,
+          attributes: {
+            ...a,
+            // your schema uses "date"
+            timestamp: a.date || a.timestamp || a.createdAt || a.updatedAt || null,
+            qr: a.qr || null
+          }
+        }
+      })
+
+    // assign raw
     rawPageViews.value = toArray(viewsRes)
     rawLinkClicks.value = unifyClicks(toArray(clicksRes))
     rawMediaPlays.value = unifyMedia(toArray(mediaRes))
+
+    // ✅ merge scans from both queries
+    const scansDirect = unifyScans(toArray(scansDirectRes))
+    const scansViaQr = unifyScans(toArray(scansViaQrRes))
+
+    const seen = new Set<string | number>()
+    const merged: any[] = []
+
+    for (const s of [...scansDirect, ...scansViaQr]) {
+      const key = s.id || s.attributes?.id
+      if (key && !seen.has(key)) {
+        seen.add(key)
+        merged.push(s)
+      }
+    }
+
+    rawQrScans.value = merged
   } else {
+    // non-daily: no raw rows
     rawPageViews.value = []
     rawLinkClicks.value = []
     rawMediaPlays.value = []
+    rawQrScans.value = []
   }
 
   await ensureChart()
@@ -835,13 +918,13 @@ async function fetchAndRender(silent = false) {
   renderViewsChart()
   renderDeviceDoughnut()
 
- // ✅ only now say "initial load is done"
-if (!silent) {
-  isInitialLoading.value = false
-} else {
-  isRefreshing.value = false
+  if (!silent) {
+    isInitialLoading.value = false
+  } else {
+    isRefreshing.value = false
+  }
 }
-}
+
 
 
 /* ---------- HiDPI canvas ---------- */
@@ -874,6 +957,8 @@ function renderViewsChart() {
       rows = rawPageViews.value
     } else if (selectedTab.value === 'Link Clicks') {
       rows = rawLinkClicks.value
+    } else if (selectedTab.value === 'QR Scans') {
+      rows = rawQrScans.value
     } else {
       // Songs OR Videos → work off media, but filter by kind
       rows = rawMediaPlays.value
@@ -922,9 +1007,13 @@ function renderViewsChart() {
     title =
       selectedTab.value === 'Page Views'
         ? 'Page Views (Hourly)'
-        : `${selectedTab.value} (Hourly)`
+        : selectedTab.value === 'Link Clicks'
+          ? 'Link Clicks (Hourly)'
+          : selectedTab.value === 'QR Scans'
+            ? 'QR Scans (Hourly)'
+            : `${selectedTab.value} (Hourly)`
   } else {
-    // RANGE (7/30/365) — already good
+    // RANGE (7/30/365)
     const s = rollups.value?.series ?? []
     labels = s.map((d: any) => fmt(parseISO(`${d.date}T00:00:00`), 'MMM d'))
 
@@ -933,6 +1022,7 @@ function renderViewsChart() {
       if (selectedTab.value === 'Link Clicks') return d.clicks
       if (selectedTab.value === 'Songs') return d.songPlays ?? 0
       if (selectedTab.value === 'Videos') return d.videoPlays ?? 0
+      if (selectedTab.value === 'QR Scans') return d.qrScans ?? 0
       return d.plays ?? 0
     })
 
@@ -940,7 +1030,11 @@ function renderViewsChart() {
     title =
       selectedTab.value === 'Page Views'
         ? `Page Views (Last ${selectedRange.value} Days)`
-        : `${selectedTab.value} (Last ${selectedRange.value} Days)`
+        : selectedTab.value === 'Link Clicks'
+          ? `Link Clicks (Last ${selectedRange.value} Days)`
+          : selectedTab.value === 'QR Scans'
+            ? `QR Scans (Last ${selectedRange.value} Days)`
+            : `${selectedTab.value} (Last ${selectedRange.value} Days)`
   }
 
   const datasetLabel =
@@ -952,7 +1046,9 @@ function renderViewsChart() {
         ? 'Link Clicks'
         : selectedTab.value === 'Songs'
           ? 'Song Plays'
-          : 'Video Plays'
+          : selectedTab.value === 'Videos'
+            ? 'Video Plays'
+            : 'QR Scans'
 
   viewsChart?.destroy()
   viewsChart = new ChartJs(ctx, {
@@ -1004,7 +1100,9 @@ function renderViewsChart() {
                   ? 'view'
                   : selectedTab.value === 'Link Clicks'
                     ? 'click'
-                    : 'play'
+                    : selectedTab.value === 'QR Scans'
+                      ? 'scan'
+                      : 'play'
               return `${v} ${v === 1 ? noun : noun + 's'}`
             }
           }
@@ -1013,7 +1111,6 @@ function renderViewsChart() {
     }
   })
 }
-
 
 function renderDeviceDoughnut() {
   if (!ChartJs) return
@@ -1100,12 +1197,12 @@ onMounted(async () => {
   await fetchMuse()
 })
 
-// when range changes → silent refresh (don't collapse layout)
+// when range changes → silent refresh
 watch(selectedRange, async () => {
   await fetchAndRender(true)
 })
 
-// when tab/date/rollups change → just re-render, no layout shift
+// when tab/date/rollups change → just re-render
 watch([selectedTab, selectedDate, rollups], async () => {
   if (!isInitialLoading.value) {
     await ensureChart()
@@ -1114,13 +1211,11 @@ watch([selectedTab, selectedDate, rollups], async () => {
   }
 })
 
-
 onBeforeUnmount(() => {
   viewsChart?.destroy()
   deviceChart?.destroy()
 })
 </script>
-
 
 <style scoped>
 .chart-card {
