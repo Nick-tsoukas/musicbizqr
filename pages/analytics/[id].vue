@@ -199,7 +199,24 @@
         <p class="text-xs uppercase tracking-wide text-red-200/70">Connected platform</p>
         <h3 class="text-white text-lg font-semibold leading-tight">YouTube (beta)</h3>
       </div>
+      <!-- Re-sync (right side of header) -->
+<button
+  @click="resyncYoutube"
+  :disabled="youtubeResyncing"
+  class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition
+         disabled:opacity-50 disabled:cursor-not-allowed
+         bg-white/5 text-gray-200 border-white/10 hover:bg-white/10"
+  aria-label="Re-sync YouTube"
+  v-tooltip="'Refresh YouTube data and recent uploads'"
+>
+  <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 12a9 9 0 1 1-3-6.7" />
+    <path d="M21 3v6h-6" />
+  </svg>
+  {{ youtubeResyncing ? 'Syncing…' : 'Re-sync' }}
+</button>
     </div>
+    
 
     <!-- Status chip -->
     <span
@@ -215,6 +232,7 @@
       {{ youtubeStatusChip.text }}
     </span>
   </div>
+  
 
   <!-- Metrics -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
@@ -325,6 +343,8 @@
       </div>
     </div>
   </div>
+
+  
 
   <!-- Quick insights -->
   <div class="px-6 pb-3">
@@ -799,6 +819,55 @@ function humanDayLabel(yyyy_mm_dd: string) {
   const d = parseISO(`${yyyy_mm_dd}T00:00:00`);
   return isValid(d) ? fmt(d, "EEE, MMM d") : "";
 }
+
+// --- Re-sync state + helpers ---
+const youtubeResyncing = ref(false);
+let youtubeResyncTimer: any = null;
+
+function debounce(fn: Function, ms = 800) {
+  return (...args: any[]) => {
+    clearTimeout(youtubeResyncTimer);
+    youtubeResyncTimer = setTimeout(() => fn(...args), ms);
+  };
+}
+
+const track = (event: string, props: Record<string, any> = {}) => {
+  try {
+    navigator.sendBeacon?.(
+      "/api/track",
+      new Blob([JSON.stringify({ event, ts: Date.now(), ...props })], { type: "application/json" })
+    );
+  } catch {}
+};
+
+const resyncYoutubeNow = async () => {
+  if (youtubeResyncing.value) return;
+  if (!bandId.value) return;
+
+  youtubeResyncing.value = true;
+  track("youtube_resync_clicked", { bandId: bandId.value });
+
+  try {
+    // 1) hit your existing Strapi sync endpoint
+    await $fetch(`${useRuntimeConfig().public.strapiUrl}/api/youtube/sync`, {
+      method: "POST",
+      body: { bandId: bandId.value },
+    });
+
+    // 2) refresh the aggregate in-place using your existing loader
+    await fetchAndRender(true);
+  } catch (e) {
+    console.warn("[youtube] resync failed", e);
+    // (optional) toast
+    alert("YouTube re-sync failed. Try again in a minute.");
+  } finally {
+    youtubeResyncing.value = false;
+  }
+};
+
+// debounced wrapper to avoid double taps
+const resyncYoutube = debounce(resyncYoutubeNow, 800);
+
 
 /* ---------- YouTube connect ---------- */
 async function connectYoutube() {
