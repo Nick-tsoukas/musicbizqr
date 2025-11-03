@@ -3,6 +3,7 @@
     class="px-4 sm:px-6 py-8 bg-black min-h-screen pt-[var(--header-height)] max-w-5xl mx-auto"
   >
     <h2 class="text-2xl font-bold mb-6 text-white">Analytics Dashboard</h2>
+    
 
     <!-- Insights (MUSE) -->
     <div class="chart-card mb-6">
@@ -177,129 +178,184 @@
   </div>
 </div>
 
-<!-- ✅ Connected -->
+<!-- ✅ CONNECTED: YouTube Card (drop-in replacement) -->
 <div
   v-else
   class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
 >
-  <!-- header -->
+  <!-- Header -->
   <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 pb-4">
     <div class="flex items-center gap-3">
       <div
         class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
       >
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="currentColor">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="currentColor" aria-hidden="true">
           <path
             d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
           />
         </svg>
       </div>
       <div>
-        <p class="text-xs uppercase tracking-wide text-red-200/70">
-          Connected platform
-        </p>
-        <h3 class="text-white text-lg font-semibold leading-tight">
-          YouTube (beta)
-        </h3>
+        <p class="text-xs uppercase tracking-wide text-red-200/70">Connected platform</p>
+        <h3 class="text-white text-lg font-semibold leading-tight">YouTube (beta)</h3>
       </div>
     </div>
 
+    <!-- Status chip -->
     <span
-      class="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 text-xs text-gray-200 border border-white/10"
+      class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border"
+      :class="youtubeStatusChip.tone === 'green'
+        ? 'bg-white/5 text-gray-200 border-white/10'
+        : 'bg-amber-500/10 text-amber-200 border-amber-400/20'"
     >
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-      synced
-      {{
-        youtubeData.date
-          ? new Date(youtubeData.date).toLocaleString()
-          : "just now"
-      }}
+      <span
+        class="w-1.5 h-1.5 rounded-full animate-pulse"
+        :class="youtubeStatusChip.tone === 'green' ? 'bg-emerald-400' : 'bg-amber-400'"
+      ></span>
+      {{ youtubeStatusChip.text }}
     </span>
   </div>
 
-  <!-- metric row -->
+  <!-- Metrics -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
     <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1">Channel views</p>
+      <p class="text-xs text-gray-300/80 mb-1">Total views</p>
       <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ youtubeData.views?.toLocaleString?.() ?? 0 }}
+        {{ richYoutube.totals.channelViews.toLocaleString() }}
       </p>
     </div>
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1">Subscribers</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ youtubeData.subs?.toLocaleString?.() ?? 0 }}
-      </p>
-    </div>
+
     <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
       <p class="text-xs text-gray-300/80 mb-1">Videos</p>
       <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ youtubeData.videos?.toLocaleString?.() ?? youtubeData.recentVideos?.length ?? 0 }}
+        {{ richYoutube.totals.totalVideos }}
       </p>
     </div>
-    <div class="bg-black/5 border border-red-500/10 rounded-lg p-3 flex items-center gap-2">
-      <span class="w-1.5 h-10 rounded-full bg-gradient-to-b from-red-400 to-red-700"></span>
-      <div>
-        <p class="text-xs text-gray-200/80">Status</p>
-        <p class="text-sm text-white font-medium">YouTube data live</p>
-      </div>
+
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1">Avg views / video</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ richYoutube.totals.avgViews }}
+      </p>
+    </div>
+
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1">Last upload</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        <template v-if="richYoutube.freshness.daysSinceLastUpload !== null">
+          {{ richYoutube.freshness.daysSinceLastUpload }} <span class="text-sm text-gray-400">days ago</span>
+        </template>
+        <template v-else>—</template>
+      </p>
     </div>
   </div>
 
-  <!-- top video -->
-  <div v-if="youtubeData.topVideo" class="px-6 pb-5">
-    <p class="text-xs uppercase text-gray-400 mb-2 tracking-wide flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
-      Top video
-    </p>
-    <div
-      class="flex items-center justify-between gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
-    >
-      <div class="min-w-0">
-        <p class="text-sm text-white font-medium truncate">
-          {{ youtubeData.topVideo.title }}
-        </p>
-        <p class="text-xs text-gray-300">
-          {{ youtubeData.topVideo.views?.toLocaleString?.() ?? 0 }} views
-        </p>
-      </div>
-      <a
-        v-if="youtubeData.topVideo.videoId"
-        :href="`https://www.youtube.com/watch?v=${youtubeData.topVideo.videoId}`"
-        target="_blank"
-        rel="noopener"
-        class="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)]"
+  <!-- Spotlight (Top & Newest) -->
+  <div class="px-6 pb-5">
+    <div class="grid gap-3 md:grid-cols-2">
+      <!-- Top performer -->
+      <div
+        v-if="richYoutube.spotlight.top"
+        class="flex items-center gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
       >
-        View
-        <svg
-          viewBox="0 0 24 24"
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+        <img
+          v-if="richYoutube.spotlight.top.thumbnail"
+          :src="richYoutube.spotlight.top.thumbnail"
+          alt=""
+          class="w-20 h-14 object-cover rounded-md"
+          loading="lazy"
+        />
+        <div class="min-w-0">
+          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
+            Top video
+          </p>
+          <p class="text-sm text-white font-medium truncate">
+            {{ richYoutube.spotlight.top.title }}
+          </p>
+          <p class="text-xs text-gray-300">
+            {{ richYoutube.spotlight.top.views.toLocaleString() }} views
+          </p>
+        </div>
+        <a
+          v-if="richYoutube.spotlight.top.id"
+          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.top.id}`"
+          target="_blank"
+          rel="noopener"
+          class="ml-auto flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)]"
         >
-          <path d="M7 17 17 7" />
-          <path d="M7 7h10v10" />
-        </svg>
-      </a>
+          View
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7" />
+            <path d="M7 7h10v10" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Newest upload (hide if same as top) -->
+      <div
+        v-if="richYoutube.spotlight.newest && (!richYoutube.spotlight.top || richYoutube.spotlight.newest.id !== richYoutube.spotlight.top.id)"
+        class="flex items-center gap-3 bg-black/20 border border-white/10 rounded-lg px-4 py-3"
+      >
+        <img
+          v-if="richYoutube.spotlight.newest.thumbnail"
+          :src="richYoutube.spotlight.newest.thumbnail"
+          alt=""
+          class="w-20 h-14 object-cover rounded-md"
+          loading="lazy"
+        />
+        <div class="min-w-0">
+          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide">Newest upload</p>
+          <p class="text-sm text-white font-medium truncate">
+            {{ richYoutube.spotlight.newest.title }}
+          </p>
+          <p class="text-xs text-gray-300">
+            {{ richYoutube.spotlight.newest.publishedAt ? new Date(richYoutube.spotlight.newest.publishedAt).toLocaleDateString() : '—' }}
+          </p>
+        </div>
+        <a
+          v-if="richYoutube.spotlight.newest.id"
+          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.newest.id}`"
+          target="_blank"
+          rel="noopener"
+          class="ml-auto inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200"
+        >
+          Watch →
+        </a>
+      </div>
     </div>
   </div>
 
-  <!-- recent videos list -->
-  <div v-if="youtubeData.recentVideos && youtubeData.recentVideos.length" class="px-6 pb-6">
+  <!-- Quick insights -->
+  <div class="px-6 pb-3">
+    <p class="text-xs uppercase text-gray-400 mb-2 tracking-wide">Channel insights</p>
+    <ul
+      v-if="youtubeInsights.length"
+      class="list-disc pl-5 text-gray-200 space-y-1"
+    >
+      <li v-for="(b, i) in youtubeInsights" :key="i">{{ b }}</li>
+    </ul>
+    <p v-else class="text-gray-400 text-sm">No insights yet.</p>
+  </div>
+
+  <!-- CTA line -->
+  <div v-if="youtubeCtaLine" class="px-6 pb-6">
+    <div class="bg-black/10 border border-white/10 rounded-lg p-3 text-sm text-gray-200">
+      {{ youtubeCtaLine }}
+    </div>
+  </div>
+
+  <!-- Recent uploads (kept, using existing data) -->
+  <div v-if="richYoutube.videos.length" class="px-6 pb-6">
     <p class="text-sm text-white font-semibold mb-2 flex items-center gap-1">
       Recent uploads
-      <span class="text-xs text-gray-400">
-        ({{ youtubeData.recentVideos.length }})
-      </span>
+      <span class="text-xs text-gray-400">({{ richYoutube.videos.length }})</span>
     </p>
 
     <div class="grid gap-3 md:grid-cols-2">
       <div
-        v-for="vid in youtubeData.recentVideos"
-        :key="vid.videoId"
+        v-for="vid in richYoutube.videos"
+        :key="vid.id || vid.title"
         class="flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
       >
         <img
@@ -310,18 +366,14 @@
           loading="lazy"
         />
         <div class="min-w-0">
-          <p class="text-sm text-white font-medium truncate">
-            {{ vid.title }}
-          </p>
+          <p class="text-sm text-white font-medium truncate">{{ vid.title }}</p>
           <p class="text-xs text-gray-400">
-            {{ vid.publishedAt ? new Date(vid.publishedAt).toLocaleDateString() : "" }}
+            {{ vid.publishedAt ? new Date(vid.publishedAt).toLocaleDateString() : "—" }}
           </p>
-          <p class="text-xs text-gray-400">
-            {{ vid.views ? `${vid.views} views` : "" }}
-          </p>
+          <p class="text-xs text-gray-400">{{ vid.views.toLocaleString() }} views</p>
           <a
-            v-if="vid.videoId"
-            :href="`https://www.youtube.com/watch?v=${vid.videoId}`"
+            v-if="vid.id"
+            :href="`https://www.youtube.com/watch?v=${vid.id}`"
             target="_blank"
             rel="noopener"
             class="inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1"
@@ -335,6 +387,7 @@
 </div>
 
 
+<!-- end of youtube  -->
     <!-- Tabs -->
     <div class="flex gap-2 mb-4">
       <button
@@ -769,6 +822,151 @@ async function connectYoutube() {
     alert("Error starting YouTube connection.");
   }
 }
+
+// put near your other computeds
+const richYoutube = computed(() => {
+  const fallback = {
+    connected: false,
+    syncedAt: null,
+    videos: [],
+    totals: { channelViews: 0, totalVideos: 0, avgViews: 0, subs: 0 },
+    spotlight: { top: null, newest: null },
+    freshness: { daysSinceLastUpload: null, activity: "unknown", sameDayBatch: false },
+  };
+
+  const yt = externalMuse.value?.external?.youtube;
+  if (!yt || !yt.connected) return fallback;
+
+  const vids = Array.isArray(yt.recentVideos) ? yt.recentVideos : [];
+  const videos = vids
+    .filter(v => v && (v.videoId || v.title))
+    .map(v => ({
+      id: v.videoId || null,
+      title: v.title || "Untitled",
+      views: Number(v.views ?? 0),
+      publishedAt: v.publishedAt || null,
+      thumbnail: v.thumbnail || null,
+    }));
+
+  const totalVideos = videos.length;
+  const totalViewsFromVideos = videos.reduce((s, v) => s + (v.views || 0), 0);
+  const channelViews = Number(yt.views ?? 0) > 0 ? Number(yt.views) : totalViewsFromVideos;
+  const avgViews = totalVideos ? +(channelViews / totalVideos).toFixed(1) : 0;
+
+  const newest = [...videos].sort(
+    (a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0)
+  )[0] || null;
+
+  const daysSinceLastUpload = newest?.publishedAt
+    ? Math.max(0, Math.round((Date.now() - new Date(newest.publishedAt).getTime()) / 86400000))
+    : null;
+
+  let activity = "unknown";
+  if (daysSinceLastUpload == null) activity = "unknown";
+  else if (daysSinceLastUpload <= 14) activity = "active";
+  else if (daysSinceLastUpload <= 45) activity = "post-soon";
+  else activity = "cooling";
+
+  let sameDayBatch = false;
+  if (videos.length >= 2) {
+    const dayKey = iso => (iso ? iso.slice(0, 10) : "");
+    const dayCounts = videos.reduce((m, v) => {
+      const k = dayKey(v.publishedAt);
+      m[k] = (m[k] || 0) + 1;
+      return m;
+    }, {});
+    sameDayBatch = Object.values(dayCounts).some(n => n >= 2);
+  }
+
+  return {
+    connected: true,
+    syncedAt: yt.date || yt.lastSynced || yt.lastFetchedAt || null,
+    videos,
+    totals: { channelViews, totalVideos, avgViews, subs: Number(yt.subs ?? 0) },
+    spotlight: { top: videos.sort((a, b) => b.views - a.views)[0] || null, newest },
+    freshness: { daysSinceLastUpload, activity, sameDayBatch },
+  };
+});
+
+
+const youtubeInsights = computed(() => {
+  const r = richYoutube.value
+  if (!r?.connected) return []
+
+  const out = []
+  const { channelViews, totalVideos, avgViews } = r.totals || {}
+  const { daysSinceLastUpload, activity, sameDayBatch } = r.freshness || {}
+  const top = r.spotlight?.top
+
+  // 1) inactivity
+  if (typeof daysSinceLastUpload === 'number' && daysSinceLastUpload > 30) {
+    out.push("You haven’t uploaded in over 30 days. A fresh video will help convert QR page visitors into YouTube views.")
+  }
+
+  // 2) early channel
+  if ((totalVideos ?? 0) < 3) {
+    out.push("Your channel is connected but still early. Keep publishing — we’ll surface top videos here as you post.")
+  }
+
+  // 3) top video outperforms baseline
+  if (top && avgViews && top.views >= avgViews * 3) {
+    out.push("One video is outperforming your average. Feature it on your MusicBizQR smart page to capture more plays.")
+  }
+
+  // 4) batch publish
+  if (sameDayBatch) {
+    out.push("You batch-published videos on the same day. Consider spacing uploads to extend reach.")
+  }
+
+  // fallback when nothing triggered
+  if (out.length === 0) {
+    if (activity === "active") {
+      out.push("Nice — you’re uploading consistently. Link your latest video on your MusicBizQR page to capture momentum.")
+    } else {
+      out.push("YouTube is connected and pulling data. We’ll add deeper insights as you publish more content.")
+    }
+  }
+
+  return out.slice(0, 3)
+})
+
+// put near your other computeds
+
+
+const youtubeCtaLine = computed(() => {
+  const r = richYoutube.value
+  if (!r?.connected) return null
+  const { channelViews, totalVideos, avgViews } = r.totals || {}
+  const top = r.spotlight?.top
+
+  if ((channelViews ?? 0) <= 50) {
+    return "Add your top video to your MusicBizQR smart page so fans from shows can watch instantly."
+  }
+  if (top) {
+    return "Link your latest YouTube video on your MusicBizQR page to capture momentum."
+  }
+  return null
+})
+
+const youtubeStatusChip = computed(() => {
+  const r = richYoutube.value
+  if (!r?.connected) return { tone: "red", text: "disconnected" }
+
+  const syncedAt = r.syncedAt ? new Date(r.syncedAt) : null
+  const ageDays = syncedAt ? Math.round((Date.now() - syncedAt.getTime())/86400000) : 0
+  const stale = ageDays > 3
+
+  let health = "ok"
+  if (r.freshness?.activity === "cooling") health = "amber"
+  if ((r.totals?.totalVideos ?? 0) === 0) health = "amber"
+
+  return {
+    tone: stale ? "amber" : "green",
+    text: stale ? `data is ${ageDays}d old — re-sync` : `synced ${syncedAt ? syncedAt.toLocaleString() : "just now"}`,
+    health, // "ok" | "amber"
+  }
+})
+
 
 /* ---------- computed from server rollups ---------- */
 const totalViewsInRange = computed(() => rollups.value?.totals?.views ?? 0);
