@@ -143,201 +143,197 @@
         </div>
       </div>
     </div>
-
+    <!-- <pre class="text-white">{{ youtubeData }}</pre> -->
     <!-- 🎬 YouTube Integration -->
     <!-- 1) NOT CONNECTED YET → show soft CTA -->
+    <!-- 🎬 YouTube Analytics -->
+<div
+  v-if="!youtubeData"
+  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
+>
+  <div class="flex flex-col items-center justify-center gap-4">
     <div
-      v-if="!externalMuse?.external?.youtube"
-      class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
+      class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
     >
-      <div class="flex flex-col items-center justify-center gap-4">
-        <div
-          class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            class="w-7 h-7 text-white"
-            fill="currentColor"
-          >
-            <path
-              d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-            />
-          </svg>
-        </div>
-        <div>
-          <h3 class="text-white text-lg font-semibold mb-1">Connect YouTube</h3>
-          <p class="text-gray-400 text-sm max-w-sm mx-auto">
-            Connect your YouTube channel to pull views, subs, and top video
-            performance right into Muse analytics. Safe & optional.
-          </p>
-        </div>
-        <!-- we already have bandId in script (computed from route), so we can just hit Strapi init -->
-        <a
-          :href="`/youtube/oauth/init?bandId=${bandId}`"
-          class="flex items-center gap-2 bg-red-500 hover:bg-red-600 transition text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)]"
-        >
-          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor">
-            <path
-              d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-            />
-          </svg>
-          Connect with Google
-        </a>
+      <svg viewBox="0 0 24 24" class="w-7 h-7 text-white" fill="currentColor">
+        <path
+          d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
+        />
+      </svg>
+    </div>
+    <div>
+      <h3 class="text-white text-lg font-semibold mb-1">Connect YouTube</h3>
+      <p class="text-gray-400 text-sm max-w-sm mx-auto">
+        Connect your YouTube channel to pull views, subs, and top video
+        performance right into Muse analytics.
+      </p>
+    </div>
+    <button
+      @click="connectYoutube"
+      class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
+    >
+      Connect YouTube
+    </button>
+  </div>
+</div>
+
+<!-- ✅ Connected -->
+<div
+  v-else
+  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
+>
+  <!-- header -->
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 pb-4">
+    <div class="flex items-center gap-3">
+      <div
+        class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
+      >
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="currentColor">
+          <path
+            d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
+          />
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-red-200/70">
+          Connected platform
+        </p>
+        <h3 class="text-white text-lg font-semibold leading-tight">
+          YouTube (beta)
+        </h3>
       </div>
     </div>
 
-    <!-- 2) CONNECTED → show the full YouTube card (your original) -->
-    <div
-      v-else
-      class="relative overflow-hidden rounded-xl mb-6 bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)]"
+    <span
+      class="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 text-xs text-gray-200 border border-white/10"
     >
-      <!-- glow -->
-      <div
-        class="pointer-events-none absolute -right-10 -top-10 w-32 h-32 bg-red-500/30 blur-3xl"
-      ></div>
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      synced
+      {{
+        youtubeData.date
+          ? new Date(youtubeData.date).toLocaleString()
+          : "just now"
+      }}
+    </span>
+  </div>
 
-      <div class="flex items-start justify-between gap-4 p-5 md:p-6">
-        <div class="flex items-center gap-3">
-          <!-- YouTube icon -->
-          <div
-            class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              class="w-6 h-6 text-white"
-              fill="currentColor"
-            >
-              <path
-                d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="text-xs uppercase tracking-wide text-red-200/70">
-              Connected platform
-            </p>
-            <h3 class="text-white text-lg font-semibold leading-tight">
-              YouTube (beta)
-            </h3>
-          </div>
-        </div>
-
-        <span
-          class="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 text-xs text-gray-200 border border-white/10"
-        >
-          <span
-            class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"
-          ></span>
-          synced {{ externalMuse.external.youtube.date }}
-        </span>
+  <!-- metric row -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1">Channel views</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ youtubeData.views?.toLocaleString?.() ?? 0 }}
+      </p>
+    </div>
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1">Subscribers</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ youtubeData.subs?.toLocaleString?.() ?? 0 }}
+      </p>
+    </div>
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1">Videos</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ youtubeData.videos?.toLocaleString?.() ?? youtubeData.recentVideos?.length ?? 0 }}
+      </p>
+    </div>
+    <div class="bg-black/5 border border-red-500/10 rounded-lg p-3 flex items-center gap-2">
+      <span class="w-1.5 h-10 rounded-full bg-gradient-to-b from-red-400 to-red-700"></span>
+      <div>
+        <p class="text-xs text-gray-200/80">Status</p>
+        <p class="text-sm text-white font-medium">YouTube data live</p>
       </div>
+    </div>
+  </div>
 
-      <!-- stats row -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-5 md:px-6 pb-4">
-        <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-          <p class="text-xs text-gray-300/80 mb-1 flex items-center gap-1">
-            Views
-            <span
-              class="text-[10px] text-red-200/70 bg-red-500/10 px-1.5 py-0.5 rounded"
-            >
-              last sync
-            </span>
-          </p>
-          <p class="text-2xl font-semibold text-white tracking-tight">
-            {{
-              externalMuse.external.youtube.views?.toLocaleString?.() ??
-              externalMuse.external.youtube.views ??
-              0
-            }}
-          </p>
-        </div>
-
-        <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-          <p class="text-xs text-gray-300/80 mb-1">Subscribers</p>
-          <p class="text-2xl font-semibold text-white tracking-tight">
-            {{
-              externalMuse.external.youtube.subs?.toLocaleString?.() ??
-              externalMuse.external.youtube.subs ??
-              0
-            }}
-          </p>
-        </div>
-
-        <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-          <p class="text-xs text-gray-300/80 mb-1">Top video views</p>
-          <p class="text-2xl font-semibold text-white tracking-tight">
-            {{
-              externalMuse.external.youtube.topVideo?.views?.toLocaleString?.() ??
-              externalMuse.external.youtube.topVideo?.views ??
-              0
-            }}
-          </p>
-        </div>
-
-        <div
-          class="bg-black/5 border border-red-500/10 rounded-lg p-3 flex items-center gap-2"
-        >
-          <span
-            class="w-1.5 h-10 rounded-full bg-gradient-to-b from-red-400 to-red-700"
-          ></span>
-          <div>
-            <p class="text-xs text-gray-200/80">Status</p>
-            <p class="text-sm text-white font-medium">YouTube data live</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- top video -->
-      <div
-        v-if="externalMuse.external.youtube.topVideo"
-        class="px-5 md:px-6 pb-5 pt-1"
-      >
-        <p
-          class="text-xs uppercase text-gray-400 mb-2 tracking-wide flex items-center gap-1"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
-          Top video on YouTube
+  <!-- top video -->
+  <div v-if="youtubeData.topVideo" class="px-6 pb-5">
+    <p class="text-xs uppercase text-gray-400 mb-2 tracking-wide flex items-center gap-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
+      Top video
+    </p>
+    <div
+      class="flex items-center justify-between gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
+    >
+      <div class="min-w-0">
+        <p class="text-sm text-white font-medium truncate">
+          {{ youtubeData.topVideo.title }}
         </p>
-        <div
-          class="flex items-center justify-between gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
+        <p class="text-xs text-gray-300">
+          {{ youtubeData.topVideo.views?.toLocaleString?.() ?? 0 }} views
+        </p>
+      </div>
+      <a
+        v-if="youtubeData.topVideo.videoId"
+        :href="`https://www.youtube.com/watch?v=${youtubeData.topVideo.videoId}`"
+        target="_blank"
+        rel="noopener"
+        class="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)]"
+      >
+        View
+        <svg
+          viewBox="0 0 24 24"
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          <div class="min-w-0">
-            <p class="text-sm text-white font-medium truncate">
-              {{ externalMuse.external.youtube.topVideo.title }}
-            </p>
-            <p class="text-xs text-gray-300">
-              {{
-                externalMuse.external.youtube.topVideo.views?.toLocaleString?.() ??
-                externalMuse.external.youtube.topVideo.views
-              }}
-              views
-            </p>
-          </div>
-          <!-- ✅ REAL LINK NOW -->
+          <path d="M7 17 17 7" />
+          <path d="M7 7h10v10" />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- recent videos list -->
+  <div v-if="youtubeData.recentVideos && youtubeData.recentVideos.length" class="px-6 pb-6">
+    <p class="text-sm text-white font-semibold mb-2 flex items-center gap-1">
+      Recent uploads
+      <span class="text-xs text-gray-400">
+        ({{ youtubeData.recentVideos.length }})
+      </span>
+    </p>
+
+    <div class="grid gap-3 md:grid-cols-2">
+      <div
+        v-for="vid in youtubeData.recentVideos"
+        :key="vid.videoId"
+        class="flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
+      >
+        <img
+          v-if="vid.thumbnail"
+          :src="vid.thumbnail"
+          alt=""
+          class="w-20 h-14 object-cover rounded-md flex-shrink-0"
+          loading="lazy"
+        />
+        <div class="min-w-0">
+          <p class="text-sm text-white font-medium truncate">
+            {{ vid.title }}
+          </p>
+          <p class="text-xs text-gray-400">
+            {{ vid.publishedAt ? new Date(vid.publishedAt).toLocaleDateString() : "" }}
+          </p>
+          <p class="text-xs text-gray-400">
+            {{ vid.views ? `${vid.views} views` : "" }}
+          </p>
           <a
-            v-if="externalMuse.external.youtube.topVideo?.videoId"
-            :href="`https://www.youtube.com/watch?v=${externalMuse.external.youtube.topVideo.videoId}`"
+            v-if="vid.videoId"
+            :href="`https://www.youtube.com/watch?v=${vid.videoId}`"
             target="_blank"
             rel="noopener"
-            class="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)]"
+            class="inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1"
           >
-            View on YouTube
-            <svg
-              viewBox="0 0 24 24"
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M7 17 17 7" />
-              <path d="M7 7h10v10" />
-            </svg>
+            Watch →
           </a>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
 
     <!-- Tabs -->
     <div class="flex gap-2 mb-4">
@@ -695,9 +691,10 @@ const museRows = ref<any[]>([]);
 const museLoading = ref(false);
 const museError = ref<any>(null);
 const latestMuse = computed(() => museRows.value?.[0]?.attributes || null);
-const bandId = computed(() =>
-  Number(route.params.bandId || route.query.bandId)
-);
+
+const config = useRuntimeConfig();
+
+const bandId = computed(() => Number(route.params.id));
 
 /* ---------- Analytics composable (rollups, geo, transitions) ---------- */
 const { getRollups, getGeo, getTransitions } = useMuse();
@@ -778,6 +775,31 @@ const totalViewsInRange = computed(() => rollups.value?.totals?.views ?? 0);
 const totalClicksInRange = computed(() => rollups.value?.totals?.clicks ?? 0);
 // ✅ total QR in range (for later if we want to show)
 const totalQrInRange = computed(() => rollups.value?.totals?.qrScans ?? 0);
+
+const youtubeData = computed(() => {
+  const raw = externalMuse.value?.external?.youtube;
+  if (!raw) return null;
+
+  const m = raw.metrics || {};
+
+  return {
+    connected: raw.connected ?? true,
+    // your template shows: synced {{ externalMuse.external.youtube.date }}
+    // but API returns lastFetchedAt
+    date: raw.date || raw.lastFetchedAt || null,
+
+    // what the template uses:
+    views: m.views ?? raw.views ?? m.viewCount ?? 0,
+    subs: m.subs ?? m.subscriberCount ?? raw.subs ?? 0,
+    videos: m.videos ?? m.videoCount ?? raw.videos ?? 0,
+
+    // we didn’t have this in the API yet, so we allow fallback to null
+    topVideo: m.topVideo || raw.topVideo || null,
+
+    // nice to have for later
+    recentVideos: m.recentVideos || [],
+  };
+});
 
 const sourceCounts = computed<[string, number][]>(
   () => rollups.value?.sources ?? []
@@ -1635,6 +1657,12 @@ watch(
 
 /* ---------- lifecycle ---------- */
 onMounted(async () => {
+  console.log("🔍 Route params:", route.params);
+  console.log("🔍 Route query:", route.query);
+  console.log(
+    "🔍 Resolved bandId:",
+    route.params.id || route.params.bandId || route.query.bandId
+  );
   await ensureChart();
   await fetchAndRender(false); // first load
   await fetchMuse();
