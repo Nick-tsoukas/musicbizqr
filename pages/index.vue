@@ -665,6 +665,14 @@
           ><img src="@/assets/musicbizlogo.png" class="h-12"
         /></NuxtLink>
       </div>
+      <div class="flex justify-center pb-10 ">
+        <NuxtLink class="text-white pr-4 " to="/privacypolicy"
+          >Privacy Policy
+       </NuxtLink>
+        <NuxtLink class="text-white " to="/termsofservice"
+          >Terms of service
+       </NuxtLink>
+      </div>
     </div>
   </div>
 </template>
