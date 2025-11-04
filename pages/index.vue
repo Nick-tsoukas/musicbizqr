@@ -16,8 +16,6 @@
             <div
               class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
             >
-      
-
               <h1
                 data-aos="fade-up"
                 class="font-extrabold tracking-tight leading-none text-center lg:text-left"
@@ -135,6 +133,18 @@
             </div>
           </div>
         </div>
+
+        <!-- muse  -->
+        <section
+          id="muse"
+          class="relative isolate overflow-hidden bg-black text-white"
+        >
+          <!-- soft glow -->
+          <div
+            class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_50%_0%,rgba(120,119,198,0.25),rgba(30,27,75,0)_70%)]"
+          />
+        </section>
+        <!-- end of muse  -->
         <!-- needs section here  -->
 
         <section class="relative text-white overflow-hidden">
@@ -365,8 +375,9 @@
           <div class="w-full max-w-md md:max-w-2xl mx-auto">
             <section class="max-w-5xl mx-auto text-white my-12 overflow-hidden">
               <div class="grid md:grid-cols-1 gap-6 p-6 md:p-10 items-center">
-
-                <div class="flex justify-center w-auto  image_gradient p-10 rounded-lg">
+                <div
+                  class="flex justify-center w-auto image_gradient p-10 rounded-lg"
+                >
                   <img
                     src="public/screenshotappnovideo.png"
                     alt="MusicBizQR dashboard"
@@ -374,17 +385,16 @@
                     loading="lazy"
                   />
                 </div>
-                 <NuxtLink
-                    to="/burningthunder"
-                    class="mb-8 inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
-                  >
-                    Preview Page
-                  </NuxtLink>
+                <NuxtLink
+                  to="/burningthunder"
+                  class="mb-8 inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
+                >
+                  Preview Page
+                </NuxtLink>
               </div>
             </section>
           </div>
         </div>
-
 
         <!-- Embed section (unchanged) -->
         <section
@@ -513,6 +523,35 @@
               </p>
               <BarChart />
             </div>
+            <div class="mx-auto max-w-7xl px-6 py-20 md:px-8 md:py-28">
+              <!-- Header -->
+              <div class="mx-auto max-w-3xl text-center">
+                <h2
+                  class="mt-6 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl"
+                >
+                  One Dashboard. Every Platform.
+                  <span
+                    class="bg-gradient-to-r from-fuchsia-400 via-violet-400 to-sky-400 bg-clip-text text-transparent"
+                  >
+                    Daily Intelligence.
+                  </span>
+                </h2>
+                <p class="mt-4 text-base leading-7 text-white/70 md:text-lg">
+                  Muse turns page views, link clicks, song &amp; video plays,
+                  geo, devices, and YouTube (beta) into
+                  <span class="text-white">actionable next steps</span>—like a
+                  daily “Wrapped” for your band.
+                </p>
+              </div>
+
+              <section class="max-w-4xl m-auto pt-28">
+                <iframe
+                src="https://musicbizqr.com/analytics/5"
+                class="w-full h-[1000px] rounded-xl border border-white/10 shadow-lg"
+                loading="lazy"
+              ></iframe>
+              </section>
+            </div>
           </section>
         </section>
 
@@ -558,19 +597,14 @@
               </ul>
 
               <NuxtLink
-  to="/signup"
-  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 
-         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
-         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
-         px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
->
-  <span> Free 30 Day Trial</span>
-</NuxtLink>
+                to="/signup"
+                class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+              >
+                <span> Free 30 Day Trial</span>
+              </NuxtLink>
             </div>
           </div>
         </section>
-
-       
 
         <!-- CTA repeat -->
         <div
@@ -593,14 +627,11 @@
                 class="flex w-full justify-center md:justify-center px-2 gap-6 mt-10 text-white"
               >
                 <NuxtLink
-  to="/signup"
-  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 
-         bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 
-         hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500
-         px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
->
-  <span> Free 30 Day Trial</span>
-</NuxtLink>
+                  to="/signup"
+                  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+                >
+                  <span> Free 30 Day Trial</span>
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -633,7 +664,7 @@
             </div>
           </div>
         </section>
-         <TutorialsSection
+        <TutorialsSection
           id="videos"
           heading="Video Tutorials"
           :videos="[
@@ -665,13 +696,13 @@
           ><img src="@/assets/musicbizlogo.png" class="h-12"
         /></NuxtLink>
       </div>
-      <div class="flex justify-center pb-10 ">
-        <NuxtLink class="text-white pr-4 " to="/privacypolicy"
+      <div class="flex justify-center pb-10">
+        <NuxtLink class="text-white pr-4" to="/privacypolicy"
           >Privacy Policy
-       </NuxtLink>
-        <NuxtLink class="text-white " to="/termsofservice"
+        </NuxtLink>
+        <NuxtLink class="text-white" to="/termsofservice"
           >Terms of service
-       </NuxtLink>
+        </NuxtLink>
       </div>
     </div>
   </div>
@@ -693,6 +724,31 @@ import {
 import { defineComponent } from "vue";
 
 import deezer from "@/assets/dezzer.svg";
+
+const insights = [
+  "Your fans in Nashville are up +26% — add venue tags to tonight’s post.",
+  "7–9pm CT = 2× engagement — schedule your reel for 7:30pm.",
+  "YouTube Shorts drove 41% of plays — republish the chorus cut.",
+  "Mobile users bounced on long pages — put the ticket link in the top 400px.",
+];
+
+const index = ref(0);
+let timer;
+
+onMounted(() => {
+  timer = setInterval(() => {
+    index.value = (index.value + 1) % insights.length;
+  }, 5000);
+});
+
+onBeforeUnmount(() => {
+  if (timer) clearInterval(timer);
+});
+
+const currentInsight = computed(() => insights[index.value]);
+
+// Placeholder image: served from /public, so the runtime path is "/screenshotappnovideo.png"
+const resolvedImageSrc = "/screenshotappnovideo.png";
 
 const isTH = ref(false);
 const USD_PRICE = 7;
@@ -784,7 +840,8 @@ const handleScroll = () => {
 };
 
 const isPlaying = ref(false);
-const videoUrl = "https://www.youtube.com/embed/cUR4LFl_UME?si=n91skAv82Us3YZkY";
+const videoUrl =
+  "https://www.youtube.com/embed/cUR4LFl_UME?si=n91skAv82Us3YZkY";
 const thumbnail = "https://img.youtube.com/vi/cUR4LFl_UME/maxresdefault.jpg";
 
 // mockups/assets (unchanged)
