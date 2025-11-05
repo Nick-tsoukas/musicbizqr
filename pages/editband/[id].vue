@@ -735,7 +735,32 @@ async function submitForm() {
     const pj = await put.json();
     if (!put.ok) throw pj;
 
-    router.push("/dashboard");
+   // ✅ get the current slug and do a full redirect (hard refresh)
+let slug =
+  pj?.data?.attributes?.slug ||
+  pj?.data?.slug ||
+  pj?.slug ||
+  null;
+
+if (!slug) {
+  // fallback: refetch just the slug by id
+  try {
+    const r = await fetch(`${config.public.strapiUrl}/api/bands/${id}?fields[0]=slug`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    const j = await r.json();
+    slug = j?.data?.attributes?.slug || null;
+  } catch {}
+}
+
+if (slug && process.client) {
+  // full page navigation → guarantees header is fresh
+  window.location.replace(`/${slug}`);
+  return;
+}
+
+// final fallback
+if (process.client) window.location.reload();
   } catch (err) {
     console.error("❌ submitForm error:", err);
     alert(err?.error?.message || "Update failed");
