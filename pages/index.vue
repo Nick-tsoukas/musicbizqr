@@ -8,8 +8,11 @@
       />
 
       <main>
+         <!-- intro to muse starts here  -->
+          <!-- HERO: mobile-first, balanced type, HTML-only -->
+
         <!-- Hero -->
-        <div class="relative isolate min-h-[100vh]">
+     <div class="relative isolate min-h-[100vh]">
           <div
             class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8"
           >
@@ -26,7 +29,7 @@
                   MusicBizQR
                 </span>
 
-                <!-- Localized subtitle -->
+              
                 <span
                   v-if="!isTH"
                   class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200"
@@ -53,7 +56,7 @@
                 />
               </div>
 
-              <!-- Bullets (kept English; concise & universal) -->
+           
               <ul class="space-y-3 text-lg lg:text-xl text-white mt-6">
                 <li>
                   <strong
@@ -97,7 +100,7 @@
                 </li>
               </ul>
 
-              <!-- Primary CTAs (localized) -->
+           
               <div
                 class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6"
               >
@@ -114,7 +117,7 @@
                 </NuxtLink>
               </div>
 
-              <!-- Micro trust for Thailand -->
+           
               <p v-if="isTH" class="text-sm text-white/70">
                 รองรับครีเอเตอร์สายเพลงและภาพยนตร์ —
                 สร้างลิงก์รวมสำหรับโปสเตอร์/บัตรเชิญ/หน้าเพจ
@@ -134,24 +137,24 @@
           </div>
         </div>
 
-        <!-- muse  -->
-        <section
+       
+        <!-- <section
           id="muse"
           class="relative isolate overflow-hidden bg-black text-white"
         >
-          <!-- soft glow -->
+    
           <div
             class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_50%_0%,rgba(120,119,198,0.25),rgba(30,27,75,0)_70%)]"
           />
-        </section>
-        <!-- end of muse  -->
+        </section> -->
+    
         <!-- needs section here  -->
 
         <section class="relative text-white overflow-hidden">
           <!-- subtle gradient glow -->
-          <div
+          <!-- <div
             class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(120%_110%_at_50%_100%,rgba(199,36,177,0.38),transparent_80%)]"
-          />
+          /> -->
 
           <div class="container mx-auto px-6 py-16 md:py-24">
             <div
@@ -318,6 +321,9 @@
             </div>
           </div>
         </section>
+
+       
+            <!-- end of muse -->
 
         <!-- CTA block -->
         <!-- <div

@@ -144,299 +144,7 @@
         </div>
       </div>
     </div>
-    <!-- <pre class="text-white">{{ youtubeData }}</pre> -->
-    <!-- 🎬 YouTube Integration -->
-    <!-- 1) NOT CONNECTED YET → show soft CTA -->
-    <!-- 🎬 YouTube Analytics -->
-<div
-  v-if="!youtubeData"
-  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
->
-  <div class="flex flex-col items-center justify-center gap-4">
-    <div
-      class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
-    >
-      <svg viewBox="0 0 24 24" class="w-7 h-7 text-white" fill="currentColor">
-        <path
-          d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-        />
-      </svg>
-    </div>
-    <div>
-      <h3 class="text-white text-lg font-semibold mb-1">Connect YouTube</h3>
-      <p class="text-gray-400 text-sm max-w-sm mx-auto">
-        Connect your YouTube channel to pull views, subs, and top video
-        performance right into Muse analytics.
-      </p>
-    </div>
-    <button
-      @click="connectYoutube"
-      class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
-    >
-      Connect YouTube
-    </button>
-  </div>
-</div>
-
-<!-- ✅ CONNECTED: YouTube Card (drop-in replacement) -->
-<div
-  v-else
-  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
->
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 pb-4">
-    <!-- Left: brand + title -->
-    <div class="flex items-center gap-3">
-      <div
-        class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
-        aria-hidden="true"
-      >
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="currentColor">
-          <path
-            d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0-.35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-          />
-        </svg>
-      </div>
-      <div>
-        <p class="text-xs uppercase tracking-wide text-red-200/70">Connected platform</p>
-        <h3 class="text-white text-lg font-semibold leading-tight">YouTube (beta)</h3>
-      </div>
-    </div>
-
-    <!-- Right: actions (status + resync) -->
-    <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto">
-      <!-- Status chip -->
-      <span
-        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border"
-        :class="youtubeStatusChip.tone === 'green'
-          ? 'bg-white/5 text-gray-200 border-white/10'
-          : 'bg-amber-500/10 text-amber-200 border-amber-400/20'"
-        v-tooltip="youtubeStatusChip.tooltip"
-      >
-        <span
-          class="w-1.5 h-1.5 rounded-full animate-pulse"
-          :class="youtubeStatusChip.tone === 'green' ? 'bg-emerald-400' : 'bg-amber-400'"
-        ></span>
-        {{ youtubeStatusChip.text }}
-      </span>
-
-      <!-- Re-sync -->
-      <button
-        @click="resyncYoutube"
-        :disabled="youtubeResyncing"
-        class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition
-               disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
-               focus:ring-2 focus:ring-red-500/50
-               bg-white/5 text-gray-200 border-white/10 hover:bg-white/10"
-        aria-label="Re-sync YouTube"
-        v-tooltip="'Refresh YouTube data and recent uploads'"
-      >
-        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12a9 9 0 1 1-3-6.7" />
-          <path d="M21 3v6h-6" />
-        </svg>
-        {{ youtubeResyncing ? 'Syncing…' : 'Re-sync' }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Metrics -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Channel views (fallback: sum of recent videos)'">Total views</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ (richYoutube.totals.channelViews ?? 0).toLocaleString() }}
-      </p>
-    </div>
-
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Number of uploaded videos found in your uploads feed'">Videos</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ richYoutube.totals.totalVideos ?? 0 }}
-      </p>
-    </div>
-
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Average views per video (Total views ÷ videos)'">Avg views / video</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ (richYoutube.totals.avgViews ?? 0).toLocaleString() }}
-      </p>
-    </div>
-
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Days since your most recent upload'">Last upload</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        <template v-if="richYoutube.freshness.daysSinceLastUpload !== null">
-          {{ richYoutube.freshness.daysSinceLastUpload }}
-          <span class="text-sm text-gray-400">days ago</span>
-        </template>
-        <template v-else>—</template>
-      </p>
-    </div>
-  </div>
-
-  <!-- Spotlight (Top & Newest) -->
-  <div class="px-6 pb-5">
-    <div class="grid gap-3 md:grid-cols-2">
-      <!-- Top performer -->
-      <div
-        v-if="richYoutube.spotlight.top"
-        class="relative flex items-center gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
-      >
-        <!-- Badge -->
-        <span class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-red-500 text-white px-2 py-0.5 rounded-full shadow">
-          Top
-        </span>
-        <div class="relative">
-          <img
-            v-if="richYoutube.spotlight.top.thumbnail"
-            :src="richYoutube.spotlight.top.thumbnail"
-            alt=""
-            class="w-20 h-14 object-cover rounded-md"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="min-w-0">
-          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
-            Top video
-          </p>
-          <p class="text-sm text-white font-medium truncate">
-            {{ richYoutube.spotlight.top.title }}
-          </p>
-          <p class="text-xs text-gray-300">
-            {{ (richYoutube.spotlight.top.views ?? 0).toLocaleString() }} views
-          </p>
-        </div>
-        <a
-          v-if="richYoutube.spotlight.top.id"
-          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.top.id}`"
-          target="_blank"
-          rel="noopener"
-          class="ml-auto flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)] focus:outline-none focus:ring-2 focus:ring-red-500/50"
-        >
-          View
-          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 17 17 7" />
-            <path d="M7 7h10v10" />
-          </svg>
-        </a>
-      </div>
-
-      <!-- Newest upload (hide if same as top) -->
-      <div
-        v-if="richYoutube.spotlight.newest && (!richYoutube.spotlight.top || richYoutube.spotlight.newest.id !== richYoutube.spotlight.top.id)"
-        class="relative flex items-center gap-3 bg-black/20 border border-white/10 rounded-lg px-4 py-3"
-      >
-        <!-- New badge (7d window) -->
-        <span
-          v-if="richYoutube.spotlight.newest.publishedAt && (Date.now() - new Date(richYoutube.spotlight.newest.publishedAt).getTime() <= 7 * 86400000)"
-          class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow"
-        >
-          New
-        </span>
-        <div class="relative">
-          <img
-            v-if="richYoutube.spotlight.newest.thumbnail"
-            :src="richYoutube.spotlight.newest.thumbnail"
-            alt=""
-            class="w-20 h-14 object-cover rounded-md"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="min-w-0">
-          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide">Newest upload</p>
-          <p class="text-sm text-white font-medium truncate">
-            {{ richYoutube.spotlight.newest.title }}
-          </p>
-          <p class="text-xs text-gray-300">
-            {{ richYoutube.spotlight.newest.publishedAt ? new Date(richYoutube.spotlight.newest.publishedAt).toLocaleDateString() : '—' }}
-          </p>
-        </div>
-        <a
-          v-if="richYoutube.spotlight.newest.id"
-          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.newest.id}`"
-          target="_blank"
-          rel="noopener"
-          class="ml-auto inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
-        >
-          Watch →
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick insights -->
-  <div class="px-6 pb-3">
-    <p class="text-xs uppercase text-gray-400 mb-2 tracking-wide">Channel insights</p>
-    <ul v-if="youtubeInsights.length" class="list-disc pl-5 text-gray-200 space-y-1">
-      <li v-for="(b, i) in youtubeInsights" :key="i">{{ b }}</li>
-    </ul>
-    <p v-else class="text-gray-400 text-sm">No insights yet.</p>
-  </div>
-
-  <!-- CTA line -->
-  <div v-if="youtubeCtaLine" class="px-6 pb-6">
-    <div class="bg-black/10 border border-white/10 rounded-lg p-3 text-sm text-gray-200">
-      {{ youtubeCtaLine }}
-    </div>
-  </div>
-
-  <!-- Recent uploads -->
-  <div v-if="richYoutube.videos.length" class="px-6 pb-6">
-    <p class="text-sm text-white font-semibold mb-2 flex items-center gap-1">
-      Recent uploads
-      <span class="text-xs text-gray-400">({{ richYoutube.videos.length }})</span>
-    </p>
-
-    <div class="grid gap-3 md:grid-cols-2">
-      <div
-        v-for="vid in richYoutube.videos"
-        :key="vid.id || vid.title"
-        class="relative flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
-      >
-        <!-- optional tiny view badge if low/high -->
-        <span
-          v-if="(vid.views ?? 0) > 1000"
-          class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-purple-500 text-white px-2 py-0.5 rounded-full shadow"
-        >
-          1k+
-        </span>
-
-        <img
-          v-if="vid.thumbnail"
-          :src="vid.thumbnail"
-          alt=""
-          class="w-20 h-14 object-cover rounded-md flex-shrink-0"
-          loading="lazy"
-          decoding="async"
-        />
-        <div class="min-w-0">
-          <p class="text-sm text-white font-medium truncate">{{ vid.title }}</p>
-          <p class="text-xs text-gray-400">
-            {{ vid.publishedAt ? new Date(vid.publishedAt).toLocaleDateString() : "—" }}
-          </p>
-          <p class="text-xs text-gray-400">{{ (vid.views ?? 0).toLocaleString() }} views</p>
-          <a
-            v-if="vid.id"
-            :href="`https://www.youtube.com/watch?v=${vid.id}`"
-            target="_blank"
-            rel="noopener"
-            class="inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
-          >
-            Watch →
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- end of youtube  -->
+  
     <!-- Tabs -->
     <div class="flex gap-2 mb-4">
       <button
@@ -767,6 +475,300 @@
           </ClientOnly>
         </div>
       </div>
+
+        <!-- <pre class="text-white">{{ youtubeData }}</pre> -->
+    <!-- 🎬 YouTube Integration -->
+    <!-- 1) NOT CONNECTED YET → show soft CTA -->
+    <!-- 🎬 YouTube Analytics -->
+<div
+  v-if="!youtubeData"
+  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
+>
+  <div class="flex flex-col items-center justify-center gap-4">
+    <div
+      class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
+    >
+      <svg viewBox="0 0 24 24" class="w-7 h-7 text-white" fill="currentColor">
+        <path
+          d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
+        />
+      </svg>
+    </div>
+    <div>
+      <h3 class="text-white text-lg font-semibold mb-1">Connect YouTube</h3>
+      <p class="text-gray-400 text-sm max-w-sm mx-auto">
+        Connect your YouTube channel to pull views, subs, and top video
+        performance right into Muse analytics.
+      </p>
+    </div>
+    <button
+      @click="connectYoutube"
+      class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
+    >
+      Connect YouTube
+    </button>
+  </div>
+</div>
+
+<!-- ✅ CONNECTED: YouTube Card (drop-in replacement) -->
+<div
+  v-else
+  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
+>
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 pb-4">
+    <!-- Left: brand + title -->
+    <div class="flex items-center gap-3">
+      <div
+        class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="currentColor">
+          <path
+            d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0-.35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
+          />
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-red-200/70">Connected platform</p>
+        <h3 class="text-white text-lg font-semibold leading-tight">YouTube (beta)</h3>
+      </div>
+    </div>
+
+    <!-- Right: actions (status + resync) -->
+    <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto">
+      <!-- Status chip -->
+      <span
+        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border"
+        :class="youtubeStatusChip.tone === 'green'
+          ? 'bg-white/5 text-gray-200 border-white/10'
+          : 'bg-amber-500/10 text-amber-200 border-amber-400/20'"
+        v-tooltip="youtubeStatusChip.tooltip"
+      >
+        <span
+          class="w-1.5 h-1.5 rounded-full animate-pulse"
+          :class="youtubeStatusChip.tone === 'green' ? 'bg-emerald-400' : 'bg-amber-400'"
+        ></span>
+        {{ youtubeStatusChip.text }}
+      </span>
+
+      <!-- Re-sync -->
+      <button
+        @click="resyncYoutube"
+        :disabled="youtubeResyncing"
+        class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition
+               disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
+               focus:ring-2 focus:ring-red-500/50
+               bg-white/5 text-gray-200 border-white/10 hover:bg-white/10"
+        aria-label="Re-sync YouTube"
+        v-tooltip="'Refresh YouTube data and recent uploads'"
+      >
+        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-3-6.7" />
+          <path d="M21 3v6h-6" />
+        </svg>
+        {{ youtubeResyncing ? 'Syncing…' : 'Re-sync' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Channel views (fallback: sum of recent videos)'">Total views</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ (richYoutube.totals.channelViews ?? 0).toLocaleString() }}
+      </p>
+    </div>
+
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Number of uploaded videos found in your uploads feed'">Videos</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ richYoutube.totals.totalVideos ?? 0 }}
+      </p>
+    </div>
+
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Average views per video (Total views ÷ videos)'">Avg views / video</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        {{ (richYoutube.totals.avgViews ?? 0).toLocaleString() }}
+      </p>
+    </div>
+
+    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Days since your most recent upload'">Last upload</p>
+      <p class="text-2xl font-semibold text-white tracking-tight">
+        <template v-if="richYoutube.freshness.daysSinceLastUpload !== null">
+          {{ richYoutube.freshness.daysSinceLastUpload }}
+          <span class="text-sm text-gray-400">days ago</span>
+        </template>
+        <template v-else>—</template>
+      </p>
+    </div>
+  </div>
+
+  <!-- Spotlight (Top & Newest) -->
+  <div class="px-6 pb-5">
+    <div class="grid gap-3 md:grid-cols-2">
+      <!-- Top performer -->
+      <div
+        v-if="richYoutube.spotlight.top"
+        class="relative flex items-center gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
+      >
+        <!-- Badge -->
+        <span class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-red-500 text-white px-2 py-0.5 rounded-full shadow">
+          Top
+        </span>
+        <div class="relative">
+          <img
+            v-if="richYoutube.spotlight.top.thumbnail"
+            :src="richYoutube.spotlight.top.thumbnail"
+            alt=""
+            class="w-20 h-14 object-cover rounded-md"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
+            Top video
+          </p>
+          <p class="text-sm text-white font-medium truncate">
+            {{ richYoutube.spotlight.top.title }}
+          </p>
+          <p class="text-xs text-gray-300">
+            {{ (richYoutube.spotlight.top.views ?? 0).toLocaleString() }} views
+          </p>
+        </div>
+        <a
+          v-if="richYoutube.spotlight.top.id"
+          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.top.id}`"
+          target="_blank"
+          rel="noopener"
+          class="ml-auto flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+        >
+          View
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7" />
+            <path d="M7 7h10v10" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Newest upload (hide if same as top) -->
+      <div
+        v-if="richYoutube.spotlight.newest && (!richYoutube.spotlight.top || richYoutube.spotlight.newest.id !== richYoutube.spotlight.top.id)"
+        class="relative flex items-center gap-3 bg-black/20 border border-white/10 rounded-lg px-4 py-3"
+      >
+        <!-- New badge (7d window) -->
+        <span
+          v-if="richYoutube.spotlight.newest.publishedAt && (Date.now() - new Date(richYoutube.spotlight.newest.publishedAt).getTime() <= 7 * 86400000)"
+          class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow"
+        >
+          New
+        </span>
+        <div class="relative">
+          <img
+            v-if="richYoutube.spotlight.newest.thumbnail"
+            :src="richYoutube.spotlight.newest.thumbnail"
+            alt=""
+            class="w-20 h-14 object-cover rounded-md"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide">Newest upload</p>
+          <p class="text-sm text-white font-medium truncate">
+            {{ richYoutube.spotlight.newest.title }}
+          </p>
+          <p class="text-xs text-gray-300">
+            {{ richYoutube.spotlight.newest.publishedAt ? new Date(richYoutube.spotlight.newest.publishedAt).toLocaleDateString() : '—' }}
+          </p>
+        </div>
+        <a
+          v-if="richYoutube.spotlight.newest.id"
+          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.newest.id}`"
+          target="_blank"
+          rel="noopener"
+          class="ml-auto inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
+        >
+          Watch →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick insights -->
+  <div class="px-6 pb-3">
+    <p class="text-xs uppercase text-gray-400 mb-2 tracking-wide">Channel insights</p>
+    <ul v-if="youtubeInsights.length" class="list-disc pl-5 text-gray-200 space-y-1">
+      <li v-for="(b, i) in youtubeInsights" :key="i">{{ b }}</li>
+    </ul>
+    <p v-else class="text-gray-400 text-sm">No insights yet.</p>
+  </div>
+
+  <!-- CTA line -->
+  <div v-if="youtubeCtaLine" class="px-6 pb-6">
+    <div class="bg-black/10 border border-white/10 rounded-lg p-3 text-sm text-gray-200">
+      {{ youtubeCtaLine }}
+    </div>
+  </div>
+
+  <!-- Recent uploads -->
+  <div v-if="richYoutube.videos.length" class="px-6 pb-6">
+    <p class="text-sm text-white font-semibold mb-2 flex items-center gap-1">
+      Recent uploads
+      <span class="text-xs text-gray-400">({{ richYoutube.videos.length }})</span>
+    </p>
+
+    <div class="grid gap-3 md:grid-cols-2">
+      <div
+        v-for="vid in richYoutube.videos"
+        :key="vid.id || vid.title"
+        class="relative flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
+      >
+        <!-- optional tiny view badge if low/high -->
+        <span
+          v-if="(vid.views ?? 0) > 1000"
+          class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-purple-500 text-white px-2 py-0.5 rounded-full shadow"
+        >
+          1k+
+        </span>
+
+        <img
+          v-if="vid.thumbnail"
+          :src="vid.thumbnail"
+          alt=""
+          class="w-20 h-14 object-cover rounded-md flex-shrink-0"
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="min-w-0">
+          <p class="text-sm text-white font-medium truncate">{{ vid.title }}</p>
+          <p class="text-xs text-gray-400">
+            {{ vid.publishedAt ? new Date(vid.publishedAt).toLocaleDateString() : "—" }}
+          </p>
+          <p class="text-xs text-gray-400">{{ (vid.views ?? 0).toLocaleString() }} views</p>
+          <a
+            v-if="vid.id"
+            :href="`https://www.youtube.com/watch?v=${vid.id}`"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
+          >
+            Watch →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- end of youtube  -->
     </div>
   </div>
 </template>
@@ -888,6 +890,7 @@ const track = (event: string, props: Record<string, any> = {}) => {
 };
 
 const resyncYoutubeNow = async () => {
+  console.log('this is the reyncyoutube now fucntion ')
   if (youtubeResyncing.value) return;
   if (!bandId.value) return;
 
@@ -896,21 +899,26 @@ const resyncYoutubeNow = async () => {
 
   try {
     // 1) hit your existing Strapi sync endpoint
-    await $fetch(`${useRuntimeConfig().public.strapiUrl}/api/youtube/sync`, {
-      method: "POST",
-      body: { bandId: bandId.value },
-    });
+    const res = await $fetch(
+      `${useRuntimeConfig().public.strapiUrl}/api/youtube/sync`,
+      {
+        method: "POST",
+        body: { bandId: bandId.value },
+      }
+    );
+
+    console.log("[youtube] resync response", res);
 
     // 2) refresh the aggregate in-place using your existing loader
     await fetchAndRender(true);
   } catch (e) {
     console.warn("[youtube] resync failed", e);
-    // (optional) toast
     alert("YouTube re-sync failed. Try again in a minute.");
   } finally {
     youtubeResyncing.value = false;
   }
 };
+
 
 // debounced wrapper to avoid double taps
 const resyncYoutube = debounce(resyncYoutubeNow, 800);
