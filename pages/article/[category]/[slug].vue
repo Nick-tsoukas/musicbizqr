@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute, useAsyncData, useHead, useRuntimeConfig } from '#imports'
+import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed } from '#imports'
 import { marked } from 'marked'
 
 const route = useRoute()
@@ -7,52 +7,82 @@ const category = route.params.category
 const slug = route.params.slug
 const config = useRuntimeConfig()
 
-const { data: seoPage, error } = await useAsyncData(`article-${category}-${slug}`, () =>
-  $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
-    params: {
-      'filters[slug][$eq]': slug,
-      'filters[category][$eq]': category,
-      populate: '*'
-    }
-  })
+// ---------------- Article Fetch ----------------
+const { data: seoPage, error } = await useAsyncData(
+  `article-${category}-${slug}`,
+  () =>
+    $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+      params: {
+        'filters[slug][$eq]': slug,
+        'filters[category][$eq]': category,
+        populate: '*'
+      }
+    })
 )
 
 if (error.value) {
   console.error('Article fetch error:', error.value)
 }
 
-// ———————— Related Posts ———————— 
-// — Related Posts —
+// ---------------- Related Posts ----------------
 const { data: articles, error: relatedError } = await useAsyncData(
   `related-${category}`,
-  () => $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
-    params: {
-      'filters[category][$eq]': category,
-      sort: ['publishedAt:desc'],
-      pagination: { limit: 3 },
-      fields: ['title','slug','metaTitle','metaDescription']
-    }
-  })
+  () =>
+    $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+      params: {
+        'filters[category][$eq]': category,
+        sort: ['publishedAt:desc'],
+        pagination: { limit: 3 },
+        fields: ['title', 'slug', 'metaTitle', 'metaDescription']
+      }
+    })
 )
 
 if (relatedError.value) {
   console.error('Related posts fetch error:', relatedError.value)
 }
+
 const page = seoPage.value?.data?.[0]?.attributes || {}
+
 const pageUrl = `https://musicbizqr.com/article/${category}/${slug}`
 const publishedDate = page.publishedAt || new Date().toISOString()
 const authorName = page.author?.name || 'MusicBizQR'
-const keywordsArray = (page.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
-const ogImage = page.ogImage?.url || 'https://musicbizqr.com/default-og.png' // Fallback
+const keywordsArray = (page.keywords || '')
+  .split(',')
+  .map(k => k.trim())
+  .filter(Boolean)
 
-useHead({
-  title: page.metaTitle || page.title || 'Discover New Music',
-  meta: [
-    { name: 'description', content: page.metaDescription || page.excerpt || page.title || 'Explore music growth strategies using QR codes and smart links.' },
+// Adjust this to match your Strapi media shape if needed
+const ogImage =
+  page.ogImage?.url || 'https://musicbizqr.com/default-og.png'
+
+// ---------------- JSON-LD from Strapi ----------------
+// We assume you added a JSON field called "jsonLd" to the seo-page type
+const jsonLdString = computed(() => {
+  if (!page.jsonLd) return null
+  try {
+    return JSON.stringify(page.jsonLd)
+  } catch (e) {
+    console.error('Error stringifying JSON-LD from Strapi', e)
+    return null
+  }
+})
+
+// ---------------- SEO Head ----------------
+useHead(() => {
+  const title = page.metaTitle || page.title || 'Discover New Music'
+  const description =
+    page.metaDescription ||
+    page.excerpt ||
+    page.title ||
+    'Explore music growth strategies using QR codes and smart links.'
+
+  const meta = [
+    { name: 'description', content: description },
 
     // ✅ Open Graph
-    { property: 'og:title', content: page.metaTitle || page.title },
-    { property: 'og:description', content: page.metaDescription || page.excerpt || page.title },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
     { property: 'og:url', content: pageUrl },
     { property: 'og:type', content: 'article' },
     { property: 'og:image', content: ogImage },
@@ -62,8 +92,8 @@ useHead({
 
     // ✅ Twitter
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: page.metaTitle || page.title },
-    { name: 'twitter:description', content: page.metaDescription || page.excerpt || page.title },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
     { name: 'twitter:image', content: ogImage },
 
     // ✅ Author & Keywords
@@ -72,73 +102,91 @@ useHead({
 
     // ✅ Optional polish
     { name: 'theme-color', content: '#000000' }
-  ],
-  link: [
+  ]
+
+  const link = [
     { rel: 'canonical', href: pageUrl },
     { rel: 'icon', href: '/favicon.ico' }
-  ],
-  script: [
-    // ✅ Article JSON-LD
-    {
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": page.metaTitle || page.title,
-        "description": page.metaDescription || page.excerpt || page.title,
-        "author": {
-          "@type": "Person",
-          "name": authorName
-        },
-        "datePublished": publishedDate,
-        "publisher": {
-          "@type": "Organization",
-          "name": "MusicBizQR",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://musicbizqr.com/logo.png"
-          }
-        },
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": pageUrl
-        },
-        "image": ogImage,
-        "keywords": keywordsArray
-      })
-    },
-
-    // ✅ Breadcrumbs JSON-LD
-    {
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://musicbizqr.com"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Articles",
-            "item": `https://musicbizqr.com/article/${category}`
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": page.title,
-            "item": pageUrl
-          }
-        ]
-      })
-    }
   ]
+
+  const script = []
+
+  if (jsonLdString.value) {
+    // ✅ Use JSON-LD from Strapi (your @graph template)
+    script.push({
+      type: 'application/ld+json',
+      children: jsonLdString.value
+    })
+  } else {
+    // 🔁 Fallback: Article + Breadcrumb JSON-LD (what you had before)
+    script.push(
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: title,
+          description: description,
+          author: {
+            '@type': 'Person',
+            name: authorName
+          },
+          datePublished: publishedDate,
+          publisher: {
+            '@type': 'Organization',
+            name: 'MusicBizQR',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://musicbizqr.com/logo.png'
+            }
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': pageUrl
+          },
+          image: ogImage,
+          keywords: keywordsArray
+        })
+      },
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: 'https://musicbizqr.com'
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'Articles',
+              item: `https://musicbizqr.com/article/${category}`
+            },
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: page.title,
+              item: pageUrl
+            }
+          ]
+        })
+      }
+    )
+  }
+
+  return {
+    title,
+    meta,
+    link,
+    script
+  }
 })
 </script>
+
 
 
 <template>
