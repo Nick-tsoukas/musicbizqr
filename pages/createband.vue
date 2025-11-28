@@ -66,7 +66,9 @@
                 maxlength="247"
                 required
               ></textarea>
-              <label class="mdc-floating-label" for="bio">Artist Description/Introduction</label>
+              <label class="mdc-floating-label" for="bio"
+                >Artist Description/Introduction</label
+              >
               <div class="mdc-line-ripple"></div>
             </div>
 
@@ -129,14 +131,24 @@
         <div class="mb-4 py-10 bg-white p-4">
           <div
             v-if="bandImgUrl"
-            class="flex justify-center items-center max-h-[400px] p-4 rounded-lg"
+            class="flex flex-col justify-center items-center max-h-[400px] p-4 rounded-lg gap-4"
           >
             <img
               :src="bandImgUrl"
               alt="Band Image"
               class="max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-md"
             />
+
+            <!-- REMOVE IMAGE BUTTON -->
+            <button
+              type="button"
+              @click="removeBandImage"
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            >
+              Remove Image
+            </button>
           </div>
+
           <input
             type="file"
             id="band-img"
@@ -257,13 +269,14 @@
             </div>
 
             <!-- Upload Mode -->
-            <div v-if="singlesongType === 'upload'">
+            <div v-if="singlesongType === 'upload'" class="space-y-4">
               <input
                 type="file"
                 id="singlesong-file"
                 class="styled-file-input"
                 @change="handleSingleSongUpload"
                 accept="audio/*"
+                :key="songInputKey"
               />
               <label
                 for="singlesong-file"
@@ -271,8 +284,21 @@
               >
                 Choose Single Song File
               </label>
-              <div v-if="singlesongFile" class="mt-4 text-black">
-                Selected Song: {{ singlesongFile.name }}
+
+              <div
+                v-if="singlesongFile"
+                class="mt-4 text-black flex items-center justify-between"
+              >
+                <span>Selected Song: {{ singlesongFile.name }}</span>
+
+                <!-- REMOVE SONG BUTTON -->
+                <button
+                  type="button"
+                  @click="removeSingleSong"
+                  class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 ml-4"
+                >
+                  Remove
+                </button>
               </div>
             </div>
 
@@ -283,7 +309,6 @@
                   id="singlesong-embedhtml"
                   class="mdc-text-field__input"
                   v-model="singlesongEmbedHtml"
-                  placeholder='<iframe src="https://open.spotify.com/embed/track/..." frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>'
                   rows="6"
                 ></textarea>
                 <label class="mdc-floating-label" for="singlesong-embedhtml">
@@ -291,6 +316,15 @@
                 </label>
                 <div class="mdc-line-ripple"></div>
               </div>
+
+              <!-- REMOVE EMBED BUTTON -->
+              <button
+                type="button"
+                @click="removeEmbedSong"
+                class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Clear Embed
+              </button>
             </div>
           </div>
         </div>
@@ -332,6 +366,17 @@
                 YouTube ID
               </label>
               <div class="mdc-line-ripple"></div>
+            </div>
+
+            <!-- NEW: Remove Video button -->
+            <div class="mt-4" v-if="singlevideoTitle || singlevideoYoutubeUrl">
+              <button
+                type="button"
+                class="mdc-button"
+                @click="clearSingleVideo"
+              >
+                Remove Video
+              </button>
             </div>
           </div>
         </div>
@@ -375,8 +420,63 @@ const websitelink = ref("");
 const websitelinktext = ref("");
 const max = 247;
 
+const bandImgInput = ref(null);
+const singleSongInput = ref(null);
+
+// KEY to reset the file input
+const songInputKey = ref(0);
+
+// Remove band image
+function removeBandImage() {
+  bandImg.value = null;
+  bandImgUrl.value = null;
+}
+
+// Remove uploaded song
+function removeSingleSong() {
+
+  singlesongFileName.value = "";
+  singlesongTitle.value = "";
+  singlesongEmbedHtml.value = "";
+  singlesongFile.value = null;
+  songInputKey.value++; // reset <input type="file">
+}
+
+// Remove embed song
+function removeEmbedSong() {
+  singlesongEmbedHtml.value = "";
+  singlesongTitle.value = "";
+}
+
+
+function clearBandImage() {
+  bandImg.value = null;
+  bandImgUrl.value = null;
+  if (bandImgInput.value) {
+    bandImgInput.value.value = "";
+  }
+}
+
+function clearSingleSong() {
+  singlesongTitle.value = "";
+  singlesongType.value = "upload";
+  singlesongFile.value = null;
+  singlesongFileName.value = "";
+  singlesongEmbedHtml.value = "";
+  if (singleSongInput.value) {
+    singleSongInput.value.value = "";
+  }
+}
+
+function clearSingleVideo() {
+  singlevideoTitle.value = "";
+  singlevideoYoutubeUrl.value = "";
+}
+
 // Members
-const members = ref([{ name: "", instrument: "", image: null, imageUrl: null }]);
+const members = ref([
+  { name: "", instrument: "", image: null, imageUrl: null },
+]);
 function addMember() {
   members.value.push({ name: "", instrument: "", image: null, imageUrl: null });
 }
@@ -552,7 +652,6 @@ async function submitForm() {
   }
 }
 </script>
-
 
 <style scoped>
 @tailwind base;
