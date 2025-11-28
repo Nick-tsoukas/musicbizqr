@@ -3,7 +3,6 @@
     class="px-4 sm:px-6 py-8 bg-black min-h-screen pt-[var(--header-height)] max-w-5xl mx-auto"
   >
     <h2 class="text-2xl font-bold mb-6 text-white">Analytics Dashboard</h2>
-    
 
     <!-- Insights (MUSE) -->
     <div class="chart-card mb-6">
@@ -57,8 +56,7 @@
                     : 'text-gray-400',
               ]"
             >
-              {{ liveMuseSummary.growthPct > 0 ? "+" : ""
-              }}{{ liveMuseSummary.growthPct ?? 0 }}% vs last day
+              {{ liveMuseSummary.growthPct > 0 ? '+' : '' }}{{ liveMuseSummary.growthPct ?? 0 }}% vs last day
             </p>
           </div>
 
@@ -111,8 +109,8 @@
             <p>
               {{
                 liveMuseSummary.topCities && liveMuseSummary.topCities.length
-                  ? liveMuseSummary.topCities.map((c) => c[0]).join(", ")
-                  : "N/A"
+                  ? liveMuseSummary.topCities.map((c) => c[0]).join(', ')
+                  : 'N/A'
               }}
             </p>
           </div>
@@ -123,8 +121,8 @@
             <p>
               {{
                 liveMuseSummary.topSources && liveMuseSummary.topSources.length
-                  ? liveMuseSummary.topSources.map((s) => s[0]).join(", ")
-                  : "N/A"
+                  ? liveMuseSummary.topSources.map((s) => s[0]).join(', ')
+                  : 'N/A'
               }}
             </p>
           </div>
@@ -136,15 +134,15 @@
               {{
                 liveMuseSummary.topPlatforms &&
                 liveMuseSummary.topPlatforms.length
-                  ? liveMuseSummary.topPlatforms.map((p) => p[0]).join(", ")
-                  : "N/A"
+                  ? liveMuseSummary.topPlatforms.map((p) => p[0]).join(', ')
+                  : 'N/A'
               }}
             </p>
           </div>
         </div>
       </div>
     </div>
-  
+
     <!-- Tabs -->
     <div class="flex gap-2 mb-4">
       <button
@@ -476,299 +474,412 @@
         </div>
       </div>
 
-        <!-- <pre class="text-white">{{ youtubeData }}</pre> -->
-    <!-- 🎬 YouTube Integration -->
-    <!-- 1) NOT CONNECTED YET → show soft CTA -->
-    <!-- 🎬 YouTube Analytics -->
-<div
-  v-if="!youtubeData"
-  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
->
-  <div class="flex flex-col items-center justify-center gap-4">
-    <div
-      class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
-    >
-      <svg viewBox="0 0 24 24" class="w-7 h-7 text-white" fill="currentColor">
-        <path
-          d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-        />
-      </svg>
-    </div>
-    <div>
-      <h3 class="text-white text-lg font-semibold mb-1">Connect YouTube</h3>
-      <p class="text-gray-400 text-sm max-w-sm mx-auto">
-        Connect your YouTube channel to pull views, subs, and top video
-        performance right into Muse analytics.
-      </p>
-    </div>
-    <button
-      @click="connectYoutube"
-      class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
-    >
-      Connect YouTube
-    </button>
-  </div>
-</div>
-
-<!-- ✅ CONNECTED: YouTube Card (drop-in replacement) -->
-<div
-  v-else
-  class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
->
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 pb-4">
-    <!-- Left: brand + title -->
-    <div class="flex items-center gap-3">
+      <!-- 🎬 YouTube Analytics -->
       <div
-        class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
-        aria-hidden="true"
+        v-if="!youtubeData"
+        class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
       >
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="currentColor">
-          <path
-            d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0-.35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
-          />
-        </svg>
-      </div>
-      <div>
-        <p class="text-xs uppercase tracking-wide text-red-200/70">Connected platform</p>
-        <h3 class="text-white text-lg font-semibold leading-tight">YouTube (beta)</h3>
-      </div>
-    </div>
-
-    <!-- Right: actions (status + resync) -->
-    <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto">
-      <!-- Status chip -->
-      <span
-        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border"
-        :class="youtubeStatusChip.tone === 'green'
-          ? 'bg-white/5 text-gray-200 border-white/10'
-          : 'bg-amber-500/10 text-amber-200 border-amber-400/20'"
-        v-tooltip="youtubeStatusChip.tooltip"
-      >
-        <span
-          class="w-1.5 h-1.5 rounded-full animate-pulse"
-          :class="youtubeStatusChip.tone === 'green' ? 'bg-emerald-400' : 'bg-amber-400'"
-        ></span>
-        {{ youtubeStatusChip.text }}
-      </span>
-
-      <!-- Re-sync -->
-      <button
-        @click="resyncYoutube"
-        :disabled="youtubeResyncing"
-        class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition
-               disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
-               focus:ring-2 focus:ring-red-500/50
-               bg-white/5 text-gray-200 border-white/10 hover:bg-white/10"
-        aria-label="Re-sync YouTube"
-        v-tooltip="'Refresh YouTube data and recent uploads'"
-      >
-        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12a9 9 0 1 1-3-6.7" />
-          <path d="M21 3v6h-6" />
-        </svg>
-        {{ youtubeResyncing ? 'Syncing…' : 'Re-sync' }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Metrics -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Channel views (fallback: sum of recent videos)'">Total views</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ (richYoutube.totals.channelViews ?? 0).toLocaleString() }}
-      </p>
-    </div>
-
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Number of uploaded videos found in your uploads feed'">Videos</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ richYoutube.totals.totalVideos ?? 0 }}
-      </p>
-    </div>
-
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Average views per video (Total views ÷ videos)'">Avg views / video</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        {{ (richYoutube.totals.avgViews ?? 0).toLocaleString() }}
-      </p>
-    </div>
-
-    <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
-      <p class="text-xs text-gray-300/80 mb-1" v-tooltip="'Days since your most recent upload'">Last upload</p>
-      <p class="text-2xl font-semibold text-white tracking-tight">
-        <template v-if="richYoutube.freshness.daysSinceLastUpload !== null">
-          {{ richYoutube.freshness.daysSinceLastUpload }}
-          <span class="text-sm text-gray-400">days ago</span>
-        </template>
-        <template v-else>—</template>
-      </p>
-    </div>
-  </div>
-
-  <!-- Spotlight (Top & Newest) -->
-  <div class="px-6 pb-5">
-    <div class="grid gap-3 md:grid-cols-2">
-      <!-- Top performer -->
-      <div
-        v-if="richYoutube.spotlight.top"
-        class="relative flex items-center gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
-      >
-        <!-- Badge -->
-        <span class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-red-500 text-white px-2 py-0.5 rounded-full shadow">
-          Top
-        </span>
-        <div class="relative">
-          <img
-            v-if="richYoutube.spotlight.top.thumbnail"
-            :src="richYoutube.spotlight.top.thumbnail"
-            alt=""
-            class="w-20 h-14 object-cover rounded-md"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="min-w-0">
-          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-red-400/90"></span>
-            Top video
-          </p>
-          <p class="text-sm text-white font-medium truncate">
-            {{ richYoutube.spotlight.top.title }}
-          </p>
-          <p class="text-xs text-gray-300">
-            {{ (richYoutube.spotlight.top.views ?? 0).toLocaleString() }} views
-          </p>
-        </div>
-        <a
-          v-if="richYoutube.spotlight.top.id"
-          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.top.id}`"
-          target="_blank"
-          rel="noopener"
-          class="ml-auto flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)] focus:outline-none focus:ring-2 focus:ring-red-500/50"
-        >
-          View
-          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 17 17 7" />
-            <path d="M7 7h10v10" />
-          </svg>
-        </a>
-      </div>
-
-      <!-- Newest upload (hide if same as top) -->
-      <div
-        v-if="richYoutube.spotlight.newest && (!richYoutube.spotlight.top || richYoutube.spotlight.newest.id !== richYoutube.spotlight.top.id)"
-        class="relative flex items-center gap-3 bg-black/20 border border-white/10 rounded-lg px-4 py-3"
-      >
-        <!-- New badge (7d window) -->
-        <span
-          v-if="richYoutube.spotlight.newest.publishedAt && (Date.now() - new Date(richYoutube.spotlight.newest.publishedAt).getTime() <= 7 * 86400000)"
-          class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow"
-        >
-          New
-        </span>
-        <div class="relative">
-          <img
-            v-if="richYoutube.spotlight.newest.thumbnail"
-            :src="richYoutube.spotlight.newest.thumbnail"
-            alt=""
-            class="w-20 h-14 object-cover rounded-md"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="min-w-0">
-          <p class="text-xs uppercase text-gray-400 mb-1 tracking-wide">Newest upload</p>
-          <p class="text-sm text-white font-medium truncate">
-            {{ richYoutube.spotlight.newest.title }}
-          </p>
-          <p class="text-xs text-gray-300">
-            {{ richYoutube.spotlight.newest.publishedAt ? new Date(richYoutube.spotlight.newest.publishedAt).toLocaleDateString() : '—' }}
-          </p>
-        </div>
-        <a
-          v-if="richYoutube.spotlight.newest.id"
-          :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.newest.id}`"
-          target="_blank"
-          rel="noopener"
-          class="ml-auto inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
-        >
-          Watch →
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick insights -->
-  <div class="px-6 pb-3">
-    <p class="text-xs uppercase text-gray-400 mb-2 tracking-wide">Channel insights</p>
-    <ul v-if="youtubeInsights.length" class="list-disc pl-5 text-gray-200 space-y-1">
-      <li v-for="(b, i) in youtubeInsights" :key="i">{{ b }}</li>
-    </ul>
-    <p v-else class="text-gray-400 text-sm">No insights yet.</p>
-  </div>
-
-  <!-- CTA line -->
-  <div v-if="youtubeCtaLine" class="px-6 pb-6">
-    <div class="bg-black/10 border border-white/10 rounded-lg p-3 text-sm text-gray-200">
-      {{ youtubeCtaLine }}
-    </div>
-  </div>
-
-  <!-- Recent uploads -->
-  <div v-if="richYoutube.videos.length" class="px-6 pb-6">
-    <p class="text-sm text-white font-semibold mb-2 flex items-center gap-1">
-      Recent uploads
-      <span class="text-xs text-gray-400">({{ richYoutube.videos.length }})</span>
-    </p>
-
-    <div class="grid gap-3 md:grid-cols-2">
-      <div
-        v-for="vid in richYoutube.videos"
-        :key="vid.id || vid.title"
-        class="relative flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
-      >
-        <!-- optional tiny view badge if low/high -->
-        <span
-          v-if="(vid.views ?? 0) > 1000"
-          class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-purple-500 text-white px-2 py-0.5 rounded-full shadow"
-        >
-          1k+
-        </span>
-
-        <img
-          v-if="vid.thumbnail"
-          :src="vid.thumbnail"
-          alt=""
-          class="w-20 h-14 object-cover rounded-md flex-shrink-0"
-          loading="lazy"
-          decoding="async"
-        />
-        <div class="min-w-0">
-          <p class="text-sm text-white font-medium truncate">{{ vid.title }}</p>
-          <p class="text-xs text-gray-400">
-            {{ vid.publishedAt ? new Date(vid.publishedAt).toLocaleDateString() : "—" }}
-          </p>
-          <p class="text-xs text-gray-400">{{ (vid.views ?? 0).toLocaleString() }} views</p>
-          <a
-            v-if="vid.id"
-            :href="`https://www.youtube.com/watch?v=${vid.id}`"
-            target="_blank"
-            rel="noopener"
-            class="inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
+        <div class="flex flex-col items-center justify-center gap-4">
+          <div
+            class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
           >
-            Watch →
-          </a>
+            <svg
+              viewBox="0 0 24 24"
+              class="w-7 h-7 text-white"
+              fill="currentColor"
+            >
+              <path
+                d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-white text-lg font-semibold mb-1">
+              Connect YouTube
+            </h3>
+            <p class="text-gray-400 text-sm max-w-sm mx-auto">
+              Connect your YouTube channel to pull views, subs, and top video
+              performance right into Muse analytics.
+            </p>
+          </div>
+          <button
+            @click="connectYoutube"
+            class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full"
+          >
+            Connect YouTube
+          </button>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
+      <!-- ✅ CONNECTED: YouTube Card -->
+      <div
+        v-else
+        class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
+      >
+        <!-- Header -->
+        <div
+          class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 pb-4"
+        >
+          <!-- Left: brand + title -->
+          <div class="flex items-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
+              aria-hidden="true"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="w-6 h-6 text-white"
+                fill="currentColor"
+              >
+                <path
+                  d="M21.58 7.19a1.52 1.52 0 0 0-1.07-1.08C19.37 5.75 12 5.75 12 5.75s-7.37 0-8.51.36a1.52 1.52 0 0 0-1.07 1.08 16.12 16.12 0 0 0-.35 3.36 16.12 16.12 0 0 0 .35 3.36 1.52 1.52 0 0 0 1.07 1.08c1.14.36 8.51.36 8.51.36s7.37 0 8.51-.36a1.52 1.52 0 0 0 1.07-1.08 16.12 16.12 0 0 0 .35-3.36 16.12 16.12 0 0 0-.35-3.36ZM10.06 14V8.99l4.73 2.51Z"
+                />
+              </svg>
+            </div>
+            <div>
+              <p
+                class="text-xs uppercase tracking-wide text-red-200/70"
+              >
+                Connected platform
+              </p>
+              <h3
+                class="text-white text-lg font-semibold leading-tight"
+              >
+                YouTube (beta)
+              </h3>
+            </div>
+          </div>
 
+          <!-- Right: actions (status + resync) -->
+          <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto">
+            <!-- Status chip -->
+            <span
+              class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border"
+              :class="
+                youtubeStatusChip.tone === 'green'
+                  ? 'bg-white/5 text-gray-200 border-white/10'
+                  : 'bg-amber-500/10 text-amber-200 border-amber-400/20'
+              "
+              v-tooltip="youtubeStatusChip.tooltip"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full animate-pulse"
+                :class="
+                  youtubeStatusChip.tone === 'green'
+                    ? 'bg-emerald-400'
+                    : 'bg-amber-400'
+                "
+              ></span>
+              {{ youtubeStatusChip.text }}
+            </span>
 
-<!-- end of youtube  -->
+            <!-- Re-sync -->
+            <button
+              @click="resyncYoutube"
+              :disabled="youtubeResyncing"
+              class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition
+                     disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
+                     focus:ring-2 focus:ring-red-500/50
+                     bg-white/5 text-gray-200 border-white/10 hover:bg-white/10"
+              aria-label="Re-sync YouTube"
+              v-tooltip="'Refresh YouTube data and recent uploads'"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 12a9 9 0 1 1-3-6.7" />
+                <path d="M21 3v6h-6" />
+              </svg>
+              {{ youtubeResyncing ? 'Syncing…' : 'Re-sync' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
+          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+            <p
+              class="text-xs text-gray-300/80 mb-1"
+              v-tooltip="'Channel views (fallback: sum of recent videos)'"
+            >
+              Total views
+            </p>
+            <p
+              class="text-2xl font-semibold text-white tracking-tight"
+            >
+              {{ (richYoutube.totals.channelViews ?? 0).toLocaleString() }}
+            </p>
+          </div>
+
+          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+            <p
+              class="text-xs text-gray-300/80 mb-1"
+              v-tooltip="'Number of uploaded videos found in your uploads feed'"
+            >
+              Videos
+            </p>
+            <p
+              class="text-2xl font-semibold text-white tracking-tight"
+            >
+              {{ richYoutube.totals.totalVideos ?? 0 }}
+            </p>
+          </div>
+
+          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+            <p
+              class="text-xs text-gray-300/80 mb-1"
+              v-tooltip="'Average views per video (Total views ÷ videos)'"
+            >
+              Avg views / video
+            </p>
+            <p
+              class="text-2xl font-semibold text-white tracking-tight"
+            >
+              {{ (richYoutube.totals.avgViews ?? 0).toLocaleString() }}
+            </p>
+          </div>
+
+          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+            <p
+              class="text-xs text-gray-300/80 mb-1"
+              v-tooltip="'Days since your most recent upload'"
+            >
+              Last upload
+            </p>
+            <p
+              class="text-2xl font-semibold text-white tracking-tight"
+            >
+              <template
+                v-if="richYoutube.freshness.daysSinceLastUpload !== null"
+              >
+                {{ richYoutube.freshness.daysSinceLastUpload }}
+                <span class="text-sm text-gray-400">days ago</span>
+              </template>
+              <template v-else>—</template>
+            </p>
+          </div>
+        </div>
+
+        <!-- Spotlight (Top & Newest) -->
+        <div class="px-6 pb-5">
+          <div class="grid gap-3 md:grid-cols-2">
+            <!-- Top performer -->
+            <div
+              v-if="richYoutube.spotlight.top"
+              class="relative flex items-center gap-3 bg-black/20 border border-red-500/10 rounded-lg px-4 py-3"
+            >
+              <span
+                class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-red-500 text-white px-2 py-0.5 rounded-full shadow"
+              >
+                Top
+              </span>
+              <div class="relative">
+                <img
+                  v-if="richYoutube.spotlight.top.thumbnail"
+                  :src="richYoutube.spotlight.top.thumbnail"
+                  alt=""
+                  class="w-20 h-14 object-cover rounded-md"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="min-w-0">
+                <p
+                  class="text-xs uppercase text-gray-400 mb-1 tracking-wide flex items-center gap-1"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full bg-red-400/90"
+                  ></span>
+                  Top video
+                </p>
+                <p class="text-sm text-white font-medium truncate">
+                  {{ richYoutube.spotlight.top.title }}
+                </p>
+                <p class="text-xs text-gray-300">
+                  {{
+                    (richYoutube.spotlight.top.views ?? 0).toLocaleString()
+                  }}
+                  views
+                </p>
+              </div>
+              <a
+                v-if="richYoutube.spotlight.top.id"
+                :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.top.id}`"
+                target="_blank"
+                rel="noopener"
+                class="ml-auto flex items-center gap-1.5 bg-red-500 hover:bg-red-600 transition text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-[0_10px_20px_rgba(239,68,68,0.35)] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+              >
+                View
+                <svg
+                  viewBox="0 0 24 24"
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M7 17 17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+              </a>
+            </div>
+
+            <!-- Newest upload (hide if same as top) -->
+            <div
+              v-if="
+                richYoutube.spotlight.newest &&
+                (!richYoutube.spotlight.top ||
+                  richYoutube.spotlight.newest.id !==
+                    richYoutube.spotlight.top.id)
+              "
+              class="relative flex items-center gap-3 bg-black/20 border border-white/10 rounded-lg px-4 py-3"
+            >
+              <span
+                v-if="
+                  richYoutube.spotlight.newest.publishedAt &&
+                  Date.now() -
+                    new Date(
+                      richYoutube.spotlight.newest.publishedAt
+                    ).getTime() <=
+                    7 * 86400000
+                "
+                class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow"
+              >
+                New
+              </span>
+              <div class="relative">
+                <img
+                  v-if="richYoutube.spotlight.newest.thumbnail"
+                  :src="richYoutube.spotlight.newest.thumbnail"
+                  alt=""
+                  class="w-20 h-14 object-cover rounded-md"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="min-w-0">
+                <p
+                  class="text-xs uppercase text-gray-400 mb-1 tracking-wide"
+                >
+                  Newest upload
+                </p>
+                <p class="text-sm text-white font-medium truncate">
+                  {{ richYoutube.spotlight.newest.title }}
+                </p>
+                <p class="text-xs text-gray-300">
+                  {{
+                    richYoutube.spotlight.newest.publishedAt
+                      ? new Date(
+                          richYoutube.spotlight.newest.publishedAt
+                        ).toLocaleDateString()
+                      : '—'
+                  }}
+                </p>
+              </div>
+              <a
+                v-if="richYoutube.spotlight.newest.id"
+                :href="`https://www.youtube.com/watch?v=${richYoutube.spotlight.newest.id}`"
+                target="_blank"
+                rel="noopener"
+                class="ml-auto inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
+              >
+                Watch →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick insights -->
+        <div class="px-6 pb-3">
+          <p
+            class="text-xs uppercase text-gray-400 mb-2 tracking-wide"
+          >
+            Channel insights
+          </p>
+          <ul
+            v-if="youtubeInsights.length"
+            class="list-disc pl-5 text-gray-200 space-y-1"
+          >
+            <li v-for="(b, i) in youtubeInsights" :key="i">{{ b }}</li>
+          </ul>
+          <p v-else class="text-gray-400 text-sm">No insights yet.</p>
+        </div>
+
+        <!-- CTA line -->
+        <div v-if="youtubeCtaLine" class="px-6 pb-6">
+          <div
+            class="bg-black/10 border border-white/10 rounded-lg p-3 text-sm text-gray-200"
+          >
+            {{ youtubeCtaLine }}
+          </div>
+        </div>
+
+        <!-- Recent uploads -->
+        <div v-if="richYoutube.videos.length" class="px-6 pb-6">
+          <p
+            class="text-sm text-white font-semibold mb-2 flex items-center gap-1"
+          >
+            Recent uploads
+            <span class="text-xs text-gray-400"
+              >({{ richYoutube.videos.length }})</span
+            >
+          </p>
+
+          <div class="grid gap-3 md:grid-cols-2">
+            <div
+              v-for="vid in richYoutube.videos"
+              :key="vid.id || vid.title"
+              class="relative flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
+            >
+              <span
+                v-if="(vid.views ?? 0) > 1000"
+                class="absolute -top-2 -left-2 text-[10px] uppercase tracking-wide bg-purple-500 text-white px-2 py-0.5 rounded-full shadow"
+              >
+                1k+
+              </span>
+
+              <img
+                v-if="vid.thumbnail"
+                :src="vid.thumbnail"
+                alt=""
+                class="w-20 h-14 object-cover rounded-md flex-shrink-0"
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="min-w-0">
+                <p class="text-sm text-white font-medium truncate">
+                  {{ vid.title }}
+                </p>
+                <p class="text-xs text-gray-400">
+                  {{
+                    vid.publishedAt
+                      ? new Date(vid.publishedAt).toLocaleDateString()
+                      : '—'
+                  }}
+                </p>
+                <p class="text-xs text-gray-400">
+                  {{ (vid.views ?? 0).toLocaleString() }} views
+                </p>
+                <a
+                  v-if="vid.id"
+                  :href="`https://www.youtube.com/watch?v=${vid.id}`"
+                  target="_blank"
+                  rel="noopener"
+                  class="inline-flex items-center gap-1 text-xs text-red-300 hover:text-red-200 mt-1 focus:outline-none focus:ring-2 focus:ring-red-500/40 rounded-full px-2 py-0.5"
+                >
+                  Watch →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end youtube -->
     </div>
   </div>
 </template>
@@ -790,46 +901,33 @@ import qs from "qs";
 const client = useStrapiClient();
 const route = useRoute();
 
-/* ---------- Muse (daily insights list — the top “Insights (Muse)” box) ---------- */
-const museRows = ref<any[]>([]);
+/* ---------- Muse (top insights box) ---------- */
 const museLoading = ref(false);
 const museError = ref<any>(null);
-const latestMuse = computed(() => museRows.value?.[0]?.attributes || null);
-
-const config = useRuntimeConfig();
 
 const bandId = computed(() => Number(route.params.id));
 
 /* ---------- Analytics composable (rollups, geo, transitions) ---------- */
 const { getRollups, getGeo, getTransitions } = useMuse();
 
-
-// Local directive: v-tooltip
+/* ---------- Local directive: v-tooltip ---------- */
 const vTooltip = {
   mounted(el: HTMLElement, binding: any) {
-    // basic native title tooltip; could be upgraded later
     if (binding?.value) el.setAttribute("title", String(binding.value));
   },
   updated(el: HTMLElement, binding: any) {
     if (binding?.value) el.setAttribute("title", String(binding.value));
   },
 };
-// make it available in template
-defineProps(); // no-op to keep <script setup> happy
+
+defineProps(); // no-op
 defineEmits(); // no-op
-// @ts-ignore - expose to template scope
+// @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const directives = { tooltip: vTooltip };
 
 /* ---------- UI state ---------- */
-// ✅ added "QR Scans" here
-const tabs = [
-  "Page Views",
-  "Link Clicks",
-  "Songs",
-  "Videos",
-  "QR Scans",
-] as const;
+const tabs = ["Page Views", "Link Clicks", "Songs", "Videos", "QR Scans"] as const;
 const selectedTab = ref<(typeof tabs)[number]>("Page Views");
 
 const rangeOptions: Record<number, string> = {
@@ -846,11 +944,11 @@ const rollups = ref<any | null>(null);
 const geo = ref<any | null>(null);
 const transitions = ref<any | null>(null);
 const externalMuse = ref<any>(null);
-/* ---------- raw events (only used for hourly chart + daily muse split) ---------- */
+
+/* ---------- raw events (only used for hourly chart + daily split) ---------- */
 const rawPageViews = ref<any[]>([]);
 const rawLinkClicks = ref<any[]>([]);
 const rawMediaPlays = ref<any[]>([]);
-// ✅ new: raw QR scans
 const rawQrScans = ref<any[]>([]);
 
 const isInitialLoading = ref(true);
@@ -869,7 +967,7 @@ function humanDayLabel(yyyy_mm_dd: string) {
   return isValid(d) ? fmt(d, "EEE, MMM d") : "";
 }
 
-// --- Re-sync state + helpers ---
+/* ---------- YouTube re-sync helpers ---------- */
 const youtubeResyncing = ref(false);
 let youtubeResyncTimer: any = null;
 
@@ -884,13 +982,14 @@ const track = (event: string, props: Record<string, any> = {}) => {
   try {
     navigator.sendBeacon?.(
       "/api/track",
-      new Blob([JSON.stringify({ event, ts: Date.now(), ...props })], { type: "application/json" })
+      new Blob([JSON.stringify({ event, ts: Date.now(), ...props })], {
+        type: "application/json",
+      })
     );
   } catch {}
 };
 
 const resyncYoutubeNow = async () => {
-  console.log('this is the reyncyoutube now fucntion ')
   if (youtubeResyncing.value) return;
   if (!bandId.value) return;
 
@@ -898,7 +997,6 @@ const resyncYoutubeNow = async () => {
   track("youtube_resync_clicked", { bandId: bandId.value });
 
   try {
-    // 1) hit your existing Strapi sync endpoint
     const res = await $fetch(
       `${useRuntimeConfig().public.strapiUrl}/api/youtube/sync`,
       {
@@ -909,7 +1007,6 @@ const resyncYoutubeNow = async () => {
 
     console.log("[youtube] resync response", res);
 
-    // 2) refresh the aggregate in-place using your existing loader
     await fetchAndRender(true);
   } catch (e) {
     console.warn("[youtube] resync failed", e);
@@ -919,10 +1016,7 @@ const resyncYoutubeNow = async () => {
   }
 };
 
-
-// debounced wrapper to avoid double taps
 const resyncYoutube = debounce(resyncYoutubeNow, 800);
-
 
 /* ---------- YouTube connect ---------- */
 async function connectYoutube() {
@@ -947,15 +1041,19 @@ async function connectYoutube() {
   }
 }
 
-// put near your other computeds
+/* ---------- YouTube rich model ---------- */
 const richYoutube = computed(() => {
   const fallback = {
     connected: false,
     syncedAt: null,
-    videos: [],
+    videos: [] as any[],
     totals: { channelViews: 0, totalVideos: 0, avgViews: 0, subs: 0 },
-    spotlight: { top: null, newest: null },
-    freshness: { daysSinceLastUpload: null, activity: "unknown", sameDayBatch: false },
+    spotlight: { top: null as any, newest: null as any },
+    freshness: {
+      daysSinceLastUpload: null as number | null,
+      activity: "unknown",
+      sameDayBatch: false,
+    },
   };
 
   const yt = externalMuse.value?.external?.youtube;
@@ -963,8 +1061,8 @@ const richYoutube = computed(() => {
 
   const vids = Array.isArray(yt.recentVideos) ? yt.recentVideos : [];
   const videos = vids
-    .filter(v => v && (v.videoId || v.title))
-    .map(v => ({
+    .filter((v) => v && (v.videoId || v.title))
+    .map((v) => ({
       id: v.videoId || null,
       title: v.title || "Untitled",
       views: Number(v.views ?? 0),
@@ -973,16 +1071,28 @@ const richYoutube = computed(() => {
     }));
 
   const totalVideos = videos.length;
-  const totalViewsFromVideos = videos.reduce((s, v) => s + (v.views || 0), 0);
-  const channelViews = Number(yt.views ?? 0) > 0 ? Number(yt.views) : totalViewsFromVideos;
+  const totalViewsFromVideos = videos.reduce(
+    (s, v) => s + (v.views || 0),
+    0
+  );
+  const channelViews =
+    Number(yt.views ?? 0) > 0 ? Number(yt.views) : totalViewsFromVideos;
   const avgViews = totalVideos ? +(channelViews / totalVideos).toFixed(1) : 0;
 
-  const newest = [...videos].sort(
-    (a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0)
-  )[0] || null;
+  const newest =
+    [...videos].sort(
+      (a, b) =>
+        new Date(b.publishedAt || 0).getTime() -
+        new Date(a.publishedAt || 0).getTime()
+    )[0] || null;
 
   const daysSinceLastUpload = newest?.publishedAt
-    ? Math.max(0, Math.round((Date.now() - new Date(newest.publishedAt).getTime()) / 86400000))
+    ? Math.max(
+        0,
+        Math.round(
+          (Date.now() - new Date(newest.publishedAt).getTime()) / 86400000
+        )
+      )
     : null;
 
   let activity = "unknown";
@@ -993,110 +1103,138 @@ const richYoutube = computed(() => {
 
   let sameDayBatch = false;
   if (videos.length >= 2) {
-    const dayKey = iso => (iso ? iso.slice(0, 10) : "");
-    const dayCounts = videos.reduce((m, v) => {
+    const dayKey = (iso: string | null) => (iso ? iso.slice(0, 10) : "");
+    const dayCounts = videos.reduce((m: any, v: any) => {
       const k = dayKey(v.publishedAt);
       m[k] = (m[k] || 0) + 1;
       return m;
     }, {});
-    sameDayBatch = Object.values(dayCounts).some(n => n >= 2);
+    sameDayBatch = Object.values(dayCounts).some((n: any) => n >= 2);
   }
 
   return {
     connected: true,
     syncedAt: yt.date || yt.lastSynced || yt.lastFetchedAt || null,
     videos,
-    totals: { channelViews, totalVideos, avgViews, subs: Number(yt.subs ?? 0) },
-    spotlight: { top: videos.sort((a, b) => b.views - a.views)[0] || null, newest },
+    totals: {
+      channelViews,
+      totalVideos,
+      avgViews,
+      subs: Number(yt.subs ?? 0),
+    },
+    spotlight: {
+      top: videos.sort((a, b) => b.views - a.views)[0] || null,
+      newest,
+    },
     freshness: { daysSinceLastUpload, activity, sameDayBatch },
   };
 });
 
-
 const youtubeInsights = computed(() => {
-  const r = richYoutube.value
-  if (!r?.connected) return []
+  const r = richYoutube.value;
+  if (!r?.connected) return [];
 
-  const out = []
-  const { channelViews, totalVideos, avgViews } = r.totals || {}
-  const { daysSinceLastUpload, activity, sameDayBatch } = r.freshness || {}
-  const top = r.spotlight?.top
+  const out: string[] = [];
+  const { channelViews, totalVideos, avgViews } = r.totals || {};
+  const { daysSinceLastUpload, activity, sameDayBatch } = r.freshness || {};
+  const top = r.spotlight?.top;
 
-  // 1) inactivity
-  if (typeof daysSinceLastUpload === 'number' && daysSinceLastUpload > 30) {
-    out.push("You haven’t uploaded in over 30 days. A fresh video will help convert QR page visitors into YouTube views.")
+  if (typeof daysSinceLastUpload === "number" && daysSinceLastUpload > 30) {
+    out.push(
+      "You haven’t uploaded in over 30 days. A fresh video will help convert QR page visitors into YouTube views."
+    );
   }
 
-  // 2) early channel
   if ((totalVideos ?? 0) < 3) {
-    out.push("Your channel is connected but still early. Keep publishing — we’ll surface top videos here as you post.")
+    out.push(
+      "Your channel is connected but still early. Keep publishing — we’ll surface top videos here as you post."
+    );
   }
 
-  // 3) top video outperforms baseline
   if (top && avgViews && top.views >= avgViews * 3) {
-    out.push("One video is outperforming your average. Feature it on your MusicBizQR smart page to capture more plays.")
+    out.push(
+      "One video is outperforming your average. Feature it on your MusicBizQR smart page to capture more plays."
+    );
   }
 
-  // 4) batch publish
   if (sameDayBatch) {
-    out.push("You batch-published videos on the same day. Consider spacing uploads to extend reach.")
+    out.push(
+      "You batch-published videos on the same day. Consider spacing uploads to extend reach."
+    );
   }
 
-  // fallback when nothing triggered
   if (out.length === 0) {
     if (activity === "active") {
-      out.push("Nice — you’re uploading consistently. Link your latest video on your MusicBizQR page to capture momentum.")
+      out.push(
+        "Nice — you’re uploading consistently. Link your latest video on your MusicBizQR page to capture momentum."
+      );
     } else {
-      out.push("YouTube is connected and pulling data. We’ll add deeper insights as you publish more content.")
+      out.push(
+        "YouTube is connected and pulling data. We’ll add deeper insights as you publish more content."
+      );
     }
   }
 
-  return out.slice(0, 3)
-})
-
-// put near your other computeds
-
+  return out.slice(0, 3);
+});
 
 const youtubeCtaLine = computed(() => {
-  const r = richYoutube.value
-  if (!r?.connected) return null
-  const { channelViews, totalVideos, avgViews } = r.totals || {}
-  const top = r.spotlight?.top
+  const r = richYoutube.value;
+  if (!r?.connected) return null;
+  const { channelViews } = r.totals || {};
+  const top = r.spotlight?.top;
 
   if ((channelViews ?? 0) <= 50) {
-    return "Add your top video to your MusicBizQR smart page so fans from shows can watch instantly."
+    return "Add your top video to your MusicBizQR smart page so fans from shows can watch instantly.";
   }
   if (top) {
-    return "Link your latest YouTube video on your MusicBizQR page to capture momentum."
+    return "Link your latest YouTube video on your MusicBizQR page to capture momentum.";
   }
-  return null
-})
+  return null;
+});
 
 const youtubeStatusChip = computed(() => {
-  const r = richYoutube.value
-  if (!r?.connected) return { tone: "red", text: "disconnected" }
+  const r = richYoutube.value;
+  if (!r?.connected)
+    return {
+      tone: "red",
+      text: "disconnected",
+      health: "amber",
+      tooltip: "YouTube is not connected yet.",
+    };
 
-  const syncedAt = r.syncedAt ? new Date(r.syncedAt) : null
-  const ageDays = syncedAt ? Math.round((Date.now() - syncedAt.getTime())/86400000) : 0
-  const stale = ageDays > 3
+  const syncedAt = r.syncedAt ? new Date(r.syncedAt) : null;
+  const ageDays = syncedAt
+    ? Math.round((Date.now() - syncedAt.getTime()) / 86400000)
+    : 0;
+  const stale = ageDays > 3;
 
-  let health = "ok"
-  if (r.freshness?.activity === "cooling") health = "amber"
-  if ((r.totals?.totalVideos ?? 0) === 0) health = "amber"
+  let health: "ok" | "amber" = "ok";
+  if (r.freshness?.activity === "cooling") health = "amber";
+  if ((r.totals?.totalVideos ?? 0) === 0) health = "amber";
 
   return {
     tone: stale ? "amber" : "green",
-    text: stale ? `data is ${ageDays}d old — re-sync` : `synced ${syncedAt ? syncedAt.toLocaleString() : "just now"}`,
-    health, // "ok" | "amber"
-  }
-})
-
+    text: stale
+      ? `data is ${ageDays}d old — re-sync`
+      : `synced ${syncedAt ? syncedAt.toLocaleString() : "just now"}`,
+    health,
+    tooltip: stale
+      ? "YouTube data is a few days old. Tap re-sync to refresh."
+      : "YouTube data is up to date.",
+  };
+});
 
 /* ---------- computed from server rollups ---------- */
-const totalViewsInRange = computed(() => rollups.value?.totals?.views ?? 0);
-const totalClicksInRange = computed(() => rollups.value?.totals?.clicks ?? 0);
-// ✅ total QR in range (for later if we want to show)
-const totalQrInRange = computed(() => rollups.value?.totals?.qrScans ?? 0);
+const totalViewsInRange = computed(
+  () => rollups.value?.totals?.views ?? 0
+);
+const totalClicksInRange = computed(
+  () => rollups.value?.totals?.clicks ?? 0
+);
+const totalQrInRange = computed(
+  () => rollups.value?.totals?.qrScans ?? 0
+);
 
 const youtubeData = computed(() => {
   const raw = externalMuse.value?.external?.youtube;
@@ -1106,42 +1244,34 @@ const youtubeData = computed(() => {
 
   return {
     connected: raw.connected ?? true,
-    // your template shows: synced {{ externalMuse.external.youtube.date }}
-    // but API returns lastFetchedAt
     date: raw.date || raw.lastFetchedAt || null,
-
-    // what the template uses:
     views: m.views ?? raw.views ?? m.viewCount ?? 0,
     subs: m.subs ?? m.subscriberCount ?? raw.subs ?? 0,
     videos: m.videos ?? m.videoCount ?? raw.videos ?? 0,
-
-    // we didn’t have this in the API yet, so we allow fallback to null
     topVideo: m.topVideo || raw.topVideo || null,
-
-    // nice to have for later
     recentVideos: m.recentVideos || [],
   };
 });
 
-const sourceCounts = computed<[string, number][]>(
-  () => rollups.value?.sources ?? []
-);
-const mediumCounts = computed<[string, number][]>(
-  () => rollups.value?.mediums ?? []
-);
-const topRefDomains = computed<[string, number][]>(
-  () => rollups.value?.refDomains ?? []
-);
-const topClickPlatforms = computed<[string, number][]>(
-  () => rollups.value?.platforms ?? []
-);
+const sourceCounts = computed<[string, number][]>(() => {
+  return rollups.value?.sources ?? [];
+});
+const mediumCounts = computed<[string, number][]>(() => {
+  return rollups.value?.mediums ?? [];
+});
+const topRefDomains = computed<[string, number][]>(() => {
+  return rollups.value?.refDomains ?? [];
+});
+const topClickPlatforms = computed<[string, number][]>(() => {
+  return rollups.value?.platforms ?? [];
+});
 
 /* ---------- Top cities (from /analytics/geo) ---------- */
 const topCities = computed<[string, number][]>(() => {
   const list = geo.value?.list ?? [];
   return list.map((r: any) => [r.city || "Unknown", r.count]) as [
     string,
-    number,
+    number
   ][];
 });
 
@@ -1180,7 +1310,7 @@ const deviceBreakdown = computed(() => {
   }));
 });
 
-/* ---------- Muse range label (for the card) ---------- */
+/* ---------- Muse range label ---------- */
 const museRangeLabel = computed(() => {
   if (selectedRange.value === 7) return "Last 7 Days";
   if (selectedRange.value === 30) return "Last 30 Days";
@@ -1211,7 +1341,7 @@ const chartTitle = computed(() => {
   return "Analytics";
 });
 
-/* ---------------- helper: count songs/videos from RAW media (STRICT) ---------------- */
+/* ---------- helper: count songs/videos from raw ---------- */
 function countMediaFromRaw(rows: any[], yyyymmdd: string) {
   let songs = 0;
   let videos = 0;
@@ -1244,17 +1374,14 @@ function countMediaFromRaw(rows: any[], yyyymmdd: string) {
       kind.includes("vimeo") ||
       kind.includes("tiktok");
 
-    if (isSong) {
-      songs++;
-    } else if (isVideo) {
-      videos++;
-    }
+    if (isSong) songs++;
+    else if (isVideo) videos++;
   }
 
   return { songs, videos };
 }
 
-/* ---------------- core media splitter ---------------- */
+/* ---------- core media splitter ---------- */
 function deriveSongVideoSplit(opts: {
   selectedRange: number;
   rollups: any;
@@ -1318,7 +1445,7 @@ function deriveSongVideoSplit(opts: {
 }
 
 /* ============================================================================ */
-/*   Build Muse summary from rollups + transitions + raw                        */
+/*   Live Muse summary from rollups + transitions + raw                         */
 /* ============================================================================ */
 const liveMuseSummary = computed(() => {
   const r = rollups.value;
@@ -1327,7 +1454,7 @@ const liveMuseSummary = computed(() => {
   const views = r.totals?.views ?? 0;
   const clicks = r.totals?.clicks ?? 0;
   const plays = r.totals?.plays ?? 0;
-  const qrScans = r.totals?.qrScans ?? 0; // ✅ NEW
+  const qrScans = r.totals?.qrScans ?? 0;
 
   const split = deriveSongVideoSplit({
     selectedRange: selectedRange.value,
@@ -1342,7 +1469,6 @@ const liveMuseSummary = computed(() => {
       ? Math.round(((clicks + plays + qrScans) / views) * 1000) / 10
       : 0;
 
-  // growth
   const series = Array.isArray(r.series) ? r.series : [];
   let growthPct = 0;
   if (series.length >= 2) {
@@ -1356,8 +1482,8 @@ const liveMuseSummary = computed(() => {
   }
 
   const topCities = Array.isArray(geo.value?.list)
-    ? geo
-        .value!.list.map((r: any) => [r.city || "unknown", r.count])
+    ? geo.value!.list
+        .map((r: any) => [r.city || "unknown", r.count])
         .slice(0, 3)
     : [];
 
@@ -1371,7 +1497,7 @@ const liveMuseSummary = computed(() => {
     linkClicks: clicks,
     songPlays: split.songPlays,
     videoPlays: split.videoPlays,
-    qrScans, // ✅ expose to template
+    qrScans,
     engagementRate,
     growthPct,
     prevComparison: 0,
@@ -1386,61 +1512,88 @@ const liveMuseSummary = computed(() => {
   return summary;
 });
 
-// when <canvas> actually mounts inside <ClientOnly>, render the chart
-watch(
-  () => viewsCanvas.value,
-  async (canvas) => {
-    if (!canvas) return;
-    await ensureChart();
-    renderViewsChart();
-    renderDeviceDoughnut();
-  }
-);
-
-/* ---------- Insight bullets (top box) ---------- */
-const serverMuse = computed(() => rollups.value?.muse || null);
-
+/* ---------- Muse display date & bullets (LIVE ONLY) ---------- */
 const museDisplayDate = computed(() => {
-  // 1) prefer rollups → latest day in series
   const s = rollups.value?.series;
   if (Array.isArray(s) && s.length) {
     const last = s[s.length - 1];
     if (last?.date) return last.date;
   }
-
-  // 2) fallback to stored muse
-  const m = latestMuse.value;
-  if (m?.date) return m.date;
-
-  // 3) fallback to today
   return fmt(new Date(), "yyyy-MM-dd");
 });
 
 const insightBullets = computed(() => {
-  // 1) prefer live server muse (today)
-  const serverList = serverMuse.value?.insights;
-  if (Array.isArray(serverList) && serverList.length) {
-    // hard cap to 3 for UX
-    return serverList
-      .slice(0, 3)
-      .map((i: any) => i?.title)
-      .filter(Boolean);
+  const summary = liveMuseSummary.value;
+  if (!summary) return [];
+
+  const bullets: string[] = [];
+
+  const g = summary.growthPct || 0;
+  const engagement = summary.engagementRate || 0;
+  const views = summary.pageViews || 0;
+  const clicks = summary.linkClicks || 0;
+  const songPlays = summary.songPlays || 0;
+  const videoPlays = summary.videoPlays || 0;
+  const qrScans = summary.qrScans || 0;
+
+  // 1) Traffic trend
+  if (g > 0) {
+    bullets.push(`Traffic grew ${g}% vs. yesterday.`);
+  } else if (g < 0) {
+    bullets.push(`Traffic fell ${Math.abs(g)}% vs. yesterday.`);
+  } else {
+    bullets.push("Traffic is flat vs. yesterday.");
   }
 
-  // 2) fallback to stored /band-insights-daily
-  const m = latestMuse.value;
-  if (!m) return [];
-  const out: string[] = [];
+  // 2) Engagement quality
+  if (engagement >= 40) {
+    bullets.push(
+      `Strong engagement: ${engagement}% of visitors clicked, played, or scanned something on your page.`
+    );
+  } else if (views >= 20 && engagement < 20) {
+    bullets.push(
+      `Engagement is on the low side (${engagement}%). Try featuring your strongest link or media at the top of the page.`
+    );
+  }
 
-  const g = Math.round((m.growthPct || 0) * 10) / 10;
-  if (g > 0) out.push(`Traffic grew ${g}% vs. yesterday.`);
-  else if (g < 0) out.push(`Traffic fell ${Math.abs(g)}% vs. yesterday.`);
-  else out.push(`Traffic is flat vs. yesterday.`);
+  // 3) Behavior highlight
+  const totalMediaPlays = songPlays + videoPlays;
+  if (totalMediaPlays > clicks && totalMediaPlays > 0) {
+    bullets.push(
+      `Fans are leaning into your media: ${totalMediaPlays} plays versus ${clicks} link clicks.`
+    );
+  } else if (clicks > 0) {
+    bullets.push(
+      `Fans are exploring your links (${clicks} clicks) — make sure merch, tickets, and socials are all up to date.`
+    );
+  }
 
-  return out.slice(0, 3);
+  // 4) QR behavior
+  if (qrScans > 0) {
+    bullets.push(
+      `${qrScans} QR scans in this period — your posters, flyers, or in-venue codes are doing work.`
+    );
+  }
+
+  // 5) Geo / platform flavor
+  if (summary.topCities?.length) {
+    const cityNames = summary.topCities.map((c: any) => c[0]).join(", ");
+    bullets.push(`Top cities right now: ${cityNames}.`);
+  } else if (summary.topPlatforms?.length) {
+    const platforms = summary.topPlatforms.map((p: any) => p[0]).join(", ");
+    bullets.push(`Most activity is coming from ${platforms}.`);
+  }
+
+  // 6) Blend in one YouTube insight
+  const yt = youtubeInsights.value;
+  if (yt.length) {
+    bullets.push(yt[0]);
+  }
+
+  return bullets.filter(Boolean).slice(0, 3);
 });
 
-/* ---------- Chart.js: client-only lazy load ---------- */
+/* ---------- Chart.js lazy load ---------- */
 let ChartJs: any = null;
 async function ensureChart() {
   if (process.server) return null;
@@ -1456,235 +1609,207 @@ function tsOf(row: any): string | null {
   return a.timestamp || a.createdAt || a.updatedAt || null;
 }
 
-/* ---------- fetch Muse daily insights (for the “Insights (Muse)” list) ---------- */
-async function fetchMuse() {
-  const bandId = Number(route.params.id);
-  const query = qs.stringify(
-    {
-      filters: { key: { $startsWith: `${bandId}:` } },
-      sort: ["date:desc"],
-      pagination: { limit: 14 },
-    },
-    { encodeValuesOnly: true }
-  );
-
-  const url = `/band-insights-daily?${query}`;
-  museLoading.value = true;
-  museError.value = null;
-  try {
-    const res = await client(url);
-    museRows.value = res?.data ?? [];
-  } catch (e: any) {
-    museError.value = e?.response?._data || e;
-  } finally {
-    museLoading.value = false;
-  }
-}
-
+/* ---------- fetch + render ---------- */
 async function fetchAndRender(silent = false) {
   if (silent) {
     isRefreshing.value = true;
   } else {
     isInitialLoading.value = true;
+    museLoading.value = true;
+    museError.value = null;
   }
 
-  const bandId = Number(route.params.id);
+  const bandIdNum = Number(route.params.id);
   const rangeKey = `${selectedRange.value}d`;
 
-  console.log("[analytics] fetching rollups for", { bandId, rangeKey });
+  console.log("[analytics] fetching rollups for", { bandId: bandIdNum, rangeKey });
 
-  const [r, g, t, m] = await Promise.all([
-    getRollups(bandId, rangeKey),
-    getGeo(bandId, rangeKey),
-    getTransitions(bandId, rangeKey),
-    client("/muse/aggregate", {
-      params: {
-        bandId,
-        range: rangeKey,
-      },
-    }).catch((e) => {
-      console.warn("[analytics] external muse failed", e);
-      return null;
-    }),
-  ]);
-
-  rollups.value = r;
-  geo.value = g;
-  transitions.value = t;
-  externalMuse.value = m;
-  console.log("[muse external]", m);
-
-  // ✅ daily raw fetch (1 day → we want raw rows)
-  if (selectedRange.value === 1) {
-    // build the 2 scan URLs with qs so deep filters actually work
-    const scansDirectQuery = qs.stringify(
-      {
-        filters: {
-          band: {
-            id: { $eq: bandId },
-          },
+  try {
+    const [r, g, t, m] = await Promise.all([
+      getRollups(bandIdNum, rangeKey),
+      getGeo(bandIdNum, rangeKey),
+      getTransitions(bandIdNum, rangeKey),
+      client("/muse/aggregate", {
+        params: {
+          bandId: bandIdNum,
+          range: rangeKey,
         },
-        sort: ["date:desc"],
-        pagination: { limit: 500 },
-        populate: { qr: { populate: ["band"] } },
-      },
-      { encodeValuesOnly: true }
-    );
+      }).catch((e) => {
+        console.warn("[analytics] external muse failed", e);
+        return null;
+      }),
+    ]);
 
-    const scansViaQrQuery = qs.stringify(
-      {
-        filters: {
-          qr: {
+    rollups.value = r;
+    geo.value = g;
+    transitions.value = t;
+    externalMuse.value = m;
+    console.log("[muse external]", m);
+
+    if (selectedRange.value === 1) {
+      const scansDirectQuery = qs.stringify(
+        {
+          filters: {
             band: {
-              id: { $eq: bandId },
+              id: { $eq: bandIdNum },
             },
           },
+          sort: ["date:desc"],
+          pagination: { limit: 500 },
+          populate: { qr: { populate: ["band"] } },
         },
-        sort: ["date:desc"],
-        pagination: { limit: 500 },
-        populate: { qr: { populate: ["band"] } },
-      },
-      { encodeValuesOnly: true }
-    );
+        { encodeValuesOnly: true }
+      );
 
-    const [viewsRes, clicksRes, mediaRes, scansDirectRes, scansViaQrRes] =
-      await Promise.all([
-        // page views (by band)
-        client("/band-page-views", {
-          params: {
-            filters: { band: { id: bandId } },
-            sort: ["timestamp:desc"],
-            pagination: { limit: 500 },
+      const scansViaQrQuery = qs.stringify(
+        {
+          filters: {
+            qr: {
+              band: {
+                id: { $eq: bandIdNum },
+              },
+            },
           },
-        }),
-        // link clicks (you already expose /link-clicks/band/:id)
-        client(`/link-clicks/band/${bandId}`),
-        // media plays (two styles, keep your fallback)
-        client(`/media-plays/band/${bandId}`).catch(() =>
-          client("/media-plays", {
+          sort: ["date:desc"],
+          pagination: { limit: 500 },
+          populate: { qr: { populate: ["band"] } },
+        },
+        { encodeValuesOnly: true }
+      );
+
+      const [viewsRes, clicksRes, mediaRes, scansDirectRes, scansViaQrRes] =
+        await Promise.all([
+          client("/band-page-views", {
             params: {
-              filters: { band: { id: bandId } },
+              filters: { band: { id: bandIdNum } },
               sort: ["timestamp:desc"],
               pagination: { limit: 500 },
             },
-          })
-        ),
-        // ✅ scans with band directly on scan
-        client(`/scans?${scansDirectQuery}`),
-        // ✅ scans where scan.qr.band = bandId
-        client(`/scans?${scansViaQrQuery}`),
-      ]);
+          }),
+          client(`/link-clicks/band/${bandIdNum}`),
+          client(`/media-plays/band/${bandIdNum}`).catch(() =>
+            client("/media-plays", {
+              params: {
+                filters: { band: { id: bandIdNum } },
+                sort: ["timestamp:desc"],
+                pagination: { limit: 500 },
+              },
+            })
+          ),
+          client(`/scans?${scansDirectQuery}`),
+          client(`/scans?${scansViaQrQuery}`),
+        ]);
 
-    // helpers (same as before)
-    const toArray = (res: any) => {
-      if (!res) return [];
-      if (Array.isArray(res)) return res;
-      if (Array.isArray(res.data)) return res.data;
-      if (Array.isArray(res.results)) return res.results;
-      if (res.data && !Array.isArray(res.data)) return [res.data];
-      return [];
-    };
+      const toArray = (res: any) => {
+        if (!res) return [];
+        if (Array.isArray(res)) return res;
+        if (Array.isArray(res.data)) return res.data;
+        if (Array.isArray(res.results)) return res.results;
+        if (res.data && !Array.isArray(res.data)) return [res.data];
+        return [];
+      };
 
-    const unifyMedia = (rows: any[]) =>
-      rows.map((r) => {
-        const a = r?.attributes || r || {};
-        return {
-          id: r?.id ?? a?.id,
-          attributes: {
-            ...a,
-            timestamp:
-              a.timestamp ||
-              a.createdAt ||
-              a.updatedAt ||
-              r?.timestamp ||
-              r?.createdAt ||
-              r?.updatedAt ||
-              null,
-            kind: String(a.kind ?? a.type ?? a.mediaType ?? "").toLowerCase(),
-            title: a.title ?? r?.title ?? "",
-          },
-        };
-      });
+      const unifyMedia = (rows: any[]) =>
+        rows.map((r) => {
+          const a = r?.attributes || r || {};
+          return {
+            id: r?.id ?? a?.id,
+            attributes: {
+              ...a,
+              timestamp:
+                a.timestamp ||
+                a.createdAt ||
+                a.updatedAt ||
+                r?.timestamp ||
+                r?.createdAt ||
+                r?.updatedAt ||
+                null,
+              kind: String(a.kind ?? a.type ?? a.mediaType ?? "").toLowerCase(),
+              title: a.title ?? r?.title ?? "",
+            },
+          };
+        });
 
-    const unifyClicks = (rows: any[]) =>
-      rows.map((r) => {
-        const a = r?.attributes || r || {};
-        return {
-          id: r?.id ?? a?.id,
-          attributes: {
-            ...a,
-            timestamp:
-              a.timestamp ||
-              a.createdAt ||
-              r?.timestamp ||
-              r?.createdAt ||
-              null,
-            platform:
-              a.platform ??
-              a.provider ??
-              a.source ??
-              r?.platform ??
-              r?.provider ??
-              r?.source ??
-              "",
-            url: a.url ?? r?.url ?? "",
-          },
-        };
-      });
+      const unifyClicks = (rows: any[]) =>
+        rows.map((r) => {
+          const a = r?.attributes || r || {};
+          return {
+            id: r?.id ?? a?.id,
+            attributes: {
+              ...a,
+              timestamp:
+                a.timestamp ||
+                a.createdAt ||
+                r?.timestamp ||
+                r?.createdAt ||
+                null,
+              platform:
+                a.platform ??
+                a.provider ??
+                a.source ??
+                r?.platform ??
+                r?.provider ??
+                r?.source ??
+                "",
+              url: a.url ?? r?.url ?? "",
+            },
+          };
+        });
 
-    const unifyScans = (rows: any[]) =>
-      rows.map((r) => {
-        const a = r?.attributes || r || {};
-        return {
-          id: r?.id ?? a?.id,
-          attributes: {
-            ...a,
-            // your schema uses "date"
-            timestamp:
-              a.date || a.timestamp || a.createdAt || a.updatedAt || null,
-            qr: a.qr || null,
-          },
-        };
-      });
+      const unifyScans = (rows: any[]) =>
+        rows.map((r) => {
+          const a = r?.attributes || r || {};
+          return {
+            id: r?.id ?? a?.id,
+            attributes: {
+              ...a,
+              timestamp:
+                a.date || a.timestamp || a.createdAt || a.updatedAt || null,
+              qr: a.qr || null,
+            },
+          };
+        });
 
-    // assign raw
-    rawPageViews.value = toArray(viewsRes);
-    rawLinkClicks.value = unifyClicks(toArray(clicksRes));
-    rawMediaPlays.value = unifyMedia(toArray(mediaRes));
+      rawPageViews.value = toArray(viewsRes);
+      rawLinkClicks.value = unifyClicks(toArray(clicksRes));
+      rawMediaPlays.value = unifyMedia(toArray(mediaRes));
 
-    // ✅ merge scans from both queries
-    const scansDirect = unifyScans(toArray(scansDirectRes));
-    const scansViaQr = unifyScans(toArray(scansViaQrRes));
+      const scansDirect = unifyScans(toArray(scansDirectRes));
+      const scansViaQr = unifyScans(toArray(scansViaQrRes));
 
-    const seen = new Set<string | number>();
-    const merged: any[] = [];
+      const seen = new Set<string | number>();
+      const merged: any[] = [];
 
-    for (const s of [...scansDirect, ...scansViaQr]) {
-      const key = s.id || s.attributes?.id;
-      if (key && !seen.has(key)) {
-        seen.add(key);
-        merged.push(s);
+      for (const s of [...scansDirect, ...scansViaQr]) {
+        const key = s.id || s.attributes?.id;
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          merged.push(s);
+        }
       }
+
+      rawQrScans.value = merged;
+    } else {
+      rawPageViews.value = [];
+      rawLinkClicks.value = [];
+      rawMediaPlays.value = [];
+      rawQrScans.value = [];
     }
 
-    rawQrScans.value = merged;
-  } else {
-    // non-daily: no raw rows
-    rawPageViews.value = [];
-    rawLinkClicks.value = [];
-    rawMediaPlays.value = [];
-    rawQrScans.value = [];
-  }
-
-  await ensureChart();
-  await nextTick();
-  renderViewsChart();
-  renderDeviceDoughnut();
-
-  if (!silent) {
-    isInitialLoading.value = false;
-  } else {
-    isRefreshing.value = false;
+    await ensureChart();
+    await nextTick();
+    renderViewsChart();
+    renderDeviceDoughnut();
+  } catch (e: any) {
+    console.error("[analytics] fetchAndRender failed", e);
+    museError.value = e?.response?._data || e;
+  } finally {
+    if (!silent) {
+      isInitialLoading.value = false;
+      museLoading.value = false;
+    } else {
+      isRefreshing.value = false;
+    }
   }
 }
 
@@ -1712,7 +1837,6 @@ function renderViewsChart() {
   let title = "";
 
   if (selectedRange.value === 1) {
-    // DAILY / HOURLY
     let rows: any[] = [];
     if (selectedTab.value === "Page Views") {
       rows = rawPageViews.value;
@@ -1721,7 +1845,6 @@ function renderViewsChart() {
     } else if (selectedTab.value === "QR Scans") {
       rows = rawQrScans.value;
     } else {
-      // Songs OR Videos → work off media, but filter by kind
       rows = rawMediaPlays.value;
     }
 
@@ -1738,7 +1861,6 @@ function renderViewsChart() {
       if (!isValid(d)) continue;
       if (fmt(d, "yyyy-MM-dd") !== dayISO) continue;
 
-      // 🔑 filter by media kind ONLY for Songs / Videos
       if (selectedTab.value === "Songs" || selectedTab.value === "Videos") {
         const a = v?.attributes || v || {};
         const kind = String(a.kind || a.mediaType || a.type || "")
@@ -1778,7 +1900,6 @@ function renderViewsChart() {
             ? "QR Scans (Hourly)"
             : `${selectedTab.value} (Hourly)`;
   } else {
-    // RANGE (7/30/365)
     const s = rollups.value?.series ?? [];
     labels = s.map((d: any) => fmt(parseISO(`${d.date}T00:00:00`), "MMM d"));
 
@@ -1978,6 +2099,16 @@ watch(
 );
 
 /* ---------- lifecycle ---------- */
+watch(
+  () => viewsCanvas.value,
+  async (canvas) => {
+    if (!canvas) return;
+    await ensureChart();
+    renderViewsChart();
+    renderDeviceDoughnut();
+  }
+);
+
 onMounted(async () => {
   console.log("🔍 Route params:", route.params);
   console.log("🔍 Route query:", route.query);
@@ -1986,8 +2117,7 @@ onMounted(async () => {
     route.params.id || route.params.bandId || route.query.bandId
   );
   await ensureChart();
-  await fetchAndRender(false); // first load
-  await fetchMuse();
+  await fetchAndRender(false);
 });
 
 // when range changes → silent refresh
