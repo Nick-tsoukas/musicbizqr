@@ -182,6 +182,15 @@ const loginWithProvider = (provider) => {
               >SIGN UP</NuxtLink
             >
           </p>
+          <div class="flex justify-center items-center mb-4">
+          
+            <NuxtLink
+              to="/forgot-password"
+              class="text-sm text-blue-800 underline"
+            >
+              Forgot your password?
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
