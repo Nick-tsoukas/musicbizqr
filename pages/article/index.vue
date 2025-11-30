@@ -42,6 +42,20 @@ useHead({
   ],
   link: [{ rel: 'canonical', href: 'https://musicbizqr.com/article' }]
 })
+
+watchEffect(() => {
+  if (seoPages.value) {
+    console.log('SEO pages:', seoPages.value.data.length)
+
+    const cats = seoPages.value.data.map(p => ({
+      title: p.attributes.title,
+      slug: p.attributes.slug,
+      category: p.attributes.category
+    }))
+
+    console.table(cats)
+  }
+})
 </script>
 
 <template>
