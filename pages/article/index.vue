@@ -24,6 +24,60 @@ const categories = computed(() => {
   return unique.filter(Boolean)
 })
 
+watchEffect(() => {
+  if (!seoPages.value) return
+
+  const rows = seoPages.value.data.map(p => ({
+    id: p.id,
+    title: p.attributes.title,
+    slug: p.attributes.slug,
+    category: p.attributes.category,
+    rawCategory: JSON.stringify(p.attributes.category),
+  }))
+
+  console.log("=======================================")
+  console.log("🔍 TOTAL ARTICLES FETCHED:", rows.length)
+  console.log("🔍 DISTINCT RAW CATEGORIES:", [
+    ...new Set(rows.map(r => r.category))
+  ])
+  console.log("=======================================")
+
+  // 1. Show FULL table
+  console.table(rows)
+
+  // 2. Show rows with EMPTY or INVALID categories
+  const emptyCats = rows.filter(r => !r.category || r.category.trim() === "")
+  if (emptyCats.length) {
+    console.warn("⚠️ EMPTY / INVALID CATEGORY ROWS:")
+    console.table(emptyCats)
+  }
+
+  // 3. Show trimmed categories to identify trailing spaces
+  const weirdCats = rows.filter(
+    r => r.category && r.category !== r.category.trim()
+  )
+  if (weirdCats.length) {
+    console.warn("⚠️ CATEGORY WITH TRAILING SPACES:")
+    console.table(weirdCats)
+  }
+
+  // 4. Show duplicate slugs
+  const slugMap = {}
+  rows.forEach(r => {
+    slugMap[r.slug] = slugMap[r.slug] ? [...slugMap[r.slug], r] : [r]
+  })
+  const dupes = Object.values(slugMap).filter(list => list.length > 1)
+  if (dupes.length) {
+    console.warn("⚠️ DUPLICATE SLUGS DETECTED:")
+    console.log(dupes)
+  }
+
+  // 5. Show the “music-marketing” article if it exists
+  const mm = rows.filter(r => r.slug === "music-marketing")
+  console.log("🎯 music-marketing entry:", mm)
+})
+
+
 useHead({
   title: 'Articles | MusicBizQR',
   meta: [
@@ -43,19 +97,7 @@ useHead({
   link: [{ rel: 'canonical', href: 'https://musicbizqr.com/article' }]
 })
 
-watchEffect(() => {
-  if (seoPages.value) {
-    console.log('SEO pages:', seoPages.value.data.length)
 
-    const cats = seoPages.value.data.map(p => ({
-      title: p.attributes.title,
-      slug: p.attributes.slug,
-      category: p.attributes.category
-    }))
-
-    console.table(cats)
-  }
-})
 </script>
 
 <template>
