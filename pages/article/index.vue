@@ -104,9 +104,63 @@ useHead({
 
 <template>
   <div class="bg-black text-white py-16 px-6 max-w-5xl mx-auto">
-    <h1 class="text-4xl font-extrabold mb-8 text-gradient">
-      Explore Articles by Category
+    <!-- Main page title (H1) -->
+    <h1 class="text-4xl font-extrabold mb-4 text-gradient">
+      MusicBizQR Knowledge Center
     </h1>
+
+    <!-- Intro copy -->
+    <p class="text-gray-300 mb-4 max-w-3xl leading-relaxed">
+      Welcome to the MusicBizQR Knowledge Center — a growing, always-evolving library of 
+      elite music marketing strategy. This is where artists, managers, and indie teams come to
+      learn how to build real fan relationships, promote music with intention, and use modern
+      tools like 
+      <NuxtLink to="/article/smart-links" class="text-pink-400 underline">
+        smart links
+      </NuxtLink> 
+      and 
+      <NuxtLink to="/article/qr-code-strategy" class="text-pink-400 underline">
+        dynamic QR codes
+      </NuxtLink> 
+      to actually grow.
+    </p>
+
+    <p class="text-gray-300 mb-4 max-w-3xl leading-relaxed">
+      Every category below leads to a full pillar guide — a deep, long-form breakdown that 
+      explains the strategy, psychology, and real-world use cases behind that part of your 
+      music career. Under each pillar, you'll find supporting articles that go deeper, showing 
+      you how to apply each tactic in the wild: on tour, at live shows, during releases, and 
+      across every social platform.
+    </p>
+
+    <p class="text-gray-300 mb-4 max-w-3xl leading-relaxed">
+      Not sure where to start? It depends on your goals. If you're releasing new music and 
+      need a fan-first digital presence, begin with the 
+      <NuxtLink to="/article/smart-links" class="text-pink-400 underline">
+        Smart Links Pillar
+      </NuxtLink>.  
+      If you're pushing live shows or trying to turn concerts into sales, explore the 
+      <NuxtLink to="/article/qr-code-strategy" class="text-pink-400 underline">
+        QR Code Strategy Pillar
+      </NuxtLink>.  
+      And if you're focused on touring, festival prep, or building a stronger live presence, you'll want the 
+      <NuxtLink to="/article/touring-events" class="text-pink-400 underline">
+        Touring &amp; Events Pillar
+      </NuxtLink>.
+    </p>
+
+    <p class="text-gray-300 mb-10 max-w-3xl leading-relaxed">
+      Each guide reflects the same philosophy behind MusicBizQR itself:  
+      <span class="text-pink-400 font-semibold">
+        music promotion should be simple, powerful, and built for real artists — not influencers or marketers.
+      </span>  
+      Dive in, explore, and use these strategies to get your sound in front of more people who’ll actually care.
+    </p>
+
+    <!-- Section heading for the grid -->
+    <h2 class="text-2xl font-bold mb-6">
+      Explore Articles by Category
+    </h2>
 
     <div v-if="categories.length" class="grid gap-6 md:grid-cols-2">
       <NuxtLink
@@ -115,18 +169,18 @@ useHead({
         :to="`/article/${cat}`"
         class="block p-6 rounded-lg shadow bg-gray-900 hover:bg-gray-800 transition"
       >
-        <h2 class="text-xl font-bold capitalize mb-2 text-pink-400">
+        <h3 class="text-xl font-bold capitalize mb-2 text-pink-400">
           {{ cat.replace(/-/g, ' ') }}
-        </h2>
+        </h3>
         <p class="text-gray-300">
           Articles about {{ cat.replace(/-/g, ' ') }} to help you grow your music career.
         </p>
       </NuxtLink>
     </div>
 
-    <div v-else class="text-gray-400 italic">No categories found.</div>
-     <!-- Videos Section -->
- 
+    <div v-else class="text-gray-400 italic">
+      No categories found.
+    </div>
   </div>
 </template>
 
