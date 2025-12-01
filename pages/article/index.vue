@@ -3,16 +3,18 @@ import { useAsyncData, useRuntimeConfig, useHead } from '#imports'
 
 const config = useRuntimeConfig()
 
+
+
 const { data: seoPages, error } = await useAsyncData('all-seo-pages', () =>
   $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
     params: {
       populate: '*',
-      sort: ['publishedAt:desc'],
-      pagination: { limit: 1000 }
+      sort: 'publishedAt:desc', // string is fine here
+      'pagination[page]': 1,
+      'pagination[pageSize]': 200, // or 1000 if your maxLimit allows it
     }
   })
 )
-
 if (error.value) {
   console.error('❌ Error fetching SEO pages:', error.value)
 }
