@@ -3,5 +3,6 @@
   - pillar page The Ultimate QR Code Strategy Guide for Musicians slug qr-code-strategy
   - The Best Linktree Alternative for Musicians: QR Codes, Music Embeds & Fan Analytics
   - https://musicbizqr.com/article/smart-links/best-music-smart-link-tools-2025
+  - https://musicbizqr.com/article/smart-links/perfect-smart-link-page-musicians
 [] article creation 
   - What Are Smart Links for Musicians? The Complete 2026 Guide
