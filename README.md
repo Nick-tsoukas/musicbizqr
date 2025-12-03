@@ -5,5 +5,6 @@
   - https://musicbizqr.com/article/smart-links/best-music-smart-link-tools-2025
   - https://musicbizqr.com/article/smart-links/perfect-smart-link-page-musicians
   - What Are Music Smart Links? (And Why Every Artist Needs One in 2025
+  - another aritlce  one more time 
 [] article creation 
   - What Are Smart Links for Musicians? The Complete 2026 Guide
