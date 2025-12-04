@@ -2,23 +2,8 @@
 import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed } from '#imports'
 import { marked } from 'marked'
 
-
-const renderer = new marked.Renderer()
-
-renderer.heading = (text, level) => {
-  const id = slugify(text)
-  return `<h${level} id="${id}">${text}</h${level}>`
-}
-
-marked.setOptions({ renderer })
-const route = useRoute()
-const category = route.params.category
-const slug = route.params.slug
-const config = useRuntimeConfig()
-
-
-
-const slugify = (text) => {
+// 1) Define slugify FIRST so it's available for the renderer
+function slugify (text) {
   return text
     .toLowerCase()
     // keep only letters, numbers, spaces, and hyphens
@@ -30,6 +15,27 @@ const slugify = (text) => {
     // trim leading/trailing hyphens
     .replace(/^-|-$/g, '')
 }
+
+// 2) Create a custom renderer that uses our slugify
+const renderer = new marked.Renderer()
+
+renderer.heading = (text, level) => {
+  const id = slugify(text)
+  return `<h${level} id="${id}">${text}</h${level}>`
+}
+
+// 3) Apply the renderer globally to marked
+marked.setOptions({ renderer })
+
+
+const route = useRoute()
+const category = route.params.category
+const slug = route.params.slug
+const config = useRuntimeConfig()
+
+
+
+
 
 // ---------------- Article Fetch ----------------
 const { data: seoPage, error } = await useAsyncData(
