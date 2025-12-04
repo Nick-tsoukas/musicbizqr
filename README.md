@@ -9,3 +9,10 @@
   - The Smart Link Alternative Built for Bands
 [] article creation 
   - What Are Smart Links for Musicians? The Complete 2026 Guide
+
+
+## need to fix 
+
+ - [] TOC https://musicbizqr.com/article/smart-links/linktree-alternative-for-musicians
+  - tried to fix 
+ - [] need another update https://musicbizqr.com/article/smart-links/smart-link-vs-linktree-musicians
