@@ -18,7 +18,7 @@ const config = useRuntimeConfig()
 
 
 
-const slugify = (text: string) => {
+const slugify = (text) => {
   return text
     .toLowerCase()
     // keep only letters, numbers, spaces, and hyphens
