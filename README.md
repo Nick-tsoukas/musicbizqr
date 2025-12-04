@@ -16,3 +16,6 @@
  - [] TOC https://musicbizqr.com/article/smart-links/linktree-alternative-for-musicians
   - tried to fix 
  - [] need another update https://musicbizqr.com/article/smart-links/smart-link-vs-linktree-musicians
+
+
+ - fixed another toc issue 
