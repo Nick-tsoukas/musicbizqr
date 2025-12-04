@@ -18,4 +18,4 @@
  - [] need another update https://musicbizqr.com/article/smart-links/smart-link-vs-linktree-musicians
 
 
- - fixed another toc issue 
+ - fixed another toc issue romve toc  one more 
