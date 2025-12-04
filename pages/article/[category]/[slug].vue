@@ -2,10 +2,34 @@
 import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed } from '#imports'
 import { marked } from 'marked'
 
+
+const renderer = new marked.Renderer()
+
+renderer.heading = (text, level) => {
+  const id = slugify(text)
+  return `<h${level} id="${id}">${text}</h${level}>`
+}
+
+marked.setOptions({ renderer })
 const route = useRoute()
 const category = route.params.category
 const slug = route.params.slug
 const config = useRuntimeConfig()
+
+
+
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    // keep only letters, numbers, spaces, and hyphens
+    .replace(/[^a-z0-9\s-]/g, '')
+    // convert spaces to single hyphens
+    .replace(/\s+/g, '-')
+    // collapse multiple hyphens
+    .replace(/-+/g, '-')
+    // trim leading/trailing hyphens
+    .replace(/^-|-$/g, '')
+}
 
 // ---------------- Article Fetch ----------------
 const { data: seoPage, error } = await useAsyncData(

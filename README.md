@@ -23,4 +23,4 @@
 ### notes 
  - must fix this article at some point Smart Link vs Linktree: What Every Musician Should Know in 2026
 
- - testing toc for one article 
+ - fixed code on article page 
