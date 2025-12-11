@@ -97,9 +97,10 @@
 <script setup>
 import { ref } from "vue";
 import { useSignup } from "~/composables/useSignup";
-const { loginWithGoogle } = useFirebase();
 
+const { loginWithGoogle } = useFirebase();
 const router = useRouter();
+const { $fbq } = useNuxtApp(); // 👈 get fbq helper from plugin
 
 const { registerUser } = useSignup();
 const loading = ref(false);
@@ -110,8 +111,38 @@ const formData = ref({
   password: "",
 });
 
+// prevent double tracking
+const hasTrackedSignupStart = ref(false);
+
+const trackSignupStarted = () => {
+  if (!process.client || !$fbq || hasTrackedSignupStart.value) return;
+
+  hasTrackedSignupStart.value = true;
+
+  // generate simple unique event_id
+  const eventId =
+    window.crypto?.randomUUID?.() ||
+    `signup-start-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  // 🔹 Standard Lead event
+  $fbq("track", "Lead", {
+    event_id: eventId,
+    content_name: "SignupStarted",
+    event_source: "nuxt-frontend",
+  });
+
+  // 🔹 Custom event (nice for custom audiences / reports)
+  $fbq("trackCustom", "SignupStarted", {
+    event_id: eventId,
+  });
+
+  // (optional) store for later if you want to reuse on server
+  // window.sessionStorage.setItem("mbq_signup_start_event_id", eventId);
+};
+
 const handleGoogleLogin = async () => {
   try {
+    // You could also call trackSignupStarted() here if you want to count Google starts
     await loginWithGoogle(); // all logic handled inside
   } catch (err) {
     console.error("[Google Signup Error]", err);
@@ -125,16 +156,20 @@ const handleSignup = async () => {
   console.log("[handleSignup] payload →", JSON.stringify(formData.value));
 
   try {
-     // Default name = email
+    // 1️⃣ Track SignupStarted (once)
+    trackSignupStarted();
+
+    // 2️⃣ Default name = email
     const name = formData.value.email;
-    // 1️⃣ Register user & start 30-day trial in one call
+
+    // 3️⃣ Register user & start 30-day trial in one call
     const user = await registerUser(
       name,
       formData.value.email,
       formData.value.password
     );
 
-    // 2️⃣ Notify & navigate
+    // 4️⃣ Notify & navigate
     alert(`✅ Welcome ${user.email}! Your 30-day trial is now active.`);
     router.push("/signupSuccess");
   } catch (err) {
@@ -145,3 +180,4 @@ const handleSignup = async () => {
   }
 };
 </script>
+
