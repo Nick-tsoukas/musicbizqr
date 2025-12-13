@@ -235,6 +235,32 @@ export default defineNuxtConfig({
 
     nitro: {
     externals: { inline: ['geoip-lite'] },
+    routeRules: {
+     '/article/smart-links/smart-links': {
+        redirect: '/article/smart-links',
+        statusCode: 301
+      },
+
+      '/article/qr-code-strategy/qr-code-strategy': {
+        redirect: '/article/qr-code-strategy',
+        statusCode: 301
+      },
+
+      '/article/music-marketing/music-marketing': {
+        redirect: '/article/music-marketing',
+        statusCode: 301
+      },
+
+      '/article/fan-funnels/fan-funnels': {
+        redirect: '/article/fan-funnels',
+        statusCode: 301
+      },
+
+      '/article/touring-events/touring-events': {
+        redirect: '/article/touring-events',
+        statusCode: 301
+      },
+    }
   },
 
   plugins: [
