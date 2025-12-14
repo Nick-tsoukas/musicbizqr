@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed, watchEffect } from '#imports'
+import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed } from '#imports'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -20,7 +20,28 @@ const hubUrl = computed(() => `${baseUrl.value}/article/${category}`)
 const articlesIndexUrl = computed(() => `${baseUrl.value}/article`)
 const homeUrl = computed(() => `${baseUrl.value}/`)
 
-// ---------------- Pillar Fetch (same style as slug page) ----------------
+// ---------------- Hub HTML / FAQ (SAFE defaults) ----------------
+const hubHtmlByCategory = {
+  'smart-links': `
+    <section class="prose prose-invert max-w-none mb-14">
+      <p>
+        Smart links are the quiet power tool behind modern music careers...
+      </p>
+    </section>
+  `
+}
+const hubHtml = computed(() => hubHtmlByCategory[category] || null)
+
+const faqByCategory = {
+  'smart-links': [
+    { q: 'What is a smart link for musicians?', a: '...' },
+    { q: 'How is a smart link different from a basic link-in-bio tool?', a: '...' },
+    { q: 'Do smart links help increase streams and followers?', a: '...' }
+  ]
+}
+const hubFaq = computed(() => faqByCategory[category] || []) // always array
+
+// ---------------- 1) Pillar fetch ----------------
 const { data: pillarRes, error: pillarError } = await useAsyncData(
   `hub-pillar-${category}`,
   () =>
@@ -35,51 +56,38 @@ const { data: pillarRes, error: pillarError } = await useAsyncData(
     })
 )
 
-if (pillarError.value) {
-  console.error('Hub pillar fetch error:', pillarError.value)
-}
+if (pillarError.value) console.error('Hub pillar fetch error:', pillarError.value)
 
 const pillar = computed(() => pillarRes.value?.data?.[0]?.attributes || null)
+const pillarSlug = computed(() => pillar.value?.slug || null)
 
-// ---------------- Cluster Fetch (RELATED ARTICLES) ----------------
-// This is the important one: same exact shape as your working related-posts query.
+// ---------------- 2) Cluster fetch (COPY slug-page pattern) ----------------
+// Fetch by category ONLY (like your working related posts), then filter locally.
 const { data: clusterRes, error: clusterError } = await useAsyncData(
   `hub-cluster-${category}`,
   () =>
     $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
       params: {
         'filters[category][$eq]': category,
-        // NOTE: if isPillar is boolean in Strapi, this should work
-        'filters[isPillar][$ne]': true,
         sort: ['publishedAt:desc'],
         pagination: { limit: 50 },
-        fields: ['title', 'slug', 'metaTitle', 'metaDescription']
+        fields: ['title', 'slug', 'metaTitle', 'metaDescription', 'isPillar']
       }
     })
 )
 
-if (clusterError.value) {
-  console.error('Hub cluster fetch error:', clusterError.value)
-}
+if (clusterError.value) console.error('Hub cluster fetch error:', clusterError.value)
 
-const clusterArticles = computed(() => clusterRes.value?.data || [])
+const clusterArticles = computed(() => {
+  const rows = clusterRes.value?.data || []
 
-// ---------------- Debug logs ----------------
-watchEffect(() => {
-  console.log('================ HUB DEBUG ================')
-  console.log('category param:', category)
-
-  console.log('pillar count:', pillarRes.value?.data?.length || 0)
-  console.log('pillar item:', pillarRes.value?.data?.[0])
-
-  console.log('cluster count:', clusterRes.value?.data?.length || 0)
-  console.log('cluster first:', clusterRes.value?.data?.[0])
-
-  // show raw categories coming back (this will expose trailing spaces)
-  const cats = (clusterRes.value?.data || []).map(p => p.attributes?.category)
-  console.log('raw categories in cluster results:', [...new Set(cats)])
-
-  console.log('===========================================')
+  // remove pillar reliably, even if isPillar is null/missing
+  return rows.filter((p) => {
+    const a = p?.attributes || {}
+    if (pillarSlug.value && a.slug === pillarSlug.value) return false
+    if (a.isPillar === true) return false
+    return true
+  })
 })
 
 // ---------------- Head ----------------
