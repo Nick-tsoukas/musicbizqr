@@ -185,14 +185,7 @@ sitemap: {
       ...articleUrls
     ]
   }
-}
-
-  
-  
-  
-
-  
-  
+},
 
   aos: {
     // Global settings:
