@@ -45,6 +45,32 @@ const category = route.params.category
 const slug = route.params.slug
 const config = useRuntimeConfig()
 
+
+function scrollToTopIfNeeded() {
+  // If navigating to a hash (TOC), let the router handle it
+  if (route.hash) return
+
+  // Wait until DOM is painted
+  nextTick(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    })
+  })
+}
+
+// Initial load
+onMounted(scrollToTopIfNeeded)
+
+// Subsequent navigations between articles
+watch(
+  () => route.fullPath,
+  () => {
+    scrollToTopIfNeeded()
+  }
+)
+
 // ---------------- Article Fetch ----------------
 const { data: seoPage, error } = await useAsyncData(
   `article-${category}-${slug}`,
