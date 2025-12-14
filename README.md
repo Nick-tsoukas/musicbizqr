@@ -25,4 +25,4 @@
 
  - fixed code on article page 
  - upgraded article again
- - upgraded again again 
+ - upgrading 
