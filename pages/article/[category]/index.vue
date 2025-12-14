@@ -102,7 +102,6 @@ function buildUrl(path, qsObj = {}) {
 function toAbsMaybe(url) {
   if (!url) return ''
   if (url.startsWith('http')) return url
-  // Strapi often returns /uploads/...
   return `${config.public.strapiUrl}${url}`
 }
 
@@ -111,10 +110,15 @@ const { data: pillarData, error: pillarError } = await useAsyncData(
   `pillar-${category}`,
   async () => {
     if (!category) return { data: [] }
+
     const url = buildUrl('/api/seo-pages', {
-      'filters[category][$eq]': category,
+      // TEMP: safer than $eq if you have trailing spaces or weird category values
+      'filters[category][$containsi]': category,
+
+      // ✅ reliable boolean filter
       'filters[isPillar][$eq]': 'true',
-      'pagination[limit]': '1',
+
+      'pagination[pageSize]': '1',
       'sort[0]': 'publishedAt:desc',
       'fields[0]': 'title',
       'fields[1]': 'slug',
@@ -125,7 +129,11 @@ const { data: pillarData, error: pillarError } = await useAsyncData(
       'populate[ogImage]': '*',
       'populate[author]': '*'
     })
-    return await $fetch(url)
+
+    const res = await $fetch(url)
+    console.log('✅ pillar url:', url)
+    console.log('✅ pillar count:', res?.data?.length)
+    return res
   }
 )
 
@@ -134,7 +142,9 @@ if (pillarError?.value) console.error('Pillar fetch error:', pillarError.value)
 const pillar = computed(() => pillarData.value?.data?.[0]?.attributes || null)
 
 const ogImage = computed(() => {
-  const rel = pillar.value?.ogImage?.url
+  const rel =
+    pillar.value?.ogImage?.data?.attributes?.url ||
+    pillar.value?.ogImage?.url
   const abs = toAbsMaybe(rel)
   return abs || `${baseUrl.value}/default-og.png`
 })
@@ -146,22 +156,33 @@ const keywordsArray = computed(() =>
     .filter(Boolean)
 )
 
-// ---------- 2) Cluster fetch ----------
+// ---------- 2) Cluster fetch (RELATED ARTICLES) ----------
 const { data: clusterData, error: clusterError } = await useAsyncData(
   `cluster-${category}`,
   async () => {
     if (!category) return { data: [] }
+
     const url = buildUrl('/api/seo-pages', {
-      'filters[category][$eq]': category,
-      'filters[isPillar][$ne]': 'true',
-      'pagination[limit]': '50',
+      // TEMP: safer than $eq if you have trailing spaces or weird category values
+      'filters[category][$containsi]': category,
+
+      // ✅ reliable boolean filter
+      'filters[isPillar][$eq]': 'false',
+
+      // ✅ correct Strapi pagination key
+      'pagination[pageSize]': '50',
+
       'sort[0]': 'publishedAt:desc',
       'fields[0]': 'title',
       'fields[1]': 'slug',
       'fields[2]': 'metaTitle',
       'fields[3]': 'metaDescription'
     })
-    return await $fetch(url)
+
+    const res = await $fetch(url)
+    console.log('✅ cluster url:', url)
+    console.log('✅ cluster count:', res?.data?.length)
+    return res
   }
 )
 
@@ -275,6 +296,7 @@ useHead(() => {
   }
 })
 </script>
+
 
 <template>
   <div class="bg-black text-white px-4 py-16 max-w-3xl mx-auto">
