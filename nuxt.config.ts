@@ -128,53 +128,65 @@ export default defineNuxtConfig({
   description: 'Dynamic QR codes and smart links for bands and musicians.'
   },
 
-  sitemap: {
-    credits: false,
-    xsl: false,
-    cacheTime: 0, // disables caching to force regeneration
-    sitemapName: 'sitemap.xml',
-    async urls() {
-      const base = process.env.STRAPI_URL || 'http://localhost:1337';
-      console.log('🧠 Rebuilding sitemap from Strapi at:', base);
-  
-      const res = await fetch(`${base}/api/seo-pages?populate=category&pagination[pageSize]=1000`);
-      const { data } = await res.json();
-  
-      // 1) Build a set of unique categories
-      const categories = Array.from(
-        new Set(data.map((page) => page.attributes.category || 'uncategorized'))
-      );
-  
-      // 2) Generate a URL entry for each category (pillar page)
-      const categoryUrls = categories.map((cat) => ({
-        loc: `/article/${cat}`,
-        changefreq: 'weekly',
-        priority: 0.8,
-      }));
-  
-      // 3) Generate a URL entry for each article (cluster page)
-      const articleUrls = data.map((page) => {
-        const cat = page.attributes.category || 'uncategorized';
-        const slug = page.attributes.slug;
+sitemap: {
+  credits: false,
+  xsl: false,
+  cacheTime: 0,
+  sitemapName: 'sitemap.xml',
+
+  async urls() {
+    const base = process.env.STRAPI_URL || 'http://localhost:1337'
+    const site = process.env.BASE_URL || 'https://musicbizqr.com'
+
+    const res = await fetch(`${base}/api/seo-pages?pagination[pageSize]=1000`)
+    const { data } = await res.json()
+
+    // ✅ Only include "good" categories (no uncategorized)
+    const categories = Array.from(
+      new Set(
+        data
+          .map((page) => (page.attributes.category || '').trim())
+          .filter((cat) => cat && cat !== 'uncategorized')
+      )
+    )
+
+    const categoryUrls = categories.map((cat) => ({
+      loc: `/article/${cat}`,
+      changefreq: 'weekly',
+      priority: 0.8
+    }))
+
+    // ✅ Only include valid article URLs (must have category+slug)
+    const articleUrls = data
+      .map((page) => {
+        const cat = (page.attributes.category || '').trim()
+        const slug = (page.attributes.slug || '').trim()
+        if (!cat || !slug) return null
+        if (cat === 'uncategorized') return null
+
         return {
           loc: `/article/${cat}/${slug}`,
           lastmod: page.attributes.updatedAt,
           changefreq: 'weekly',
-          priority: 0.9,
-        };
-      });
-  
-      console.log(`✅ Sitemap includes ${categories.length} categories and ${articleUrls.length} articles`);
-  
-      // 4) Return the combined list
-      return [
-        // optional: add other static routes here
-        { loc: '/', changefreq: 'daily', priority: 1.0 },
-        ...categoryUrls,
-        ...articleUrls,
-      ];
-    },
-  },
+          priority: 0.9
+        }
+      })
+      .filter(Boolean)
+
+    return [
+      { loc: '/', changefreq: 'daily', priority: 1.0 },
+      { loc: '/article', changefreq: 'weekly', priority: 0.9 },
+      // optional but fine:
+      { loc: '/contact', changefreq: 'monthly', priority: 0.4 },
+      { loc: '/privacypolicy', changefreq: 'yearly', priority: 0.2 },
+      { loc: '/termsofservice', changefreq: 'yearly', priority: 0.2 },
+
+      ...categoryUrls,
+      ...articleUrls
+    ]
+  }
+}
+
   
   
   
@@ -294,9 +306,10 @@ export default defineNuxtConfig({
             continue
           }
   
-          prerenderRoutes.push(`/article/${category}`)
           prerenderRoutes.push(`/article/${category}/${slug}`)
         }
+
+           prerenderRoutes.push('/article')
   
         console.log(`✅ Pre-rendering ${prerenderRoutes.length} routes (${json.data.length - skipped} of ${json.data.length} articles)`)
   
