@@ -50,7 +50,7 @@ const { data: clusterRes, error: clusterError } = await useAsyncData(
       params: {
         'filters[category][$eq]': category,
         // NOTE: if isPillar is boolean in Strapi, this should work
-        'filters[isPillar][$ne]': false || null ,
+        'filters[isPillar][$ne]': true ,
         sort: ['publishedAt:desc'],
         pagination: { limit: 50 },
         fields: ['title', 'slug', 'metaTitle', 'metaDescription']
