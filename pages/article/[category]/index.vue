@@ -156,35 +156,23 @@ const keywordsArray = computed(() =>
     .filter(Boolean)
 )
 
-// ---------- 2) Cluster fetch (RELATED ARTICLES) ----------
-// ---------- 2) Cluster fetch (RELATED ARTICLES) ----------
 const categoryStr = computed(() => String(route.params.category || '').trim())
 
-// This handles cases where DB stores "Smart Links" but route is "smart-links"
 const categoryForSearch = computed(() =>
   categoryStr.value.replace(/-/g, ' ').trim()
 )
 
 const { data: clusterData, error: clusterError } = await useAsyncData(
-  () => `cluster-${categoryStr.value}`,
+  `cluster-${categoryStr.value || 'none'}`, // ✅ key is a string
   async () => {
     if (!categoryStr.value) return { data: [] }
 
     const url = buildUrl('/api/seo-pages', {
-      // ✅ use OR so both "smart-links" and "smart links" styles match
       'filters[$or][0][category][$containsi]': categoryStr.value,
       'filters[$or][1][category][$containsi]': categoryForSearch.value,
-
-      // ✅ exclude the pillar
       'filters[isPillar][$ne]': 'true',
-
-      // ✅ Strapi v4 pagination
       'pagination[pageSize]': '50',
-
-      // ✅ Strapi v4 sort
       'sort[0]': 'publishedAt:desc',
-
-      // fields
       'fields[0]': 'title',
       'fields[1]': 'slug',
       'fields[2]': 'metaTitle',
@@ -196,12 +184,13 @@ const { data: clusterData, error: clusterError } = await useAsyncData(
     console.log('✅ cluster count:', res?.data?.length)
     return res
   },
-  { watch: [categoryStr] }
+  { watch: [categoryStr] } // ✅ refetch when category changes
 )
 
 if (clusterError?.value) console.error('Cluster fetch error:', clusterError.value)
 
 const clusterArticles = computed(() => clusterData.value?.data || [])
+
 
 
 
