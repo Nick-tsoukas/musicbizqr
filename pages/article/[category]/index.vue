@@ -257,10 +257,17 @@ const { data: clusterData, pending: clusterPending, error: clusterError, refresh
   )
 
 // This will show you if Nuxt is giving you a Ref, an object, etc.
-console.log('🧩 clusterData ref exists?', !!clusterData)
-console.log('🧩 clusterData current value:', safePreview(clusterData.value))
 
-const clusterArticles = computed(() =>
+console.log('🧩 clusterPending:', clusterPending.value)
+console.log('🧩 clusterError:', clusterError.value || null)
+console.log('🧩 clusterData.value preview:', safePreview(clusterData.value))
+
+
+const clusterArticles = computed(() => {
+  const v = clusterData.value
+  if (Array.isArray(v)) return v
+  return v?.data || []
+})
 
 
 
