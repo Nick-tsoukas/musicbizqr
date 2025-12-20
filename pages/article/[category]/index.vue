@@ -157,30 +157,52 @@ const keywordsArray = computed(() =>
 )
 
 // ---------- 2) Cluster fetch (RELATED ARTICLES) ----------
+// ---------- 2) Cluster fetch (RELATED ARTICLES) ----------
 const categoryStr = computed(() => String(route.params.category || '').trim())
+
+// This handles cases where DB stores "Smart Links" but route is "smart-links"
+const categoryForSearch = computed(() =>
+  categoryStr.value.replace(/-/g, ' ').trim()
+)
 
 const { data: clusterData, error: clusterError } = await useAsyncData(
   () => `cluster-${categoryStr.value}`,
-  () =>
-    $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
-      params: {
-        // use $eq first. If your DB has trailing spaces, switch to $containsi temporarily.
-        'filters[category][$eq]': categoryStr.value,
+  async () => {
+    if (!categoryStr.value) return { data: [] }
 
-        sort: ['publishedAt:desc'],
+    const url = buildUrl('/api/seo-pages', {
+      // ✅ use OR so both "smart-links" and "smart links" styles match
+      'filters[$or][0][category][$containsi]': categoryStr.value,
+      'filters[$or][1][category][$containsi]': categoryForSearch.value,
 
-        // pick one pagination style — this one matches your working example
-        pagination: { limit: 50 },
+      // ✅ exclude the pillar
+      'filters[isPillar][$ne]': 'true',
 
-        fields: ['title', 'slug', 'metaTitle', 'metaDescription']
-      }
-    }),
+      // ✅ Strapi v4 pagination
+      'pagination[pageSize]': '50',
+
+      // ✅ Strapi v4 sort
+      'sort[0]': 'publishedAt:desc',
+
+      // fields
+      'fields[0]': 'title',
+      'fields[1]': 'slug',
+      'fields[2]': 'metaTitle',
+      'fields[3]': 'metaDescription'
+    })
+
+    const res = await $fetch(url)
+    console.log('✅ cluster url:', url)
+    console.log('✅ cluster count:', res?.data?.length)
+    return res
+  },
   { watch: [categoryStr] }
 )
 
-if (clusterError.value) console.error('Cluster fetch error:', clusterError.value)
+if (clusterError?.value) console.error('Cluster fetch error:', clusterError.value)
 
 const clusterArticles = computed(() => clusterData.value?.data || [])
+
 
 
 // ---------- JSON-LD ----------
