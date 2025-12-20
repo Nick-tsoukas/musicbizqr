@@ -182,7 +182,9 @@ function safePreview(obj, max = 600) {
 const clusterUrl = computed(() =>
   buildUrl('/api/seo-pages', {
     'filters[category][$eq]': categoryStr.value,
-    'filters[isPillar][$ne]': 'true',
+       // ✅ include NULL (your non-pillars) OR false (future-proof)
+    'filters[$or][0][isPillar][$null]': 'true',
+    'filters[$or][1][isPillar][$eq]': 'false',
     'pagination[pageSize]': '50',
     'sort[0]': 'publishedAt:desc',
     'fields[0]': 'title',
@@ -191,6 +193,9 @@ const clusterUrl = computed(() =>
     'fields[3]': 'metaDescription'
   })
 )
+
+console.log('🔥 clusterUrl FINAL:', clusterUrl.value)
+
 
 const { data: clusterData, pending: clusterPending, error: clusterError, refresh: refreshCluster } =
   await useAsyncData(
