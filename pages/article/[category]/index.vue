@@ -167,14 +167,16 @@ const categoryForSearch = computed(() =>
 )
 
 const { data: clusterData, error: clusterError } = await useAsyncData(
-  `cluster-${categoryStr.value || 'none'}`, // ✅ key is a string
+  `cluster-${category}`,
   async () => {
-    if (!categoryStr.value) return { data: [] }
+    if (!category) return { data: [] }
 
     const url = buildUrl('/api/seo-pages', {
-      'filters[$or][0][category][$containsi]': categoryStr.value,
-      'filters[$or][1][category][$containsi]': categoryForSearch.value,
+      'filters[category][$eq]': category,
+
+      // ✅ include nulls + false, exclude only the true pillar
       'filters[isPillar][$ne]': 'true',
+
       'pagination[pageSize]': '50',
       'sort[0]': 'publishedAt:desc',
       'fields[0]': 'title',
@@ -187,9 +189,10 @@ const { data: clusterData, error: clusterError } = await useAsyncData(
     console.log('✅ cluster url:', url)
     console.log('✅ cluster count:', res?.data?.length)
     return res
-  },
-  { watch: [categoryStr] } // ✅ refetch when category changes
+  }
 )
+
+
 
 if (clusterError?.value) console.error('Cluster fetch error:', clusterError.value)
 
