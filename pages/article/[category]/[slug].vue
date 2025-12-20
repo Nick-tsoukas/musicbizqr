@@ -124,13 +124,17 @@ const takeaways = computed(() => {
   if (!Array.isArray(raw)) return []
 
   return raw
-    .map((item) => ({
-      text: String(item?.text || '').trim(),
-      anchorId: String(item?.anchorId || '').trim()
-    }))
-    .filter(t => t.text && t.anchorId)
+    .map((item) => {
+      const label = String(item?.label || item?.text || '').trim()
+      const anchorId = String(item?.anchorId || '').trim()
+      const description = String(item?.description || '').trim()
+
+      return { label, anchorId, description }
+    })
+    .filter(t => t.label && t.anchorId)
     .slice(0, 7)
 })
+
 
 // Optional: smooth-scroll + highlight when a hash is present
 function scrollToHashAndHighlight () {
@@ -347,7 +351,7 @@ useHead(() => {
               :href="`#${t.anchorId}`"
               class="text-gray-100 hover:text-pink-300 transition underline decoration-gray-600 hover:decoration-pink-400"
             >
-              {{ t.text }}
+             {{ t.label }}
             </a>
           </li>
         </ul>
