@@ -353,6 +353,9 @@ useHead(() => {
             >
              {{ t.label }}
             </a>
+            <p v-if="t.description" class="text-sm text-gray-400 mt-1">
+  {{ t.description }}
+</p>
           </li>
         </ul>
       </div>
