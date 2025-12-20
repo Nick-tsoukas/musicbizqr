@@ -15,9 +15,146 @@ const displayTitle = computed(() =>
     .replace(/\b\w/g, (l) => l.toUpperCase())
 )
 
+
+
 const hubUrl = computed(() => `${baseUrl.value}/article/${category}`)
 const articlesIndexUrl = computed(() => `${baseUrl.value}/article`)
 const homeUrl = computed(() => `${baseUrl.value}/`)
+
+
+const DEBUG = true
+
+async function debugSeoPages() {
+  if (!DEBUG) return
+
+  console.log('===============================')
+  console.log('🔎 SEO DEBUG START')
+  console.log('Route category param:', route.params.category)
+  console.log('Computed categoryStr:', categoryStr.value)
+  console.log('Computed categoryForSearch:', categoryForSearch.value)
+  console.log('Strapi URL:', config.public.strapiUrl)
+  console.log('===============================')
+
+  // 1) Can we fetch anything at all?
+  const urlAny = buildUrl('/api/seo-pages', {
+    'pagination[pageSize]': '5',
+    'sort[0]': 'publishedAt:desc',
+    // include these fields so we can inspect them
+    'fields[0]': 'title',
+    'fields[1]': 'slug',
+    'fields[2]': 'category',
+    'fields[3]': 'isPillar',
+    'fields[4]': 'publishedAt'
+  })
+
+  const anyRes = await $fetch(urlAny).catch((e) => {
+    console.error('❌ Unfiltered fetch failed:', e)
+    return null
+  })
+
+  console.log('✅ Unfiltered URL:', urlAny)
+  console.log('✅ Unfiltered count:', anyRes?.data?.length)
+  console.log('✅ Unfiltered sample raw:', anyRes?.data?.[0])
+
+  if (!anyRes?.data?.length) {
+    console.warn('⚠️ ZERO results from unfiltered /api/seo-pages')
+    console.warn('This almost always means: Strapi Permissions OR Draft/Publish not public.')
+    console.warn('Go to Strapi Admin → Settings → Users & Permissions → Public → seo-page → find + findOne must be enabled.')
+    console.warn('Also check that the entries are actually Published.')
+    console.log('🔎 SEO DEBUG END (early)')
+    console.log('===============================')
+    return
+  }
+
+  // 2) Pull a bigger sample to inspect categories
+  const urlSample = buildUrl('/api/seo-pages', {
+    'pagination[pageSize]': '200',
+    'sort[0]': 'publishedAt:desc',
+    'fields[0]': 'category',
+    'fields[1]': 'isPillar',
+    'fields[2]': 'slug'
+  })
+
+  const sampleRes = await $fetch(urlSample).catch((e) => {
+    console.error('❌ Sample fetch failed:', e)
+    return null
+  })
+
+  const rows = sampleRes?.data || []
+  console.log('✅ Sample URL:', urlSample)
+  console.log('✅ Sample count:', rows.length)
+
+  const categories = {}
+  const isPillarCounts = { true: 0, false: 0, null: 0, other: 0 }
+
+  for (const r of rows) {
+    const a = r?.attributes || {}
+
+    const cat = a.category
+    const catKey =
+      cat === null || cat === undefined || cat === ''
+        ? '(empty)'
+        : String(cat)
+
+    categories[catKey] = (categories[catKey] || 0) + 1
+
+    const p = a.isPillar
+    if (p === true) isPillarCounts.true++
+    else if (p === false) isPillarCounts.false++
+    else if (p === null || p === undefined) isPillarCounts.null++
+    else isPillarCounts.other++
+  }
+
+  console.log('📌 DISTINCT CATEGORIES (value -> count):', categories)
+  console.log('📌 isPillar counts:', isPillarCounts)
+
+  // 3) Test filters directly
+  const tests = [
+    { label: 'containsi route param', filter: categoryStr.value },
+    { label: 'containsi hyphen->space', filter: categoryForSearch.value },
+    { label: 'eq route param', filterEq: categoryStr.value },
+    { label: 'eq hyphen->space', filterEq: categoryForSearch.value }
+  ]
+
+  for (const t of tests) {
+    let testUrl
+    if (t.filter) {
+      testUrl = buildUrl('/api/seo-pages', {
+        'filters[category][$containsi]': t.filter,
+        'pagination[pageSize]': '5',
+        'sort[0]': 'publishedAt:desc',
+        'fields[0]': 'category',
+        'fields[1]': 'isPillar',
+        'fields[2]': 'slug'
+      })
+    } else {
+      testUrl = buildUrl('/api/seo-pages', {
+        'filters[category][$eq]': t.filterEq,
+        'pagination[pageSize]': '5',
+        'sort[0]': 'publishedAt:desc',
+        'fields[0]': 'category',
+        'fields[1]': 'isPillar',
+        'fields[2]': 'slug'
+      })
+    }
+
+    const testRes = await $fetch(testUrl).catch((e) => {
+      console.error(`❌ Test failed (${t.label}):`, e)
+      return null
+    })
+
+    console.log(`🧪 TEST: ${t.label}`)
+    console.log('URL:', testUrl)
+    console.log('count:', testRes?.data?.length)
+    console.log('sample:', testRes?.data?.[0])
+  }
+
+  console.log('🔎 SEO DEBUG END')
+  console.log('===============================')
+}
+
+// run once on page load
+await debugSeoPages()
 
 // ---------- Hardcoded hub HTML ----------
 const hubHtmlByCategory = {
