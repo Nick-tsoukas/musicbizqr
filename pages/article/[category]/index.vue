@@ -160,43 +160,48 @@ const keywordsArray = computed(() =>
     .filter(Boolean)
 )
 
-const categoryStr = computed(() => String(route.params.category || '').trim())
 
+
+
+const categoryStr = computed(() => String(route.params.category || '').trim())
+const clusterKey = computed(() => `cluster-${categoryStr.value || 'none'}`)
 const categoryForSearch = computed(() =>
   categoryStr.value.replace(/-/g, ' ').trim()
 )
+const { data: clusterData, pending: clusterPending, error: clusterError } =
+  await useAsyncData(
+    clusterKey.value,
+    async () => {
+      if (!categoryStr.value) return { data: [] }
 
-const { data: clusterData, error: clusterError } = await useAsyncData(
-  `cluster-${category}`,
-  async () => {
-    if (!category) return { data: [] }
+      const url = buildUrl('/api/seo-pages', {
+        'filters[category][$eq]': categoryStr.value,
+        'filters[isPillar][$ne]': 'true',
+        'pagination[pageSize]': '50',
+        'sort[0]': 'publishedAt:desc',
+        'fields[0]': 'title',
+        'fields[1]': 'slug',
+        'fields[2]': 'metaTitle',
+        'fields[3]': 'metaDescription'
+      })
 
-    const url = buildUrl('/api/seo-pages', {
-      'filters[category][$eq]': category,
+      const res = await $fetch(url)
 
-      // ✅ include nulls + false, exclude only the true pillar
-      'filters[isPillar][$ne]': 'true',
+      console.log('✅ cluster url:', url)
+      console.log('✅ cluster count:', res?.data?.length)
+      console.log('✅ cluster first:', res?.data?.[0])
 
-      'pagination[pageSize]': '50',
-      'sort[0]': 'publishedAt:desc',
-      'fields[0]': 'title',
-      'fields[1]': 'slug',
-      'fields[2]': 'metaTitle',
-      'fields[3]': 'metaDescription'
-    })
-
-    const res = await $fetch(url)
-    console.log('✅ cluster url:', url)
-    console.log('✅ cluster count:', res?.data?.length)
-    return res
-  }
-)
-
-
-
-if (clusterError?.value) console.error('Cluster fetch error:', clusterError.value)
+      return res
+    },
+    {
+      watch: [clusterKey], // ✅ watch the key, not just category
+      server: true
+    }
+  )
 
 const clusterArticles = computed(() => clusterData.value?.data || [])
+
+
 
 
 const DEBUG = true
