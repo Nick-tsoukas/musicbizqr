@@ -157,38 +157,31 @@ const keywordsArray = computed(() =>
 )
 
 // ---------- 2) Cluster fetch (RELATED ARTICLES) ----------
+const categoryStr = computed(() => String(route.params.category || '').trim())
+
 const { data: clusterData, error: clusterError } = await useAsyncData(
-  `cluster-${category}`,
-  async () => {
-    if (!category) return { data: [] }
+  () => `cluster-${categoryStr.value}`,
+  () =>
+    $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
+      params: {
+        // use $eq first. If your DB has trailing spaces, switch to $containsi temporarily.
+        'filters[category][$eq]': categoryStr.value,
 
-    const url = buildUrl('/api/seo-pages', {
-      // TEMP: safer than $eq if you have trailing spaces or weird category values
-      'filters[category][$containsi]': category,
+        sort: ['publishedAt:desc'],
 
-      // ✅ reliable boolean filter
-      'filters[isPillar][$eq]': 'false',
+        // pick one pagination style — this one matches your working example
+        pagination: { limit: 50 },
 
-      // ✅ correct Strapi pagination key
-      'pagination[pageSize]': '50',
-
-      'sort[0]': 'publishedAt:desc',
-      'fields[0]': 'title',
-      'fields[1]': 'slug',
-      'fields[2]': 'metaTitle',
-      'fields[3]': 'metaDescription'
-    })
-
-    const res = await $fetch(url)
-    console.log('✅ cluster url:', url)
-    console.log('✅ cluster count:', res?.data?.length)
-    return res
-  }
+        fields: ['title', 'slug', 'metaTitle', 'metaDescription']
+      }
+    }),
+  { watch: [categoryStr] }
 )
 
-if (clusterError?.value) console.error('Cluster fetch error:', clusterError.value)
+if (clusterError.value) console.error('Cluster fetch error:', clusterError.value)
 
 const clusterArticles = computed(() => clusterData.value?.data || [])
+
 
 // ---------- JSON-LD ----------
 const jsonLdHub = computed(() => {
