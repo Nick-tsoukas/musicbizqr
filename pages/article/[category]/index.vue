@@ -168,9 +168,20 @@ const clusterKey = computed(() => `cluster-${categoryStr.value || 'none'}`)
 const categoryForSearch = computed(() =>
   categoryStr.value.replace(/-/g, ' ').trim()
 )
-const { data: clusterData, pending: clusterPending, error: clusterError } = await useFetch(
-  () => buildUrl('/api/seo-pages', {
-    'filters[category][$eq]': category,
+
+
+function safePreview(obj, max = 600) {
+  try {
+    const s = JSON.stringify(obj)
+    return s.length > max ? s.slice(0, max) + '…(truncated)' : s
+  } catch (e) {
+    return String(obj)
+  }
+}
+
+const clusterUrl = computed(() =>
+  buildUrl('/api/seo-pages', {
+    'filters[category][$eq]': categoryStr.value,
     'filters[isPillar][$ne]': 'true',
     'pagination[pageSize]': '50',
     'sort[0]': 'publishedAt:desc',
@@ -178,13 +189,79 @@ const { data: clusterData, pending: clusterPending, error: clusterError } = awai
     'fields[1]': 'slug',
     'fields[2]': 'metaTitle',
     'fields[3]': 'metaDescription'
-  }),
-  {
-    key: `cluster-${category}`
-  }
+  })
 )
 
-const clusterArticles = computed(() => clusterData.value?.data || [])
+const { data: clusterData, pending: clusterPending, error: clusterError, refresh: refreshCluster } =
+  await useAsyncData(
+    `cluster-${categoryStr.value || 'none'}`,
+    async () => {
+      const url = clusterUrl.value
+
+      // --------- MEGA LOGS ---------
+      console.log('===============================')
+      console.log('🚀 CLUSTER ASYNCDATA START')
+      console.log('env:', process.server ? 'SERVER' : 'CLIENT')
+      console.log('route:', route.fullPath)
+      console.log('categoryStr:', categoryStr.value)
+      console.log('url:', url)
+      console.log('strapiUrl config:', config.public.strapiUrl)
+      console.log('===============================')
+
+      // 1) try $fetch (Nuxt)
+      try {
+        const res = await $fetch(url)
+        console.log('✅ $fetch OK')
+        console.log('✅ $fetch type:', typeof res)
+        console.log('✅ $fetch preview:', safePreview(res))
+        console.log('✅ $fetch data length:', res?.data?.length)
+        console.log('✅ $fetch first:', res?.data?.[0])
+        console.log('🚀 CLUSTER ASYNCDATA END ($fetch)')
+        console.log('===============================')
+        return res
+      } catch (e) {
+        console.error('❌ $fetch FAILED:', e)
+      }
+
+      // 2) fallback to raw fetch so we can inspect status/headers/body
+      try {
+        const r = await fetch(url, { method: 'GET' })
+        console.log('✅ raw fetch status:', r.status, r.statusText)
+        console.log('✅ raw fetch content-type:', r.headers.get('content-type'))
+        const text = await r.text()
+        console.log('✅ raw fetch body length:', text.length)
+        console.log('✅ raw fetch body preview:', text.slice(0, 800))
+        let json = null
+        try {
+          json = JSON.parse(text)
+          console.log('✅ raw fetch JSON parsed')
+          console.log('✅ raw fetch data length:', json?.data?.length)
+          console.log('✅ raw fetch first:', json?.data?.[0])
+        } catch (parseErr) {
+          console.error('❌ raw fetch JSON parse failed:', parseErr)
+        }
+        console.log('🚀 CLUSTER ASYNCDATA END (raw fetch)')
+        console.log('===============================')
+        return json || { data: [] }
+      } catch (e2) {
+        console.error('❌ raw fetch FAILED:', e2)
+        console.log('🚀 CLUSTER ASYNCDATA END (failed)')
+        console.log('===============================')
+        return { data: [] }
+      }
+    },
+    {
+      watch: [categoryStr],
+      server: true
+    }
+  )
+
+// This will show you if Nuxt is giving you a Ref, an object, etc.
+console.log('🧩 clusterData ref exists?', !!clusterData)
+console.log('🧩 clusterData current value:', safePreview(clusterData.value))
+
+const clusterArticles = computed(() =>
+
 
 
 
