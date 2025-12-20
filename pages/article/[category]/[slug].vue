@@ -1,5 +1,14 @@
 <script setup>
-import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed } from '#imports'
+import {
+  useRoute,
+  useAsyncData,
+  useHead,
+  useRuntimeConfig,
+  computed,
+  nextTick,
+  onMounted,
+  watch
+} from '#imports'
 import { marked } from 'marked'
 
 // ---------------- Markdown / Marked Setup ----------------
@@ -11,8 +20,8 @@ function slugify (text) {
   return s
     .trim()
     .toLowerCase()
-    .replace(/[^\w]+/g, '-')   // replace non-word chars with dashes
-    .replace(/(^-|-$)+/g, '')  // trim leading/trailing dashes
+    .replace(/[^\w]+/g, '-') // replace non-word chars with dashes
+    .replace(/(^-|-$)+/g, '') // trim leading/trailing dashes
 }
 
 // Modern Marked v8-style renderer
@@ -45,9 +54,8 @@ const category = route.params.category
 const slug = route.params.slug
 const config = useRuntimeConfig()
 
-
-function scrollToTopIfNeeded() {
-  // If navigating to a hash (TOC), let the router handle it
+function scrollToTopIfNeeded () {
+  // If navigating to a hash (TOC or takeaways), let the router handle it
   if (route.hash) return
 
   // Wait until DOM is painted
@@ -99,8 +107,57 @@ const keywordsArray = (page.keywords || '')
   .filter(Boolean)
 
 // Adjust this to match your Strapi media shape if needed
-const ogImage =
-  page.ogImage?.url || 'https://musicbizqr.com/default-og.png'
+const ogImage = page.ogImage?.url || 'https://musicbizqr.com/default-og.png'
+
+// ---------------- Executive Summary + Key Takeaways ----------------
+
+// Render executive summary markdown (safe: empty string if missing)
+const executiveSummaryHtml = computed(() => {
+  const md = page.executiveSummary || ''
+  if (!md) return ''
+  return renderMarkdown(md)
+})
+
+// Normalize takeaways JSON (safe for old articles)
+const takeaways = computed(() => {
+  const raw = page.executiveSummaryTakeaways
+  if (!Array.isArray(raw)) return []
+
+  return raw
+    .map((item) => ({
+      text: String(item?.text || '').trim(),
+      anchorId: String(item?.anchorId || '').trim()
+    }))
+    .filter(t => t.text && t.anchorId)
+    .slice(0, 7)
+})
+
+// Optional: smooth-scroll + highlight when a hash is present
+function scrollToHashAndHighlight () {
+  const id = String(route.hash || '').replace('#', '').trim()
+  if (!id) return
+
+  nextTick(() => {
+    const el = document.getElementById(id)
+    if (!el) return
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+    el.classList.add('anchor-highlight')
+    window.setTimeout(() => el.classList.remove('anchor-highlight'), 1400)
+  })
+}
+
+onMounted(() => {
+  scrollToHashAndHighlight()
+})
+
+watch(
+  () => route.hash,
+  () => {
+    scrollToHashAndHighlight()
+  }
+)
 
 // ---------------- Related Posts ----------------
 const { data: articles, error: relatedError } = await useAsyncData(
@@ -257,6 +314,46 @@ useHead(() => {
       {{ page.title }}
     </h1>
 
+    <!-- Executive Summary + Key Takeaways (only shows if present) -->
+    <section
+      v-if="executiveSummaryHtml || takeaways.length"
+      class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 mb-10"
+    >
+      <h2 class="text-xl font-extrabold text-pink-400 mb-3">
+        Executive Summary
+      </h2>
+
+      <div
+        v-if="executiveSummaryHtml"
+        class="prose prose-invert max-w-none"
+        v-html="executiveSummaryHtml"
+      />
+
+      <div v-if="takeaways.length" class="mt-6">
+        <h3 class="text-lg font-bold mb-3">
+          Key Takeaways
+        </h3>
+
+        <ul class="space-y-3">
+          <li
+            v-for="(t, i) in takeaways"
+            :key="`${t.anchorId}-${i}`"
+            class="flex gap-3"
+          >
+            <span class="text-pink-400 font-bold">•</span>
+
+            <!-- Native hash behavior; our watcher will smooth-scroll + highlight -->
+            <a
+              :href="`#${t.anchorId}`"
+              class="text-gray-100 hover:text-pink-300 transition underline decoration-gray-600 hover:decoration-pink-400"
+            >
+              {{ t.text }}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
     <div
       class="prose prose-invert max-w-none"
       v-html="renderMarkdown(page.content || '')"
@@ -336,5 +433,11 @@ useHead(() => {
   background: linear-gradient(to right, #ec4899, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.anchor-highlight {
+  outline: 2px solid rgba(236, 72, 153, 0.9);
+  border-radius: 12px;
+  scroll-margin-top: 96px;
 }
 </style>
