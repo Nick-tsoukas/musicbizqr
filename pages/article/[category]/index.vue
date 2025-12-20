@@ -168,36 +168,21 @@ const clusterKey = computed(() => `cluster-${categoryStr.value || 'none'}`)
 const categoryForSearch = computed(() =>
   categoryStr.value.replace(/-/g, ' ').trim()
 )
-const { data: clusterData, pending: clusterPending, error: clusterError } =
-  await useAsyncData(
-    clusterKey.value,
-    async () => {
-      if (!categoryStr.value) return { data: [] }
-
-      const url = buildUrl('/api/seo-pages', {
-        'filters[category][$eq]': categoryStr.value,
-        'filters[isPillar][$ne]': 'true',
-        'pagination[pageSize]': '50',
-        'sort[0]': 'publishedAt:desc',
-        'fields[0]': 'title',
-        'fields[1]': 'slug',
-        'fields[2]': 'metaTitle',
-        'fields[3]': 'metaDescription'
-      })
-
-      const res = await $fetch(url)
-
-      console.log('✅ cluster url:', url)
-      console.log('✅ cluster count:', res?.data?.length)
-      console.log('✅ cluster first:', res?.data?.[0])
-
-      return res
-    },
-    {
-      watch: [clusterKey], // ✅ watch the key, not just category
-      server: true
-    }
-  )
+const { data: clusterData, pending: clusterPending, error: clusterError } = await useFetch(
+  () => buildUrl('/api/seo-pages', {
+    'filters[category][$eq]': category,
+    'filters[isPillar][$ne]': 'true',
+    'pagination[pageSize]': '50',
+    'sort[0]': 'publishedAt:desc',
+    'fields[0]': 'title',
+    'fields[1]': 'slug',
+    'fields[2]': 'metaTitle',
+    'fields[3]': 'metaDescription'
+  }),
+  {
+    key: `cluster-${category}`
+  }
+)
 
 const clusterArticles = computed(() => clusterData.value?.data || [])
 
