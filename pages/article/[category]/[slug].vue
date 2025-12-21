@@ -165,7 +165,7 @@ watch(
 );
 
 onMounted(async () => {
-  const fbq = (nuxtApp.$fbq as any)
+  const fbq = (nuxtApp.$fbq )
   if (!process.client || !fbq) return
 
   // Build article identifiers
@@ -184,7 +184,7 @@ onMounted(async () => {
   }
 
   // Pull UTMs saved by plugin (B.2)
-  let utm: Record<string, string> = {}
+  let utm = {}
   try {
     utm = JSON.parse(sessionStorage.getItem('mbq_utm') || '{}')
   } catch {}
