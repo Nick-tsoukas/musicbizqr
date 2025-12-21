@@ -71,6 +71,82 @@ const hubHtmlByCategory = {
         </a>
       </div>
     </section>
+  `,
+  'qr-code-strategy': `
+    <section class="prose prose-invert max-w-none mb-14">
+      <p>
+        QR codes aren’t a gimmick for musicians — they’re the fastest bridge between a real-world moment and a digital fan action.
+        Posters, flyers, merch inserts, tip jars, stage banners, table tents, ticket stubs, even a phone screen at the merch booth:
+        QR codes turn all of it into clickable momentum.
+      </p>
+      <p>
+        But most artists use QR codes like a shortcut: one code, one random link, no strategy. The result is wasted scans and
+        zero insight. A real <strong>QR code strategy</strong> treats every scan like a measurable entry point into your fan funnel —
+        where you can drive streams, follows, ticket clicks, email signups, and merch sales <em>without guessing</em>.
+      </p>
+      <p>
+        This hub is your library for building QR codes the right way: what to link to, where to place codes, how to track results,
+        and how to design scans that actually convert — not just “look cool.”
+      </p>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-3xl font-extrabold mb-4">Quick Start: QR Code Strategy Library</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy">
+          <div class="text-pink-400 font-bold">Pillar</div>
+          <div class="text-white font-extrabold text-lg">The QR Code Strategy Hub</div>
+          <div class="text-gray-300 text-sm mt-1">Your complete framework for scans, funnels, tracking, and growth.</div>
+        </a>
+
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/how-to-make-qr-code-for-music">
+          <div class="text-pink-400 font-bold">Start Here</div>
+          <div class="text-white font-extrabold text-lg">How to Make a QR Code for Music</div>
+          <div class="text-gray-300 text-sm mt-1">The right destinations, best practices, and mistakes to avoid.</div>
+        </a>
+
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-codes-for-musicians">
+          <div class="text-pink-400 font-bold">Use Cases</div>
+          <div class="text-white font-extrabold text-lg">QR Codes for Musicians</div>
+          <div class="text-gray-300 text-sm mt-1">Where QR codes belong in your marketing — online and on the street.</div>
+        </a>
+
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-code-tracking-for-musicians">
+          <div class="text-pink-400 font-bold">Track</div>
+          <div class="text-white font-extrabold text-lg">QR Code Tracking for Musicians</div>
+          <div class="text-gray-300 text-sm mt-1">Measure scans, locations, and conversion — and improve what’s working.</div>
+        </a>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-3xl font-extrabold mb-4">Where QR Codes Convert Best</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-codes-for-concerts">
+          <div class="text-pink-400 font-bold">Live Shows</div>
+          <div class="text-white font-extrabold text-lg">QR Codes for Concerts</div>
+          <div class="text-gray-300 text-sm mt-1">From posters to merch tables — turn a crowd into a funnel.</div>
+        </a>
+
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-code-for-merch">
+          <div class="text-pink-400 font-bold">Merch</div>
+          <div class="text-white font-extrabold text-lg">QR Codes for Merch</div>
+          <div class="text-gray-300 text-sm mt-1">Add scans to shirts, stickers, inserts, and receipts for repeat traffic.</div>
+        </a>
+
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/spotify-qr-code-for-artists">
+          <div class="text-pink-400 font-bold">Streaming</div>
+          <div class="text-white font-extrabold text-lg">Spotify QR Codes for Artists</div>
+          <div class="text-gray-300 text-sm mt-1">Drive saves and follows without hoping they search your name later.</div>
+        </a>
+
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-code-to-email-signup">
+          <div class="text-pink-400 font-bold">Email List</div>
+          <div class="text-white font-extrabold text-lg">QR Codes to Email Signup</div>
+          <div class="text-gray-300 text-sm mt-1">Own your audience by turning physical moments into subscribers.</div>
+        </a>
+      </div>
+    </section>
   `
 }
 
