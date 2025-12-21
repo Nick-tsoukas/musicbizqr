@@ -13,7 +13,26 @@
 </template>
 
 <script setup lang="ts">
-// No script logic is needed on this page for Option B
+import { onMounted } from 'vue'
+
+const nuxtApp = useNuxtApp()
+
+onMounted(() => {
+  const fbq = (nuxtApp.$fbq as any)
+  if (!process.client || !fbq) return
+
+  const eventId =
+    window.crypto?.randomUUID?.() ||
+    `signup-complete-${Date.now()}-${Math.random().toString(16).slice(2)}`
+
+  fbq('track', 'CompleteRegistration', {
+    event_id: eventId,
+    content_name: 'MBQ Trial Signup',
+    status: 'success'
+  })
+
+  fbq('trackCustom', 'SignupCompleted', { event_id: eventId })
+})
 </script>
 
 <style scoped>
