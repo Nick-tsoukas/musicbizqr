@@ -21,19 +21,44 @@ onMounted(() => {
   const fbq = (nuxtApp.$fbq as any)
   if (!process.client || !fbq) return
 
-  const eventId =
-    window.crypto?.randomUUID?.() ||
-    `signup-complete-${Date.now()}-${Math.random().toString(16).slice(2)}`
+  // ✅ Stable, stored event_id for "signup completed"
+  const storageKey = 'mbq_event_signup_completed'
+  let eventId = sessionStorage.getItem(storageKey)
 
-  fbq('track', 'CompleteRegistration', {
+  if (!eventId) {
+    eventId =
+      window.crypto?.randomUUID?.() ||
+      `signup-complete-${Date.now()}-${Math.random().toString(16).slice(2)}`
+    sessionStorage.setItem(storageKey, eventId)
+  }
+
+  // ✅ Pull UTMs saved by B.2 (if they exist)
+  let utm: Record<string, string> = {}
+  try {
+    utm = JSON.parse(sessionStorage.getItem('mbq_utm') || '{}')
+  } catch {}
+
+  const payload = {
+    ...utm,
     event_id: eventId,
     content_name: 'MBQ Trial Signup',
-    status: 'success'
-  })
+    status: 'success',
+    event_source: 'nuxt-frontend',
+  }
 
-  fbq('trackCustom', 'SignupCompleted', { event_id: eventId })
+  // ✅ Standard conversion event (best for optimization)
+  fbq('track', 'CompleteRegistration', payload)
+
+  // ✅ Optional custom event (useful for custom audiences)
+  fbq('trackCustom', 'SignupCompleted', payload)
+
+  // 🧼 Optional: clear funnel keys after success
+  // (prevents edge cases if user repeats flow in same session)
+  sessionStorage.removeItem('mbq_event_signup_started')
+  sessionStorage.removeItem('mbq_event_signup_completed')
 })
 </script>
+
 
 <style scoped>
 /* (optional) you can tweak these to match your design system */

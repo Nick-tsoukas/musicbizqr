@@ -105,6 +105,7 @@ const { $fbq } = useNuxtApp(); // 👈 get fbq helper from plugin
 const { registerUser } = useSignup();
 const loading = ref(false);
 const errorMessage = ref("");
+const { trackWithStoredEventId } = useMetaTracking()
 
 const formData = ref({
   email: "",
@@ -115,30 +116,20 @@ const formData = ref({
 const hasTrackedSignupStart = ref(false);
 
 const trackSignupStarted = () => {
-  if (!process.client || !$fbq || hasTrackedSignupStart.value) return;
+  if (!process.client || hasTrackedSignupStart.value) return
+  hasTrackedSignupStart.value = true
 
-  hasTrackedSignupStart.value = true;
-
-  // generate simple unique event_id
-  const eventId =
-    window.crypto?.randomUUID?.() ||
-    `signup-start-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
-  // 🔹 Standard Lead event
-  $fbq("track", "Lead", {
-    event_id: eventId,
-    content_name: "SignupStarted",
-    event_source: "nuxt-frontend",
-  });
-
-  // 🔹 Custom event (nice for custom audiences / reports)
-  $fbq("trackCustom", "SignupStarted", {
-    event_id: eventId,
-  });
-
-  // (optional) store for later if you want to reuse on server
-  // window.sessionStorage.setItem("mbq_signup_start_event_id", eventId);
-};
+  trackWithStoredEventId({
+    eventKey: 'signup_started',
+    standardName: 'Lead',
+    customName: 'SignupStarted',
+    params: {
+      content_name: 'SignupStarted',
+      event_source: 'nuxt-frontend',
+    },
+    reuse: true,
+  })
+}
 
 const handleGoogleLogin = async () => {
   try {

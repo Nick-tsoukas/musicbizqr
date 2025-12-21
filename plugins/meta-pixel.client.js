@@ -25,17 +25,37 @@ export default defineNuxtPlugin((nuxtApp) => {
   window.fbq('init', '2397193350740405')
   window.fbq('track', 'PageView')
 
+  // ✅ B.2 — CAPTURE UTMs ONCE (ADD THIS BLOCK RIGHT HERE)
+  try {
+    const url = new URL(window.location.href)
+    const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']
+    const hasUtm = keys.some((k) => url.searchParams.get(k))
+
+    // Only write if we actually have UTMs
+    if (hasUtm) {
+      const utm = {
+        utm_source: url.searchParams.get('utm_source') || '',
+        utm_medium: url.searchParams.get('utm_medium') || '',
+        utm_campaign: url.searchParams.get('utm_campaign') || '',
+        utm_content: url.searchParams.get('utm_content') || '',
+        utm_term: url.searchParams.get('utm_term') || '',
+      }
+      sessionStorage.setItem('mbq_utm', JSON.stringify(utm))
+    }
+  } catch (e) {
+    // ignore
+  }
+
   // Track Nuxt route changes
   nuxtApp.hook('page:finish', () => {
     window.fbq('track', 'PageView')
   })
-console.log("Meta Pixel plugin loaded")
+
+  console.log('Meta Pixel plugin loaded')
 
   return {
-    
     provide: {
       fbq: (...args) => window.fbq(...args),
     },
   }
 })
-
