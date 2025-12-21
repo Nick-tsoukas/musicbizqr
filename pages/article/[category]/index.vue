@@ -93,28 +93,28 @@ const hubHtmlByCategory = {
     <section class="mb-12">
       <h2 class="text-3xl font-extrabold mb-4">Quick Start: QR Code Strategy Library</h2>
       <div class="grid gap-4 sm:grid-cols-2">
-        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy">
+        <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-codes-for-musicians-guide">
           <div class="text-pink-400 font-bold">Pillar</div>
-          <div class="text-white font-extrabold text-lg">The QR Code Strategy Hub</div>
-          <div class="text-gray-300 text-sm mt-1">Your complete framework for scans, funnels, tracking, and growth.</div>
+          <div class="text-white font-extrabold text-lg">QR Codes for Musicians — Complete Guide</div>
+          <div class="text-gray-300 text-sm mt-1">Your foundational framework for scans, funnels, tracking, and growth.</div>
         </a>
 
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/how-to-make-qr-code-for-music">
           <div class="text-pink-400 font-bold">Start Here</div>
           <div class="text-white font-extrabold text-lg">How to Make a QR Code for Music</div>
-          <div class="text-gray-300 text-sm mt-1">The right destinations, best practices, and mistakes to avoid.</div>
+          <div class="text-gray-300 text-sm mt-1">Best practices, link strategy, and common mistakes to avoid.</div>
         </a>
 
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-codes-for-musicians">
           <div class="text-pink-400 font-bold">Use Cases</div>
           <div class="text-white font-extrabold text-lg">QR Codes for Musicians</div>
-          <div class="text-gray-300 text-sm mt-1">Where QR codes belong in your marketing — online and on the street.</div>
+          <div class="text-gray-300 text-sm mt-1">Where QR codes belong in your marketing — online, live, or merch-based.</div>
         </a>
 
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-code-tracking-for-musicians">
           <div class="text-pink-400 font-bold">Track</div>
           <div class="text-white font-extrabold text-lg">QR Code Tracking for Musicians</div>
-          <div class="text-gray-300 text-sm mt-1">Measure scans, locations, and conversion — and improve what’s working.</div>
+          <div class="text-gray-300 text-sm mt-1">How to measure scans, campaign success, and fan actions over time.</div>
         </a>
       </div>
     </section>
@@ -125,25 +125,25 @@ const hubHtmlByCategory = {
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-codes-for-concerts">
           <div class="text-pink-400 font-bold">Live Shows</div>
           <div class="text-white font-extrabold text-lg">QR Codes for Concerts</div>
-          <div class="text-gray-300 text-sm mt-1">From posters to merch tables — turn a crowd into a funnel.</div>
+          <div class="text-gray-300 text-sm mt-1">Turn a crowd into a funnel — merch tables, posters, and stage signage.</div>
         </a>
 
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-code-for-merch">
           <div class="text-pink-400 font-bold">Merch</div>
           <div class="text-white font-extrabold text-lg">QR Codes for Merch</div>
-          <div class="text-gray-300 text-sm mt-1">Add scans to shirts, stickers, inserts, and receipts for repeat traffic.</div>
+          <div class="text-gray-300 text-sm mt-1">Add scans to shirts, stickers, inserts, and packaging for repeat traffic.</div>
         </a>
 
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/spotify-qr-code-for-artists">
           <div class="text-pink-400 font-bold">Streaming</div>
           <div class="text-white font-extrabold text-lg">Spotify QR Codes for Artists</div>
-          <div class="text-gray-300 text-sm mt-1">Drive saves and follows without hoping they search your name later.</div>
+          <div class="text-gray-300 text-sm mt-1">Drive saves and follows without hoping listeners search your name later.</div>
         </a>
 
         <a class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition" href="/article/qr-code-strategy/qr-code-to-email-signup">
           <div class="text-pink-400 font-bold">Email List</div>
           <div class="text-white font-extrabold text-lg">QR Codes to Email Signup</div>
-          <div class="text-gray-300 text-sm mt-1">Own your audience by turning physical moments into subscribers.</div>
+          <div class="text-gray-300 text-sm mt-1">Turn physical moments into subscribers and long-term fans.</div>
         </a>
       </div>
     </section>
@@ -165,6 +165,24 @@ const faqByCategory = {
     {
       q: 'Do smart links help increase streams and followers?',
       a: 'Yes. By reducing friction and presenting the “next best action” clearly, more fans follow, save, and click through instead of bouncing.'
+    }
+  ],
+  'qr-code-strategy': [
+    {
+      q: 'What should a musician link a QR code to?',
+      a: 'Most of the time, you should link to your main smart-link fan hub or landing page — not a single platform. That gives fans one place to listen, watch, follow, and take action, and gives you a stable destination you can update without reprinting the QR code.'
+    },
+    {
+      q: 'Are dynamic QR codes worth it for musicians?',
+      a: 'Yes — dynamic QR codes let you change the destination later, track scan analytics, and run different campaigns without replacing printed materials. That flexibility makes them much more valuable than static codes, especially for tours, merch, and recurring campaigns.'
+    },
+    {
+      q: 'Where should bands place QR codes to get the most scans?',
+      a: 'High-scan placements include where fans already have their phones out: merch tables, posters at venues, table tents on bar tops, tip jars, and post-show signage. The QR code must be accompanied by a clear call-to-action, not just “scan me.”'
+    },
+    {
+      q: 'How do you track QR code scans and conversions?',
+      a: 'Use a QR code generator that offers analytics, and link to a stable landing page (like a smart-link hub). Then track scans per campaign/location and measure downstream actions — like music plays, follows, email signups, ticket clicks, or merch traffic.'
     }
   ]
 }
