@@ -11,6 +11,9 @@ import {
 } from "#imports";
 import { marked } from "marked";
 
+
+const nuxtApp = useNuxtApp()
+
 // ---------------- Markdown / Marked Setup ----------------
 
 // Simple, safe slugify that ALWAYS works with strings
@@ -165,7 +168,8 @@ watch(
 );
 
 onMounted(async () => {
-  const fbq = (nuxtApp.$fbq )
+  const { $fbq } = useNuxtApp()
+
   if (!process.client || !fbq) return
 
   // Build article identifiers
