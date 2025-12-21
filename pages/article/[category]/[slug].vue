@@ -164,6 +164,61 @@ watch(
   }
 );
 
+onMounted(async () => {
+  const fbq = (nuxtApp.$fbq as any)
+  if (!process.client || !fbq) return
+
+  // Build article identifiers
+  const slug = String(route.params.slug || '')
+  const url = window.location.href
+
+  // Stable event_id for this article view (per session)
+  const storageKey = `mbq_event_article_${slug}`
+  let eventId = sessionStorage.getItem(storageKey)
+
+  if (!eventId) {
+    eventId =
+      window.crypto?.randomUUID?.() ||
+      `article-${slug}-${Date.now()}-${Math.random().toString(16).slice(2)}`
+    sessionStorage.setItem(storageKey, eventId)
+  }
+
+  // Pull UTMs saved by plugin (B.2)
+  let utm: Record<string, string> = {}
+  try {
+    utm = JSON.parse(sessionStorage.getItem('mbq_utm') || '{}')
+  } catch {}
+
+  const payload = {
+    ...utm,
+    event_id: eventId,
+    content_name: slug,
+    content_category: 'article',
+    content_type: 'article',
+  }
+
+  // 1) Browser pixel events
+  fbq('track', 'ViewContent', payload)
+  fbq('trackCustom', 'ArticleViewed', payload)
+
+  // 2) Server-side CAPI (dedupe)
+  try {
+    await fetch('/api/meta/capi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_name: 'ViewContent',
+        event_id: eventId,
+        event_source_url: url,
+        custom_data: {
+          ...payload,
+        },
+      }),
+    })
+  } catch {}
+})
+
+
 // ---------------- Related Posts ----------------
 const { data: articles, error: relatedError } = await useAsyncData(
   `related-${category}`,

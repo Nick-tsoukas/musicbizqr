@@ -16,8 +16,10 @@
 import { onMounted } from 'vue'
 
 const nuxtApp = useNuxtApp()
+// If available in your app, this improves match quality a lot:
+const user = (typeof useStrapiUser === 'function') ? useStrapiUser() : null
 
-onMounted(() => {
+onMounted(async () => {
   const fbq = (nuxtApp.$fbq as any)
   if (!process.client || !fbq) return
 
@@ -46,18 +48,38 @@ onMounted(() => {
     event_source: 'nuxt-frontend',
   }
 
-  // ✅ Standard conversion event (best for optimization)
+  // 1) Browser pixel (you already had this)
   fbq('track', 'CompleteRegistration', payload)
-
-  // ✅ Optional custom event (useful for custom audiences)
   fbq('trackCustom', 'SignupCompleted', payload)
 
-  // 🧼 Optional: clear funnel keys after success
-  // (prevents edge cases if user repeats flow in same session)
+  // 2) Server-side CAPI (NEW) — same event_id for dedupe
+  try {
+    await fetch('/api/meta/capi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_name: 'CompleteRegistration',
+        event_id: eventId,
+        event_source_url: window.location.href,
+        // Send email if you can (server will hash it)
+        email: user?.value?.email || undefined,
+        custom_data: {
+          content_name: 'MBQ Trial Signup',
+          status: 'success',
+          ...utm,
+        },
+      }),
+    })
+  } catch (e) {
+    // silent fail (don’t break UX if Meta call fails)
+  }
+
+  // 🧼 Clear funnel keys AFTER server call (so eventId remains available)
   sessionStorage.removeItem('mbq_event_signup_started')
   sessionStorage.removeItem('mbq_event_signup_completed')
 })
 </script>
+
 
 
 <style scoped>

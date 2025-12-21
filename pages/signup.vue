@@ -115,11 +115,12 @@ const formData = ref({
 // prevent double tracking
 const hasTrackedSignupStart = ref(false);
 
-const trackSignupStarted = () => {
+const trackSignupStarted = async () => {
   if (!process.client || hasTrackedSignupStart.value) return
   hasTrackedSignupStart.value = true
 
-  trackWithStoredEventId({
+  // This fires pixel events AND stores a stable event_id in sessionStorage
+  const eventId = trackWithStoredEventId({
     eventKey: 'signup_started',
     standardName: 'Lead',
     customName: 'SignupStarted',
@@ -129,7 +130,34 @@ const trackSignupStarted = () => {
     },
     reuse: true,
   })
+
+  // ✅ NEW: server-side CAPI (same event_id for dedupe)
+  try {
+    // UTMs already stored in sessionStorage by B.2;
+    // we can include them as custom_data if you want.
+    let utm = {}
+    try { utm = JSON.parse(sessionStorage.getItem('mbq_utm') || '{}') } catch {}
+
+    await fetch('/api/meta/capi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_name: 'Lead',
+        event_id: eventId,
+        event_source_url: window.location.href,
+        // Email is optional here (user typed it, but could be empty pre-submit)
+        email: formData.value?.email || undefined,
+        custom_data: {
+          content_name: 'SignupStarted',
+          ...utm,
+        },
+      }),
+    })
+  } catch (e) {
+    // silent fail, don't break signup UX
+  }
 }
+
 
 const handleGoogleLogin = async () => {
   try {
@@ -148,7 +176,7 @@ const handleSignup = async () => {
 
   try {
     // 1️⃣ Track SignupStarted (once)
-    trackSignupStarted();
+    await trackSignupStarted();
 
     // 2️⃣ Default name = email
     const name = formData.value.email;
