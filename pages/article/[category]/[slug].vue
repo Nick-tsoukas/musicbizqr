@@ -373,51 +373,60 @@ useHead(() => {
 </script>
 
 <template>
-  <div class="bg-black text-white py-16 px-6 max-w-3xl mx-auto">
+  <div class="bg-black text-white py-16 px-2 md:px-6 max-w-4xl mx-auto">
     <h1 class="text-3xl md:text-5xl font-extrabold mb-8 text-gradient">
       {{ page.title }}
     </h1>
 
-    <!-- Executive Summary + Key Takeaways (only shows if present) -->
-    <section
-      v-if="executiveSummaryHtml || takeaways.length"
-      class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 mb-10"
-    >
-      <h2 class="text-xl font-extrabold text-pink-400 mb-3">
-        Executive Summary
-      </h2>
+  <!-- Executive Summary + Key Takeaways (only shows if present) -->
+<section
+  v-if="executiveSummaryHtml || takeaways.length"
+  class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 mb-10"
+>
+  <h2 class="text-xl font-extrabold text-pink-400 mb-3">
+    Executive Summary
+  </h2>
 
-      <div
-        v-if="executiveSummaryHtml"
-        class="prose prose-invert max-w-none"
-        v-html="executiveSummaryHtml"
-      />
+  <div
+    v-if="executiveSummaryHtml"
+    class="prose prose-invert max-w-none"
+    v-html="executiveSummaryHtml"
+  />
 
-      <div v-if="takeaways.length" class="mt-6">
-        <h3 class="text-lg font-bold mb-3">Key Takeaways</h3>
+  <div v-if="takeaways.length" class="mt-6">
+    <h3 class="text-lg font-bold mb-3">Key Takeaways</h3>
 
-        <ul class="space-y-3">
-          <li
-            v-for="(t, i) in takeaways"
-            :key="`${t.anchorId}-${i}`"
-            class="flex gap-3"
+    <ul class="space-y-4">
+      <li
+        v-for="(t, i) in takeaways"
+        :key="`${t.anchorId}-${i}`"
+        class="rounded-xl border border-gray-800/60 bg-black/20 p-4"
+      >
+        <!-- Row 1: bullet + link -->
+        <div class="flex items-start gap-3">
+          <span class="text-pink-400 font-bold leading-6">•</span>
+
+          <!-- Native hash behavior; our watcher will smooth-scroll + highlight -->
+          <a
+            :href="`#${t.anchorId}`"
+            class="text-gray-100 hover:text-pink-300 transition underline decoration-gray-600 hover:decoration-pink-400 leading-6"
           >
-            <span class="text-pink-400 font-bold">•</span>
+            {{ t.label }}
+          </a>
+        </div>
 
-            <!-- Native hash behavior; our watcher will smooth-scroll + highlight -->
-            <a
-              :href="`#${t.anchorId}`"
-              class="text-gray-100 hover:text-pink-300 transition underline decoration-gray-600 hover:decoration-pink-400"
-            >
-              {{ t.label }}
-            </a>
-            <p v-if="t.description" class="text-sm text-gray-400 mt-1">
-              {{ t.description }}
-            </p>
-          </li>
-        </ul>
-      </div>
-    </section>
+        <!-- Row 2: description stacked -->
+        <p
+          v-if="t.description"
+          class="text-sm text-gray-400 mt-2 pl-6"
+        >
+          {{ t.description }}
+        </p>
+      </li>
+    </ul>
+  </div>
+</section>
+
 
     <div
       class="prose prose-invert max-w-none"
