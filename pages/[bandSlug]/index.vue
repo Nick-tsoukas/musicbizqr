@@ -164,7 +164,7 @@
             Streaming Links
           </h2>
           <template v-for="platform in streamingPlatforms" :key="platform.name">
-            <span v-if="band.data[platform.name]">
+            <span v-if="band.data[platform.name] && !isLinkHidden(platform.name)">
               <a
                 :href="band.data[platform.name]"
                 @click.prevent="
@@ -196,7 +196,7 @@
             Social Media
           </h2>
           <template v-for="platform in socialPlatforms" :key="platform.name">
-            <span v-if="band.data[platform.name]">
+            <span v-if="band.data[platform.name] && !isLinkHidden(platform.name)">
               <a
                 :href="band.data[platform.name]"
                 @click.prevent="
@@ -697,11 +697,22 @@ function handleFirstClick() {
 }
 
 /* ---------- streaming & social sections ---------- */
+const hiddenLinkKeys = computed(() => {
+  const v = band.value?.data?.hiddenLinks;
+  if (Array.isArray(v)) return v.map(String).filter(Boolean);
+  if (v && typeof v === 'object') return Object.keys(v).filter((k) => v[k]);
+  return [];
+});
+
+function isLinkHidden(key) {
+  return hiddenLinkKeys.value.includes(key);
+}
+
 const hasStreamingLinks = computed(() =>
-  streamingPlatforms.some((p) => !!band.value?.data?.[p.name])
+  streamingPlatforms.some((p) => !!band.value?.data?.[p.name] && !isLinkHidden(p.name))
 );
 const hasSocialLinks = computed(() =>
-  socialPlatforms.some((p) => !!band.value?.data?.[p.name])
+  socialPlatforms.some((p) => !!band.value?.data?.[p.name] && !isLinkHidden(p.name))
 );
 
 /* ---------- video ---------- */
@@ -785,7 +796,7 @@ async function fetchBandData() {
     `&fields[6]=youtube&fields[7]=youtubeMusic&fields[8]=spotify&fields[9]=appleMusic` + // streaming
     `&fields[10]=reverbnation&fields[11]=soundcloud&fields[12]=bandcamp&fields[13]=twitch&fields[14]=deezer` +
     `&fields[15]=facebook&fields[16]=instagram&fields[17]=twitter&fields[18]=tiktok` + // social
-    `&fields[19]=paymentsEnabled&fields[20]=stripeOnboardingComplete&fields[21]=paymentButtons` +
+    `&fields[19]=paymentsEnabled&fields[20]=stripeOnboardingComplete&fields[21]=paymentButtons&fields[22]=hiddenLinks` +
     `&populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
     `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +

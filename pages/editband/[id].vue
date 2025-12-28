@@ -243,6 +243,15 @@
                 net.charAt(0).toUpperCase() + net.slice(1)
               }}</label>
               <div class="mdc-line-ripple"></div>
+              <div class="mt-2 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :id="`hide-${net}`"
+                  :checked="isLinkHidden(net)"
+                  @change="setLinkHidden(net, $event.target.checked)"
+                />
+                <label :for="`hide-${net}`" class="text-black select-none">Hide</label>
+              </div>
             </div>
           </div>
         </div>
@@ -271,6 +280,15 @@
                 stream
               }}</label>
               <div class="mdc-line-ripple"></div>
+              <div class="mt-2 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :id="`hide-${stream}`"
+                  :checked="isLinkHidden(stream)"
+                  @change="setLinkHidden(stream, $event.target.checked)"
+                />
+                <label :for="`hide-${stream}`" class="text-black select-none">Hide</label>
+              </div>
             </div>
           </div>
         </div>
