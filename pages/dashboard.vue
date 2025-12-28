@@ -182,6 +182,18 @@
               >
                 {{ band.title }}
               </span>
+              <div class="text-xs text-white/70 mt-1">
+                Payouts:
+                <span v-if="band.paymentsEnabled === true && band.stripeOnboardingComplete === true">
+                  Enabled
+                </span>
+                <span v-else-if="band.stripeAccountId">
+                  Setup required
+                </span>
+                <span v-else>
+                  Not connected
+                </span>
+              </div>
             </div>
 
             <!-- ✅ Band Action Buttons -->
@@ -218,6 +230,16 @@
               >
                 <img src="@/assets/share-icon.svg" class="h-5 w-5" />
                 <span>Share</span>
+              </button>
+
+              <button
+                @click="startPayoutOnboarding(band.id)"
+                class="action-button text-purple-300 hover:text-purple-200"
+                :disabled="payoutLoadingId === band.id"
+              >
+                <span>
+                  {{ payoutLoadingId === band.id ? "Loading…" : (band.stripeOnboardingComplete ? "Manage Payouts" : "Set Up Payouts") }}
+                </span>
               </button>
 
               <button
@@ -456,6 +478,8 @@ const qrs = ref([]);
 const scans = ref([]);
 const bands = ref([]);
 const events = ref([]);
+
+const payoutLoadingId = ref(null);
 
 const hasQr = computed(() => qrItems.value.length > 0);
 const hasBand = computed(() => bandItems.value.length > 0);
@@ -722,7 +746,7 @@ async function fetchQrsLite() {
 async function fetchBandsLite() {
   const resp = await find("bands", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name", "slug"],
+    fields: ["name", "slug", "stripeAccountId", "paymentsEnabled", "stripeOnboardingComplete"],
     populate: { bandImg: { fields: ["url", "formats"] } },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },
@@ -790,9 +814,38 @@ const bandItems = computed(() =>
         title: b.name,
         slug: b.slug,
         imageUrl: b.bandImg?.formats?.medium?.url || b.bandImg?.url || "",
+        stripeAccountId: b.stripeAccountId ?? b.attributes?.stripeAccountId ?? null,
+        paymentsEnabled: b.paymentsEnabled ?? b.attributes?.paymentsEnabled ?? null,
+        stripeOnboardingComplete: b.stripeOnboardingComplete ?? b.attributes?.stripeOnboardingComplete ?? null,
       }))
     : []
 );
+
+async function startPayoutOnboarding(bandId) {
+  if (!token.value) {
+    alert("You must be logged in.");
+    return;
+  }
+  payoutLoadingId.value = bandId;
+  try {
+    const res = await fetch(`${config.public.strapiUrl}/api/bands/${bandId}/payments/onboard`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      throw new Error(json?.error?.message || "Unable to start Stripe onboarding");
+    }
+    if (!json?.url) throw new Error("Stripe onboarding URL missing");
+    window.location.href = json.url;
+  } catch (e) {
+    alert(e?.message || "Unable to start payouts setup");
+  } finally {
+    payoutLoadingId.value = null;
+  }
+}
 
 const eventItems = computed(() =>
   events.value.map((ev) => ({
@@ -899,9 +952,6 @@ img {
 }
 .border-white {
   border-color: #fff;
-}
-.bg-[#000] {
-  background-color: #000;
 }
 .container {
   max-width: 1200px;

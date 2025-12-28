@@ -8,6 +8,30 @@
       v-else
       class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)] fade-in"
     >
+      <div
+        v-if="paymentBannerVisible"
+        class="w-full px-4 md:px-8 py-3 bg-purple-900/60 text-white border-b border-purple-500/40"
+      >
+        <div class="max-w-5xl mx-auto flex items-start justify-between gap-4">
+          <div class="text-sm md:text-base">
+            <div class="font-semibold">
+              {{ paymentBannerTitle }}
+            </div>
+            <div v-if="paymentBannerDetail" class="text-white/90 mt-1">
+              {{ paymentBannerDetail }}
+            </div>
+          </div>
+          <button
+            type="button"
+            class="text-white/80 hover:text-white text-lg leading-none"
+            @click="dismissPaymentBanner"
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
       <!-- Hero Section -->
       <div class="relative w-full h-[35vh] md:h-[60vh]">
         <img
@@ -311,6 +335,82 @@
             </table>
           </div>
         </section>
+
+        <section v-if="canShowPayments" class="mt-10">
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+            Support {{ band.data.name }}
+          </h2>
+
+          <div v-if="paymentError" class="text-red-400 mb-3">
+            {{ paymentError }}
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              v-for="btn in enabledPaymentButtons"
+              :key="btn.key"
+              class="border border-white/20 rounded-lg p-4 bg-black/40"
+            >
+              <div class="text-white font-semibold text-lg">
+                {{ btn.title }}
+              </div>
+              <div v-if="btn.description" class="text-white/80 mt-1">
+                {{ btn.description }}
+              </div>
+
+              <div class="mt-3">
+                <div v-if="btn.pricingMode === 'min'">
+                  <div class="flex items-center gap-2">
+                    <span class="text-white/80">$</span>
+                    <input
+                      v-model.number="paymentAmountByKey[btn.key]"
+                      type="number"
+                      step="1"
+                      min="0"
+                      class="w-32 px-3 py-2 rounded-md bg-black border border-white/20 text-white"
+                    />
+                    <span v-if="btn.minAmount" class="text-white/60">
+                      min {{ btn.minAmount }}
+                    </span>
+                  </div>
+                </div>
+
+                <div v-else-if="btn.pricingMode === 'presets'">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="amt in (btn.presetAmounts || [])"
+                      :key="amt"
+                      type="button"
+                      class="px-3 py-2 rounded-md border border-white/20 text-white hover:bg-purple-900/40"
+                      :class="{
+                        'bg-purple-900/60': Number(paymentAmountByKey[btn.key]) === Number(amt),
+                      }"
+                      @click="paymentAmountByKey[btn.key] = Number(amt)"
+                    >
+                      ${{ amt }}
+                    </button>
+                  </div>
+                </div>
+
+                <div v-else-if="btn.pricingMode === 'fixed'">
+                  <div class="text-white/80">
+                    ${{ btn.fixedAmount }}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="w-full mt-4 custom-border text-white text-lg flex justify-center font-semibold px-4 py-3 items-center relative shadow-lg rounded-md md:text-xl disabled:opacity-60"
+                :disabled="paymentLoadingKey === btn.key"
+                @click="startCheckout(btn)"
+              >
+                <span v-if="paymentLoadingKey === btn.key">Loading…</span>
+                <span v-else>Continue to Payment</span>
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
 
       <footer class="h-40 flex justify-center items-center">
@@ -350,6 +450,145 @@ const { trackClick, trackMediaPlay } = useBeacon();
 const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
+
+const paymentBannerVisible = ref(false);
+const paymentBannerTitle = ref("");
+const paymentBannerDetail = ref("");
+
+const paymentError = ref("");
+const paymentLoadingKey = ref(null);
+const paymentAmountByKey = ref({});
+
+const enabledPaymentButtons = computed(() => {
+  const btns = band.value?.data?.paymentButtons;
+  if (!Array.isArray(btns)) return [];
+  return btns.filter((b) => b && b.enabled === true);
+});
+
+const canShowPayments = computed(() => {
+  // Payments are only meaningful if the band has connect enabled.
+  // If these fields are absent from the public response, we still show the buttons.
+  const enabled = band.value?.data?.paymentsEnabled;
+  const onboarded = band.value?.data?.stripeOnboardingComplete;
+  if (enabled === false || onboarded === false) return false;
+  return enabledPaymentButtons.value.length > 0;
+});
+
+function initPaymentDefaults() {
+  const next = { ...(paymentAmountByKey.value || {}) };
+  for (const btn of enabledPaymentButtons.value) {
+    if (next[btn.key] != null) continue;
+    if (btn.pricingMode === "min") {
+      next[btn.key] = Number(btn.minAmount || 5);
+    } else if (btn.pricingMode === "presets") {
+      const first = Array.isArray(btn.presetAmounts) ? btn.presetAmounts[0] : null;
+      next[btn.key] = first != null ? Number(first) : 5;
+    } else if (btn.pricingMode === "fixed") {
+      next[btn.key] = Number(btn.fixedAmount || 0);
+    }
+  }
+  paymentAmountByKey.value = next;
+}
+
+async function startCheckout(btn) {
+  paymentError.value = "";
+  paymentLoadingKey.value = btn.key;
+
+  try {
+    const api = config.public.strapiUrl;
+    const bandId = band.value?.data?.id;
+    if (!bandId) throw new Error("Band not loaded yet");
+
+    const body = { buttonKey: btn.key };
+
+    if (btn.pricingMode === "min") {
+      const a = Number(paymentAmountByKey.value?.[btn.key]);
+      if (!a || a <= 0) throw new Error("Enter an amount");
+      if (btn.minAmount && a < Number(btn.minAmount)) {
+        throw new Error(`Minimum is $${btn.minAmount}`);
+      }
+      body.amount = a;
+    }
+
+    if (btn.pricingMode === "presets") {
+      const a = Number(paymentAmountByKey.value?.[btn.key]);
+      if (!a || a <= 0) throw new Error("Select an amount");
+      body.amount = a;
+    }
+
+    const res = await fetch(`${api}/api/bands/${bandId}/payments/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const json = await res.json();
+
+    const url = json?.url || json?.data?.url;
+    if (!res.ok) {
+      const msg = json?.error?.message || "Unable to start checkout";
+      throw new Error(msg);
+    }
+
+    if (!url) throw new Error("Checkout URL missing");
+
+    window.location.href = url;
+  } catch (e) {
+    paymentError.value = e?.message || String(e);
+  } finally {
+    paymentLoadingKey.value = null;
+  }
+}
+
+async function handlePaymentQuery() {
+  const paid = String(route.query?.paid || "");
+  const canceled = String(route.query?.canceled || "");
+  const sm = route.query?.sm ? String(route.query.sm) : null;
+
+  if (paid === "1") {
+    paymentBannerVisible.value = true;
+    paymentBannerTitle.value = "Payment successful";
+    paymentBannerDetail.value = sm ? `Support moment #${sm}` : "";
+
+    if (sm) {
+      try {
+        const api = config.public.strapiUrl;
+        const url =
+          `${api}/api/support-moments/${encodeURIComponent(sm)}/summary`;
+
+        const res = await fetch(url, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          const attrs = data?.data || null;
+          const amount = attrs?.amount;
+          const currency = (attrs?.currency || "usd").toUpperCase();
+          const label = attrs?.supportLabel;
+
+          if (amount != null && label) {
+            paymentBannerDetail.value = `${label} — ${currency} ${amount}`;
+          } else if (amount != null) {
+            paymentBannerDetail.value = `${currency} ${amount}`;
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  } else if (canceled === "1") {
+    paymentBannerVisible.value = true;
+    paymentBannerTitle.value = "Payment canceled";
+    paymentBannerDetail.value = "You can try again anytime.";
+  }
+}
+
+function dismissPaymentBanner() {
+  paymentBannerVisible.value = false;
+  const nextQuery = { ...(route.query || {}) };
+  delete nextQuery.paid;
+  delete nextQuery.canceled;
+  delete nextQuery.sm;
+  router.replace({ query: nextQuery });
+}
 
 // replace: const loading = ref(true);
 const loadingData = ref(true);
@@ -546,6 +785,7 @@ async function fetchBandData() {
     `&fields[6]=youtube&fields[7]=youtubeMusic&fields[8]=spotify&fields[9]=appleMusic` + // streaming
     `&fields[10]=reverbnation&fields[11]=soundcloud&fields[12]=bandcamp&fields[13]=twitch&fields[14]=deezer` +
     `&fields[15]=facebook&fields[16]=instagram&fields[17]=twitter&fields[18]=tiktok` + // social
+    `&fields[19]=paymentsEnabled&fields[20]=stripeOnboardingComplete&fields[21]=paymentButtons` +
     `&populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
     `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +
@@ -584,6 +824,8 @@ events.value = evts.map(e => ({
   venue: e.venue ?? null,
   slug: e.slug ?? null,
 })).filter(e => !!e.date);
+
+    initPaymentDefaults();
 
 
     // build the exact URL you’ll render for the hero
@@ -715,7 +957,10 @@ const beaconSent = ref(false);
 //   }
 // })
 
-onMounted(fetchBandData);
+onMounted(() => {
+  fetchBandData();
+  handlePaymentQuery();
+});
 
 // watch([loadingData, band], ([loadingData, bandVal]) => {
 //   if (loadingData) return

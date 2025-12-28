@@ -880,6 +880,82 @@
         </div>
       </div>
       <!-- end youtube -->
+
+      <!-- Payments (Support Moments) -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-white text-lg font-semibold">Payments</h3>
+          <span class="text-gray-400 text-xs">Recent + totals</span>
+        </div>
+
+        <div v-if="paymentsLoading" class="text-gray-300 text-sm">
+          Loading payments…
+        </div>
+
+        <div v-else-if="paymentsError" class="text-red-400 text-sm">
+          {{ paymentsError }}
+        </div>
+
+        <div v-else>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-neutral-900 rounded-lg p-3">
+              <p class="text-gray-400 text-xs">Total paid</p>
+              <p class="text-2xl font-semibold text-white">
+                {{ formatUsd(paymentsTotals.totalPaidAmount) }}
+              </p>
+            </div>
+            <div class="bg-neutral-900 rounded-lg p-3">
+              <p class="text-gray-400 text-xs">Payments count</p>
+              <p class="text-2xl font-semibold text-white">
+                {{ paymentsTotals.totalPaidCount }}
+              </p>
+            </div>
+            <div class="bg-neutral-900 rounded-lg p-3">
+              <p class="text-gray-400 text-xs">Recent payments</p>
+              <p class="text-2xl font-semibold text-white">
+                {{ paymentsRecent.length }}
+              </p>
+            </div>
+          </div>
+
+          <div v-if="paymentsRecent.length" class="overflow-x-auto">
+            <table class="w-full table-auto text-sm">
+              <thead>
+                <tr class="text-gray-300 border-b border-white/10">
+                  <th class="text-left py-2 pr-4">When</th>
+                  <th class="text-left py-2 pr-4">Type</th>
+                  <th class="text-left py-2 pr-4">Status</th>
+                  <th class="text-right py-2">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="row in paymentsRecent"
+                  :key="row.id"
+                  class="text-gray-200 border-b border-white/5"
+                >
+                  <td class="py-2 pr-4 whitespace-nowrap">
+                    {{ formatWhen(row.paidAt || row.createdAt) }}
+                  </td>
+                  <td class="py-2 pr-4">
+                    {{ row.supportLabel || row.buttonKey || '—' }}
+                  </td>
+                  <td class="py-2 pr-4 capitalize">
+                    {{ row.status || '—' }}
+                  </td>
+                  <td class="py-2 text-right tabular-nums">
+                    {{ formatUsd(row.amount) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-else class="text-gray-400 text-sm">
+            No payments yet.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -893,13 +969,15 @@ import {
   onBeforeUnmount,
   computed,
 } from "vue";
-import { useRoute, useStrapiClient } from "#imports";
+import { useRoute, useStrapiClient, useStrapiToken, useRuntimeConfig } from "#imports";
 import { format as fmt, parseISO, isValid, getHours } from "date-fns";
 import qs from "qs";
 
 /* ---------- Strapi client / route ---------- */
 const client = useStrapiClient();
 const route = useRoute();
+const token = useStrapiToken();
+const config = useRuntimeConfig();
 
 /* ---------- Muse (top insights box) ---------- */
 const museLoading = ref(false);
@@ -953,6 +1031,64 @@ const rawQrScans = ref<any[]>([]);
 
 const isInitialLoading = ref(true);
 const isRefreshing = ref(false);
+
+/* ---------- payments summary ---------- */
+const paymentsLoading = ref(false);
+const paymentsError = ref("");
+const paymentsSummary = ref<any | null>(null);
+
+const paymentsTotals = computed(() => {
+  return (
+    paymentsSummary.value?.totals || {
+      totalPaidCount: 0,
+      totalPaidAmount: 0,
+      currency: "usd",
+    }
+  );
+});
+
+const paymentsRecent = computed<any[]>(() => {
+  const r = paymentsSummary.value?.recent;
+  return Array.isArray(r) ? r : [];
+});
+
+function formatUsd(n: any) {
+  const v = Number(n || 0);
+  return `$${v.toFixed(2)}`;
+}
+
+function formatWhen(iso: string | null) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString();
+}
+
+async function fetchPaymentsSummary(bandIdNum: number) {
+  if (!token.value) {
+    paymentsSummary.value = null;
+    paymentsError.value = "";
+    return;
+  }
+
+  paymentsLoading.value = true;
+  paymentsError.value = "";
+
+  try {
+    const res: any = await $fetch(
+      `${config.public.strapiUrl}/api/bands/${bandIdNum}/payments/summary?limit=10`,
+      {
+        headers: { Authorization: `Bearer ${token.value}` },
+      }
+    );
+    paymentsSummary.value = res;
+  } catch (e) {
+    paymentsSummary.value = null;
+    paymentsError.value = "Couldn’t load payments.";
+  } finally {
+    paymentsLoading.value = false;
+  }
+}
 
 /* ---------- canvases / chart handles ---------- */
 const viewsCanvas = ref<HTMLCanvasElement | null>(null);
@@ -1645,6 +1781,8 @@ async function fetchAndRender(silent = false) {
     transitions.value = t;
     externalMuse.value = m;
     console.log("[muse external]", m);
+
+    await fetchPaymentsSummary(bandIdNum);
 
     if (selectedRange.value === 1) {
       const scansDirectQuery = qs.stringify(

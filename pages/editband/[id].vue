@@ -6,6 +6,45 @@
     <div class="container-mdc bg-black max-w-5xl">
       <h1 class="title text-white">Edit Band Profile</h1>
       <form class="form-group" @submit.prevent="submitForm">
+        <div class="bg-[#fff] rounded-md my-10">
+          <div
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Payouts (Get Paid)</h2>
+          </div>
+          <div class="p-4">
+            <div class="text-black">
+              <div>
+                Stripe Account:
+                <span class="font-semibold">
+                  {{ stripeAccountId ? "Connected" : "Not connected" }}
+                </span>
+              </div>
+              <div>
+                Onboarding:
+                <span class="font-semibold">
+                  {{ stripeOnboardingComplete ? "Complete" : "Incomplete" }}
+                </span>
+              </div>
+              <div>
+                Payments:
+                <span class="font-semibold">
+                  {{ paymentsEnabled ? "Enabled" : "Disabled" }}
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="mdc-button w-full mt-4"
+              :disabled="payoutLoading"
+              @click="startPayoutOnboarding"
+            >
+              {{ payoutLoading ? "Loading…" : (stripeOnboardingComplete ? "Manage / Continue Payout Setup" : "Set Up Payouts") }}
+            </button>
+          </div>
+        </div>
+
         <!-- Band Details Section -->
         <div class="bg-[#fff] rounded-md">
           <div
@@ -417,6 +456,53 @@
         </div>
 
         <!-- Save Button -->
+        <div class="bg-[#fff] rounded-md my-10">
+          <div
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Support Buttons</h2>
+          </div>
+          <div class="p-4 space-y-4">
+            <div
+              v-for="btn in paymentButtons"
+              :key="btn.key"
+              class="border border-black/10 rounded-md p-4"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <div class="font-semibold text-black">{{ btn.title }}</div>
+                  <div v-if="btn.description" class="text-sm text-gray-700 mt-1">
+                    {{ btn.description }}
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    :id="`paybtn-${btn.key}`"
+                    type="checkbox"
+                    v-model="btn.enabled"
+                    class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded"
+                  />
+                  <label :for="`paybtn-${btn.key}`" class="text-black select-none">
+                    Enabled
+                  </label>
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-center gap-2">
+                <span class="text-black">$</span>
+                <input
+                  v-model.number="btn.minAmount"
+                  type="number"
+                  step="1"
+                  min="0"
+                  class="w-32 px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                />
+                <span class="text-black/70">minimum</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <button type="submit" class="mdc-button w-full mt-10">
           Save Changes
         </button>
@@ -438,6 +524,11 @@ const user = useStrapiUser();
 const token = useStrapiToken();
 
 const loading = ref(false);
+const payoutLoading = ref(false);
+
+const stripeAccountId = ref(null);
+const stripeOnboardingComplete = ref(false);
+const paymentsEnabled = ref(false);
 
 // flags for “delete on save”
 const removeSong = ref(false);
@@ -479,6 +570,68 @@ const streaming = ref({
   bandcamp: "",
   reverbnation: "",
 });
+
+const paymentButtons = ref([
+  {
+    key: "pay_entry",
+    title: "Pay Entry",
+    description: "Door entry for tonight’s show",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "tip_band",
+    title: "Tip the Band",
+    description: "Thanks for the support ❤️",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "pay_merch",
+    title: "Pay for Merch",
+    description: "Shirts, posters, vinyl, etc.",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "support_band",
+    title: "Support the Band",
+    description: "Help us keep making music",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "help_get_home",
+    title: "Help Us Get Home",
+    description: "Gas, food, and late nights on the road",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "after_show_support",
+    title: "After-Show Support",
+    description: "Thanks for coming out tonight ❤️",
+    enabled: false,
+    minAmount: 5,
+  },
+]);
+
+function mergePaymentButtons(existing = []) {
+  const safeExisting = Array.isArray(existing) ? existing : [];
+  const byKey = new Map(safeExisting.filter(Boolean).map((b) => [b.key, b]));
+  return paymentButtons.value.map((d) => {
+    const e = byKey.get(d.key) || {};
+    return {
+      ...d,
+      ...e,
+      key: d.key,
+      title: d.title,
+      description: d.description,
+      enabled: e.enabled === true,
+      minAmount: Number(e.minAmount ?? d.minAmount ?? 5),
+    };
+  });
+}
 
 // Featured song/video
 const singlesongType = ref("upload"); // 'upload' or 'embed'
@@ -539,6 +692,10 @@ async function fetchBand() {
 
     const attrs = j.data.attributes;
 
+    stripeAccountId.value = attrs.stripeAccountId || null;
+    stripeOnboardingComplete.value = attrs.stripeOnboardingComplete === true;
+    paymentsEnabled.value = attrs.paymentsEnabled === true;
+
     // Basic fields
     bandName.value = attrs.name || "";
     genre.value = attrs.genre || "";
@@ -565,6 +722,8 @@ async function fetchBand() {
     Object.keys(streaming.value).forEach(
       (k) => (streaming.value[k] = attrs[k] || "")
     );
+
+    paymentButtons.value = mergePaymentButtons(attrs.paymentButtons);
 
     // Singlesong component + existing file
     if (attrs.singlesong) {
@@ -595,6 +754,35 @@ async function fetchBand() {
   }
 }
 onMounted(fetchBand);
+
+async function startPayoutOnboarding() {
+  const id = route.params.id;
+  if (!token.value) {
+    alert("You must be logged in.");
+    return;
+  }
+
+  payoutLoading.value = true;
+  try {
+    const res = await fetch(
+      `${config.public.strapiUrl}/api/bands/${id}/payments/onboard`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token.value}` },
+      }
+    );
+    const json = await res.json();
+    if (!res.ok) {
+      throw new Error(json?.error?.message || "Unable to start Stripe onboarding");
+    }
+    if (!json?.url) throw new Error("Stripe onboarding URL missing");
+    window.location.href = json.url;
+  } catch (e) {
+    alert(e?.message || "Unable to start payouts setup");
+  } finally {
+    payoutLoading.value = false;
+  }
+}
 
 // Handlers
 function handleImageUpload(e) {
@@ -710,6 +898,12 @@ async function submitForm() {
       websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
+      paymentButtons: paymentButtons.value.map((b) => ({
+        key: b.key,
+        enabled: b.enabled === true,
+        pricingMode: "min",
+        minAmount: Number(b.minAmount || 5),
+      })),
       ...(newImageId
         ? { bandImg: newImageId }
         : bandImgId.value && { bandImg: bandImgId.value }),

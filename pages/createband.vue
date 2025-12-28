@@ -381,6 +381,54 @@
           </div>
         </div>
 
+        <!-- Support Buttons Section -->
+        <div class="bg-[#fff] rounded-md my-10">
+          <div
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Support Buttons</h2>
+          </div>
+          <div class="p-4 space-y-4">
+            <div
+              v-for="btn in paymentButtons"
+              :key="btn.key"
+              class="border border-black/10 rounded-md p-4"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <div class="font-semibold text-black">{{ btn.title }}</div>
+                  <div v-if="btn.description" class="text-sm text-gray-700 mt-1">
+                    {{ btn.description }}
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    :id="`paybtn-${btn.key}`"
+                    type="checkbox"
+                    v-model="btn.enabled"
+                    class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded"
+                  />
+                  <label :for="`paybtn-${btn.key}`" class="text-black select-none">
+                    Enabled
+                  </label>
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-center gap-2">
+                <span class="text-black">$</span>
+                <input
+                  v-model.number="btn.minAmount"
+                  type="number"
+                  step="1"
+                  min="0"
+                  class="w-32 px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                />
+                <span class="text-black/70">minimum</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Submit Button -->
         <button type="submit" class="mdc-button w-full mt-10">
           Create Profile
@@ -519,6 +567,51 @@ const singlesongEmbedHtml = ref(""); // NEW: raw iframe paste
 const singlevideoYoutubeUrl = ref("");
 const singlevideoTitle = ref("");
 
+const paymentButtons = ref([
+  {
+    key: "pay_entry",
+    title: "Pay Entry",
+    description: "Door entry for tonight’s show",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "tip_band",
+    title: "Tip the Band",
+    description: "Thanks for the support ❤️",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "pay_merch",
+    title: "Pay for Merch",
+    description: "Shirts, posters, vinyl, etc.",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "support_band",
+    title: "Support the Band",
+    description: "Help us keep making music",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "help_get_home",
+    title: "Help Us Get Home",
+    description: "Gas, food, and late nights on the road",
+    enabled: false,
+    minAmount: 5,
+  },
+  {
+    key: "after_show_support",
+    title: "After-Show Support",
+    description: "Thanks for coming out tonight ❤️",
+    enabled: false,
+    minAmount: 5,
+  },
+]);
+
 // Helpers
 function normalizeLink(link) {
   if (!link) return "";
@@ -575,6 +668,12 @@ async function submitForm() {
       websitelink: normalizeLink(websitelink.value) || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
+      paymentButtons: paymentButtons.value.map((b) => ({
+        key: b.key,
+        enabled: b.enabled === true,
+        pricingMode: "min",
+        minAmount: Number(b.minAmount || 5),
+      })),
 
       // members
       members: members.value.map((m) => ({
