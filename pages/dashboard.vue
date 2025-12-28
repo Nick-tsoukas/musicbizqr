@@ -653,7 +653,8 @@ async function fetchTrialInfo() {
       subscription && subscription.status ? subscription.status : null;
 
     const rawEnds = subscription.trialEndsAt;
-    if (rawEnds) {
+    const isTrialing = subscriptionStatus.value === 'trialing';
+    if (isTrialing && rawEnds) {
       const endDate =
         typeof rawEnds === "number"
           ? new Date(rawEnds * 1000)

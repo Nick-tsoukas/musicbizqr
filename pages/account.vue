@@ -36,7 +36,7 @@
         <h2 class="text-2xl font-semibold mb-2">Subscription Status</h2>
 
         <p class="text-gray-300">
-          Plan: {{ billingData.subscription?.plan.nickname || 'Trial' }}
+          Plan: {{ planLabel }}
         </p>
 
         <p class="text-gray-300">
@@ -49,10 +49,10 @@
           </span>
         </p>
 
-        <p v-if="billingData.trialEndsAt" class="text-gray-300">
+        <p v-if="showTrialEnds" class="text-gray-300">
           Trial Ends: {{ format(new Date(billingData.trialEndsAt), 'PPP') }}
         </p>
-        <p v-if="billingData.trialEndsAt" class="text-gray-300">
+        <p v-if="billingData.subscription" class="text-gray-300">
           Renews at $7.00 per month
         </p>
       </div>
@@ -88,6 +88,7 @@ const stripeStatus = computed(() => billingData.value?.subscription?.status || '
 const normalizedStatus = computed(() =>
   strapiStatus.value === 'pastDue' ? 'pastDue' : stripeStatus.value
 );
+const isTrialing = computed(() => normalizedStatus.value === 'trialing');
 const isPastDue = computed(() =>
   normalizedStatus.value === 'past_due' || normalizedStatus.value === 'pastDue'
 );
@@ -97,6 +98,18 @@ const displayStatus = computed(() =>
     : normalizedStatus.value.charAt(0).toUpperCase() +
       normalizedStatus.value.slice(1)
 );
+
+const planLabel = computed(() =>
+  billingData.value?.subscription?.plan?.nickname || (isTrialing.value ? 'Trial' : 'Monthly')
+);
+
+const showTrialEnds = computed(() => {
+  if (!isTrialing.value) return false;
+  const t = billingData.value?.trialEndsAt;
+  if (!t) return false;
+  const d = new Date(t);
+  return !Number.isNaN(d.getTime()) && d.getTime() > Date.now();
+});
 
 onMounted(async () => {
   if (user.value) email.value = user.value.email;
