@@ -589,6 +589,26 @@ const streaming = ref({
   reverbnation: "",
 });
 
+const hiddenLinks = ref([]);
+
+function normalizeHiddenLinks(v) {
+  if (Array.isArray(v)) return v.map(String).filter(Boolean);
+  if (v && typeof v === 'object') return Object.keys(v).filter((k) => v[k]);
+  return [];
+}
+
+function isLinkHidden(key) {
+  return Array.isArray(hiddenLinks.value) && hiddenLinks.value.includes(key);
+}
+
+function setLinkHidden(key, hidden) {
+  const next = Array.isArray(hiddenLinks.value) ? [...hiddenLinks.value] : [];
+  const idx = next.indexOf(key);
+  if (hidden && idx === -1) next.push(key);
+  if (!hidden && idx !== -1) next.splice(idx, 1);
+  hiddenLinks.value = next;
+}
+
 const paymentButtons = ref([
   {
     key: "pay_entry",
@@ -680,8 +700,7 @@ function deleteVideo() {
   singlevideoYoutubeUrl.value = "";
 }
 
-
-const rawEmbedHtml = computed(() => band.value?.data?.singlesong?.embedHtml || "");
+const rawEmbedHtml = computed(() => singlesongEmbedHtml.value || "");
 
 function normalizeLink(link) {
   if (!link) return "";
@@ -740,6 +759,8 @@ async function fetchBand() {
     Object.keys(streaming.value).forEach(
       (k) => (streaming.value[k] = attrs[k] || "")
     );
+
+    hiddenLinks.value = normalizeHiddenLinks(attrs.hiddenLinks);
 
     paymentButtons.value = mergePaymentButtons(attrs.paymentButtons);
 
@@ -916,6 +937,7 @@ async function submitForm() {
       websitelink: websitelink.value || null,
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
+      hiddenLinks: hiddenLinks.value,
       paymentButtons: paymentButtons.value.map((b) => ({
         key: b.key,
         enabled: b.enabled === true,
