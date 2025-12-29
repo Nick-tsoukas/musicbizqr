@@ -550,8 +550,8 @@
                 <div v-else-if="btn.pricingMode === 'presets'" class="md:col-span-2">
                   <div class="text-xs text-black/70 mb-1">Preset amounts (comma-separated)</div>
                   <input
-                    :value="formatPresetAmounts(btn.presetAmounts)"
-                    @input="(e) => (btn.presetAmounts = parsePresetAmounts(e.target.value))"
+                    v-model="btn.presetAmountsText"
+                    @blur="btn.presetAmounts = parsePresetAmounts(btn.presetAmountsText)"
                     type="text"
                     placeholder="e.g. 3, 5, 10"
                     class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
@@ -661,6 +661,7 @@ const paymentButtons = ref([
     minAmount: 5,
     fixedAmount: null,
     presetAmounts: [],
+    presetAmountsText: "",
     shareEnabled: true,
     unlockEnabled: false,
     supporterWallEligible: true,
@@ -675,6 +676,7 @@ const paymentButtons = ref([
     minAmount: 5,
     fixedAmount: null,
     presetAmounts: [],
+    presetAmountsText: "",
     shareEnabled: true,
     unlockEnabled: false,
     supporterWallEligible: true,
@@ -689,6 +691,7 @@ const paymentButtons = ref([
     minAmount: 5,
     fixedAmount: null,
     presetAmounts: [],
+    presetAmountsText: "",
     shareEnabled: true,
     unlockEnabled: false,
     supporterWallEligible: true,
@@ -703,6 +706,7 @@ const paymentButtons = ref([
     minAmount: 5,
     fixedAmount: null,
     presetAmounts: [],
+    presetAmountsText: "",
     shareEnabled: true,
     unlockEnabled: false,
     supporterWallEligible: true,
@@ -717,6 +721,7 @@ const paymentButtons = ref([
     minAmount: 5,
     fixedAmount: null,
     presetAmounts: [],
+    presetAmountsText: "",
     shareEnabled: true,
     unlockEnabled: false,
     supporterWallEligible: true,
@@ -731,6 +736,7 @@ const paymentButtons = ref([
     minAmount: 5,
     fixedAmount: null,
     presetAmounts: [],
+    presetAmountsText: "",
     shareEnabled: true,
     unlockEnabled: false,
     supporterWallEligible: true,
@@ -784,6 +790,8 @@ function mergePaymentButtons(existing = []) {
       minAmount: pricingMode === "min" ? minAmount : null,
       fixedAmount: pricingMode === "fixed" ? fixedAmount : null,
       presetAmounts: pricingMode === "presets" ? presetAmounts : [],
+      presetAmountsText:
+        pricingMode === "presets" ? formatPresetAmounts(presetAmounts) : "",
     };
   });
 }
@@ -1062,7 +1070,14 @@ async function submitForm() {
           mode === "fixed" && b.fixedAmount != null && b.fixedAmount !== ""
             ? Number(b.fixedAmount)
             : null;
-        const presetAmounts = mode === "presets" ? sanitizePresetAmounts(b.presetAmounts) : [];
+        const presetAmounts =
+          mode === "presets"
+            ? parsePresetAmounts(
+                b.presetAmountsText != null
+                  ? String(b.presetAmountsText)
+                  : formatPresetAmounts(b.presetAmounts)
+              )
+            : [];
         return {
           key: b.key,
           title: b.title,
