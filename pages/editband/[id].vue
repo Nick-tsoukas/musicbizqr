@@ -506,16 +506,57 @@
                 </div>
               </div>
 
-              <div class="mt-3 flex items-center gap-2">
-                <span class="text-black">$</span>
-                <input
-                  v-model.number="btn.minAmount"
-                  type="number"
-                  step="1"
-                  min="0"
-                  class="w-32 px-3 py-2 rounded-md bg-white border border-black/20 text-black"
-                />
-                <span class="text-black/70">minimum</span>
+              <div class="mt-4 grid gap-3 md:grid-cols-2">
+                <div>
+                  <div class="text-xs text-black/70 mb-1">Pricing</div>
+                  <select
+                    v-model="btn.pricingMode"
+                    class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                  >
+                    <option value="min">Minimum</option>
+                    <option value="fixed">Fixed</option>
+                    <option value="presets">Presets</option>
+                  </select>
+                </div>
+
+                <div v-if="btn.pricingMode === 'min'">
+                  <div class="text-xs text-black/70 mb-1">Minimum amount</div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-black">$</span>
+                    <input
+                      v-model.number="btn.minAmount"
+                      type="number"
+                      step="1"
+                      min="0"
+                      class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                    />
+                  </div>
+                </div>
+
+                <div v-else-if="btn.pricingMode === 'fixed'">
+                  <div class="text-xs text-black/70 mb-1">Fixed amount</div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-black">$</span>
+                    <input
+                      v-model.number="btn.fixedAmount"
+                      type="number"
+                      step="1"
+                      min="0"
+                      class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                    />
+                  </div>
+                </div>
+
+                <div v-else-if="btn.pricingMode === 'presets'" class="md:col-span-2">
+                  <div class="text-xs text-black/70 mb-1">Preset amounts (comma-separated)</div>
+                  <input
+                    :value="formatPresetAmounts(btn.presetAmounts)"
+                    @input="(e) => (btn.presetAmounts = parsePresetAmounts(e.target.value))"
+                    type="text"
+                    placeholder="e.g. 3, 5, 10"
+                    class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -613,52 +654,125 @@ const paymentButtons = ref([
   {
     key: "pay_entry",
     title: "Pay Entry",
+    badgeId: "show_supporter",
     description: "Door entry for tonight’s show",
     enabled: false,
+    pricingMode: "min",
     minAmount: 5,
+    fixedAmount: null,
+    presetAmounts: [],
+    shareEnabled: true,
+    unlockEnabled: false,
+    supporterWallEligible: true,
   },
   {
     key: "tip_band",
     title: "Tip the Band",
+    badgeId: "tip_legend",
     description: "Thanks for the support ❤️",
     enabled: false,
+    pricingMode: "min",
     minAmount: 5,
+    fixedAmount: null,
+    presetAmounts: [],
+    shareEnabled: true,
+    unlockEnabled: false,
+    supporterWallEligible: true,
   },
   {
     key: "pay_merch",
     title: "Pay for Merch",
+    badgeId: "merch_mvp",
     description: "Shirts, posters, vinyl, etc.",
     enabled: false,
+    pricingMode: "min",
     minAmount: 5,
+    fixedAmount: null,
+    presetAmounts: [],
+    shareEnabled: true,
+    unlockEnabled: false,
+    supporterWallEligible: true,
   },
   {
     key: "support_band",
     title: "Support the Band",
+    badgeId: "band_backer",
     description: "Help us keep making music",
     enabled: false,
+    pricingMode: "min",
     minAmount: 5,
+    fixedAmount: null,
+    presetAmounts: [],
+    shareEnabled: true,
+    unlockEnabled: false,
+    supporterWallEligible: true,
   },
   {
     key: "help_get_home",
     title: "Help Us Get Home",
+    badgeId: "road_crew",
     description: "Gas, food, and late nights on the road",
     enabled: false,
+    pricingMode: "min",
     minAmount: 5,
+    fixedAmount: null,
+    presetAmounts: [],
+    shareEnabled: true,
+    unlockEnabled: false,
+    supporterWallEligible: true,
   },
   {
     key: "after_show_support",
     title: "After-Show Support",
+    badgeId: "after_show_backer",
     description: "Thanks for coming out tonight ❤️",
     enabled: false,
+    pricingMode: "min",
     minAmount: 5,
+    fixedAmount: null,
+    presetAmounts: [],
+    shareEnabled: true,
+    unlockEnabled: false,
+    supporterWallEligible: true,
   },
 ]);
+
+function sanitizePricingMode(v) {
+  return v === "fixed" || v === "presets" || v === "min" ? v : "min";
+}
+
+function parsePresetAmounts(v) {
+  if (!v) return [];
+  return String(v)
+    .split(",")
+    .map((s) => Number(String(s).trim()))
+    .filter((n) => Number.isFinite(n) && n > 0);
+}
+
+function sanitizePresetAmounts(arr) {
+  return Array.isArray(arr)
+    ? arr
+        .map((n) => Number(n))
+        .filter((n) => Number.isFinite(n) && n > 0)
+    : [];
+}
+
+function formatPresetAmounts(arr) {
+  return Array.isArray(arr) ? arr.filter(Boolean).join(", ") : "";
+}
 
 function mergePaymentButtons(existing = []) {
   const safeExisting = Array.isArray(existing) ? existing : [];
   const byKey = new Map(safeExisting.filter(Boolean).map((b) => [b.key, b]));
   return paymentButtons.value.map((d) => {
     const e = byKey.get(d.key) || {};
+
+    const pricingMode = sanitizePricingMode(e.pricingMode ?? d.pricingMode);
+    const minAmount = Number(e.minAmount ?? d.minAmount ?? 5);
+    const fixedAmountRaw = e.fixedAmount ?? d.fixedAmount ?? null;
+    const fixedAmount = fixedAmountRaw == null ? null : Number(fixedAmountRaw);
+    const presetAmounts = sanitizePresetAmounts(e.presetAmounts ?? d.presetAmounts);
+
     return {
       ...d,
       ...e,
@@ -666,7 +780,10 @@ function mergePaymentButtons(existing = []) {
       title: d.title,
       description: d.description,
       enabled: e.enabled === true,
-      minAmount: Number(e.minAmount ?? d.minAmount ?? 5),
+      pricingMode,
+      minAmount: pricingMode === "min" ? minAmount : null,
+      fixedAmount: pricingMode === "fixed" ? fixedAmount : null,
+      presetAmounts: pricingMode === "presets" ? presetAmounts : [],
     };
   });
 }
@@ -938,12 +1055,29 @@ async function submitForm() {
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
       hiddenLinks: hiddenLinks.value,
-      paymentButtons: paymentButtons.value.map((b) => ({
-        key: b.key,
-        enabled: b.enabled === true,
-        pricingMode: "min",
-        minAmount: Number(b.minAmount || 5),
-      })),
+      paymentButtons: paymentButtons.value.map((b) => {
+        const mode = sanitizePricingMode(b.pricingMode);
+        const minAmount = mode === "min" ? Number(b.minAmount || 5) : null;
+        const fixedAmount =
+          mode === "fixed" && b.fixedAmount != null && b.fixedAmount !== ""
+            ? Number(b.fixedAmount)
+            : null;
+        const presetAmounts = mode === "presets" ? sanitizePresetAmounts(b.presetAmounts) : [];
+        return {
+          key: b.key,
+          title: b.title,
+          description: b.description,
+          badgeId: b.badgeId ?? null,
+          enabled: b.enabled === true,
+          pricingMode: mode,
+          minAmount,
+          fixedAmount,
+          presetAmounts,
+          shareEnabled: b.shareEnabled ?? true,
+          unlockEnabled: b.unlockEnabled ?? false,
+          supporterWallEligible: b.supporterWallEligible ?? true,
+        };
+      }),
       ...(newImageId
         ? { bandImg: newImageId }
         : bandImgId.value && { bandImg: bandImgId.value }),

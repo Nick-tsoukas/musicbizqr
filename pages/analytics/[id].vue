@@ -596,6 +596,20 @@
               </svg>
               {{ youtubeResyncing ? 'Syncing…' : 'Re-sync' }}
             </button>
+
+            <!-- Disconnect + Purge -->
+            <button
+              @click="purgeYoutube"
+              :disabled="youtubePurging"
+              class="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition
+                     disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
+                     focus:ring-2 focus:ring-red-500/50
+                     bg-red-500/10 text-red-200 border-red-400/20 hover:bg-red-500/20"
+              aria-label="Disconnect YouTube"
+              v-tooltip="'Disconnect YouTube and clear stored YouTube data'"
+            >
+              {{ youtubePurging ? 'Disconnecting…' : 'Disconnect' }}
+            </button>
           </div>
         </div>
 
@@ -1105,6 +1119,7 @@ function humanDayLabel(yyyy_mm_dd: string) {
 
 /* ---------- YouTube re-sync helpers ---------- */
 const youtubeResyncing = ref(false);
+const youtubePurging = ref(false);
 let youtubeResyncTimer: any = null;
 
 function debounce(fn: Function, ms = 800) {
@@ -1153,6 +1168,36 @@ const resyncYoutubeNow = async () => {
 };
 
 const resyncYoutube = debounce(resyncYoutubeNow, 800);
+
+const purgeYoutube = async () => {
+  if (youtubePurging.value) return;
+  if (!bandId.value) return;
+
+  const ok = confirm(
+    "Disconnect YouTube and clear stored YouTube data for this band? You can reconnect anytime."
+  );
+  if (!ok) return;
+
+  youtubePurging.value = true;
+
+  try {
+    const res = await $fetch(
+      `${useRuntimeConfig().public.strapiUrl}/api/youtube/purge`,
+      {
+        method: "POST",
+        body: { bandId: bandId.value },
+      }
+    );
+
+    console.log("[youtube] purge response", res);
+    await fetchAndRender(true);
+  } catch (e) {
+    console.warn("[youtube] purge failed", e);
+    alert("YouTube disconnect failed. Try again in a minute.");
+  } finally {
+    youtubePurging.value = false;
+  }
+};
 
 /* ---------- YouTube connect ---------- */
 async function connectYoutube() {

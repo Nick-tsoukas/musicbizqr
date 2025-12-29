@@ -337,15 +337,13 @@
         </section>
 
         <section v-if="canShowPayments" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Support {{ band.data.name }}
-          </h2>
+          
 
           <div v-if="paymentError" class="text-red-400 mb-3">
             {{ paymentError }}
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
             <div
               v-for="btn in enabledPaymentButtons"
               :key="btn.key"
@@ -360,6 +358,7 @@
 
               <div class="mt-3">
                 <div v-if="btn.pricingMode === 'min'">
+                  <div class="text-white/70 text-sm mb-2">Enter an amount</div>
                   <div class="flex items-center gap-2">
                     <span class="text-white/80">$</span>
                     <input
@@ -370,12 +369,13 @@
                       class="w-32 px-3 py-2 rounded-md bg-black border border-white/20 text-white"
                     />
                     <span v-if="btn.minAmount" class="text-white/60">
-                      min {{ btn.minAmount }}
+                      Minimum ${{ btn.minAmount }}
                     </span>
                   </div>
                 </div>
 
                 <div v-else-if="btn.pricingMode === 'presets'">
+                  <div class="text-white/70 text-sm mb-2">Select an amount</div>
                   <div class="flex flex-wrap gap-2">
                     <button
                       v-for="amt in (btn.presetAmounts || [])"
@@ -393,7 +393,8 @@
                 </div>
 
                 <div v-else-if="btn.pricingMode === 'fixed'">
-                  <div class="text-white/80">
+                  <div class="text-white/70 text-sm mb-1">Fixed price</div>
+                  <div class="text-white text-xl font-semibold">
                     ${{ btn.fixedAmount }}
                   </div>
                 </div>
