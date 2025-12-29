@@ -241,6 +241,12 @@ sitemap: {
     nitro: {
     externals: { inline: ['geoip-lite'] },
     routeRules: {
+     '/**': {
+        headers: {
+          'Content-Security-Policy':
+            "frame-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com; child-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com;",
+        }
+      },
      '/article/smart-links/smart-links': {
         redirect: '/article/smart-links',
         statusCode: 301

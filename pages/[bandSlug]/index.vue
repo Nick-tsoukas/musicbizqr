@@ -87,18 +87,9 @@
               <div
                 id="embedPlayerWrapper"
                 class="absolute inset-0 w-full h-full"
+                @pointerdown.capture="handleFirstClick"
                 v-html="safeEmbedHtml"
               ></div>
-
-              <div
-                v-if="!embedClickCaptured"
-                class="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer z-10"
-                @click="handleFirstClick"
-              >
-                <span class="text-white text-lg font-semibold">
-                  ▶ Click to Play
-                </span>
-              </div>
             </div>
           </div>
 
@@ -443,7 +434,6 @@ import youtubeMusicIcon from "@/assets/youtube-icon.svg";
 import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
 
-const embedClickCaptured = ref(false);
 const hasTrackedEmbedClick = ref(false);
 const nuxtApp = useNuxtApp();
 
@@ -680,10 +670,7 @@ const hasFeaturedSong = computed(() => {
 });
 
 function handleFirstClick() {
-  // Hide overlay so the iframe can be interacted with
-  embedClickCaptured.value = true;
-
-  // Optional: track the first interaction
+  // Track the first interaction with the embed without blocking it
   if (!hasTrackedEmbedClick.value) {
     try {
       const bandId = band.value?.data?.id;
@@ -1022,12 +1009,6 @@ onMounted(() => {
   width: 100%;
   height: 100%;
 }
-:deep(#embedPlayerWrapper iframe) {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
 .custom-border {
   border: 0.1px solid white;
 }
@@ -1055,4 +1036,9 @@ onMounted(() => {
   }
 }
 /* testing */
+#embedPlayerWrapper :deep(iframe) {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
 </style>
