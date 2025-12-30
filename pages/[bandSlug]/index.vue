@@ -438,6 +438,12 @@ const hasTrackedEmbedClick = ref(false);
 const embedPlayerWrapperEl = ref(null);
 const embedIframeEl = ref(null);
 let onEmbedIframeFocus = null;
+let onEmbedIframeMouseEnter = null;
+let onEmbedIframeMouseLeave = null;
+let onWindowBlur = null;
+let embedActivePollInterval = null;
+let embedHovering = false;
+let lastEmbedHoverAt = 0;
 const nuxtApp = useNuxtApp();
 
 const { trackClick, trackMediaPlay } = useBeacon();
@@ -691,8 +697,36 @@ function detachEmbedIframeListeners() {
   if (embedIframeEl.value && onEmbedIframeFocus) {
     embedIframeEl.value.removeEventListener("focus", onEmbedIframeFocus, true);
   }
+  if (embedIframeEl.value && onEmbedIframeMouseEnter) {
+    embedIframeEl.value.removeEventListener(
+      "mouseenter",
+      onEmbedIframeMouseEnter,
+      true
+    );
+  }
+  if (embedIframeEl.value && onEmbedIframeMouseLeave) {
+    embedIframeEl.value.removeEventListener(
+      "mouseleave",
+      onEmbedIframeMouseLeave,
+      true
+    );
+  }
+
+  if (typeof window !== "undefined" && onWindowBlur) {
+    window.removeEventListener("blur", onWindowBlur, true);
+  }
+
+  if (embedActivePollInterval) {
+    clearInterval(embedActivePollInterval);
+    embedActivePollInterval = null;
+  }
   embedIframeEl.value = null;
   onEmbedIframeFocus = null;
+  onEmbedIframeMouseEnter = null;
+  onEmbedIframeMouseLeave = null;
+  onWindowBlur = null;
+  embedHovering = false;
+  lastEmbedHoverAt = 0;
 }
 
 async function attachEmbedIframeListeners() {
@@ -712,10 +746,48 @@ async function attachEmbedIframeListeners() {
   detachEmbedIframeListeners();
 
   embedIframeEl.value = iframe;
+  // Some providers/UA combos won't focus the iframe unless it is explicitly focusable.
+  try {
+    iframe.setAttribute("tabindex", "0");
+  } catch {
+    // ignore
+  }
+
   onEmbedIframeFocus = () => handleFirstClick();
+  onEmbedIframeMouseEnter = () => {
+    embedHovering = true;
+    lastEmbedHoverAt = Date.now();
+  };
+  onEmbedIframeMouseLeave = () => {
+    embedHovering = false;
+  };
+
+  // Hacky-but-good-UX: when a user clicks into a cross-origin iframe,
+  // some browsers won't fire parent click/pointer events, but they often:
+  // - focus the iframe element, or
+  // - cause the top window to blur while the mouse is hovering over the iframe.
+  onWindowBlur = () => {
+    if (hasTrackedEmbedClick.value) return;
+    if (!embedHovering) return;
+    if (Date.now() - lastEmbedHoverAt > 2000) return;
+    handleFirstClick();
+  };
 
   // When the user clicks/taps inside the embed, the iframe element becomes focused.
   iframe.addEventListener("focus", onEmbedIframeFocus, true);
+  iframe.addEventListener("mouseenter", onEmbedIframeMouseEnter, true);
+  iframe.addEventListener("mouseleave", onEmbedIframeMouseLeave, true);
+  window.addEventListener("blur", onWindowBlur, true);
+
+  // Poll fallback: if the provider focuses the iframe without firing focus listeners reliably,
+  // we still detect it (lightweight, short lived).
+  embedActivePollInterval = setInterval(() => {
+    if (hasTrackedEmbedClick.value) return;
+    if (!embedIframeEl.value) return;
+    if (document.activeElement === embedIframeEl.value) {
+      handleFirstClick();
+    }
+  }, 250);
 }
 
 watch(
