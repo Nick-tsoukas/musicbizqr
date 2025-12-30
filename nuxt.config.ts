@@ -243,8 +243,9 @@ sitemap: {
     routeRules: {
      '/**': {
         headers: {
+          'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
           'Content-Security-Policy':
-            "frame-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com; child-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com;",
+            "frame-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com; child-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com;",
         }
       },
      '/article/smart-links/smart-links': {
