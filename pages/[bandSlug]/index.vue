@@ -438,10 +438,14 @@ const hasTrackedEmbedClick = ref(false);
 const embedPlayerWrapperEl = ref(null);
 const embedIframeEl = ref(null);
 let onEmbedIframeFocus = null;
+let onEmbedIframePointerDown = null;
+let onEmbedIframeTouchStart = null;
 let onEmbedIframeMouseEnter = null;
 let onEmbedIframeMouseLeave = null;
 let onWindowBlur = null;
+let onDocumentVisibilityChange = null;
 let embedActivePollInterval = null;
+let embedActivePollTimeout = null;
 let embedHovering = false;
 let lastEmbedHoverAt = 0;
 const nuxtApp = useNuxtApp();
@@ -689,6 +693,8 @@ function handleFirstClick() {
       console.error("trackMediaPlay (embed) error:", e);
     } finally {
       hasTrackedEmbedClick.value = true;
+      // Once we have recorded the first engagement, remove listeners to keep it lightweight.
+      detachEmbedIframeListeners();
     }
   }
 }
@@ -696,6 +702,20 @@ function handleFirstClick() {
 function detachEmbedIframeListeners() {
   if (embedIframeEl.value && onEmbedIframeFocus) {
     embedIframeEl.value.removeEventListener("focus", onEmbedIframeFocus, true);
+  }
+  if (embedIframeEl.value && onEmbedIframePointerDown) {
+    embedIframeEl.value.removeEventListener(
+      "pointerdown",
+      onEmbedIframePointerDown,
+      true
+    );
+  }
+  if (embedIframeEl.value && onEmbedIframeTouchStart) {
+    embedIframeEl.value.removeEventListener(
+      "touchstart",
+      onEmbedIframeTouchStart,
+      true
+    );
   }
   if (embedIframeEl.value && onEmbedIframeMouseEnter) {
     embedIframeEl.value.removeEventListener(
@@ -716,15 +736,30 @@ function detachEmbedIframeListeners() {
     window.removeEventListener("blur", onWindowBlur, true);
   }
 
+  if (typeof document !== "undefined" && onDocumentVisibilityChange) {
+    document.removeEventListener(
+      "visibilitychange",
+      onDocumentVisibilityChange,
+      true
+    );
+  }
+
   if (embedActivePollInterval) {
     clearInterval(embedActivePollInterval);
     embedActivePollInterval = null;
   }
+  if (embedActivePollTimeout) {
+    clearTimeout(embedActivePollTimeout);
+    embedActivePollTimeout = null;
+  }
   embedIframeEl.value = null;
   onEmbedIframeFocus = null;
+  onEmbedIframePointerDown = null;
+  onEmbedIframeTouchStart = null;
   onEmbedIframeMouseEnter = null;
   onEmbedIframeMouseLeave = null;
   onWindowBlur = null;
+  onDocumentVisibilityChange = null;
   embedHovering = false;
   lastEmbedHoverAt = 0;
 }
@@ -754,6 +789,8 @@ async function attachEmbedIframeListeners() {
   }
 
   onEmbedIframeFocus = () => handleFirstClick();
+  onEmbedIframePointerDown = () => handleFirstClick();
+  onEmbedIframeTouchStart = () => handleFirstClick();
   onEmbedIframeMouseEnter = () => {
     embedHovering = true;
     lastEmbedHoverAt = Date.now();
@@ -773,11 +810,24 @@ async function attachEmbedIframeListeners() {
     handleFirstClick();
   };
 
+  // On some mobile browsers, a tap into an iframe can sometimes trigger visibility transitions.
+  // This is a weak signal, so we only treat it as engagement if the iframe is currently focused.
+  onDocumentVisibilityChange = () => {
+    if (hasTrackedEmbedClick.value) return;
+    if (document.visibilityState !== "hidden") return;
+    if (document.activeElement === iframe) {
+      handleFirstClick();
+    }
+  };
+
   // When the user clicks/taps inside the embed, the iframe element becomes focused.
   iframe.addEventListener("focus", onEmbedIframeFocus, true);
+  iframe.addEventListener("pointerdown", onEmbedIframePointerDown, true);
+  iframe.addEventListener("touchstart", onEmbedIframeTouchStart, true);
   iframe.addEventListener("mouseenter", onEmbedIframeMouseEnter, true);
   iframe.addEventListener("mouseleave", onEmbedIframeMouseLeave, true);
   window.addEventListener("blur", onWindowBlur, true);
+  document.addEventListener("visibilitychange", onDocumentVisibilityChange, true);
 
   // Poll fallback: if the provider focuses the iframe without firing focus listeners reliably,
   // we still detect it (lightweight, short lived).
@@ -787,7 +837,19 @@ async function attachEmbedIframeListeners() {
     if (document.activeElement === embedIframeEl.value) {
       handleFirstClick();
     }
-  }, 250);
+  }, 500);
+
+  // Don't poll forever; if the user never interacts, stop after a short window.
+  embedActivePollTimeout = setTimeout(() => {
+    if (embedActivePollInterval) {
+      clearInterval(embedActivePollInterval);
+      embedActivePollInterval = null;
+    }
+    if (embedActivePollTimeout) {
+      clearTimeout(embedActivePollTimeout);
+      embedActivePollTimeout = null;
+    }
+  }, 120000);
 }
 
 watch(
