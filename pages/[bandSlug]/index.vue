@@ -86,8 +86,8 @@
             <div class="relative w-full h-64 rounded-lg overflow-hidden">
               <div
                 id="embedPlayerWrapper"
+                ref="embedPlayerWrapperEl"
                 class="absolute inset-0 w-full h-full"
-                @pointerdown.capture="handleFirstClick"
                 v-html="safeEmbedHtml"
               ></div>
             </div>
@@ -413,7 +413,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import { useRoute, useRouter } from "vue-router";
@@ -435,6 +435,9 @@ import tiktokIcon from "@/assets/tiktok.png";
 import twitterIcon from "@/assets/twitter.png";
 
 const hasTrackedEmbedClick = ref(false);
+const embedPlayerWrapperEl = ref(null);
+const embedIframeEl = ref(null);
+let onEmbedIframeFocus = null;
 const nuxtApp = useNuxtApp();
 
 const { trackClick, trackMediaPlay } = useBeacon();
@@ -674,8 +677,8 @@ function handleFirstClick() {
   if (!hasTrackedEmbedClick.value) {
     try {
       const bandId = band.value?.data?.id;
-      const title = band.value?.data?.singlesong?.title || "song-embed";
-      trackMediaPlay(bandId, "song-embed", title);
+      const title = band.value?.data?.singlesong?.title || "song";
+      trackMediaPlay(bandId, "song", title);
     } catch (e) {
       console.error("trackMediaPlay (embed) error:", e);
     } finally {
@@ -683,6 +686,52 @@ function handleFirstClick() {
     }
   }
 }
+
+function detachEmbedIframeListeners() {
+  if (embedIframeEl.value && onEmbedIframeFocus) {
+    embedIframeEl.value.removeEventListener("focus", onEmbedIframeFocus, true);
+  }
+  embedIframeEl.value = null;
+  onEmbedIframeFocus = null;
+}
+
+async function attachEmbedIframeListeners() {
+  if (typeof window === "undefined") return;
+
+  await nextTick();
+
+  const wrapper = embedPlayerWrapperEl.value;
+  if (!wrapper) return;
+
+  const iframe = wrapper.querySelector("iframe");
+  if (!iframe) return;
+
+  // avoid double-binding if Nuxt re-renders
+  if (embedIframeEl.value === iframe && onEmbedIframeFocus) return;
+
+  detachEmbedIframeListeners();
+
+  embedIframeEl.value = iframe;
+  onEmbedIframeFocus = () => handleFirstClick();
+
+  // When the user clicks/taps inside the embed, the iframe element becomes focused.
+  iframe.addEventListener("focus", onEmbedIframeFocus, true);
+}
+
+watch(
+  () => safeEmbedHtml.value,
+  async () => {
+    await attachEmbedIframeListeners();
+  }
+);
+
+onMounted(async () => {
+  await attachEmbedIframeListeners();
+});
+
+onBeforeUnmount(() => {
+  detachEmbedIframeListeners();
+});
 
 /* ---------- streaming & social sections ---------- */
 const hiddenLinkKeys = computed(() => {
