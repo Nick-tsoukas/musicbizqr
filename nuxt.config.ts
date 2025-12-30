@@ -245,32 +245,27 @@ sitemap: {
         headers: {
           'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
           'Content-Security-Policy':
-            "frame-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com; child-src 'self' https://open.spotify.com https://embed.spotify.com https://embed.music.apple.com https://music.apple.com https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com;",
+            "frame-src 'self' https:; child-src 'self' https:;",
         }
       },
      '/article/smart-links/smart-links': {
-        redirect: '/article/smart-links',
-        statusCode: 301
+        redirect: { to: '/article/smart-links', statusCode: 301 }
       },
 
       '/article/qr-code-strategy/qr-code-strategy': {
-        redirect: '/article/qr-code-strategy',
-        statusCode: 301
+        redirect: { to: '/article/qr-code-strategy', statusCode: 301 }
       },
 
       '/article/music-marketing/music-marketing': {
-        redirect: '/article/music-marketing',
-        statusCode: 301
+        redirect: { to: '/article/music-marketing', statusCode: 301 }
       },
 
       '/article/fan-funnels/fan-funnels': {
-        redirect: '/article/fan-funnels',
-        statusCode: 301
+        redirect: { to: '/article/fan-funnels', statusCode: 301 }
       },
 
       '/article/touring-events/touring-events': {
-        redirect: '/article/touring-events',
-        statusCode: 301
+        redirect: { to: '/article/touring-events', statusCode: 301 }
       },
     }
   },

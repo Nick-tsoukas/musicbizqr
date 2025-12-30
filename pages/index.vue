@@ -728,7 +728,6 @@ import {
   onUnmounted,
   useRuntimeConfig,
 } from "#imports";
-import { defineComponent } from "vue";
 
 import deezer from "@/assets/dezzer.svg";
 
@@ -898,7 +897,6 @@ import externalScreen from "@/assets/newbandhome.jpg";
 import videoScreen from "@/assets/vidgrid.jpg";
 import aisix from "@/assets/aisix.webp";
 
-import { defineComponent, h } from "vue";
 import {
   Dialog,
   DialogPanel,
