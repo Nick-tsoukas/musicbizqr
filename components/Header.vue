@@ -38,6 +38,12 @@
           Logout
         </p>
         <NuxtLink to="/article" class="nav-link">Articles</NuxtLink>
+        <NuxtLink to="/saved" class="nav-link">
+          Saved
+          <client-only>
+            <span v-if="savedCount" class="ml-1">({{ savedCount }})</span>
+          </client-only>
+        </NuxtLink>
         <NuxtLink to="/contact" class="nav-link">Contact</NuxtLink>
         <NuxtLink v-if="user" to="/account" class="nav-link">Account</NuxtLink>
       </nav>
@@ -84,6 +90,12 @@
           class="mobile-nav-link"
           >Home</NuxtLink
         >
+        <NuxtLink to="/saved" @click="toggleMenu" class="mobile-nav-link">
+          Saved
+          <client-only>
+            <span v-if="savedCount" class="ml-1">({{ savedCount }})</span>
+          </client-only>
+        </NuxtLink>
         <client-only>
         <NuxtLink
           v-if="user && userSlug"
@@ -144,11 +156,14 @@ import { ref, computed } from 'vue'
 import { useStrapiUser, useStrapiAuth, useFetch, useRuntimeConfig } from '#imports'
 import { useRouter } from 'vue-router'
 import { useAsyncData } from '#app'
+import { useSavedBands } from '@/composables/useSavedBands'
 
 const user = useStrapiUser()
 const { logout } = useStrapiAuth()
 const router = useRouter()
 const config = useRuntimeConfig()
+
+const { count: savedCount } = useSavedBands()
 
 // 1) Fetch the user's band slug via SSR + client
 const { data: bandData, pending: bandLoading, error: bandError } = await useAsyncData(

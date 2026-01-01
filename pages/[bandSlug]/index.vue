@@ -82,6 +82,25 @@
         </div>
       </div>
 
+      <client-only>
+        <div v-if="band?.data" class="flex justify-center mt-4">
+          <div class="w-full max-w-5xl px-6 flex justify-end">
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-colors"
+              @click="onToggleSaveBand"
+            >
+              {{ isCurrentBandSaved ? "✓ Saved" : "⭐ Save this band" }}
+            </button>
+          </div>
+        </div>
+        <div v-if="showSavedConfirmation" class="flex justify-center mt-2">
+          <div class="w-full max-w-5xl px-6 text-white/70 text-sm">
+            Saved — find it anytime in the menu
+          </div>
+        </div>
+      </client-only>
+
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <!-- Featured Song -->
@@ -428,6 +447,7 @@
 import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
+import { useSavedBands } from "@/composables/useSavedBands";
 import { useRoute, useRouter } from "vue-router";
 import { useNuxtApp } from "#app";
 import AudioPlayer from "@/components/AudioPlayer.vue";
@@ -463,9 +483,13 @@ let lastEmbedHoverAt = 0;
 const nuxtApp = useNuxtApp();
 
 const { trackClick, trackMediaPlay } = useBeacon();
+const { isSaved, toggleSaveBand } = useSavedBands();
 const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
+
+const showSavedConfirmation = ref(false);
+let savedConfirmationTimeout = null;
 
 const paymentBannerVisible = ref(false);
 const paymentBannerTitle = ref("");
@@ -618,6 +642,47 @@ const showPage = computed(() => {
 });
 const band = ref(null);
 const events = ref([]);
+
+const currentBandSlug = computed(() => {
+  return (
+    band.value?.data?.slug ||
+    String(route.params.bandSlug || "").toLowerCase() ||
+    ""
+  );
+});
+
+const isCurrentBandSaved = computed(() => {
+  const slug = currentBandSlug.value;
+  if (!slug) return false;
+  return isSaved(slug);
+});
+
+function onToggleSaveBand() {
+  const slug = currentBandSlug.value;
+  if (!slug) return;
+
+  const payload = {
+    bandSlug: slug,
+    bandName: band.value?.data?.name || slug,
+    bandImageUrl: band.value?.data?.bandImg?.url || null,
+  };
+
+  const didSave = toggleSaveBand(payload);
+  if (didSave) {
+    showSavedConfirmation.value = true;
+    if (savedConfirmationTimeout) clearTimeout(savedConfirmationTimeout);
+    savedConfirmationTimeout = setTimeout(() => {
+      showSavedConfirmation.value = false;
+      savedConfirmationTimeout = null;
+    }, 2500);
+  } else {
+    showSavedConfirmation.value = false;
+    if (savedConfirmationTimeout) {
+      clearTimeout(savedConfirmationTimeout);
+      savedConfirmationTimeout = null;
+    }
+  }
+}
 
 // ⬇️ add this small helper near the top of <script setup>
 function readQrStampFromCookie() {
@@ -878,6 +943,10 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   detachEmbedIframeListeners();
+  if (savedConfirmationTimeout) {
+    clearTimeout(savedConfirmationTimeout);
+    savedConfirmationTimeout = null;
+  }
 });
 
 /* ---------- streaming & social sections ---------- */
