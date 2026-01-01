@@ -1,7 +1,19 @@
 <template>
   <div>
-    <div v-if="!showPage" class="loading-container">
+    <div v-if="loadingData" class="loading-container">
       <div class="spinner"></div>
+    </div>
+
+    <div
+      v-else-if="notFound"
+      class="bg-black w-screen min-h-[60vh] mx-auto pt-[var(--header-height)] fade-in"
+    >
+      <div class="max-w-5xl mx-auto px-6 py-10">
+        <div class="text-white text-2xl font-bold">Band not found</div>
+        <div class="text-white/70 mt-2">
+          Check the link and try again.
+        </div>
+      </div>
     </div>
 
     <div
@@ -597,6 +609,7 @@ function dismissPaymentBanner() {
 // replace: const loading = ref(true);
 const loadingData = ref(true);
 const heroReady = ref(false);
+const notFound = ref(false);
 
 const showPage = computed(() => {
   const url = band.value?.data?.bandImg?.url;
@@ -956,18 +969,25 @@ function handleClick(bandId, platform, url) {
 
 /* ---------- data fetch ---------- */
 async function fetchBandData() {
-  const slug = route.params.bandSlug?.toLowerCase() || "";
+  notFound.value = false;
+  loadingData.value = true;
+
+  const incomingSlug = String(route.params.bandSlug || "").toLowerCase();
+  const canonicalSlug = incomingSlug
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+  const slug = incomingSlug;
   const api = config.public.strapiUrl;
 
   // Ask ONLY for fields used on the page
-  const url =
-    `${api}/api/bands/slug/${slug}` +
-    `?fields[0]=name&fields[1]=isBandNameInLogo&fields[2]=bio&fields[3]=biotagline` +
-    `&fields[4]=websitelink&fields[5]=websitelinktext` +
-    `&fields[6]=youtube&fields[7]=youtubeMusic&fields[8]=spotify&fields[9]=appleMusic` + // streaming
-    `&fields[10]=reverbnation&fields[11]=soundcloud&fields[12]=bandcamp&fields[13]=twitch&fields[14]=deezer` +
-    `&fields[15]=facebook&fields[16]=instagram&fields[17]=twitter&fields[18]=tiktok` + // social
-    `&fields[19]=paymentsEnabled&fields[20]=stripeOnboardingComplete&fields[21]=paymentButtons&fields[22]=hiddenLinks` +
+  const buildUrl = (s) =>
+    `${api}/api/bands/slug/${encodeURIComponent(s)}` +
+    `?fields[0]=slug&fields[1]=name&fields[2]=isBandNameInLogo&fields[3]=bio&fields[4]=biotagline` +
+    `&fields[5]=websitelink&fields[6]=websitelinktext` +
+    `&fields[7]=youtube&fields[8]=youtubeMusic&fields[9]=spotify&fields[10]=appleMusic` + // streaming
+    `&fields[11]=reverbnation&fields[12]=soundcloud&fields[13]=bandcamp&fields[14]=twitch&fields[15]=deezer` +
+    `&fields[16]=facebook&fields[17]=instagram&fields[18]=twitter&fields[19]=tiktok` + // social
+    `&fields[20]=paymentsEnabled&fields[21]=stripeOnboardingComplete&fields[22]=paymentButtons&fields[23]=hiddenLinks` +
     `&populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
     `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +
@@ -975,9 +995,29 @@ async function fetchBandData() {
     `&populate[events][fields][0]=date&populate[events][fields][1]=slug&populate[events][fields][2]=city&populate[events][fields][3]=state&populate[events][fields][4]=venue`;
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    let res = await fetch(buildUrl(slug), { cache: "no-store" });
+
+    // If someone hits an old hyphenated URL, retry with canonical no-hyphen slug.
+    if (res.status === 404 && canonicalSlug && canonicalSlug !== slug) {
+      res = await fetch(buildUrl(canonicalSlug), { cache: "no-store" });
+      if (res.ok) {
+        // Redirect to canonical, no-hyphen URL.
+        router.replace({ path: `/${canonicalSlug}`, query: route.query });
+      }
+    }
+
+    if (res.status === 404) {
+      band.value = null;
+      notFound.value = true;
+      heroReady.value = true;
+      return;
+    }
+
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
     const data = await res.json();
     band.value = data;
+
     // Peek at shape so we know how to unwrap
 console.log('[BAND PAYLOAD]', band.value);
 
@@ -1026,6 +1066,8 @@ events.value = evts.map(e => ({
   } catch (e) {
     console.error("Fetch band error:", e);
     heroReady.value = true; // don’t hang the page on errors
+    band.value = null;
+    notFound.value = true;
   } finally {
     console.log(events.value, band.value , 'bandpayload')
     loadingData.value = false;
