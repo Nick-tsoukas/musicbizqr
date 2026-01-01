@@ -358,9 +358,86 @@
           </div>
         </section>
 
-        <section v-if="canShowPayments" class="mt-10">
-          
+        <section v-if="canShowMerchConcierge" class="mt-10">
+          <div class="border border-violet-500/40 bg-gradient-to-br from-violet-900/40 to-black/40 rounded-2xl p-5">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="text-2xl md:text-3xl font-bold text-white">Skip the merch line</div>
+                <div class="text-white/80 mt-1">Show-only merch • Pick up after the set</div>
+                <div v-if="merchPickupLine" class="text-violet-200 mt-2">
+                  Pickup: <span class="text-white">{{ merchPickupLine }}</span>
+                </div>
+              </div>
+            </div>
 
+            <div v-if="merchError" class="text-red-300 mt-3">{{ merchError }}</div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div
+                v-for="(item, i) in merchItems"
+                :key="i"
+                class="border border-white/10 bg-black/30 rounded-xl overflow-hidden"
+              >
+                <div class="w-full h-44 bg-white/5">
+                  <img
+                    v-if="item.imageUrl"
+                    :src="item.imageUrl"
+                    :alt="item.title"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div class="p-4">
+                  <div class="text-white font-semibold text-lg">{{ item.title }}</div>
+                  <div v-if="item.description" class="text-white/70 text-sm mt-1">
+                    {{ item.description }}
+                  </div>
+                  <div class="text-white mt-3 font-semibold">
+                    {{ formatUsd(item.priceCents) }}
+                  </div>
+
+                  <div v-if="item.sizesEnabled" class="mt-3">
+                    <div class="text-white/70 text-sm mb-2">Select a size</div>
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        v-for="sz in item.availableSizes"
+                        :key="sz"
+                        type="button"
+                        class="px-3 py-2 rounded-md border border-white/20 text-white disabled:opacity-50"
+                        :class="
+                          selectedMerchSizeByIndex?.[i] === sz
+                            ? 'bg-violet-900/60 hover:bg-violet-900/60 focus:bg-violet-900/60'
+                            : 'hover:bg-white/5 focus:bg-white/5'
+                        "
+                        :disabled="Number(item.sizeStock?.[sz] || 0) <= 0"
+                        @click="selectMerchSize(i, sz)"
+                      >
+                        {{ sz }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div v-else class="mt-3 text-white/70 text-sm">
+                    <span v-if="item.availableQty > 0">Remaining: {{ item.availableQty }}</span>
+                    <span v-else>Sold out</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="w-full mt-4 px-4 py-3 rounded-lg font-semibold text-white border border-violet-400/40 bg-violet-700/40 hover:bg-violet-700/55 disabled:opacity-60"
+                    :disabled="!canBuyMerchItem(i) || merchCheckoutLoadingIndex === i"
+                    @click="startMerchCheckout(i)"
+                  >
+                    <span v-if="merchCheckoutLoadingIndex === i">Loading…</span>
+                    <span v-else>{{ isMerchSoldOut(i) ? "Sold out" : "Reserve & Pay" }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section v-if="canShowPayments" class="mt-10">
           <div v-if="paymentError" class="text-red-400 mb-3">
             {{ paymentError }}
           </div>
@@ -499,6 +576,72 @@ const paymentError = ref("");
 const paymentLoadingKey = ref(null);
 const paymentAmountByKey = ref({});
 
+const merchError = ref("");
+const merchCheckoutLoadingIndex = ref(null);
+const selectedMerchSizeByIndex = ref({});
+
+function selectMerchSize(index, size) {
+  const next = { ...(selectedMerchSizeByIndex.value || {}) };
+  next[index] = size;
+  selectedMerchSizeByIndex.value = next;
+}
+
+const merchConfig = computed(() => {
+  const mc = band.value?.data?.merchConcierge;
+  if (!mc || typeof mc !== "object") return null;
+  return mc;
+});
+
+const merchPickupLine = computed(() => {
+  const v = merchConfig.value?.pickupInstructions;
+  return v ? String(v) : "";
+});
+
+const merchItems = computed(() => {
+  const items = Array.isArray(merchConfig.value?.merchItems)
+    ? merchConfig.value.merchItems
+    : [];
+
+  return items
+    .slice(0, 3)
+    .map((raw) => {
+      const sizesEnabled = raw?.sizesEnabled === true;
+      const sizeStock = raw?.sizeStock && typeof raw.sizeStock === "object" ? raw.sizeStock : {};
+      const availableSizes = sizesEnabled
+        ? Object.keys(sizeStock)
+            .filter((k) => Number(sizeStock?.[k] || 0) > 0)
+            .map(String)
+        : [];
+
+      return {
+        title: String(raw?.title || ""),
+        description: String(raw?.description || ""),
+        imageUrl: raw?.imageUrl ? String(raw.imageUrl) : null,
+        priceCents: Number(raw?.priceCents || 0),
+        sizesEnabled,
+        availableQty: Number(raw?.availableQty || 0),
+        sizeStock,
+        availableSizes,
+      };
+    })
+    .filter((x) => !!x.title && Number(x.priceCents || 0) > 0);
+});
+
+const canShowMerchConcierge = computed(() => {
+  const mc = merchConfig.value;
+  if (!mc) return false;
+  if (mc.enabled !== true) return false;
+  if (mc.staffReadyConfirmed !== true) return false;
+  if (!merchPickupLine.value.trim()) return false;
+
+  // Require Stripe connect to be ready (same as payments)
+  const enabled = band.value?.data?.paymentsEnabled;
+  const onboarded = band.value?.data?.stripeOnboardingComplete;
+  if (enabled === false || onboarded === false) return false;
+
+  return merchItems.value.length > 0;
+});
+
 const enabledPaymentButtons = computed(() => {
   const btns = band.value?.data?.paymentButtons;
   if (!Array.isArray(btns)) return [];
@@ -528,6 +671,69 @@ function initPaymentDefaults() {
     }
   }
   paymentAmountByKey.value = next;
+}
+
+function formatUsd(cents) {
+  const n = Number(cents || 0);
+  return `$${(n / 100).toFixed(2)}`;
+}
+
+function isMerchSoldOut(index) {
+  const item = merchItems.value?.[index];
+  if (!item) return true;
+  if (item.sizesEnabled) {
+    return item.availableSizes.length === 0;
+  }
+  return Number(item.availableQty || 0) <= 0;
+}
+
+function canBuyMerchItem(index) {
+  const item = merchItems.value?.[index];
+  if (!item) return false;
+  if (isMerchSoldOut(index)) return false;
+
+  if (item.sizesEnabled) {
+    const sz = selectedMerchSizeByIndex.value?.[index] || null;
+    if (!sz) return false;
+    return Number(item.sizeStock?.[sz] || 0) > 0;
+  }
+
+  return Number(item.availableQty || 0) > 0;
+}
+
+async function startMerchCheckout(index) {
+  merchError.value = "";
+  merchCheckoutLoadingIndex.value = index;
+
+  try {
+    const item = merchItems.value?.[index];
+    if (!item) throw new Error("Item not found");
+
+    const bandSlug = currentBandSlug.value;
+    if (!bandSlug) throw new Error("Band not loaded");
+
+    const body = {
+      bandSlug,
+      itemSlotIndex: index + 1,
+      selectedSize: item.sizesEnabled
+        ? (selectedMerchSizeByIndex.value?.[index] || null)
+        : null,
+    };
+
+    const res = await $fetch("/api/merch-concierge/create-checkout", {
+      method: "POST",
+      body,
+    });
+
+    const url = res?.checkoutUrl;
+    if (!url) throw new Error("Checkout URL missing");
+
+    window.location.href = url;
+  } catch (e) {
+    merchError.value = e?.data?.message || e?.message || String(e);
+  } finally {
+    merchCheckoutLoadingIndex.value = null;
+  }
 }
 
 async function startCheckout(btn) {
@@ -1056,7 +1262,7 @@ async function fetchBandData() {
     `&fields[7]=youtube&fields[8]=youtubeMusic&fields[9]=spotify&fields[10]=appleMusic` + // streaming
     `&fields[11]=reverbnation&fields[12]=soundcloud&fields[13]=bandcamp&fields[14]=twitch&fields[15]=deezer` +
     `&fields[16]=facebook&fields[17]=instagram&fields[18]=twitter&fields[19]=tiktok` + // social
-    `&fields[20]=paymentsEnabled&fields[21]=stripeOnboardingComplete&fields[22]=paymentButtons&fields[23]=hiddenLinks` +
+    `&fields[20]=paymentsEnabled&fields[21]=stripeOnboardingComplete&fields[22]=paymentButtons&fields[23]=hiddenLinks&fields[24]=merchConcierge` +
     `&populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
     `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +

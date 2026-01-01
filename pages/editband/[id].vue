@@ -45,6 +45,194 @@
           </div>
         </div>
 
+        <div class="bg-[#fff] rounded-md my-10">
+          <div
+            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-violet-500 to-purple-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+          >
+            <h2 class="font-semibold text-white text-2xl">Merch Concierge (Show-only pickup)</h2>
+          </div>
+
+          <div class="p-4 space-y-4">
+            <label for="mc-enabled" class="flex items-center justify-between gap-4 cursor-pointer select-none">
+              <div class="text-black">
+                <div class="font-semibold">Enable Merch Concierge</div>
+                <div class="text-sm text-gray-700 mt-1">
+                  This shows a premium merch section at the top of your band page.
+                </div>
+              </div>
+              <input
+                id="mc-enabled"
+                type="checkbox"
+                v-model="mcEnabled"
+                class="h-5 w-5 text-purple-600 border-gray-300 rounded"
+              />
+            </label>
+
+            <div class="text-sm text-gray-700 mt-2 mb-8">
+              <div>Let fans buy merch during the show and pick it up later — skipping the merch line.</div>
+              <div>Fans pay on their phone and show a confirmation at pickup.</div>
+            </div>
+
+            <div v-if="mcEnabled" class="space-y-4">
+              <div class="mdc-text-field">
+                <textarea
+                  id="mc-pickup"
+                  class="mdc-text-field__input"
+                  v-model="mcPickupInstructions"
+                  placeholder=" "
+                  required
+                ></textarea>
+                <label class="mdc-floating-label" for="mc-pickup">
+                  Pickup Instructions (required)
+                </label>
+                <div class="mdc-line-ripple"></div>
+                <div class="text-xs text-gray-700 mt-2">
+                  Example: “Pickup at the merch table after the set — show this screen to staff.”
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <input
+                  id="mc-ready"
+                  type="checkbox"
+                  v-model="mcStaffReadyConfirmed"
+                  class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded"
+                />
+                <label for="mc-ready" class="text-black select-none">
+                  <div class="font-semibold">We have reserved inventory and told staff/venue about pickup</div>
+                  <div class="text-sm text-gray-700 mt-1">
+                    This must be checked for the checkout button to work.
+                  </div>
+                </label>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4">
+                <div
+                  v-for="(item, idx) in mcItems"
+                  :key="idx"
+                  class="border border-black/10 rounded-md p-4"
+                >
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="text-black font-semibold">Item {{ idx + 1 }}</div>
+                    <button
+                      type="button"
+                      class="text-sm text-red-600"
+                      @click="resetMcItem(idx)"
+                    >
+                      Remove item
+                    </button>
+                  </div>
+
+                  <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="mdc-text-field">
+                      <input
+                        :id="`mc-title-${idx}`"
+                        v-model="item.title"
+                        type="text"
+                        class="mdc-text-field__input"
+                        placeholder=" "
+                      />
+                      <label class="mdc-floating-label" :for="`mc-title-${idx}`">Title</label>
+                      <div class="mdc-line-ripple"></div>
+                    </div>
+
+                    <div class="mdc-text-field">
+                      <input
+                        :id="`mc-price-${idx}`"
+                        type="text"
+                        inputmode="decimal"
+                        class="mdc-text-field__input"
+                        placeholder=" "
+                        v-model="mcPriceTextByIndex[idx]"
+                        @blur="commitMcPrice(idx)"
+                        @change="commitMcPrice(idx)"
+                      />
+                      <label class="mdc-floating-label" :for="`mc-price-${idx}`">Price (USD)</label>
+                      <div class="mdc-line-ripple"></div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                      <div class="text-xs text-gray-700 mb-2">Product image (optional)</div>
+                      <input
+                        :id="`mc-img-${idx}`"
+                        type="file"
+                        accept="image/*"
+                        class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                        @change="onMcImageFileChange(idx, $event)"
+                      />
+
+                      <div v-if="mcItemImagePreviewByIndex[idx] || item.imageUrl" class="mt-2">
+                        <img
+                          :src="mcItemImagePreviewByIndex[idx] || item.imageUrl"
+                          :alt="item.title || 'Product image'"
+                          class="w-full max-h-56 object-contain rounded-md border border-black/10"
+                        />
+                        <button
+                          type="button"
+                          class="mt-2 text-sm text-red-600"
+                          @click="clearMcImage(idx)"
+                        >
+                          Remove image
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="mdc-text-field md:col-span-2 mt-4">
+                      <textarea
+                        :id="`mc-desc-${idx}`"
+                        v-model="item.description"
+                        class="mdc-text-field__input"
+                        placeholder=" "
+                      ></textarea>
+                      <label class="mdc-floating-label" :for="`mc-desc-${idx}`">Description</label>
+                      <div class="mdc-line-ripple"></div>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 flex items-center gap-3">
+                    <input
+                      :id="`mc-sizes-${idx}`"
+                      type="checkbox"
+                      v-model="item.sizesEnabled"
+                      class="h-4 w-4 text-purple-600 border-gray-300 rounded"
+                    />
+                    <label :for="`mc-sizes-${idx}`" class="text-black select-none">
+                      Sizes enabled
+                    </label>
+                  </div>
+
+                  <div v-if="!item.sizesEnabled" class="mt-3">
+                    <div class="text-xs text-black/70 mb-1">Available quantity</div>
+                    <input
+                      v-model.number="item.availableQty"
+                      type="number"
+                      step="1"
+                      min="0"
+                      class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                    />
+                  </div>
+
+                  <div v-else class="mt-3">
+                    <div class="text-xs text-black/70 mb-2">Size stock (set 0 for sold out)</div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                      <div v-for="sz in mcSizes" :key="sz">
+                        <div class="text-xs text-black/70 mb-1">{{ sz }}</div>
+                        <input
+                          v-model.number="item.sizeStock[sz]"
+                          type="number"
+                          step="1"
+                          min="0"
+                          class="w-full px-3 py-2 rounded-md bg-white border border-black/20 text-black"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Band Details Section -->
         <div class="bg-[#fff] rounded-md">
           <div
@@ -390,8 +578,7 @@
               </button>
 
               <!-- Optional: keep the legacy fields hidden for now
-       (remove this whole comment if you don't need them) -->
-              <!--
+       (remove this whole comment if you don't need them)
   <details class="text-white/70">
     <summary>Legacy platform / trackId (optional)</summary>
     <div class="mdc-text-field w-full mt-2">
@@ -421,17 +608,9 @@
       <div class="mdc-line-ripple"></div>
     </div>
   </details>
-  -->
+              -->
             </div>
-          </div>
-        </div>
 
-        <!-- Featured Video Section -->
-        <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Featured Video</h2>
           </div>
 
           <div class="p-4">
@@ -631,6 +810,143 @@ const streaming = ref({
 });
 
 const hiddenLinks = ref([]);
+
+// Merch Concierge config
+const mcSizes = ["S", "M", "L", "XL", "2XL"];
+const mcEnabled = ref(false);
+const mcPickupInstructions = ref("");
+const mcStaffReadyConfirmed = ref(false);
+const mcPriceTextByIndex = ref(["", "", ""]);
+const mcItemImageFiles = ref([null, null, null]);
+const mcItemImagePreviewByIndex = ref({});
+const mcItems = ref([
+  {
+    title: "",
+    description: "",
+    imageUrl: "",
+    priceCents: 0,
+    sizesEnabled: false,
+    availableQty: 0,
+    sizeStock: { S: 0, M: 0, L: 0, XL: 0, "2XL": 0 },
+  },
+  {
+    title: "",
+    description: "",
+    imageUrl: "",
+    priceCents: 0,
+    sizesEnabled: false,
+    availableQty: 0,
+    sizeStock: { S: 0, M: 0, L: 0, XL: 0, "2XL": 0 },
+  },
+  {
+    title: "",
+    description: "",
+    imageUrl: "",
+    priceCents: 0,
+    sizesEnabled: false,
+    availableQty: 0,
+    sizeStock: { S: 0, M: 0, L: 0, XL: 0, "2XL": 0 },
+  },
+]);
+
+function normalizeMerchConcierge(raw) {
+  const mc = raw && typeof raw === "object" ? raw : null;
+  if (!mc) return;
+
+  mcEnabled.value = mc.enabled === true;
+  mcPickupInstructions.value = mc.pickupInstructions ? String(mc.pickupInstructions) : "";
+  mcStaffReadyConfirmed.value = mc.staffReadyConfirmed === true;
+
+  const items = Array.isArray(mc.merchItems) ? mc.merchItems : [];
+  const next = mcItems.value.map((d, i) => {
+    const it = items[i] || {};
+    const sizesEnabled = it.sizesEnabled === true;
+    const sizeStock = it.sizeStock && typeof it.sizeStock === "object" ? it.sizeStock : {};
+
+    return {
+      ...d,
+      title: it.title ? String(it.title) : "",
+      description: it.description ? String(it.description) : "",
+      imageUrl: it.imageUrl ? String(it.imageUrl) : "",
+      priceCents: Number(it.priceCents || 0),
+      sizesEnabled,
+      availableQty: Number(it.availableQty || 0),
+      sizeStock: {
+        S: Number(sizeStock.S || 0),
+        M: Number(sizeStock.M || 0),
+        L: Number(sizeStock.L || 0),
+        XL: Number(sizeStock.XL || 0),
+        "2XL": Number(sizeStock["2XL"] || 0),
+      },
+    };
+  });
+
+  mcItems.value = next;
+
+  mcPriceTextByIndex.value = next.map((it) => formatMcPriceDollars(it.priceCents));
+}
+
+function formatMcPriceDollars(priceCents) {
+  const n = Number(priceCents || 0);
+  return (n / 100).toFixed(2);
+}
+
+function parseMcPriceToCents(value) {
+  const s = String(value == null ? "" : value).trim();
+  if (!s) return 0;
+  const num = Number(s);
+  if (!Number.isFinite(num) || num < 0) return 0;
+  return Math.round(num * 100);
+}
+
+function commitMcPrice(idx) {
+  const v = mcPriceTextByIndex.value?.[idx];
+  const cents = parseMcPriceToCents(v);
+  mcItems.value[idx].priceCents = cents;
+  mcPriceTextByIndex.value[idx] = formatMcPriceDollars(cents);
+}
+
+function onMcImageFileChange(idx, e) {
+  const f = e?.target?.files?.[0] || null;
+  mcItemImageFiles.value[idx] = f;
+
+  const next = { ...(mcItemImagePreviewByIndex.value || {}) };
+  if (f) {
+    next[idx] = URL.createObjectURL(f);
+  } else {
+    delete next[idx];
+  }
+  mcItemImagePreviewByIndex.value = next;
+}
+
+function clearMcImage(idx) {
+  mcItemImageFiles.value[idx] = null;
+  mcItems.value[idx].imageUrl = "";
+  const next = { ...(mcItemImagePreviewByIndex.value || {}) };
+  delete next[idx];
+  mcItemImagePreviewByIndex.value = next;
+}
+
+function resetMcItem(idx) {
+  if (!confirm("Clear this merch item?")) return;
+
+  mcItems.value[idx] = {
+    title: "",
+    description: "",
+    imageUrl: "",
+    priceCents: 0,
+    sizesEnabled: false,
+    availableQty: 0,
+    sizeStock: { S: 0, M: 0, L: 0, XL: 0, "2XL": 0 },
+  };
+
+  mcItemImageFiles.value[idx] = null;
+  const next = { ...(mcItemImagePreviewByIndex.value || {}) };
+  delete next[idx];
+  mcItemImagePreviewByIndex.value = next;
+
+  mcPriceTextByIndex.value[idx] = "";
+}
 
 function normalizeHiddenLinks(v) {
   if (Array.isArray(v)) return v.map(String).filter(Boolean);
@@ -889,6 +1205,8 @@ async function fetchBand() {
 
     paymentButtons.value = mergePaymentButtons(attrs.paymentButtons);
 
+    normalizeMerchConcierge(attrs.merchConcierge);
+
     // Singlesong component + existing file
     if (attrs.singlesong) {
       const ss = attrs.singlesong;
@@ -964,6 +1282,13 @@ async function submitForm() {
   const id = route.params.id;
 
   try {
+    // Ensure merch price inputs are committed to cents
+    for (let i = 0; i < mcItems.value.length; i++) {
+      const cents = parseMcPriceToCents(mcPriceTextByIndex.value?.[i]);
+      mcItems.value[i].priceCents = cents;
+      mcPriceTextByIndex.value[i] = formatMcPriceDollars(cents);
+    }
+
     // 1) Upload new image if chosen
     let newImageId = null;
     if (bandImgFile.value) {
@@ -998,6 +1323,33 @@ async function submitForm() {
       const suj = await su.json();
       if (!su.ok) throw suj;
       newSongId = suj[0]?.id ?? null;
+    }
+
+    // 2b) Upload merch concierge images (stored as absolute URL in merchConcierge JSON)
+    if (mcEnabled.value) {
+      for (let i = 0; i < mcItemImageFiles.value.length; i++) {
+        const f = mcItemImageFiles.value[i];
+        if (!f) continue;
+
+        const fm3 = new FormData();
+        fm3.append("files", f, f.name);
+        const mu = await fetch(`${config.public.strapiUrl}/api/upload`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token.value}` },
+          body: fm3,
+        });
+        const muj = await mu.json();
+        if (!mu.ok) throw muj;
+
+        const uploadedUrl = muj?.[0]?.url || null;
+        if (uploadedUrl) {
+          const base = String(config.public.strapiUrl || "").replace(/\/+$/, "");
+          const u = String(uploadedUrl);
+          mcItems.value[i].imageUrl = u.startsWith("http")
+            ? u
+            : base + (u.startsWith("/") ? u : `/${u}`);
+        }
+      }
     }
 
     // Optional: require a real <iframe> when in embed mode and user pasted something
@@ -1063,6 +1415,26 @@ async function submitForm() {
       websitelinktext: websitelinktext.value || null,
       users_permissions_user: user.value.id,
       hiddenLinks: hiddenLinks.value,
+      merchConcierge: mcEnabled.value
+        ? {
+            enabled: true,
+            pickupInstructions: String(mcPickupInstructions.value || "").trim(),
+            staffReadyConfirmed: mcStaffReadyConfirmed.value === true,
+            merchItems: mcItems.value.map((it) => {
+              const sizesEnabled = it.sizesEnabled === true;
+              const sizeStock = sizesEnabled ? (it.sizeStock || {}) : {};
+              return {
+                title: String(it.title || "").trim(),
+                description: String(it.description || "").trim(),
+                imageUrl: String(it.imageUrl || "").trim(),
+                priceCents: Number(it.priceCents || 0),
+                sizesEnabled,
+                availableQty: sizesEnabled ? null : Number(it.availableQty || 0),
+                sizeStock: sizesEnabled ? sizeStock : null,
+              };
+            }),
+          }
+        : { enabled: false },
       paymentButtons: paymentButtons.value.map((b) => {
         const mode = sanitizePricingMode(b.pricingMode);
         const minAmount = mode === "min" ? Number(b.minAmount || 5) : null;
