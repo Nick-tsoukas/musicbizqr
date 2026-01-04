@@ -114,13 +114,33 @@
             v-if="band.data.singlesong.isEmbed && safeEmbedHtml"
             class="w-full"
           >
-            <div class="relative w-full h-64 rounded-lg overflow-hidden">
+            <div
+              class="relative w-full h-64 rounded-lg overflow-hidden"
+              :class="{ 'embed-shake': embedShake }"
+            >
               <div
                 id="embedPlayerWrapper"
                 ref="embedPlayerWrapperEl"
                 class="absolute inset-0 w-full h-full"
                 v-html="safeEmbedHtml"
               ></div>
+
+              <div
+                v-if="!hasTrackedEmbedClick"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-black/35 text-white text-sm font-semibold"
+                @click.prevent.stop="onEmbedOverlayTap"
+              >
+                Tap to play
+              </div>
+
+              <div
+                v-if="showEmbedTapAgainHint"
+                class="absolute inset-x-0 bottom-2 z-20 flex justify-center pointer-events-none"
+              >
+                <div class="px-3 py-1 rounded-md bg-black/70 text-white text-xs">
+                  Tap again to play
+                </div>
+              </div>
             </div>
           </div>
 
@@ -546,6 +566,14 @@ import twitterIcon from "@/assets/twitter.png";
 const hasTrackedEmbedClick = ref(false);
 const embedPlayerWrapperEl = ref(null);
 const embedIframeEl = ref(null);
+const showEmbedTapAgainHint = ref(false);
+const embedShake = ref(false);
+let embedTapAgainTimeout = null;
+let embedShakeTimeout = null;
+let onEmbedWrapperPointerDown = null;
+let onEmbedWrapperMouseDown = null;
+let onEmbedWrapperTouchStart = null;
+let onEmbedWrapperPointerEnter = null;
 let onEmbedIframeFocus = null;
 let onEmbedIframePointerDown = null;
 let onEmbedIframeTouchStart = null;
@@ -983,7 +1011,56 @@ function handleFirstClick() {
   }
 }
 
+function onEmbedOverlayTap() {
+  if (hasTrackedEmbedClick.value) return;
+
+  embedShake.value = true;
+  if (embedShakeTimeout) clearTimeout(embedShakeTimeout);
+  embedShakeTimeout = setTimeout(() => {
+    embedShake.value = false;
+    embedShakeTimeout = null;
+  }, 400);
+
+  handleFirstClick();
+
+  showEmbedTapAgainHint.value = true;
+  if (embedTapAgainTimeout) clearTimeout(embedTapAgainTimeout);
+  embedTapAgainTimeout = setTimeout(() => {
+    showEmbedTapAgainHint.value = false;
+    embedTapAgainTimeout = null;
+  }, 2000);
+}
+
 function detachEmbedIframeListeners() {
+  if (embedPlayerWrapperEl.value && onEmbedWrapperPointerDown) {
+    embedPlayerWrapperEl.value.removeEventListener(
+      "pointerdown",
+      onEmbedWrapperPointerDown,
+      true
+    );
+  }
+  if (embedPlayerWrapperEl.value && onEmbedWrapperMouseDown) {
+    embedPlayerWrapperEl.value.removeEventListener(
+      "mousedown",
+      onEmbedWrapperMouseDown,
+      true
+    );
+  }
+  if (embedPlayerWrapperEl.value && onEmbedWrapperTouchStart) {
+    embedPlayerWrapperEl.value.removeEventListener(
+      "touchstart",
+      onEmbedWrapperTouchStart,
+      true
+    );
+  }
+  if (embedPlayerWrapperEl.value && onEmbedWrapperPointerEnter) {
+    embedPlayerWrapperEl.value.removeEventListener(
+      "pointerenter",
+      onEmbedWrapperPointerEnter,
+      true
+    );
+  }
+
   if (embedIframeEl.value && onEmbedIframeFocus) {
     embedIframeEl.value.removeEventListener("focus", onEmbedIframeFocus, true);
   }
@@ -1037,6 +1114,10 @@ function detachEmbedIframeListeners() {
     embedActivePollTimeout = null;
   }
   embedIframeEl.value = null;
+  onEmbedWrapperPointerDown = null;
+  onEmbedWrapperMouseDown = null;
+  onEmbedWrapperTouchStart = null;
+  onEmbedWrapperPointerEnter = null;
   onEmbedIframeFocus = null;
   onEmbedIframePointerDown = null;
   onEmbedIframeTouchStart = null;
@@ -1059,10 +1140,22 @@ async function attachEmbedIframeListeners() {
   const iframe = wrapper.querySelector("iframe");
   if (!iframe) return;
 
-  // avoid double-binding if Nuxt re-renders
-  if (embedIframeEl.value === iframe && onEmbedIframeFocus) return;
-
+  // Always detach first to avoid stale handlers if Nuxt re-renders.
   detachEmbedIframeListeners();
+
+  // Wrapper-level listeners (more reliable across cross-origin iframe providers)
+  onEmbedWrapperPointerDown = () => handleFirstClick();
+  onEmbedWrapperMouseDown = () => handleFirstClick();
+  onEmbedWrapperTouchStart = () => handleFirstClick();
+  onEmbedWrapperPointerEnter = () => {
+    embedHovering = true;
+    lastEmbedHoverAt = Date.now();
+  };
+
+  wrapper.addEventListener("pointerdown", onEmbedWrapperPointerDown, true);
+  wrapper.addEventListener("mousedown", onEmbedWrapperMouseDown, true);
+  wrapper.addEventListener("touchstart", onEmbedWrapperTouchStart, true);
+  wrapper.addEventListener("pointerenter", onEmbedWrapperPointerEnter, true);
 
   embedIframeEl.value = iframe;
   // Some providers/UA combos won't focus the iframe unless it is explicitly focusable.
@@ -1152,6 +1245,15 @@ onBeforeUnmount(() => {
   if (savedConfirmationTimeout) {
     clearTimeout(savedConfirmationTimeout);
     savedConfirmationTimeout = null;
+  }
+
+  if (embedTapAgainTimeout) {
+    clearTimeout(embedTapAgainTimeout);
+    embedTapAgainTimeout = null;
+  }
+  if (embedShakeTimeout) {
+    clearTimeout(embedShakeTimeout);
+    embedShakeTimeout = null;
   }
 });
 
@@ -1486,6 +1588,31 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.embed-shake {
+  animation: embedShake 0.4s ease-in-out;
+}
+
+@keyframes embedShake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .embed-container {
   position: relative;
   width: 100%;
