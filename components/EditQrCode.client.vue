@@ -453,7 +453,7 @@ const qrMargin = ref(4)      // quiet zone (modules)
 
 const imageSettings = reactive({
   src: "",
-  imageSize: 0.2,
+  imageSize: 0.4,
   margin: 0,
   crossOrigin: "anonymous",
 })
@@ -559,7 +559,7 @@ async function initializeVariables() {
 
   imageSettings.src =
     data.options?.imageOptions?.src || data.options?.image || ""
-  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.7
+  imageSettings.imageSize = data.options?.imageOptions?.imageSize || 0.4
   imageSettings.margin = data.options?.imageOptions?.margin || 0
   imageSettings.crossOrigin = "anonymous"
 
@@ -690,7 +690,7 @@ const handleImageUpload = (event) => {
   reader.onload = (e) => {
     imageSettings.src = e.target.result
     if (qrCode.value) {
-      qrCode.value.update({ image: imageSettings.src })
+      qrCode.value.update(getQRCodeOptions())
     }
   }
   reader.readAsDataURL(file)

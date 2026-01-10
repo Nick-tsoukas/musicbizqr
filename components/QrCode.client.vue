@@ -362,7 +362,7 @@ const cornersDotType = ref('square')
 
 const imageSettings = reactive({
   src: '',
-  imageSize: 0.2,
+  imageSize: 0.4,
   margin: 0,
   crossOrigin: 'anonymous'
 })

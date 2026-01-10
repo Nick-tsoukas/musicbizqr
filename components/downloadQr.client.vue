@@ -27,11 +27,15 @@
           </button>
         </div>
 
-        <!-- Warning if no options -->
-        <div
-          v-if="!qrInstance && (!qrOptions || !qrOptions.data)"
-          class="px-5 py-3 bg-amber-500/10 text-amber-300 text-sm"
-        >
+        <!-- Loading / Warning states -->
+        <div v-if="isLoading" class="px-5 py-3 bg-white/5 text-white/80 text-sm">
+          <div class="flex items-center gap-3">
+            <span class="inline-block h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></span>
+            <span>Loading QR…</span>
+          </div>
+        </div>
+
+        <div v-else-if="showMissingOptionsWarning" class="px-5 py-3 bg-amber-500/10 text-amber-300 text-sm">
           ⚠️ No <code>qr-options</code> (with a <code>data</code> field) were passed.
           Showing a test QR until you provide real options.
         </div>
@@ -43,12 +47,21 @@
           <!-- Preview (centered; borderless) -->
           <div class="flex items-center justify-center">
             <div
-              class="aspect-square w-[min(90vw,80vh)]"
+              class="relative aspect-square w-[min(90vw,80vh)]"
               :style="{
                 transform: `scale(${previewZoom / 100})`,
                 transformOrigin: 'center'
               }"
             >
+              <div
+                v-if="isLoading"
+                class="absolute inset-0 z-10 grid place-items-center bg-black/30 backdrop-blur-sm rounded"
+              >
+                <div class="flex flex-col items-center gap-3">
+                  <span class="inline-block h-10 w-10 rounded-full border-4 border-white/20 border-t-white animate-spin"></span>
+                  <div class="text-sm text-white/80">Loading preview…</div>
+                </div>
+              </div>
               <div
                 ref="previewEl"
                 class="w-full h-full
@@ -187,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed, nextTick } from 'vue'
 
 // Props from parent
 const props = defineProps({
@@ -216,11 +229,18 @@ const transparentBg = ref(false) // default unchecked
 const bgColor = ref('#FFFFFF')
 const downloading = ref(false)
 const errorMsg = ref('')
+const isLoading = ref(false)
+const showMissingOptionsWarning = ref(false)
 
 // Internal QR instance (if parent didn’t pass one)
 let qr = null
 let appended = false
 const PREVIEW_SIZE = 512 // fast render size for on-screen preview
+let missingOptsTimer = null
+
+const hasReadyOptions = computed(() => {
+  return !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))
+})
 
 // Normalize options: ensure imageOptions.src mirrors image if needed, and set preview size
 function withImageNormalized(opts) {
@@ -244,10 +264,15 @@ function close() {
 async function mountQr() {
   if (typeof window === 'undefined' || !previewEl.value) return
 
+  isLoading.value = true
+  errorMsg.value = ''
+
   const FALLBACK_DATA = 'https://example.com'
 
   // Do we have usable options?
   const hasOpts = !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))
+
+  showMissingOptionsWarning.value = !hasOpts
 
   // Base options (respect incoming options but force preview size)
   const rawOpts = hasOpts ? withImageNormalized(props.qrOptions) : {
@@ -289,24 +314,31 @@ async function mountQr() {
       qr = props.qrInstance
       try { await qr.update({ ...baseOpts }) } catch { /* noop for older builds */ }
     } else {
-      const { default: QRCodeStyling } = await import('qr-code-styling')
-      qr = new QRCodeStyling({ ...baseOpts })
+      if (!qr) {
+        const { default: QRCodeStyling } = await import('qr-code-styling')
+        qr = new QRCodeStyling({ ...baseOpts })
+      } else {
+        try { await qr.update({ ...baseOpts }) } catch { /* noop */ }
+      }
     }
   } catch (e) {
     console.error('[DownloadQr] Failed to create QR instance:', e)
     errorMsg.value = 'Could not create QR instance.'
+    isLoading.value = false
     return
   }
 
   // Append once
   try {
     if (!appended) {
+      previewEl.value.innerHTML = ''
       qr.append(previewEl.value)
       appended = true
     }
   } catch (e) {
     console.error('[DownloadQr] Failed to append QR to DOM:', e)
     errorMsg.value = 'Could not render into the modal.'
+    isLoading.value = false
     return
   }
 
@@ -322,6 +354,8 @@ async function mountQr() {
   } catch { /* older versions may ignore partial updates */ }
 
   await refreshPreview() // keeps your existing flow; safe to call
+
+  isLoading.value = false
 }
 console.log('[DownloadQr] PROPS:', {
   modelValue: props.modelValue,
@@ -441,18 +475,66 @@ watch(
   () => props.modelValue,
   async (open) => {
     if (open) {
-      fileName.value = props.defaultName || 'qr-code'
-      errorMsg.value = ''
-      appended = false // allow append if remounting
-      await mountQr()
+      await onOpen()
       setTimeout(() => modal.value?.focus?.(), 0)
+    } else {
+      onClose()
     }
   }
 )
 
+watch(
+  () => hasReadyOptions.value,
+  async (ready) => {
+    if (!props.modelValue || !ready) return
+    if (missingOptsTimer) {
+      clearTimeout(missingOptsTimer)
+      missingOptsTimer = null
+    }
+    await nextTick()
+    await mountQr()
+  }
+)
+
 onMounted(() => {
-  if (props.modelValue) mountQr()
+  if (props.modelValue) onOpen()
 })
+
+async function onOpen() {
+  fileName.value = props.defaultName || 'qr-code'
+  errorMsg.value = ''
+  appended = false // allow append if remounting
+
+  showMissingOptionsWarning.value = false
+  isLoading.value = true
+  await nextTick()
+
+  if (missingOptsTimer) {
+    clearTimeout(missingOptsTimer)
+    missingOptsTimer = null
+  }
+
+  if (hasReadyOptions.value) {
+    await mountQr()
+    return
+  }
+
+  // Grace period for async props: keep spinner and avoid warning flash.
+  missingOptsTimer = setTimeout(async () => {
+    if (!props.modelValue) return
+    if (hasReadyOptions.value) return
+    await mountQr()
+  }, 2500)
+}
+
+function onClose() {
+  if (missingOptsTimer) {
+    clearTimeout(missingOptsTimer)
+    missingOptsTimer = null
+  }
+  isLoading.value = false
+  showMissingOptionsWarning.value = false
+}
 </script>
 
 <style scoped>
