@@ -97,7 +97,11 @@
                 <span>Download</span>
               </button>
 
-              <button @click="editItem(qr.id, 'editqr')" class="action-button">
+              <button
+                v-if="!qr.isShared"
+                @click="editItem(qr.id, 'editqr')"
+                class="action-button"
+              >
                 <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
                 <span>Edit</span>
               </button>
@@ -111,6 +115,7 @@
               </button>
 
               <button
+                v-if="!qr.isShared"
                 @click="deleteItem(qr.id, 'qr')"
                 class="action-button text-red-400 hover:text-red-200"
               >
@@ -430,6 +435,8 @@ import { useRuntimeConfig } from "#imports";
 const specialEmails = [
   "mjc773@gmail.com",
   "nick.tsoukas101@gmail.com",
+  "info@rocksnaps.com",
+  "novamusic@aol.com",
   "partner@musicbizqr.com",
 ];
 const isSpecialUser = computed(() => {
@@ -437,10 +444,19 @@ const isSpecialUser = computed(() => {
   return specialEmails.includes(e);
 });
 
+const sharedViewEmails = ["info@rocksnaps.com", "novamusic@aol.com"];
+const sharedQrIds = computed(() => {
+  const e = (user.value?.email || "").toLowerCase();
+  if (!sharedViewEmails.includes(e)) return [];
+  return [46];
+});
+
 const maxQrAllowed = computed(() => (isSpecialUser.value ? 10 : 1));
 
+const ownedQrCount = computed(() => qrItems.value.filter((q) => !q.isShared).length);
+
 const canCreateMoreQrs = computed(
-  () => qrItems.value.length < maxQrAllowed.value
+  () => ownedQrCount.value < maxQrAllowed.value
 );
 
 const token = useStrapiToken();
@@ -694,8 +710,30 @@ const fetchData = async () => {
       fetchEventsLite(),
     ]);
 
+    const mergedQrs = [...qrsArr];
+
+    const extraIds = sharedQrIds.value || [];
+    if (extraIds.length) {
+      const sharedRows = await Promise.all(
+        extraIds.map((id) =>
+          findOne('qrs', id, {
+            fields: ['name'],
+            populate: { q_image: { fields: ['url'] } },
+          }).catch(() => null)
+        )
+      );
+
+      for (const resp of sharedRows) {
+        const row = resp?.data;
+        if (!row) continue;
+        if (mergedQrs.some((q) => String(q.id) === String(row.id))) continue;
+        row.__shared = true;
+        mergedQrs.push(row);
+      }
+    }
+
     // Set state in one go (minimize reactive churn)
-    qrs.value = qrsArr;
+    qrs.value = mergedQrs;
     bands.value = bandsArr;
     events.value = eventsArr;
 
@@ -805,6 +843,7 @@ const qrItems = computed(() =>
     imageUrl: qr.attributes.q_image?.data?.attributes?.url || "",
     // scans: qr.attributes.scans,
     raw: qr, // ← keep the full Strapi row so we can build QR options later
+    isShared: !!qr.__shared,
   }))
 );
 
