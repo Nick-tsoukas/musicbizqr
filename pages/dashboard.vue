@@ -440,13 +440,13 @@ const specialEmails = [
   "partner@musicbizqr.com",
 ];
 const isSpecialUser = computed(() => {
-  const e = (user.value?.email || "").toLowerCase();
+  const e = String(user.value?.email || "").toLowerCase().trim();
   return specialEmails.includes(e);
 });
 
 const sharedViewEmails = ["info@rocksnaps.com", "novamusic@aol.com"];
 const sharedQrIds = computed(() => {
-  const e = (user.value?.email || "").toLowerCase();
+  const e = String(user.value?.email || "").toLowerCase().trim();
   if (!sharedViewEmails.includes(e)) return [];
   return [46];
 });
@@ -699,7 +699,7 @@ watch(
 );
 
 const fetchData = async () => {
-  if (!user.value) return;
+  if (!user.value?.id) return;
   loading.value = true;
 
   try {
@@ -719,7 +719,10 @@ const fetchData = async () => {
           findOne('qrs', id, {
             fields: ['name'],
             populate: { q_image: { fields: ['url'] } },
-          }).catch(() => null)
+          }).catch((e) => {
+            console.warn('[Dashboard] Could not fetch shared QR', id, e)
+            return null
+          })
         )
       );
 
