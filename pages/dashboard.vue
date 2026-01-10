@@ -58,7 +58,7 @@
 
         <ul v-if="qrItems.length" class="px-6 py-6">
           <li
-            v-for="qr in qrItems"
+            v-for="(qr, idx) in qrItems"
             :key="qr.id"
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
@@ -70,9 +70,9 @@
               class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
               width="100"
               height="100"
-              loading="lazy"
+              :loading="idx === 0 ? 'eager' : 'lazy'"
               decoding="async"
-              fetchpriority="low"
+              :fetchpriority="idx === 0 ? 'high' : 'auto'"
               :modifiers="{ fit: 'cover' }"
             />
 
@@ -164,7 +164,7 @@
 
         <ul v-if="bandItems.length" class="px-6 py-6">
           <li
-            v-for="band in bandItems"
+            v-for="(band, idx) in bandItems"
             :key="band.id"
             class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
           >
@@ -175,9 +175,9 @@
               class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
               width="100"
               height="100"
-              loading="lazy"
+              :loading="idx === 0 ? 'eager' : 'lazy'"
               decoding="async"
-              fetchpriority="low"
+              :fetchpriority="idx === 0 ? 'high' : 'auto'"
               :modifiers="{ fit: 'cover' }"
             />
 
