@@ -699,7 +699,10 @@ watch(
 );
 
 const fetchData = async () => {
-  if (!user.value?.id) return;
+  if (!user.value?.id) {
+    loading.value = false;
+    return;
+  }
   loading.value = true;
 
   try {
@@ -933,6 +936,18 @@ onMounted(async () => {
     fetchTrialInfo();
   });
 });
+
+watch(
+  [() => user.value?.id, () => user.value?.email],
+  async ([id, email], oldValue) => {
+    const [prevId, prevEmail] = Array.isArray(oldValue) ? oldValue : [];
+    if (!id) return;
+    if (id !== prevId || email !== prevEmail) {
+      await fetchData();
+    }
+  },
+  { immediate: true }
+);
 
 const editItem = (id, page) => {
   router.push(`/${page}/${id}`);
