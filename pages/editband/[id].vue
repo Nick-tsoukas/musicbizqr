@@ -188,7 +188,34 @@
 
             <!-- Upload Mode -->
             <div v-if="singlesongType === 'upload'" class="space-y-4">
+              <!-- Show uploaded file info -->
+              <div v-if="singlesongFile || singlesongFileId" class="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <span class="text-white truncate block">{{ singlesongFile?.name || existingSongFilename || 'Audio file' }}</span>
+                    <span v-if="singlesongFile" class="text-white/50 text-sm">New file selected</span>
+                    <span v-else-if="singlesongFileId" class="text-white/50 text-sm">Current file</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  @click="deleteSong"
+                  class="text-red-400 hover:text-red-300 transition flex-shrink-0 ml-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Upload area (show when no file) -->
               <label
+                v-else
                 for="singlesong-file"
                 class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-purple-500/50 hover:bg-white/5 transition group"
               >
@@ -196,22 +223,36 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
                 <span class="text-white/50 group-hover:text-white/70 transition">Click to upload audio file</span>
+                <span class="text-white/30 text-sm mt-1">MP3, WAV, OGG supported</span>
                 <input
                   type="file"
                   id="singlesong-file"
                   class="hidden"
                   @change="handleSingleSongUpload"
                   accept="audio/*"
+                  :key="songInputKey"
                 />
               </label>
-              <button
-                type="button"
-                v-if="singlesongFileId"
-                @click="deleteSong"
-                class="text-red-400 hover:text-red-300 text-sm transition"
+
+              <!-- Replace file button (when file exists) -->
+              <label
+                v-if="singlesongFile || singlesongFileId"
+                for="singlesong-file-replace"
+                class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm cursor-pointer transition"
               >
-                Delete Song
-              </button>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Replace with different file</span>
+                <input
+                  type="file"
+                  id="singlesong-file-replace"
+                  class="hidden"
+                  @change="handleSingleSongUpload"
+                  accept="audio/*"
+                  :key="songInputKey"
+                />
+              </label>
             </div>
 
             <!-- Embed Mode -->
@@ -1144,6 +1185,8 @@ const singlesongPlatform = ref(""); // new
 const singlesongTrackId = ref(""); // new
 const singlesongFile = ref(null);
 const singlesongFileId = ref(null); // preserve existing file relation
+const existingSongFilename = ref(""); // store the existing song filename
+const songInputKey = ref(0); // key to reset file input
 
 const singlevideoYoutubeUrl = ref("");
 
@@ -1157,6 +1200,8 @@ function deleteSong() {
   singlesongEmbedHtml.value = ""; // NEW
   singlesongFile.value = null;
   singlesongFileId.value = null;
+  existingSongFilename.value = "";
+  songInputKey.value++; // reset file input
 }
 
 // Clear the video field and mark for removal on Save
@@ -1247,6 +1292,8 @@ async function fetchBand() {
         singlesongType.value = "upload";
       }
       singlesongFileId.value = ss.song?.data?.id || null;
+      // Store existing song filename for display
+      existingSongFilename.value = ss.song?.data?.attributes?.name || "";
     }
 
     // Singlevideo component
