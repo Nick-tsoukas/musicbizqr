@@ -253,71 +253,7 @@
 
               <!-- Right phones -->
               <div class="hidden md:flex md:col-span-5 justify-center gap-6">
-                <!-- Phone 1 -->
-                <div class="relative select-none">
-                  <div
-                    class="relative rounded-[2.4rem] border border-white/20 bg-neutral-900 shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
-                    style="width: 230px; height: 470px"
-                  >
-                    <div
-                      class="absolute inset-0 rounded-[2.4rem] pointer-events-none"
-                      style="
-                        box-shadow:
-                          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-                          inset 0 0 24px rgba(255, 255, 255, 0.06);
-                      "
-                    ></div>
-                    <div
-                      class="absolute left-1/2 -translate-x-1/2 top-1.5 h-5 w-24 rounded-b-2xl bg-black/80"
-                    ></div>
-                    <div
-                      class="absolute inset-[10px] rounded-[1.9rem] overflow-hidden bg-black"
-                    >
-                      <img
-                        :src="leftPhoneSrcResolved"
-                        :alt="leftPhoneAltResolved"
-                        class="h-full w-full object-contain p-[.5em]"
-                        style="aspect-ratio: 9/19.5"
-                      />
-                    </div>
-                    <div
-                      class="absolute bottom-2 left-1/2 -translate-x-1/2 h-1 w-24 rounded-full bg-white/10"
-                    ></div>
-                  </div>
-                </div>
-
-                <!-- Phone 2 -->
-                <div class="relative select-none">
-                  <div
-                    class="relative rounded-[2.4rem] border border-white/20 bg-neutral-900 shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
-                    style="width: 230px; height: 470px"
-                  >
-                    <div
-                      class="absolute inset-0 rounded-[2.4rem] pointer-events-none"
-                      style="
-                        box-shadow:
-                          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-                          inset 0 0 24px rgba(255, 255, 255, 0.06);
-                      "
-                    ></div>
-                    <div
-                      class="absolute left-1/2 -translate-x-1/2 top-1.5 h-5 w-24 rounded-b-2xl bg-black/80"
-                    ></div>
-                    <div
-                      class="absolute inset-[10px] rounded-[1.9rem] overflow-hidden bg-black"
-                    >
-                      <img
-                        :src="rightPhoneSrcResolved"
-                        :alt="rightPhoneAltResolved"
-                        class="h-full w-full object-contain p-[.5em]"
-                        style="aspect-ratio: 9/19.5"
-                      />
-                    </div>
-                    <div
-                      class="absolute bottom-2 left-1/2 -translate-x-1/2 h-1 w-24 rounded-full bg-white/10"
-                    ></div>
-                  </div>
-                </div>
+                <SmartLinkDemoPhone />
               </div>
             </div>
           </div>
@@ -365,39 +301,24 @@
           <h2
             class="text-4xl lg:text-4xl 2xl:text-5xl font-bold mt-0 pt-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
           >
-            Artist Smart Link &amp; Splash Page Example
+            Artist Smart Link &amp; Smart Link Page Example
           </h2>
           <p
             class="mt-4 max-w-3xl mx-auto text-center text-white/90 text-lg leading-relaxed"
           >
             When fans scan one of your
             <strong>MusicBizQR dynamic QR codes</strong>, they land on a
-            mobile-first <strong>artist splash page</strong> that pulls in your
+            mobile-first <strong>artist smart link page</strong> that pulls in your
             streaming platforms (Spotify, Apple Music, YouTube), socials,
             featured tracks or videos, and even
             <strong>merch &amp; ticket links</strong>—all in one tap-friendly
             layout you can update anytime and track in real time.
           </p>
 
-          <div class="w-full max-w-md md:max-w-2xl mx-auto">
+          <div class="w-full max-w-md md:max-w-5xl mx-auto">
             <section class="max-w-5xl mx-auto text-white my-12 overflow-hidden">
               <div class="grid md:grid-cols-1 gap-6 p-6 md:p-10 items-center">
-                <div
-                  class="flex justify-center w-auto image_gradient p-10 rounded-lg"
-                >
-                  <img
-                    src="public/screenshotappnovideo.png"
-                    alt="MusicBizQR dashboard"
-                    class="rounded-xl w-full max-w-md shadow-2xl"
-                    loading="lazy"
-                  />
-                </div>
-                <NuxtLink
-                  to="/burningthunder"
-                  class="mb-8 inline-block w-full text-center text-white font-semibold px-6 py-3 rounded-xl shadow bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 transition"
-                >
-                  Preview Page
-                </NuxtLink>
+                <SmartLinkDemoInline />
               </div>
             </section>
           </div>
@@ -456,11 +377,11 @@
           </div>
         </section>
 
-        <!-- Video section (unchanged) -->
-        <section
+        <!-- Video section (unchanged) removed for now -->
+        <!-- <section
           class="min-h-screen flex flex-col items-center justify-center pt-10 md:py-24"
-        >
-          <div class="text-center px-6 max-w-4xl">
+        > -->
+          <!-- <div class="text-center px-6 max-w-4xl">
             <h2 class="text-white font-bold text-4xl mb-4 lg:text-6xl">
               Showcase Your Music Videos &amp; Live Clips
             </h2>
@@ -473,9 +394,9 @@
                 musicians</span
               >
             </p>
-          </div>
+          </div> -->
 
-          <div class="w-full flex justify-center">
+          <!-- <div class="w-full flex justify-center">
             <div class="relative w-[90vw] md:w-[80vw] max-w-4xl">
               <div
                 v-if="!isPlaying"
@@ -502,8 +423,8 @@
                 allowfullscreen
               ></iframe>
             </div>
-          </div>
-        </section>
+          </div> -->
+        <!-- </section> -->
 
         <!-- Analytics chart (unchanged) -->
         <section class="w-[100vw] mx-auto">
@@ -729,6 +650,9 @@ import {
   useRuntimeConfig,
 } from "#imports";
 
+import SmartLinkDemoPhone from "@/components/demo/SmartLinkDemoPhone.vue";
+import SmartLinkDemoInline from "@/components/demo/SmartLinkDemoInline.vue";
+
 import deezer from "@/assets/dezzer.svg";
 
 const insights = [
@@ -739,7 +663,7 @@ const insights = [
 ];
 
 const index = ref(0);
-let timer;
+let timer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
   timer = setInterval(() => {
@@ -747,7 +671,7 @@ onMounted(() => {
   }, 5000);
 });
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   if (timer) clearInterval(timer);
 });
 
@@ -771,22 +695,6 @@ const approxTHB = computed(
  * Pass your screenshot images via props (optional).
  * Defaults are safe placeholders—replace with your own assets.
  */
-const props = defineProps<{
-  leftPhoneSrc?: string;
-  rightPhoneSrc?: string;
-  leftPhoneAlt?: string;
-  rightPhoneAlt?: string;
-}>();
-
-const leftPhoneSrcResolved =
-  props.leftPhoneSrc || "/images/improvescreenshot.png";
-const rightPhoneSrcResolved =
-  props.rightPhoneSrc || "/images/screentopdannynova.png";
-const leftPhoneAltResolved =
-  props.leftPhoneAlt || "/images/screentopdannynova.png";
-const rightPhoneAltResolved =
-  props.rightPhoneAlt || "/images/improvescreenshot.png";
-
 onMounted(() => {
   const locale = (
     navigator.language ||
@@ -799,7 +707,7 @@ onMounted(() => {
   }
 });
 
-const parallaxBg = ref(null);
+const parallaxBg = ref<HTMLElement | null>(null);
 const faqItems = ref([
   {
     question: "❓ What is a “dynamic QR code”?",
@@ -923,7 +831,7 @@ const imageToRender = ref(bandScreen);
 
 const config = useRuntimeConfig();
 
-const { data: featuredRes, error: featuredError } = await useAsyncData(
+const { data: featuredRes, error: featuredError } = await useAsyncData<any>(
   "featured-articles",
   () =>
     $fetch(`${config.public.strapiUrl}/api/seo-pages`, {
@@ -1061,30 +969,30 @@ useHead({
   script: [
     {
       type: "application/ld+json",
-      children: JSON.stringify(webSiteLd),
+      innerHTML: JSON.stringify(webSiteLd),
       key: "ld-website",
     },
     {
       type: "application/ld+json",
-      children: JSON.stringify(faqLd.value),
+      innerHTML: JSON.stringify(faqLd.value),
       key: "ld-faq",
     },
     {
       type: "application/ld+json",
-      children: JSON.stringify(orgLd),
+      innerHTML: JSON.stringify(orgLd),
       key: "ld-org",
     },
     {
       type: "application/ld+json",
-      children: JSON.stringify(appLd),
+      innerHTML: JSON.stringify(appLd),
       key: "ld-app",
     },
   ],
   __dangerouslyDisableSanitizersByTagID: {
-    "ld-website": ["children"],
-    "ld-org": ["children"],
-    "ld-app": ["children"],
-    "ld-faq": ["children"],
+    "ld-website": ["innerHTML"],
+    "ld-org": ["innerHTML"],
+    "ld-app": ["innerHTML"],
+    "ld-faq": ["innerHTML"],
   },
 });
 
@@ -1212,12 +1120,12 @@ const pricing = {
 
 const frequency = ref(pricing.frequencies[0]);
 
-const options = {
+const options: any = {
   fullScreen: { enable: false },
   style: {
     position: "absolute",
-    top: 0,
-    left: 0,
+    top: "0",
+    left: "0",
     width: "100vw",
     height: "100vh",
     zIndex: -1,

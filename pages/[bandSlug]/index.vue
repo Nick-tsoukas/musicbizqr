@@ -171,9 +171,16 @@
               :alt="`${band.data.name} video thumbnail`"
               class="absolute inset-0 w-full h-full object-cover"
             />
-            <div
-              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            ></div>
+            <div class="absolute inset-0 bg-black/30"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div
+                class="h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/15"
+              >
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           <div v-else class="embed-container rounded-lg overflow-hidden">
@@ -218,14 +225,14 @@
                 "
               >
                 <button
-                  class="w-full mb-6 custom-border text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
+                  class="w-full mb-6 custom-border text-white text-lg flex items-center gap-3 font-semibold px-4 py-4 shadow-lg rounded-md md:text-xl min-w-0"
                 >
                   <img
                     :src="platform.img"
-                    class="h-10 absolute left-2"
+                    class="h-8 w-8 shrink-0"
                     :alt="platform.label"
                   />
-                  {{ platform.label }}
+                  <span class="min-w-0 truncate">{{ platform.label }}</span>
                 </button>
               </a>
             </span>
@@ -250,14 +257,14 @@
                 "
               >
                 <button
-                  class="w-full custom-border mb-6 text-white text-lg flex justify-center font-semibold px-4 py-4 items-center relative shadow-lg rounded-md md:text-xl"
+                  class="w-full custom-border mb-6 text-white text-lg flex items-center gap-3 font-semibold px-4 py-4 shadow-lg rounded-md md:text-xl min-w-0"
                 >
                   <img
                     :src="platform.img"
-                    class="h-10 absolute left-2"
+                    class="h-8 w-8 shrink-0"
                     :alt="platform.label"
                   />
-                  {{ platform.label }}
+                  <span class="min-w-0 truncate">{{ platform.label }}</span>
                 </button>
               </a>
             </span>
@@ -273,9 +280,31 @@
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Upcoming Events
           </h2>
-          <div
-            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
-          >
+          <div class="space-y-3 md:hidden">
+            <div
+              v-for="event in upcomingEvents"
+              :key="event.id"
+              class="rounded-xl border border-white/10 bg-black/30 px-4 py-3"
+              @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+            >
+              <div class="text-purple-300 font-semibold">
+                {{ formatDate(event.date) }}
+              </div>
+              <div class="text-white font-semibold mt-1">
+                {{ event.city || 'N/A' }}, {{ event.state }}
+              </div>
+              <div class="text-white/80">{{ event.venue || 'N/A' }}</div>
+              <button
+                type="button"
+                class="mt-3 w-full custom-border text-white font-semibold px-4 py-3 rounded-md hover:bg-white/5 active:bg-white/10 transition-colors"
+                @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+              >
+                View Event
+              </button>
+            </div>
+          </div>
+
+          <div class="hidden md:block overflow-x-scroll md:overflow-hidden relative no-scrollbar">
             <table
               class="w-full table-auto bg-black text-white rounded-md shadow-lg"
             >
@@ -328,9 +357,31 @@
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Past Events
           </h2>
-          <div
-            class="overflow-x-scroll md:overflow-hidden relative no-scrollbar"
-          >
+          <div class="space-y-3 md:hidden">
+            <div
+              v-for="event in pastEvents"
+              :key="event.id"
+              class="rounded-xl border border-white/10 bg-black/30 px-4 py-3"
+              @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+            >
+              <div class="text-purple-300 font-semibold">
+                {{ formatDate(event.date) }}
+              </div>
+              <div class="text-white font-semibold mt-1">
+                {{ event.city || 'N/A' }}, {{ event.state }}
+              </div>
+              <div class="text-white/80">{{ event.venue || 'N/A' }}</div>
+              <button
+                type="button"
+                class="mt-3 w-full custom-border text-white font-semibold px-4 py-3 rounded-md hover:bg-white/5 active:bg-white/10 transition-colors"
+                @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+              >
+                View Event
+              </button>
+            </div>
+          </div>
+
+          <div class="hidden md:block overflow-x-scroll md:overflow-hidden relative no-scrollbar">
             <table
               class="w-full table-auto bg-black text-white rounded-md shadow-lg"
             >

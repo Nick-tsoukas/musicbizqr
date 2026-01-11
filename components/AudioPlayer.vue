@@ -47,7 +47,8 @@
         step="0.1"
         v-model="currentTime"
         @input="seekAudio"
-        class="progress-bar flex-1 mx-2"
+        class="progress-bar flex-1"
+        :style="progressBarStyle"
       />
 
       <!-- Total Time -->
@@ -111,6 +112,20 @@ const duration = ref(0);
 const volume = ref(1);
 const shuffle = ref(false);
 const repeat = ref(false);
+
+const progressPercent = computed(() => {
+  const d = Number(duration.value) || 0;
+  if (d <= 0) return 0;
+  const t = Number(currentTime.value) || 0;
+  return Math.max(0, Math.min(100, (t / d) * 100));
+});
+
+const progressBarStyle = computed(() => {
+  const p = progressPercent.value;
+  return {
+    '--progress': `${p}%`,
+  };
+});
 
 // Computed: build a “songs” array out of either album.attributes.songs or single-song data
 const songs = computed(() => {
@@ -352,18 +367,37 @@ const formatTime = (time) => {
 .now-playing {
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  gap: 0.75rem;
+  padding: 0.5rem;
+  gap: 0.5rem;
 }
 .album-cover {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   object-fit: cover;
   border-radius: 0.25rem;
 }
-.song-info { flex: 1; }
-.song-title { font-size: 1rem; font-weight: bold; margin: 0; }
-.artist-name { font-size: 0.875rem; color: #bbb; margin: 0; }
+.song-info {
+  flex: 1;
+  min-width: 0;
+}
+.song-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.artist-name {
+  font-size: 0.75rem;
+  line-height: 1.1;
+  color: #9ca3af;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* Controls + Progress Row */
 .controls-progress {
@@ -372,6 +406,7 @@ const formatTime = (time) => {
   padding: 0.5rem;
   width: 100%;
   box-sizing: border-box;
+  min-width: 0;
   /* ensure it's always visible */
 }
 .control-button {
@@ -402,20 +437,68 @@ const formatTime = (time) => {
 /* Slider */
 .progress-bar {
   flex: 1;
-  height: 4px;
-  background: #404040;
-  border-radius: 2px;
+  min-width: 0;
+  max-width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    #1db954 0%,
+    #1db954 var(--progress, 0%),
+    #404040 var(--progress, 0%),
+    #404040 100%
+  );
+  appearance: none;
   -webkit-appearance: none;
   margin: 0 0.5rem;
   cursor: pointer;
+  border: 0;
+  outline: none;
 }
+
+.progress-bar::-webkit-slider-runnable-track {
+  height: 8px;
+  background: transparent;
+  border-radius: 9999px;
+}
+
+.progress-bar::-moz-range-track {
+  height: 8px;
+  background: #404040;
+  border-radius: 9999px;
+}
+
+.progress-bar::-moz-range-progress {
+  height: 8px;
+  background: #1db954;
+  border-radius: 9999px;
+}
+
+@media (max-width: 360px) {
+  .controls-progress {
+    padding: 0.5rem;
+  }
+
+  .current-time,
+  .total-time {
+    width: 2.1rem;
+  }
+
+  .progress-bar {
+    margin: 0 0.35rem;
+  }
+}
+
 .progress-bar::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 12px;
   height: 12px;
   background: #1db954;
   border-radius: 50%;
+  border: 0;
+  margin-top: -2px;
 }
+
 .progress-bar::-moz-range-thumb {
   width: 12px;
   height: 12px;
