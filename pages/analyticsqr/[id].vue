@@ -16,6 +16,13 @@
       </NuxtLink>
     </div>
 
+    <!-- MBQ Pulse Card -->
+    <MbqPulseCard
+      :pulse="pulseData"
+      :loading="pulseLoading"
+      :range-label="rangeLabel"
+    />
+
     <!-- Summary Cards -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-3">
@@ -285,6 +292,10 @@ const rollups = ref<any>(null)
 const geoList = ref<any[]>([])
 const qrInfo = ref({ name: '', id: null })
 
+// Pulse data
+const pulseData = ref<any>(null)
+const pulseLoading = ref(true)
+
 const scansCanvas = ref<HTMLCanvasElement | null>(null)
 let scansChart: any = null
 
@@ -344,9 +355,24 @@ async function fetchGeo() {
   }
 }
 
+async function fetchPulse() {
+  pulseLoading.value = true
+  try {
+    const data = await client('/analytics/pulse', {
+      params: { entityType: 'qr', entityId: qrId, range: `${selectedRange.value}d` }
+    })
+    pulseData.value = data?.pulse || null
+  } catch (err) {
+    console.error('Failed to fetch pulse:', err)
+    pulseData.value = null
+  } finally {
+    pulseLoading.value = false
+  }
+}
+
 async function loadData() {
   isLoading.value = true
-  await Promise.all([fetchQrInfo(), fetchRollups(), fetchGeo()])
+  await Promise.all([fetchQrInfo(), fetchRollups(), fetchGeo(), fetchPulse()])
   isLoading.value = false
   await nextTick()
   renderScansChart()
@@ -407,7 +433,7 @@ onMounted(loadData)
 
 watch(selectedRange, async () => {
   isRefreshing.value = true
-  await Promise.all([fetchRollups(), fetchGeo()])
+  await Promise.all([fetchRollups(), fetchGeo(), fetchPulse()])
   isRefreshing.value = false
   await nextTick()
   renderScansChart()

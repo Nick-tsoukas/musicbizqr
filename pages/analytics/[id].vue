@@ -11,6 +11,13 @@
       </div>
     </div>
 
+    <!-- MBQ Pulse Card -->
+    <MbqPulseCard
+      :pulse="pulseData"
+      :loading="pulseLoading"
+      :range-label="museRangeLabel"
+    />
+
     <!-- Insights (MUSE) -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-2">
@@ -1223,6 +1230,10 @@ const transitions = ref<any | null>(null);
 const externalMuse = ref<any>(null);
 const followsData = ref<any | null>(null);
 
+/* ---------- MBQ Pulse state ---------- */
+const pulseData = ref<any | null>(null);
+const pulseLoading = ref(true);
+
 /* ---------- raw events (only used for hourly chart + daily split) ---------- */
 const rawPageViews = ref<any[]>([]);
 const rawLinkClicks = ref<any[]>([]);
@@ -2029,6 +2040,23 @@ function tsOf(row: any): string | null {
   return a.timestamp || a.createdAt || a.updatedAt || null;
 }
 
+/* ---------- fetch pulse ---------- */
+async function fetchPulse() {
+  if (!bandId.value) return;
+  pulseLoading.value = true;
+  try {
+    const data = await client('/analytics/pulse', {
+      params: { entityType: 'band', entityId: bandId.value, range: `${selectedRange.value}d` }
+    });
+    pulseData.value = data?.pulse || null;
+  } catch (err) {
+    console.error('Failed to fetch pulse:', err);
+    pulseData.value = null;
+  } finally {
+    pulseLoading.value = false;
+  }
+}
+
 /* ---------- fetch + render ---------- */
 async function fetchAndRender(silent: boolean) {
   if (!bandId.value) return;
@@ -2236,6 +2264,7 @@ async function fetchAndRender(silent: boolean) {
   } finally {
     isInitialLoading.value = false;
     isRefreshing.value = false;
+    museLoading.value = false;
   }
 }
 
@@ -2493,11 +2522,13 @@ onMounted(async () => {
   } catch {}
   await ensureChart();
   await fetchAndRender(false);
+  fetchPulse(); // non-blocking pulse fetch after initial load
 });
 
 // when range changes → silent refresh
 watch(selectedRange, async () => {
   await fetchAndRender(true);
+  fetchPulse(); // refresh pulse when range changes
 });
 
 // when tab/date/rollups change → just re-render
