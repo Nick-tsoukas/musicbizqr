@@ -82,24 +82,6 @@
         </div>
       </div>
 
-      <client-only>
-        <div v-if="band?.data" class="flex justify-center mt-4">
-          <div class="w-full max-w-5xl px-6 flex justify-end">
-            <button
-              type="button"
-              class="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-colors"
-              @click="onToggleSaveBand"
-            >
-              {{ isCurrentBandSaved ? "✓ Saved" : "⭐ Save this band" }}
-            </button>
-          </div>
-        </div>
-        <div v-if="showSavedConfirmation" class="flex justify-center mt-2">
-          <div class="w-full max-w-5xl px-6 text-white/70 text-sm">
-            Saved — find it anytime in the menu
-          </div>
-        </div>
-      </client-only>
 
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
@@ -594,21 +576,55 @@
         </section>
       </div>
 
-      <!-- Follow the Band CTA -->
-      <section v-if="followablePlatforms.length > 0 && isSectionVisible('follow')" class="mt-16 mb-8 px-6">
-        <div class="max-w-md mx-auto">
+      <!-- Follow & Save Band Section -->
+      <div class="w-full px-6 mt-16 mb-8 md:max-w-[80vw] md:mx-auto">
+        <!-- Follow Band Button -->
+        <button
+          v-if="followablePlatforms.length > 0 && isSectionVisible('follow')"
+          type="button"
+          class="w-full mb-4 flex items-center justify-center gap-3 rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-900/50 to-violet-900/50 px-4 py-4 text-white text-lg md:text-xl font-semibold shadow-lg transition hover:from-purple-900/70 hover:to-violet-900/70 hover:border-purple-400/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          @click="openFollowModal"
+        >
+          <svg class="h-6 w-6 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+          </svg>
+          <span>Follow {{ band.data.name }}</span>
+        </button>
+
+        <!-- Save Band Button -->
+        <client-only>
           <button
+            v-if="band?.data"
             type="button"
-            class="w-full flex items-center justify-center gap-3 rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-900/40 to-violet-900/40 px-6 py-4 text-white font-semibold shadow-lg transition hover:from-purple-900/60 hover:to-violet-900/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-            @click="openFollowModal"
+            class="w-full mb-4 flex items-center justify-center gap-3 rounded-2xl px-4 py-4 text-white text-lg md:text-xl font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+            :class="isCurrentBandSaved 
+              ? 'border border-amber-500/50 bg-gradient-to-r from-amber-900/40 to-yellow-900/40 hover:from-amber-900/60 hover:to-yellow-900/60 hover:border-amber-400/70' 
+              : 'border border-white/20 bg-gradient-to-r from-slate-800/60 to-slate-700/60 hover:from-slate-800/80 hover:to-slate-700/80 hover:border-white/30'"
+            @click="onToggleSaveBand"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            <svg v-if="isCurrentBandSaved" class="h-6 w-6 shrink-0 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
             </svg>
-            <span>Follow {{ band.data.name }}</span>
+            <svg v-else class="h-6 w-6 shrink-0 text-white/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+            </svg>
+            <span>{{ isCurrentBandSaved ? "Saved to My Bands" : "Save to My Bands" }}</span>
           </button>
-        </div>
-      </section>
+          
+          <!-- Saved Confirmation -->
+          <Transition name="fade">
+            <div 
+              v-if="showSavedConfirmation" 
+              class="flex items-center justify-center gap-2 text-amber-300/90 text-sm py-2"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+              </svg>
+              <span>Saved — find it anytime in the menu</span>
+            </div>
+          </Transition>
+        </client-only>
+      </div>
 
       <footer class="h-40 flex justify-center items-center">
         <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
