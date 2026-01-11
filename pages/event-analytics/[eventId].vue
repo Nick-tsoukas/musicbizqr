@@ -1,61 +1,249 @@
 <template>
-  <div class="px-6 py-8 bg-black min-h-screen pt-[var(--header-height)]">
-    <h2 class="text-2xl font-bold mb-6 text-white">Event Analytics</h2>
+  <div class="px-4 sm:px-6 py-10 bg-gradient-to-b from-black via-slate-950 to-black min-h-screen pt-[var(--header-height)] max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4 mb-6">
+      <div class="min-w-0">
+        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Event Analytics</h2>
+        <div class="text-gray-400 text-sm mt-1" v-if="eventInfo.title">
+          {{ eventInfo.title }}
+        </div>
+      </div>
+      <NuxtLink
+        to="/dashboard"
+        class="shrink-0 px-3 py-1.5 text-sm rounded-full border border-white/10 bg-black/30 text-gray-300 hover:bg-white/5 transition-colors"
+      >
+        ← Back
+      </NuxtLink>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="chart-card mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-white text-lg font-semibold">Performance Overview</h3>
+        <span class="text-gray-400 text-xs">{{ rangeLabel }}</span>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Total Views</p>
+          <p class="text-2xl font-semibold text-white tabular-nums">
+            {{ rollups?.totals?.views ?? 0 }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top Source</p>
+          <p class="text-lg font-semibold text-white truncate capitalize">
+            {{ topSource }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top Country</p>
+          <p class="text-lg font-semibold text-white truncate">
+            {{ topCountry }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">QR vs Web</p>
+          <p class="text-lg font-semibold text-white">
+            {{ qrPercent }}% QR
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Range Selector -->
-    <div class="flex space-x-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-4">
       <button
         v-for="(label, days) in rangeOptions"
         :key="days"
         @click="selectedRange = Number(days)"
         :class="[
-          'px-3 py-1 text-sm rounded',
+          'px-3 py-1.5 text-sm rounded-full border transition-colors shadow-sm',
           selectedRange === Number(days)
-            ? 'bg-purple-500 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
+            ? 'bg-purple-500/20 text-purple-100 border-purple-400/40'
+            : 'bg-black/30 text-gray-300 border-white/10 hover:bg-white/5',
         ]"
       >
         {{ label }}
       </button>
     </div>
 
-    <!-- Date Picker for 1-day -->
-    <div v-if="selectedRange === 1" class="mb-6">
-      <label class="text-white mr-2">Select Day:</label>
-      <input
-        type="date"
-        v-model="selectedDate"
-        class="bg-gray-800 text-white rounded px-2 py-1"
-      />
+    <!-- Loading State -->
+    <div v-if="isLoading" class="text-white py-8 text-center">🔄 Loading analytics…</div>
+
+    <!-- Main Content -->
+    <div v-else class="space-y-6">
+      <!-- Views Time Series Chart -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-white text-lg font-semibold">Page Views Over Time</h3>
+          <span class="text-gray-400 text-xs">{{ rangeLabel }}</span>
+        </div>
+        <div class="chart-wrap">
+          <ClientOnly>
+            <canvas ref="viewsCanvas" class="chart-canvas" />
+          </ClientOnly>
+        </div>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Traffic Sources -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Traffic Sources</h3>
+          </div>
+          <ul v-if="rollups?.sources?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.sources.slice(0, 8)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white capitalize">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-purple-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.sources[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No source data yet.</div>
+        </div>
+
+        <!-- Devices -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Devices</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div v-for="(count, device) in rollups?.devices || {}" :key="device" class="bg-white/5 border border-white/10 rounded-lg p-3">
+              <p class="text-gray-400 text-xs capitalize">{{ device }}</p>
+              <p class="text-xl font-semibold text-white tabular-nums">{{ count }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Countries -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Top Countries</h3>
+          </div>
+          <ul v-if="rollups?.countries?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.countries.slice(0, 8)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white uppercase">{{ name || 'Unknown' }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-emerald-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.countries[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No geo data yet.</div>
+        </div>
+
+        <!-- Browsers -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Browsers</h3>
+          </div>
+          <ul v-if="rollups?.browsers?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.browsers.slice(0, 6)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white capitalize">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-blue-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.browsers[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No browser data yet.</div>
+        </div>
+
+        <!-- Entry Types (QR vs Web) -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Entry Type</h3>
+          </div>
+          <ul v-if="rollups?.entryTypes?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.entryTypes" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white uppercase">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-amber-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.entryTypes[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No entry type data yet.</div>
+        </div>
+
+        <!-- OS -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Operating Systems</h3>
+          </div>
+          <ul v-if="rollups?.osList?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.osList.slice(0, 6)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white capitalize">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-pink-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.osList[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No OS data yet.</div>
+        </div>
+      </div>
+
+      <!-- Geo Map Section -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-white text-lg font-semibold">Top Locations</h3>
+        </div>
+        <ul v-if="geoList.length" class="text-gray-200 text-sm space-y-2 max-h-64 overflow-y-auto">
+          <li v-for="loc in geoList.slice(0, 15)" :key="`${loc.city}-${loc.country}`" class="flex items-center gap-2">
+            <span class="inline-block w-40 truncate text-white">
+              {{ loc.city }}{{ loc.region ? `, ${loc.region}` : '' }}{{ loc.country ? ` (${loc.country})` : '' }}
+            </span>
+            <div class="h-2 bg-gray-800 rounded flex-1">
+              <div
+                class="h-2 bg-cyan-500 rounded"
+                :style="{ width: Math.round((loc.count / (geoList[0]?.count || 1)) * 100) + '%' }"
+              />
+            </div>
+            <span class="text-gray-400 w-10 text-right tabular-nums">{{ loc.count }}</span>
+          </li>
+        </ul>
+        <div v-else class="text-gray-400 text-sm">No location data yet.</div>
+      </div>
     </div>
-
-    <!-- event title  -->
-
-    <h3 v-if="eventTitle" class="text-xl font-semibold text-white mb-4">
-      Event title : {{ eventTitle }}
-    </h3>
-
-    <!-- Chart -->
-    <div v-if="!isLoading" class="bg-gray-900 rounded-lg p-4 shadow-lg">
-      <canvas ref="lineChartCanvas" class="w-full h-64"></canvas>
-    </div>
-    <div v-else class="text-white">🔄 Loading analytics…</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from "vue";
 import { useRoute, useStrapiClient } from "#imports";
-import { parseISO, format, getHours, subDays } from "date-fns";
 import {
   Chart,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 
 Chart.register(
@@ -63,196 +251,182 @@ Chart.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const route = useRoute();
 const client = useStrapiClient();
 
-const selectedRange = ref(1);
-const selectedDate = ref(format(new Date(), "yyyy-MM-dd"));
-
+const selectedRange = ref(30);
 const rangeOptions = {
-  1: "daily",
-  7: "Last 7 Days",
-  30: "Last 30 Days",
-  365: "Last 1 Year",
+  7: "7 Days",
+  30: "30 Days",
+  90: "90 Days",
+  365: "1 Year",
 };
 
-const eventTitle = computed(() => {
-  const firstView = rawViews.value[0];
-  return firstView?.attributes?.event?.data?.attributes?.title || "Event";
+const rangeLabel = computed(() => `Last ${selectedRange.value} days`);
+
+const isLoading = ref(true);
+const rollups = ref(null);
+const geoList = ref([]);
+const eventInfo = ref({ title: '', id: null });
+
+const viewsCanvas = ref(null);
+let viewsChart = null;
+
+// Computed helpers
+const topSource = computed(() => {
+  const src = rollups.value?.sources?.[0];
+  return src ? src[0] : 'N/A';
 });
 
-const rawViews = ref([]);
-const isLoading = ref(true);
-const lineChartCanvas = ref(null);
-let lineChartInstance = null;
+const topCountry = computed(() => {
+  const c = rollups.value?.countries?.[0];
+  return c ? c[0] : 'N/A';
+});
 
-function getLastNDates(n) {
-  const today = new Date();
-  return Array.from({ length: n }, (_, i) => {
-    const d = subDays(today, n - 1 - i);
-    return format(d, "yyyy-MM-dd");
-  });
-}
+const qrPercent = computed(() => {
+  const entries = rollups.value?.entryTypes || [];
+  const qr = entries.find(e => e[0] === 'qr')?.[1] || 0;
+  const total = rollups.value?.totals?.views || 0;
+  return total > 0 ? Math.round((qr / total) * 100) : 0;
+});
 
-async function fetchViews() {
-  isLoading.value = true;
-  console.log("📡 Fetching event views for ID:", route.params.eventId);
-
+async function fetchEventInfo() {
   try {
-    const { data } = await client("/event-page-views", {
-      params: {
-        filters: {
-          event: {
-            id: {
-              $eq: route.params.eventId,
-            },
-          },
-        },
-        sort: ["timestamp:desc"],
-        populate: "event",
-      },
+    const { data } = await client(`/events/${route.params.eventId}`, {
+      params: { fields: ['title', 'slug'] }
     });
-
-    console.log("✅ Filtered event views:", data);
-    rawViews.value = data;
+    if (data?.attributes) {
+      eventInfo.value = { title: data.attributes.title, id: data.id };
+    }
   } catch (err) {
-    console.error(
-      "❌ Error fetching filtered event views:",
-      err?.response || err
-    );
-  } finally {
-    isLoading.value = false;
-
-    // Wait for canvas to be visible in DOM
-    await nextTick();
-    await nextTick();
-
-    renderChart();
+    console.error('Failed to fetch event info:', err);
   }
 }
 
-function renderChart() {
-  const ctx = lineChartCanvas.value?.getContext("2d");
-  if (!ctx) {
-    console.error("❌ [renderChart] Could not get canvas context");
-    return;
-  }
-
-  console.log("📊 [renderChart] Selected range:", selectedRange.value);
-  console.log("📊 [renderChart] Selected date:", selectedDate.value);
-  console.log("📊 [renderChart] Raw views count:", rawViews.value.length);
-
-  let labels = [];
-  let dataPoints = [];
-  let title = "";
-
-  if (selectedRange.value === 1) {
-    labels = Array.from(
-      { length: 24 },
-      (_, i) => `${String(i).padStart(2, "0")}:00`
-    );
-    const day = selectedDate.value;
-    const counts = labels.reduce((acc, hour) => ({ ...acc, [hour]: 0 }), {});
-
-    rawViews.value.forEach((view) => {
-      const ts = view?.attributes?.timestamp;
-      if (!ts) return;
-
-      const date = format(parseISO(ts), "yyyy-MM-dd");
-      const hour = `${String(getHours(parseISO(ts))).padStart(2, "0")}:00`;
-
-      if (date === day) {
-        counts[hour]++;
-      }
+async function fetchRollups() {
+  try {
+    const data = await client('/analytics/event-rollups', {
+      params: { eventId: route.params.eventId, range: `${selectedRange.value}d` }
     });
-
-    dataPoints = labels.map((h) => counts[h]);
-    title = `Event Views – Hourly for ${day}`;
-    console.log("⏱ [renderChart] Hourly data points:", dataPoints);
-  } else {
-    labels = getLastNDates(selectedRange.value);
-    const counts = labels.reduce((acc, date) => ({ ...acc, [date]: 0 }), {});
-
-    rawViews.value.forEach((view) => {
-      const ts = view?.attributes?.timestamp;
-      if (!ts) return;
-
-      const day = format(parseISO(ts), "yyyy-MM-dd");
-      if (counts[day] !== undefined) counts[day]++;
-    });
-
-    dataPoints = labels.map((d) => counts[d]);
-    title = `Event Views – Last ${selectedRange.value} Days`;
-    console.log("📅 [renderChart] Daily data points:", dataPoints);
+    rollups.value = data;
+  } catch (err) {
+    console.error('Failed to fetch event rollups:', err);
+    rollups.value = null;
   }
+}
 
-  lineChartInstance?.destroy();
-  lineChartInstance = new Chart(ctx, {
-    type: "line",
+async function fetchGeo() {
+  try {
+    const data = await client('/analytics/event-geo', {
+      params: { eventId: route.params.eventId, range: `${selectedRange.value}d` }
+    });
+    geoList.value = data?.list || [];
+  } catch (err) {
+    console.error('Failed to fetch event geo:', err);
+    geoList.value = [];
+  }
+}
+
+async function loadData() {
+  isLoading.value = true;
+  await Promise.all([fetchEventInfo(), fetchRollups(), fetchGeo()]);
+  isLoading.value = false;
+  await nextTick();
+  renderViewsChart();
+}
+
+function renderViewsChart() {
+  const ctx = viewsCanvas.value?.getContext('2d');
+  if (!ctx) return;
+
+  const series = rollups.value?.series || [];
+  const labels = series.map(s => s.date?.slice(5) || ''); // MM-DD format
+  const data = series.map(s => s.views || 0);
+
+  viewsChart?.destroy();
+  viewsChart = new Chart(ctx, {
+    type: 'line',
     data: {
       labels,
-      datasets: [
-        {
-          label: "Views",
-          data: dataPoints,
-          borderColor: "#8B5CF6",
-          backgroundColor: "#8B5CF6",
-          fill: false,
-          tension: 0.3,
-          pointRadius: 3,
-        },
-      ],
+      datasets: [{
+        label: 'Views',
+        data,
+        borderColor: '#8B5CF6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+      }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { intersect: false, mode: 'index' },
       scales: {
-        x: { ticks: { color: "white" }, grid: { color: "#444" } },
+        x: {
+          ticks: { color: '#9CA3AF', maxTicksLimit: 10 },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
         y: {
           beginAtZero: true,
-          ticks: { color: "white" },
-          grid: { color: "#444" },
-        },
+          ticks: { color: '#9CA3AF' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
       },
       plugins: {
-        legend: { labels: { color: "white" } },
-        title: {
-          display: true,
-          text: title,
-          color: "white",
-          font: { size: 18 },
-        },
-      },
-    },
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleColor: '#fff',
+          bodyColor: '#9CA3AF',
+        }
+      }
+    }
   });
 }
 
-onMounted(fetchViews);
+onMounted(loadData);
 
-watch([selectedRange, selectedDate], () => {
-  if (!isLoading.value) {
-    console.log("🔄 [watch] Redrawing chart due to change");
-    renderChart();
-  }
+watch(selectedRange, async () => {
+  isLoading.value = true;
+  await Promise.all([fetchRollups(), fetchGeo()]);
+  isLoading.value = false;
+  await nextTick();
+  renderViewsChart();
 });
 
 onBeforeUnmount(() => {
-  lineChartInstance?.destroy();
+  viewsChart?.destroy();
 });
 </script>
 
 <style scoped>
-canvas {
+.chart-card {
+  @apply bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-lg;
+}
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+.chart-canvas {
+  position: absolute;
+  inset: 0;
   width: 100% !important;
-  height: 600px !important;
+  height: 100% !important;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* makes black icons white */
+  filter: invert(1);
 }
 </style>

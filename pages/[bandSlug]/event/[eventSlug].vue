@@ -348,25 +348,50 @@ async function fetchEvent() {
 onMounted(async () => {
   await fetchEvent();
 
-  // Track Event View
+  // Track Event View with rich analytics data
   try {
-    const eventId = eventData.value?.id || eventData.value?.band?.data?.id;
+    const eventId = eventData.value?.id;
+    const bandId = eventData.value?.band?.data?.id || null;
     const eventTitle = eventData.value?.title || "Untitled Event";
 
     if (eventId) {
-      await fetch(`${config.public.strapiUrl}/api/event-page-views`, {
+      // Check for QR entry (via query param or sessionStorage)
+      const urlParams = new URLSearchParams(window.location.search);
+      const isQrEntry = urlParams.has('qr') || urlParams.has('scan') || sessionStorage.getItem('qr_entry') === 'true';
+      const qrId = urlParams.get('qr') || urlParams.get('qrId') || null;
+      
+      // Get or create session/visitor IDs (privacy-safe, no PII)
+      let visitorId = localStorage.getItem('_vid');
+      if (!visitorId) {
+        visitorId = crypto.randomUUID?.() || Math.random().toString(36).slice(2);
+        localStorage.setItem('_vid', visitorId);
+      }
+      let sessionId = sessionStorage.getItem('_sid');
+      if (!sessionId) {
+        sessionId = crypto.randomUUID?.() || Math.random().toString(36).slice(2);
+        sessionStorage.setItem('_sid', sessionId);
+      }
+
+      await fetch(`${config.public.strapiUrl}/api/event-page-views/track`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          data: {
-            event: eventId,
-            title: eventTitle,
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
-            referrer: document.referrer,
-          },
+          event: eventId,
+          band: bandId,
+          title: eventTitle,
+          timestamp: new Date().toISOString(),
+          pageUrl: window.location.href,
+          path: window.location.pathname,
+          referrer: document.referrer,
+          userAgent: navigator.userAgent,
+          screenW: window.screen?.width || null,
+          screenH: window.screen?.height || null,
+          tzOffset: new Date().getTimezoneOffset(),
+          lang: navigator.language || '',
+          sessionId,
+          visitorId,
+          entryType: isQrEntry ? 'qr' : 'web',
+          qrId: qrId ? Number(qrId) : null,
         }),
       });
       console.log("📈 Event view tracked");
