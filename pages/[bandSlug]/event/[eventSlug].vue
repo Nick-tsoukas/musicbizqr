@@ -1,194 +1,276 @@
 <template>
-  <div class="bg-black text-white min-h-screen pt-[var(--header-height)] pb-20">
-    <div class="container mx-auto my-10 px-4">
-      <!-- Event Hero -->
-      <!-- Event Hero (Option A) -->
-      <div
-        v-if="eventData"
-        class="relative w-full max-w-4xl mx-auto rounded-lg overflow-hidden mb-8 shadow-xl bg-black"
-        tabindex="-1"
-      >
-        <div
-          class="aspect-video md:aspect-[21/9] lg:aspect-[2/1] max-h-[70vh] select-none"
+  <div class="relative bg-black text-white min-h-screen pt-[var(--header-height)] pb-20 overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 -z-10">
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-[520px] w-[520px] rounded-full bg-purple-500/20 blur-3xl"></div>
+      <div class="absolute -bottom-28 right-[-120px] h-[520px] w-[520px] rounded-full bg-emerald-500/15 blur-3xl"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black via-black to-black"></div>
+    </div>
+
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-10">
+      <div class="flex items-center justify-between gap-3">
+        <NuxtLink
+          :to="`/${String(route.params.bandSlug || '')}`"
+          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
         >
-          <img
-            v-if="eventData.image?.data?.attributes?.url"
-            :src="eventData.image.data.attributes.url"
-            alt="Event Hero Image"
-            class="w-full h-full object-contain pointer-events-none"
-            loading="lazy"
-            decoding="async"
-          />
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Back
+        </NuxtLink>
+
+        <div v-if="eventData?.band?.data?.attributes?.name" class="text-xs text-white/50 truncate">
+          {{ eventData.band.data.attributes.name }}
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Left Column -->
-        <div
-          class="md:col-span-2 bg-[#1c1c1e] text-white shadow-lg rounded-xl p-6"
-        >
-          <!-- Description -->
-          <section v-if="descriptionHTML" class="mb-8">
-            <h2 class="section-heading">
-              <i class="fas fa-info-circle mr-2"></i> Description
-            </h2>
+      <div v-if="loading" class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div class="text-white/70">Loading event…</div>
+      </div>
+
+      <div v-else-if="error" class="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-6">
+        <div class="text-red-200 font-semibold">Couldn’t load this event</div>
+        <div class="mt-1 text-red-200/80 text-sm">{{ error }}</div>
+      </div>
+
+      <div v-else class="mt-6">
+        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_25px_60px_rgba(0,0,0,0.55)]">
+          <div class="relative aspect-[16/9] sm:aspect-[21/9]">
+            <img
+              v-if="eventData.image?.data?.attributes?.url"
+              :src="eventData.image.data.attributes.url"
+              alt=""
+              class="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
             <div
-              class="prose prose-invert max-w-none text-lg leading-relaxed space-y-4"
-              v-html="descriptionHTML"
+              v-else
+              class="absolute inset-0 bg-gradient-to-br from-purple-500/25 via-black/60 to-emerald-500/20"
             ></div>
-          </section>
 
-          <!-- Date & Time -->
-          <section v-if="eventData.date || eventData.time" class="mb-8">
-            <h2 class="section-heading">
-              <i class="far fa-calendar-alt mr-2"></i> Date & Time
-            </h2>
-            <p v-if="eventData.date" class="text-lg">
-              {{ formatDate(eventData.date) }}
-            </p>
-            <p v-if="eventData.time" class="text-lg">
-              {{ formatTime(eventData.time) }}
-            </p>
-          </section>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
 
-          <!-- Location -->
-          <section
-            v-if="
-              eventData.venue ||
-              eventData.address ||
-              eventData.city ||
-              eventData.state
-            "
-            class="mb-8"
-          >
-            <h2 class="section-heading">
-              <i class="fas fa-map-marker-alt mr-2"></i> Location
-            </h2>
-            <p v-if="eventData.venue" class="text-lg">{{ eventData.venue }}</p>
-            <p v-if="eventData.address" class="text-lg">
-              {{ eventData.address }}
-            </p>
-            <p v-if="eventData.city || eventData.state" class="text-lg">
-              {{ eventData.city
-              }}<span v-if="eventData.city && eventData.state">, </span
-              >{{ eventData.state }}
-            </p>
-          </section>
+            <div class="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+              <div class="flex flex-wrap items-end justify-between gap-4">
+                <div class="min-w-0">
+                  <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+                    {{ eventData.title || 'Event' }}
+                  </h1>
 
-          <!-- Tickets -->
-          <div v-if="eventData.link" class="mt-10">
-            <a
-              :href="eventData.link"
-              target="_blank"
-              class="inline-flex items-center px-5 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-violet-600 text-white font-semibold shadow hover:opacity-90 transition"
-            >
-              <i class="fas fa-ticket-alt mr-2"></i> Buy Tickets
-            </a>
+                  <div class="mt-3 flex flex-wrap gap-2 text-sm text-white/70">
+                    <span v-if="eventData.date" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8 2v4" />
+                        <path d="M16 2v4" />
+                        <path d="M3 10h18" />
+                        <path d="M5 6h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
+                      </svg>
+                      {{ formatDate(eventData.date) }}
+                    </span>
+
+                    <span v-if="eventData.time" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-purple-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7v5l3 2" />
+                      </svg>
+                      {{ formatTime(eventData.time) }}
+                    </span>
+
+                    <span v-if="eventData.venue || eventData.city || eventData.state" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11z" />
+                        <circle cx="12" cy="10" r="2.5" />
+                      </svg>
+                      <span class="truncate">{{ eventData.venue || `${eventData.city || ''}${eventData.state ? `, ${eventData.state}` : ''}` }}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="shrink-0 flex items-center gap-2">
+                  <a
+                    v-if="eventData.link"
+                    :href="eventData.link"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/25 to-violet-500/25 border border-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  >
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 10h18" />
+                      <path d="M7 15h1" />
+                      <path d="M6 19h12a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3z" />
+                    </svg>
+                    Tickets
+                  </a>
+
+                  <a
+                    v-if="eventData.website && !eventData.link"
+                    :href="eventData.website"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  >
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/70" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M10 14a5 5 0 0 1 0-7l.8-.8a5 5 0 0 1 7 7l-.8.8" />
+                      <path d="M14 10a5 5 0 0 1 0 7l-.8.8a5 5 0 1 1-7-7l.8-.8" />
+                    </svg>
+                    Link
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Right Column -->
-        <div class="bg-[#1c1c1e] text-white shadow-lg rounded-xl p-6">
-          <!-- Contact -->
-          <section
-            v-if="eventData.contactEmail || eventData.contactPhone"
-            class="mb-6"
-          >
-            <h2 class="section-heading">
-              <i class="fas fa-address-book mr-2"></i> Contact
-            </h2>
-            <p v-if="eventData.contactEmail" class="text-lg flex items-center">
-              <i class="fas fa-envelope mr-2"></i>
-              <a
-                :href="`mailto:${eventData.contactEmail}`"
-                class="hover:underline"
-              >
-                {{ eventData.contactEmail }}
-              </a>
-            </p>
-            <p v-if="eventData.contactPhone" class="text-lg flex items-center">
-              <i class="fas fa-phone mr-2"></i>
-              <a
-                :href="`tel:${eventData.contactPhone}`"
-                class="hover:underline"
-              >
-                {{ eventData.contactPhone }}
-              </a>
-            </p>
-          </section>
+        <div class="mt-6 grid gap-4 lg:grid-cols-3">
+          <div class="lg:col-span-2 space-y-4">
+            <section v-if="descriptionHTML" class="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div class="flex items-center gap-2 text-white font-semibold">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+                </svg>
+                About this event
+              </div>
+              <div
+                class="prose prose-invert max-w-none text-base leading-relaxed mt-4"
+                v-html="descriptionHTML"
+              ></div>
+            </section>
 
-          <!-- Age Restriction -->
-          <section v-if="eventData.ageRestriction" class="mb-6">
-            <h2 class="section-heading">
-              <i class="fas fa-user-lock mr-2"></i> Age Restriction
-            </h2>
-            <p class="text-lg">{{ eventData.ageRestriction }}</p>
-          </section>
+            <section class="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div class="flex items-center gap-2 text-white font-semibold">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 text-purple-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2v2" />
+                  <path d="M12 20v2" />
+                  <path d="M4.9 4.9l1.4 1.4" />
+                  <path d="M17.7 17.7l1.4 1.4" />
+                  <path d="M2 12h2" />
+                  <path d="M20 12h2" />
+                  <path d="M4.9 19.1l1.4-1.4" />
+                  <path d="M17.7 6.3l1.4-1.4" />
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
+                Details
+              </div>
 
-          <!-- Social -->
-          <section v-if="hasSocialLinks" class="mb-6">
-            <h2 class="section-heading">
-              <i class="fas fa-share-alt mr-2"></i> Follow Us
-            </h2>
-            <div class="flex space-x-4 text-white text-2xl">
-              <a
-                v-if="eventData.facebook"
-                :href="eventData.facebook"
-                target="_blank"
-                class="hover:text-blue-500"
-              >
-                <i class="fab fa-facebook-square"></i>
-              </a>
-              <a
-                v-if="eventData.twitter"
-                :href="eventData.twitter"
-                target="_blank"
-                class="hover:text-sky-400"
-              >
-                <i class="fab fa-twitter-square"></i>
-              </a>
-              <a
-                v-if="eventData.instagram"
-                :href="eventData.instagram"
-                target="_blank"
-                class="hover:text-pink-500"
-              >
-                <i class="fab fa-instagram-square"></i>
-              </a>
-              <a
-                v-if="eventData.youtube"
-                :href="eventData.youtube"
-                target="_blank"
-                class="hover:text-red-600"
-              >
-                <i class="fab fa-youtube-square"></i>
-              </a>
-              <a
-                v-if="eventData.tiktok"
-                :href="eventData.tiktok"
-                target="_blank"
-                class="hover:text-gray-100"
-              >
-                <i class="fab fa-tiktok"></i>
-              </a>
-              <a
-                v-if="eventData.website"
-                :href="eventData.website"
-                target="_blank"
-                class="hover:text-green-300"
-              >
-                <i class="fas fa-globe"></i>
-              </a>
-            </div>
-          </section>
+              <div class="mt-4 grid sm:grid-cols-2 gap-3">
+                <div v-if="eventData.date" class="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div class="text-xs text-white/60">Date</div>
+                  <div class="mt-1 text-white font-semibold">{{ formatDate(eventData.date) }}</div>
+                </div>
+                <div v-if="eventData.time" class="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div class="text-xs text-white/60">Time</div>
+                  <div class="mt-1 text-white font-semibold">{{ formatTime(eventData.time) }}</div>
+                </div>
+                <div v-if="eventData.venue" class="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div class="text-xs text-white/60">Venue</div>
+                  <div class="mt-1 text-white font-semibold">{{ eventData.venue }}</div>
+                </div>
+                <div v-if="eventData.city || eventData.state" class="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div class="text-xs text-white/60">City</div>
+                  <div class="mt-1 text-white font-semibold">{{ eventData.city }}<span v-if="eventData.city && eventData.state">, </span>{{ eventData.state }}</div>
+                </div>
+                <div v-if="eventData.address" class="rounded-xl border border-white/10 bg-white/5 p-4 sm:col-span-2">
+                  <div class="text-xs text-white/60">Address</div>
+                  <div class="mt-1 text-white font-semibold">{{ eventData.address }}</div>
+                </div>
+              </div>
+            </section>
+          </div>
 
-          <!-- Band Info -->
-          <section v-if="eventData.band?.data" class="mb-6">
-            <h2 class="section-heading">
-              <i class="fas fa-music mr-2"></i> Band
-            </h2>
-            <p class="text-lg">{{ eventData.band.data.attributes.name }}</p>
-          </section>
+          <div class="space-y-4">
+            <section v-if="eventData.contactEmail || eventData.contactPhone" class="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div class="flex items-center gap-2 text-white font-semibold">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8" />
+                  <path d="M21 8l-9 6-9-6" />
+                  <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2" />
+                </svg>
+                Contact
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <a
+                  v-if="eventData.contactEmail"
+                  :href="`mailto:${eventData.contactEmail}`"
+                  class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10 transition"
+                >
+                  <div class="min-w-0">
+                    <div class="text-xs text-white/60">Email</div>
+                    <div class="text-sm font-semibold text-white truncate">{{ eventData.contactEmail }}</div>
+                  </div>
+                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" />
+                  </svg>
+                </a>
+                <a
+                  v-if="eventData.contactPhone"
+                  :href="`tel:${eventData.contactPhone}`"
+                  class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10 transition"
+                >
+                  <div class="min-w-0">
+                    <div class="text-xs text-white/60">Phone</div>
+                    <div class="text-sm font-semibold text-white truncate">{{ eventData.contactPhone }}</div>
+                  </div>
+                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 16.92V21a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h4.09a2 2 0 0 1 2 1.72c.12.81.3 1.6.54 2.36a2 2 0 0 1-.45 2.11L9.91 10.91a16 16 0 0 0 3.18 3.18l1.72-1.27a2 2 0 0 1 2.11-.45c.76.24 1.55.42 2.36.54A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                </a>
+              </div>
+            </section>
+
+            <section v-if="eventData.ageRestriction || eventData.band?.data" class="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div class="flex items-center gap-2 text-white font-semibold">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 text-purple-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4z" />
+                  <path d="M20 21a8 8 0 0 0-16 0" />
+                </svg>
+                Notes
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <div v-if="eventData.ageRestriction" class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div class="text-xs text-white/60">Age restriction</div>
+                  <div class="text-sm font-semibold text-white">{{ eventData.ageRestriction }}</div>
+                </div>
+                <div v-if="eventData.band?.data" class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div class="text-xs text-white/60">Band</div>
+                  <div class="text-sm font-semibold text-white">{{ eventData.band.data.attributes.name }}</div>
+                </div>
+              </div>
+            </section>
+
+            <section v-if="hasSocialLinks" class="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div class="flex items-center gap-2 text-white font-semibold">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 8a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3" />
+                  <path d="M10 12l8-8" />
+                  <path d="M15 4h3v3" />
+                </svg>
+                Links
+              </div>
+
+              <div class="mt-4 grid gap-2">
+                <a
+                  v-for="row in socialRows"
+                  :key="row.key"
+                  :href="row.href"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10 transition"
+                >
+                  <div class="min-w-0">
+                    <div class="text-xs text-white/60">{{ row.label }}</div>
+                    <div class="text-sm font-semibold text-white truncate">{{ row.short }}</div>
+                  </div>
+                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" />
+                  </svg>
+                </a>
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </div>
@@ -196,8 +278,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useRuntimeConfig } from "#imports";
 
 import { format, parseISO, parse } from "date-fns";
@@ -206,6 +288,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 
 const route = useRoute();
+const router = useRouter();
 const { findOne } = useStrapi();
 const eventData = ref({});
 const loading = ref(false);
@@ -220,7 +303,7 @@ const descriptionHTML = computed(() => {
 });
 
 async function fetchEvent() {
-  const bandSlug = route.params.slug;
+  const bandSlug = route.params.bandSlug;
   const eventSlug = route.params.eventSlug;
 
   try {
@@ -329,6 +412,27 @@ const hasSocialLinks = computed(() =>
     (key) => eventData.value[key]
   )
 );
+
+const socialRows = computed(() => {
+  const rows = [];
+  const add = (key, label) => {
+    const href = eventData.value?.[key];
+    if (!href) return;
+    const short = String(href)
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .replace(/\/$/, "");
+    rows.push({ key, label, href, short });
+  };
+
+  add("website", "Website");
+  add("instagram", "Instagram");
+  add("youtube", "YouTube");
+  add("tiktok", "TikTok");
+  add("facebook", "Facebook");
+  add("twitter", "Twitter / X");
+  return rows;
+});
 </script>
 
 <style scoped>
@@ -350,52 +454,4 @@ const hasSocialLinks = computed(() =>
   font-weight: 600;
 }
 
-.section-heading {
-  @apply text-2xl font-bold mb-4 bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent flex items-center;
-}
-.gradient-icon {
-  /* Set the icon size */
-  font-size: 1rem;
-
-  /* Gradient background */
-  background: linear-gradient(to right, #ec4899, #8b5cf6);
-
-  -webkit-background-clip: text;
-  color: transparent;
-  display: inline-block;
-}
-.mdc-button {
-  display: inline-flex;
-  align-items: center;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #fff;
-  background-color: #6200ee;
-  border: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.mdc-button:hover {
-  background-color: #3700b3;
-}
-
-.shadow-lg {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.flex {
-  display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.space-x-4 > :not([hidden]) ~ :not([hidden]) {
-  margin-left: 1rem;
-}
-
-/* Additional styling for icons and layout */
 </style>

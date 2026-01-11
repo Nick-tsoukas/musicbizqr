@@ -277,155 +277,129 @@
           id="upcoming-events"
           class="mt-10"
         >
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Upcoming Events
-          </h2>
-          <div class="space-y-3 md:hidden">
+          <div class="flex items-end justify-between gap-4">
+            <h2 class="text-2xl md:text-3xl font-bold text-white">
+              Upcoming Events
+            </h2>
+            <div class="text-white/50 text-sm">{{ upcomingEvents.length }}</div>
+          </div>
+
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
             <div
               v-for="event in upcomingEvents"
               :key="event.id"
-              class="rounded-xl border border-white/10 bg-black/30 px-4 py-3"
+              class="group rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_18px_50px_rgba(0,0,0,0.45)] overflow-hidden cursor-pointer hover:bg-white/5 transition motion-reduce:transition-none"
               @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
             >
-              <div class="text-purple-300 font-semibold">
-                {{ formatDate(event.date) }}
-              </div>
-              <div class="text-white font-semibold mt-1">
-                {{ event.city || 'N/A' }}, {{ event.state }}
-              </div>
-              <div class="text-white/80">{{ event.venue || 'N/A' }}</div>
-              <button
-                type="button"
-                class="mt-3 w-full custom-border text-white font-semibold px-4 py-3 rounded-md hover:bg-white/5 active:bg-white/10 transition-colors"
-                @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
-              >
-                View Event
-              </button>
-            </div>
-          </div>
+              <div class="p-5">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8 2v4" />
+                        <path d="M16 2v4" />
+                        <path d="M3 10h18" />
+                        <path d="M5 6h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
+                      </svg>
+                      {{ formatDate(event.date) }}
+                    </div>
 
-          <div class="hidden md:block overflow-x-scroll md:overflow-hidden relative no-scrollbar">
-            <table
-              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-            >
-              <thead>
-                <tr class="border-b border-purple-500 border-opacity-30">
-                  <th class="px-2 py-2 text-left">Date</th>
-                  <th class="px-2 py-2 text-left">City</th>
-                  <th class="px-2 py-2 text-left">Venue</th>
-                  <th class="px-2 py-2 text-left">Tickets</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="event in upcomingEvents"
-                  :key="event.id"
-                  class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click.stop="
-                    router.push(`/${route.params.bandSlug}/event/${event.slug}`)
-                  "
+                    <div class="mt-3 text-white font-semibold text-lg leading-tight truncate">
+                      {{ event.venue || 'Event' }}
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-white/70 text-sm">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-purple-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11z" />
+                        <circle cx="12" cy="10" r="2.5" />
+                      </svg>
+                      <span class="truncate">{{ event.city || 'N/A' }}<span v-if="event.state">, {{ event.state }}</span></span>
+                    </div>
+                  </div>
+
+                  <div class="shrink-0">
+                    <span class="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-semibold text-white/70">
+                      upcoming
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40 motion-reduce:transition-none"
+                  @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                 >
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ formatDate(event.date) }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.city || "N/A" }}, {{ event.state }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.venue || "N/A" }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    <button
-                      @click.stop="
-                        router.push(
-                          `/${route.params.bandSlug}/event/${event.slug}`
-                        )
-                      "
-                      class="text-purple-400"
-                    >
-                      View Event
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  View Event
+                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
         <!-- Past Events -->
         <section v-if="pastEvents.length" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Past Events
-          </h2>
-          <div class="space-y-3 md:hidden">
+          <div class="flex items-end justify-between gap-4">
+            <h2 class="text-2xl md:text-3xl font-bold text-white">
+              Past Events
+            </h2>
+            <div class="text-white/50 text-sm">{{ pastEvents.length }}</div>
+          </div>
+
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
             <div
               v-for="event in pastEvents"
               :key="event.id"
-              class="rounded-xl border border-white/10 bg-black/30 px-4 py-3"
+              class="group rounded-2xl border border-white/10 bg-black/30 hover:bg-white/5 transition overflow-hidden cursor-pointer motion-reduce:transition-none"
               @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
             >
-              <div class="text-purple-300 font-semibold">
-                {{ formatDate(event.date) }}
-              </div>
-              <div class="text-white font-semibold mt-1">
-                {{ event.city || 'N/A' }}, {{ event.state }}
-              </div>
-              <div class="text-white/80">{{ event.venue || 'N/A' }}</div>
-              <button
-                type="button"
-                class="mt-3 w-full custom-border text-white font-semibold px-4 py-3 rounded-md hover:bg-white/5 active:bg-white/10 transition-colors"
-                @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
-              >
-                View Event
-              </button>
-            </div>
-          </div>
+              <div class="p-5">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-purple-400/20 bg-purple-500/10 px-3 py-1 text-xs font-semibold text-purple-200">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8 2v4" />
+                        <path d="M16 2v4" />
+                        <path d="M3 10h18" />
+                        <path d="M5 6h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
+                      </svg>
+                      {{ formatDate(event.date) }}
+                    </div>
 
-          <div class="hidden md:block overflow-x-scroll md:overflow-hidden relative no-scrollbar">
-            <table
-              class="w-full table-auto bg-black text-white rounded-md shadow-lg"
-            >
-              <thead>
-                <tr class="border-b border-purple-500 border-opacity-30">
-                  <th class="px-2 py-2 text-left">Date</th>
-                  <th class="px-2 py-2 text-left">City</th>
-                  <th class="px-2 py-2 text-left">Venue</th>
-                  <th class="px-2 py-2 text-left">Tickets</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="event in pastEvents"
-                  :key="event.id"
-                  class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                  @click.stop="
-                    router.push(`/${route.params.bandSlug}/event/${event.slug}`)
-                  "
+                    <div class="mt-3 text-white font-semibold text-lg leading-tight truncate">
+                      {{ event.venue || 'Event' }}
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-white/70 text-sm">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11z" />
+                        <circle cx="12" cy="10" r="2.5" />
+                      </svg>
+                      <span class="truncate">{{ event.city || 'N/A' }}<span v-if="event.state">, {{ event.state }}</span></span>
+                    </div>
+                  </div>
+
+                  <div class="shrink-0">
+                    <span class="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-semibold text-white/70">
+                      past
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40 motion-reduce:transition-none"
+                  @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                 >
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ formatDate(event.date) }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.city || "N/A" }}, {{ event.state }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    {{ event.venue || "N/A" }}
-                  </td>
-                  <td class="px-2 py-1 whitespace-nowrap text-purple-400">
-                    <button
-                      @click.stop="
-                        router.push(
-                          `/${route.params.bandSlug}/event/${event.slug}`
-                        )
-                      "
-                      class="text-purple-400"
-                    >
-                      View Event
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  View Event
+                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 

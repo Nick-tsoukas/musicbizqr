@@ -26,7 +26,6 @@
         </div>
 
         <div
-          v-if="!isPhone"
           :class="[
             moduleClass(1),
             'text-center text-white font-bold motion-reduce:transition-none motion-reduce:transform-none',
@@ -520,6 +519,7 @@ import AudioPlayer from '@/components/AudioPlayer.vue'
 
 import neonPoster from '@/assets/neonposter.png'
 import eventPoster from '@/assets/eventposter1.png'
+import aisixPoster from '@/assets/aisix.webp'
 
 import facebookIcon from '@/assets/facebookfree.png'
 import instagramIcon from '@/assets/instagramfree.png'
@@ -748,7 +748,7 @@ const singleVideoEmbedUrl = computed(() => {
 })
 
 const singleVideoThumbnail = computed(() => {
-  return `https://img.youtube.com/vi/${demoVideoId}/hqdefault.jpg`
+  return aisixPoster
 })
 
 function playVideo() {
