@@ -301,11 +301,17 @@ async function mountQr() {
   // Save style bits so preview/export re-use the exact look
   styleOpts.value = {
     margin: baseOpts?.margin ?? 16,
+    backgroundOptions: baseOpts?.backgroundOptions,
     dotsOptions: baseOpts?.dotsOptions,
     cornersSquareOptions: baseOpts?.cornersSquareOptions,
     cornersDotOptions: baseOpts?.cornersDotOptions,
     image: baseOpts?.image,
     imageOptions: baseOpts?.imageOptions,
+  }
+  
+  // Sync local bgColor with saved options
+  if (baseOpts?.backgroundOptions?.color) {
+    bgColor.value = baseOpts.backgroundOptions.color
   }
 
   try {
@@ -375,7 +381,8 @@ watch(
 function computeBgColor() {
   // For PNG/JPEG, use hex or transparent; for SVG, 'transparent' usually works too
   if (transparentBg.value) return 'transparent'
-  return bgColor.value || '#FFFFFF'
+  // Use local bgColor (which is synced from saved options) or fall back to saved options directly
+  return bgColor.value || styleOpts.value?.backgroundOptions?.color || '#FFFFFF'
 }
 
 async function refreshPreview() {
@@ -504,6 +511,11 @@ async function onOpen() {
   fileName.value = props.defaultName || 'qr-code'
   errorMsg.value = ''
   appended = false // allow append if remounting
+
+  // Initialize bgColor from saved options if available
+  if (props.qrOptions?.backgroundOptions?.color) {
+    bgColor.value = props.qrOptions.backgroundOptions.color
+  }
 
   showMissingOptionsWarning.value = false
   isLoading.value = true
