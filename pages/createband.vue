@@ -1,438 +1,503 @@
 <template>
-  <div class="bg-[#000] w-[90vw] mx-auto z-0 pt-[var(--header-height)]">
-    <div v-if="loading" class="loading-container">
-      <div class="spinner"></div>
+  <div class="min-h-screen bg-black pt-[var(--header-height)]">
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 border-3 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+        <span class="text-white/70 text-sm">Creating your band...</span>
+      </div>
     </div>
-    <div class="container-mdc bg-black max-w-5xl">
-      <h1 class="title text-white">Create Band Profile</h1>
-      <form class="form-group" @submit.prevent="submitForm">
+
+    <div class="max-w-3xl mx-auto px-6 py-10">
+      <!-- Header -->
+      <div class="mb-10">
+        <NuxtLink to="/dashboard" class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm mb-4 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Dashboard
+        </NuxtLink>
+        <h1 class="text-3xl md:text-4xl font-bold text-white">Create Band Profile</h1>
+        <p class="text-white/60 mt-2">Set up your band's presence and start connecting with fans</p>
+      </div>
+
+      <form @submit.prevent="submitForm" class="space-y-8">
         <!-- Band Details Section -->
-        <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Band Details</h2>
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-purple-500 to-violet-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Band Details</h2>
+              <p class="form-section-subtitle">Basic information about your band</p>
+            </div>
           </div>
-          <div class="p-4">
+
+          <div class="form-section-content">
             <!-- Band Name -->
-            <div class="mdc-text-field">
+            <div class="form-field">
+              <label for="band-name" class="form-label">Band Name <span class="text-red-400">*</span></label>
               <input
                 type="text"
                 id="band-name"
-                class="mdc-text-field__input"
                 v-model="bandName"
-                placeholder=" "
+                class="form-input"
+                placeholder="Enter your band name"
                 required
               />
-              <label class="mdc-floating-label" for="band-name"
-                >Band Name</label
-              >
-              <div class="mdc-line-ripple"></div>
             </div>
 
-            <!-- New: Band name is in logo -->
-            <div class="flex items-center mb-4">
-              <input
-                id="isBandNameInLogo"
-                type="checkbox"
-                v-model="isBandNameInLogo"
-                class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded"
-              />
-              <label for="isBandNameInLogo" class="text-black select-none">
-                Show artist name in page or is it in the logo
-              </label>
-            </div>
+            <!-- Band name in logo toggle -->
+            <label for="isBandNameInLogo" class="flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/5 cursor-pointer hover:bg-white/[0.07] transition group">
+              <div class="relative">
+                <input
+                  id="isBandNameInLogo"
+                  type="checkbox"
+                  v-model="isBandNameInLogo"
+                  class="sr-only peer"
+                />
+                <div class="w-11 h-6 bg-white/20 rounded-full peer peer-checked:bg-purple-600 peer-focus:ring-2 peer-focus:ring-purple-500/50 transition-colors"></div>
+                <div class="absolute left-[2px] top-[2px] w-5 h-5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
+              </div>
+              <div>
+                <div class="text-white font-medium">Band name is in logo</div>
+                <div class="text-white/50 text-sm">Hide the text name if your logo already includes it</div>
+              </div>
+            </label>
 
             <!-- Genre -->
-            <div class="mdc-text-field">
+            <div class="form-field">
+              <label for="genre" class="form-label">Genre</label>
               <input
                 type="text"
                 id="genre"
-                class="mdc-text-field__input"
                 v-model="genre"
-                placeholder=" "
+                class="form-input"
+                placeholder="e.g. Rock, Jazz, Electronic"
               />
-              <label class="mdc-floating-label" for="genre">Genre</label>
-              <div class="mdc-line-ripple"></div>
             </div>
 
             <!-- Bio -->
-            <div class="mdc-text-field">
+            <div class="form-field">
+              <label for="bio" class="form-label">Bio / Description <span class="text-red-400">*</span></label>
               <textarea
                 id="bio"
-                class="mdc-text-field__input"
                 v-model="bio"
-                placeholder=" "
+                class="form-input form-textarea"
+                placeholder="Tell fans about your band..."
                 maxlength="247"
+                rows="4"
                 required
               ></textarea>
-              <label class="mdc-floating-label" for="bio"
-                >Artist Description/Introduction</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-
-            <div
-              class="mdc-text-field-helper"
-              :class="{ 'mdc-text-field-helper--error': bio.length > max }"
-            >
-              {{ bio.length }} / {{ max }} characters
+              <div class="flex justify-end mt-2">
+                <span 
+                  class="text-sm"
+                  :class="bio.length > max ? 'text-red-400' : 'text-white/40'"
+                >
+                  {{ bio.length }} / {{ max }}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Website Link and Text -->
-        <div class="bg-[#fff] rounded-md my-10">
-          <div
-            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">
-              Website Link and Text
-            </h2>
-          </div>
-          <div class="p-4">
-            <div class="mdc-text-field">
-              <input
-                type="text"
-                id="websitelink"
-                class="mdc-text-field__input"
-                v-model="websitelink"
-                placeholder="https://yourbandsite.com"
-              />
-              <label class="mdc-floating-label" for="websitelink"
-                >Website Link</label
-              >
-              <div class="mdc-line-ripple"></div>
+        <!-- Band Image Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-pink-500 to-rose-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Band Image</h2>
+              <p class="form-section-subtitle">Upload your band photo or logo</p>
             </div>
           </div>
-          <div class="p-4">
-            <div class="mdc-text-field">
-              <input
-                type="text"
-                id="websitelinktext"
-                class="mdc-text-field__input"
-                v-model="websitelinktext"
-                placeholder="YourBandSiteLinkText.com"
-              />
-              <label class="mdc-floating-label" for="websitelinktext"
-                >Website Link Text To Show</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Band Image -->
-        <div
-          class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h3 class="font-semibold text-white text-2xl">Upload Image</h3>
-        </div>
-        <div class="mb-4 py-10 bg-white p-4">
-          <div
-            v-if="bandImgUrl"
-            class="flex flex-col justify-center items-center max-h-[400px] p-4 rounded-lg gap-4"
-          >
-            <img
-              :src="bandImgUrl"
-              alt="Band Image"
-              class="max-h-[400px] w-auto h-auto object-contain rounded-lg shadow-md"
-            />
-
-            <!-- REMOVE IMAGE BUTTON -->
-            <button
-              type="button"
-              @click="removeBandImage"
-              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-            >
-              Remove Image
-            </button>
-          </div>
-
-          <input
-            type="file"
-            id="band-img"
-            class="styled-file-input"
-            @change="handleImageUpload"
-            accept="image/*"
-          />
-          <label
-            for="band-img"
-            class="styled-file-label w-full text-center my-10"
-          >
-            Choose Band Image
-          </label>
-        </div>
-
-        <!-- Social Media Links Section -->
-        <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">
-              Social Media Links
-            </h2>
-          </div>
-          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div
-              v-for="net in Object.keys(social)"
-              :key="net"
-              class="mdc-text-field"
-            >
-              <input
-                :id="net"
-                type="text"
-                class="mdc-text-field__input"
-                v-model="social[net]"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" :for="net">{{
-                net.charAt(0).toUpperCase() + net.slice(1)
-              }}</label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Streaming Links Section -->
-        <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Streaming Links</h2>
-          </div>
-          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div
-              v-for="stream in Object.keys(streaming)"
-              :key="stream"
-              class="mdc-text-field"
-            >
-              <input
-                :id="stream"
-                type="text"
-                class="mdc-text-field__input"
-                v-model="streaming[stream]"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" :for="stream">
-                {{ stream.charAt(0).toUpperCase() + stream.slice(1) }}
-              </label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Single Song Section (Embed or Upload) -->
-        <!-- Single Song Section (Embed or Upload) -->
-        <div class="bg-[#fff] rounded-md">
-          <div
-            class="flex mt-10 flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Single Song</h2>
-          </div>
-          <div class="p-4">
-            <!-- Toggle: Upload vs Embed -->
-            <div class="flex space-x-4 mb-4">
-              <label class="text-black">
-                <input
-                  type="radio"
-                  value="upload"
-                  v-model="singlesongType"
-                  class="mr-1"
+          <div class="form-section-content">
+            <div v-if="bandImgUrl" class="mb-6">
+              <div class="relative inline-block">
+                <img
+                  :src="bandImgUrl"
+                  alt="Band Image"
+                  class="max-h-64 w-auto rounded-xl border border-white/10 shadow-lg"
                 />
-                Upload File
-              </label>
-              <label class="text-black">
-                <input
-                  type="radio"
-                  value="embed"
-                  v-model="singlesongType"
-                  class="mr-1"
-                />
-                Embed Content
-              </label>
-            </div>
-
-            <!-- Song Title -->
-            <div class="mdc-text-field mb-4">
-              <input
-                type="text"
-                id="singlesong-title"
-                class="mdc-text-field__input"
-                v-model="singlesongTitle"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="singlesong-title"
-                >Song Title</label
-              >
-              <div class="mdc-line-ripple"></div>
-            </div>
-
-            <!-- Upload Mode -->
-            <div v-if="singlesongType === 'upload'" class="space-y-4">
-              <input
-                type="file"
-                id="singlesong-file"
-                class="styled-file-input"
-                @change="handleSingleSongUpload"
-                accept="audio/*"
-                :key="songInputKey"
-              />
-              <label
-                for="singlesong-file"
-                class="styled-file-label w-full text-center"
-              >
-                Choose Single Song File
-              </label>
-
-              <div
-                v-if="singlesongFile"
-                class="mt-4 text-black flex items-center justify-between"
-              >
-                <span>Selected Song: {{ singlesongFile.name }}</span>
-
-                <!-- REMOVE SONG BUTTON -->
                 <button
                   type="button"
-                  @click="removeSingleSong"
-                  class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 ml-4"
+                  @click="removeBandImage"
+                  class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition"
                 >
-                  Remove
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
             </div>
 
-            <!-- Embed Mode: paste raw iframe code -->
-            <div v-else class="space-y-4">
-              <div class="mdc-text-field">
+            <label
+              for="band-img"
+              class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-purple-500/50 hover:bg-white/5 transition group"
+            >
+              <svg class="w-10 h-10 text-white/30 group-hover:text-purple-400 transition mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <span class="text-white/50 group-hover:text-white/70 transition">Click to upload image</span>
+              <span class="text-white/30 text-sm mt-1">PNG, JPG up to 10MB</span>
+              <input
+                type="file"
+                id="band-img"
+                class="hidden"
+                @change="handleImageUpload"
+                accept="image/*"
+              />
+            </label>
+          </div>
+        </section>
+
+        <!-- Featured Song Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-orange-500 to-amber-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Featured Song</h2>
+              <p class="form-section-subtitle">Showcase a track on your profile</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <!-- Toggle: Upload vs Embed -->
+            <div class="flex gap-4 mb-6">
+              <button 
+                type="button"
+                @click="singlesongType = 'upload'"
+                class="flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border cursor-pointer transition"
+                :class="singlesongType === 'upload' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/[0.07]'"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span class="font-medium">Upload File</span>
+              </button>
+              <button 
+                type="button"
+                @click="singlesongType = 'embed'"
+                class="flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border cursor-pointer transition"
+                :class="singlesongType === 'embed' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/[0.07]'"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                <span class="font-medium">Embed Code</span>
+              </button>
+            </div>
+
+            <!-- Song Title -->
+            <div class="form-field">
+              <label for="singlesong-title" class="form-label">Song Title</label>
+              <input
+                type="text"
+                id="singlesong-title"
+                v-model="singlesongTitle"
+                class="form-input"
+                placeholder="Enter song title"
+              />
+            </div>
+
+            <!-- Upload Mode -->
+            <div v-if="singlesongType === 'upload'" class="space-y-4">
+              <div v-if="singlesongFile" class="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                  <span class="text-white truncate">{{ singlesongFile.name }}</span>
+                </div>
+                <button
+                  type="button"
+                  @click="removeSingleSong"
+                  class="text-red-400 hover:text-red-300 transition"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+
+              <label
+                v-else
+                for="singlesong-file"
+                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-purple-500/50 hover:bg-white/5 transition group"
+              >
+                <svg class="w-8 h-8 text-white/30 group-hover:text-purple-400 transition mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+                <span class="text-white/50 group-hover:text-white/70 transition">Click to upload audio file</span>
+                <input
+                  type="file"
+                  id="singlesong-file"
+                  class="hidden"
+                  @change="handleSingleSongUpload"
+                  accept="audio/*"
+                  :key="songInputKey"
+                />
+              </label>
+            </div>
+
+            <!-- Embed Mode -->
+            <div v-if="singlesongType === 'embed'" class="space-y-4">
+              <div class="form-field">
+                <label for="singlesong-embedhtml" class="form-label">Embed Code</label>
                 <textarea
                   id="singlesong-embedhtml"
-                  class="mdc-text-field__input"
                   v-model="singlesongEmbedHtml"
-                  rows="6"
+                  class="form-input form-textarea font-mono text-sm"
+                  rows="5"
+                  placeholder="Paste your iframe embed code here..."
                 ></textarea>
-                <label class="mdc-floating-label" for="singlesong-embedhtml">
-                  Paste embed code (iframe)
-                </label>
-                <div class="mdc-line-ripple"></div>
               </div>
-
-              <!-- REMOVE EMBED BUTTON -->
               <button
+                v-if="singlesongEmbedHtml"
                 type="button"
                 @click="removeEmbedSong"
-                class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700"
+                class="text-red-400 hover:text-red-300 text-sm transition"
               >
-                Clear Embed
+                Clear embed code
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Single Video Section -->
-        <!-- Featured Video -->
-        <div class="bg-white rounded-md my-10">
-          <div
-            class="flex bg-black p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500"
-          >
-            <h2 class="text-white text-2xl font-semibold">Featured Video</h2>
-          </div>
-          <div class="p-4 space-y-4">
-            <!-- Video Title -->
-            <div class="mdc-text-field">
-              <input
-                id="singlevideo-title"
-                v-model="singlevideoTitle"
-                type="text"
-                class="mdc-text-field__input"
-                placeholder=" "
-              />
-              <label class="mdc-floating-label" for="singlevideo-title">
-                Video Title
-              </label>
-              <div class="mdc-line-ripple"></div>
+        <!-- Featured Video Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-red-500 to-rose-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
             </div>
-
-            <!-- YouTube ID -->
-            <div class="mdc-text-field">
-              <input
-                id="singlevideo-youtube"
-                v-model="singlevideoYoutubeUrl"
-                type="text"
-                class="mdc-text-field__input"
-                placeholder="e.g. dQw4w9WgXcQ"
-              />
-              <label class="mdc-floating-label" for="singlevideo-youtube">
-                YouTube ID
-              </label>
-              <div class="mdc-line-ripple"></div>
-            </div>
-
-            <!-- NEW: Remove Video button -->
-            <div class="mt-4" v-if="singlevideoTitle || singlevideoYoutubeUrl">
-              <button
-                type="button"
-                class="mdc-button"
-                @click="clearSingleVideo"
-              >
-                Remove Video
-              </button>
+            <div>
+              <h2 class="form-section-title">Featured Video</h2>
+              <p class="form-section-subtitle">Add a YouTube video to your profile</p>
             </div>
           </div>
-        </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="singlevideo-title" class="form-label">Video Title</label>
+                <input
+                  id="singlevideo-title"
+                  v-model="singlevideoTitle"
+                  type="text"
+                  class="form-input"
+                  placeholder="Enter video title"
+                />
+              </div>
+              <div class="form-field">
+                <label for="singlevideo-youtube" class="form-label">YouTube Video ID</label>
+                <input
+                  id="singlevideo-youtube"
+                  v-model="singlevideoYoutubeUrl"
+                  type="text"
+                  class="form-input"
+                  placeholder="e.g. dQw4w9WgXcQ"
+                />
+              </div>
+            </div>
+            <button
+              v-if="singlevideoTitle || singlevideoYoutubeUrl"
+              type="button"
+              @click="clearSingleVideo"
+              class="text-red-400 hover:text-red-300 text-sm transition mt-4"
+            >
+              Remove video
+            </button>
+          </div>
+        </section>
+
+        <!-- Streaming Links Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-green-500 to-emerald-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Streaming Links</h2>
+              <p class="form-section-subtitle">Where fans can stream your music</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-for="stream in Object.keys(streaming)" :key="stream" class="form-field">
+                <label :for="stream" class="form-label capitalize">{{ stream }}</label>
+                <input
+                  :id="stream"
+                  type="text"
+                  v-model="streaming[stream]"
+                  class="form-input"
+                  placeholder="Paste your link here"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Social Media Links Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-pink-500 to-purple-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Social Media</h2>
+              <p class="form-section-subtitle">Connect your social profiles</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-for="net in Object.keys(social)" :key="net" class="form-field">
+                <label :for="net" class="form-label capitalize">{{ net }}</label>
+                <input
+                  :id="net"
+                  type="text"
+                  v-model="social[net]"
+                  class="form-input"
+                  :placeholder="`https://${net}.com/...`"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Website Link Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-blue-500 to-cyan-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Website</h2>
+              <p class="form-section-subtitle">Link to your official website</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="websitelink" class="form-label">Website URL</label>
+                <input
+                  type="text"
+                  id="websitelink"
+                  v-model="websitelink"
+                  class="form-input"
+                  placeholder="https://yourbandsite.com"
+                />
+              </div>
+              <div class="form-field">
+                <label for="websitelinktext" class="form-label">Display Text</label>
+                <input
+                  type="text"
+                  id="websitelinktext"
+                  v-model="websitelinktext"
+                  class="form-input"
+                  placeholder="Visit our website"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
         <!-- Support Buttons Section -->
-        <div class="bg-[#fff] rounded-md my-10">
-          <div
-            class="flex flex-col bg-[#000] p-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-          >
-            <h2 class="font-semibold text-white text-2xl">Support Buttons</h2>
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-emerald-500 to-teal-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Support Buttons</h2>
+              <p class="form-section-subtitle">Let fans support you financially</p>
+            </div>
           </div>
-          <div class="p-4 space-y-4">
-            <div
-              v-for="btn in paymentButtons"
-              :key="btn.key"
-              class="border border-black/10 rounded-md p-4"
-            >
-              <div class="flex items-start justify-between gap-4">
-                <div>
-                  <div class="font-semibold text-black">{{ btn.title }}</div>
-                  <div v-if="btn.description" class="text-sm text-gray-700 mt-1">
-                    {{ btn.description }}
+
+          <div class="form-section-content">
+            <div class="space-y-3">
+              <div
+                v-for="btn in paymentButtons"
+                :key="btn.key"
+                class="p-4 rounded-xl border transition"
+                :class="btn.enabled ? 'border-purple-500/40 bg-purple-500/10' : 'border-white/10 bg-white/5'"
+              >
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex-1">
+                    <div class="text-white font-medium">{{ btn.title }}</div>
+                    <div v-if="btn.description" class="text-white/50 text-sm mt-1">
+                      {{ btn.description }}
+                    </div>
                   </div>
-                </div>
-                <div class="flex items-center">
-                  <input
-                    :id="`paybtn-${btn.key}`"
-                    type="checkbox"
-                    v-model="btn.enabled"
-                    class="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded"
-                  />
-                  <label :for="`paybtn-${btn.key}`" class="text-black select-none">
-                    Enabled
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input
+                      :id="`paybtn-${btn.key}`"
+                      type="checkbox"
+                      v-model="btn.enabled"
+                      class="sr-only peer"
+                    />
+                    <div class="w-11 h-6 bg-white/20 rounded-full peer peer-checked:bg-purple-600 transition-colors"></div>
+                    <div class="absolute left-[2px] top-[2px] w-5 h-5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
                   </label>
                 </div>
-              </div>
 
-              <div class="mt-3 flex items-center gap-2">
-                <span class="text-black">$</span>
-                <input
-                  v-model.number="btn.minAmount"
-                  type="number"
-                  step="1"
-                  min="0"
-                  class="w-32 px-3 py-2 rounded-md bg-white border border-black/20 text-black"
-                />
-                <span class="text-black/70">minimum</span>
+                <div v-if="btn.enabled" class="mt-4 flex items-center gap-3">
+                  <span class="text-white/60">Min $</span>
+                  <input
+                    v-model.number="btn.minAmount"
+                    type="number"
+                    step="1"
+                    min="0"
+                    class="w-24 px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-purple-500 focus:outline-none transition"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         <!-- Submit Button -->
-        <button type="submit" class="mdc-button w-full mt-10">
-          Create Profile
-        </button>
+        <div class="pt-6 pb-10">
+          <button 
+            type="submit" 
+            class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white font-semibold text-lg shadow-lg shadow-purple-500/25 transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="loading"
+          >
+            <span v-if="loading" class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Creating...
+            </span>
+            <span v-else>Create Band Profile</span>
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -753,135 +818,58 @@ async function submitForm() {
 </script>
 
 <style scoped>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.container-mdc {
-  margin: 1rem auto;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Form Section Card */
+.form-section {
+  @apply rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent overflow-hidden;
 }
 
-.mdc-text-field-helper {
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 0.25rem;
-  line-height: 1;
-}
-.mdc-text-field-helper--error {
-  color: #b00020; /* a red for over-limit */
-}
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-}
-.mdc-text-field {
-  position: relative;
-  margin-bottom: 1rem;
-  width: 100%;
-}
-.mdc-text-field__input {
-  width: 100%;
-  padding: 0.75rem 0.5rem;
-  border: 1px solid #000;
-  border-radius: 10px;
-  outline: none;
+.form-section-header {
+  @apply flex items-center gap-4 p-5 border-b border-white/10 bg-white/[0.02];
 }
 
-/* hide all placeholders by default */
-.mdc-text-field__input::placeholder {
-  color: transparent;
-  transition: color 0.2s;
+.form-section-icon {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0;
 }
 
-/* reveal placeholder only when the input is focused */
-.mdc-text-field__input:focus::placeholder {
-  color: #888; /* or whatever light gray matches your theme */
+.form-section-title {
+  @apply text-lg font-semibold text-white;
 }
 
-.mdc-floating-label {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.5rem;
-  background: #fff;
-  padding: 0 0.2em;
-  transition:
-    transform 0.2s,
-    color 0.2s;
-}
-.mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
-  transform: translateY(-1.5rem);
-  color: #6200ee;
-}
-.mdc-line-ripple {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #6200ee;
-  transform: scaleX(0);
-  transition: transform 0.2s;
-}
-.mdc-text-field__input:focus ~ .mdc-line-ripple {
-  transform: scaleX(1);
+.form-section-subtitle {
+  @apply text-sm text-white/50;
 }
 
-.mdc-button,
-.styled-file-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.mdc-button {
-  background: #2c2c2c;
-  color: #fff;
-  border: none;
-  margin-top: 1rem;
-}
-.mdc-button:hover {
-  background: #3700b3;
-}
-.styled-file-input {
-  display: none;
-}
-.styled-file-label {
-  background: #7c3aed;
-  color: #fff;
-}
-.styled-file-label:hover {
-  background: #3700b3;
+.form-section-content {
+  @apply p-5 space-y-4;
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+/* Form Fields */
+.form-field {
+  @apply space-y-2;
 }
-.spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #6200ee;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-  margin-top: 2rem;
+
+.form-label {
+  @apply block text-sm font-medium text-white/70;
 }
+
+.form-input {
+  @apply w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 
+         focus:border-purple-500 focus:bg-white/[0.07] focus:outline-none focus:ring-1 focus:ring-purple-500/50 
+         transition duration-200;
+}
+
+.form-textarea {
+  @apply resize-none;
+}
+
+/* Animations */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style>
