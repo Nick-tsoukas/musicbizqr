@@ -321,11 +321,36 @@
                 <SmartLinkDemoInline />
               </div>
             </section>
+
+            <div class="px-6 md:px-10">
+              <div class="mt-8 flex items-center justify-center">
+                <span
+                  class="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/80"
+                >
+                  Interactive Analytics Demo
+                </span>
+              </div>
+              <h3
+                class="mt-4 text-4xl md:text-5xl font-extrabold text-center tracking-tight"
+              >
+                <span
+                  class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-teal-300 to-violet-400"
+                >
+                  See what fans do after they scan
+                </span>
+              </h3>
+              <p class="mt-3 max-w-3xl mx-auto text-center text-white/80 text-lg leading-relaxed">
+                Toggle between metrics, date ranges, and bar/line views to preview the dashboard your band gets—so you can spot what’s working and double down.
+              </p>
+            </div>
+
+            <AnalyticsDemoInline />
           </div>
         </div>
 
-        <!-- Embed section (unchanged) -->
+        <!-- Embed section (unused) -->
         <section
+          v-if="false"
           class="relative min-h-screen items-center justify-center pt-10 md:pt-24 image_gradient"
         >
           <div class="flex flex-col items-center mx-2 md:mx-20 md:flex-row">
@@ -426,8 +451,8 @@
           </div> -->
         <!-- </section> -->
 
-        <!-- Analytics chart (unchanged) -->
-        <section class="w-[100vw] mx-auto">
+        <!-- Analytics chart (unused) -->
+        <section v-if="false" class="w-[100vw] mx-auto">
           <section
             class="bg-gradient-to-r from-purple-600 to-indigo-600 py-10 md:py-20"
           >
@@ -652,6 +677,7 @@ import {
 
 import SmartLinkDemoPhone from "@/components/demo/SmartLinkDemoPhone.vue";
 import SmartLinkDemoInline from "@/components/demo/SmartLinkDemoInline.vue";
+import AnalyticsDemoInline from "@/components/demo/AnalyticsDemoInline.vue";
 
 import deezer from "@/assets/dezzer.svg";
 

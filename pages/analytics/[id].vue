@@ -1,8 +1,15 @@
 <template>
   <div
-    class="px-4 sm:px-6 py-8 bg-black min-h-screen pt-[var(--header-height)] max-w-5xl mx-auto"
+    class="px-4 sm:px-6 py-10 bg-gradient-to-b from-black via-slate-950 to-black min-h-screen pt-[var(--header-height)] max-w-6xl mx-auto"
   >
-    <h2 class="text-2xl font-bold mb-6 text-white">Analytics Dashboard</h2>
+    <div class="flex items-start justify-between gap-4 mb-6">
+      <div class="min-w-0">
+        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Analytics Dashboard</h2>
+        <div class="text-gray-400 text-sm mt-1">
+          Understand what fans do after they scan.
+        </div>
+      </div>
+    </div>
 
     <!-- Insights (MUSE) -->
     <div class="chart-card mb-6">
@@ -39,9 +46,9 @@
 
       <div v-else>
         <!-- Metric grid -->
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
           <!-- Page Views -->
-          <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p class="text-gray-400 text-xs">Page Views</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.pageViews ?? 0 }}
@@ -61,7 +68,7 @@
           </div>
 
           <!-- Link Clicks -->
-          <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p class="text-gray-400 text-xs">Link Clicks</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.linkClicks ?? 0 }}
@@ -69,7 +76,7 @@
           </div>
 
           <!-- Song Plays -->
-          <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p class="text-gray-400 text-xs">Song Plays</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.songPlays ?? 0 }}
@@ -77,7 +84,7 @@
           </div>
 
           <!-- Video Plays -->
-          <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p class="text-gray-400 text-xs">Video Plays</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.videoPlays ?? 0 }}
@@ -85,7 +92,7 @@
           </div>
 
           <!-- ✅ QR Scans -->
-          <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p class="text-gray-400 text-xs">QR Scans</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.qrScans ?? 0 }}
@@ -93,7 +100,7 @@
           </div>
 
           <!-- Engagement -->
-          <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p class="text-gray-400 text-xs">Engagement Rate</p>
             <p class="text-2xl font-semibold text-white">
               {{ liveMuseSummary.engagementRate ?? 0 }}%
@@ -143,17 +150,69 @@
       </div>
     </div>
 
+    <!-- Performance Overview (matches homepage demo KPI strip) -->
+    <div class="chart-card mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-white text-lg font-semibold">Performance Overview</h3>
+        <span class="text-gray-400 text-xs">{{ museRangeLabel }}</span>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Total</p>
+          <p class="text-2xl font-semibold text-white tabular-nums">
+            {{ kpiTotalValue.toLocaleString() }}
+          </p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ kpiTotalLabel }}</p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Range</p>
+          <p class="text-2xl font-semibold text-white">{{ museRangeLabel }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">Selected window</p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top City</p>
+          <p class="text-white font-semibold truncate">
+            {{ topCityKpi.city }}
+          </p>
+          <p class="text-xs text-gray-400 mt-0.5 tabular-nums">
+            {{ topCityKpi.count.toLocaleString() }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top Platform</p>
+          <p class="text-white font-semibold truncate">
+            {{ topPlatformKpi.platform }}
+          </p>
+          <p class="text-xs text-gray-400 mt-0.5 tabular-nums">
+            {{ topPlatformKpi.count.toLocaleString() }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Engagement</p>
+          <p class="text-2xl font-semibold text-white tabular-nums">
+            {{ (liveMuseSummary?.engagementRate ?? 0).toLocaleString() }}%
+          </p>
+          <p class="text-xs text-gray-400 mt-0.5">Clicks + plays + scans</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Tabs -->
-    <div class="flex gap-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-4">
       <button
         v-for="tab in tabs"
         :key="tab"
         @click="selectedTab = tab"
         :class="[
-          'px-3 py-1.5 text-sm rounded-full transition-colors',
+          'px-3 py-1.5 text-sm rounded-full border transition-colors shadow-sm',
           selectedTab === tab
-            ? 'bg-purple-600 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
+            ? 'bg-purple-500/20 text-purple-100 border-purple-400/40'
+            : 'bg-black/30 text-gray-300 border-white/10 hover:bg-white/5',
         ]"
       >
         {{ tab }}
@@ -161,16 +220,16 @@
     </div>
 
     <!-- Range Selector -->
-    <div class="flex gap-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-4">
       <button
         v-for="(label, days) in rangeOptions"
         :key="days"
         @click="selectedRange = Number(days)"
         :class="[
-          'px-3 py-1 text-sm rounded-full transition-colors',
+          'px-3 py-1 text-sm rounded-full border transition-colors shadow-sm',
           selectedRange === Number(days)
-            ? 'bg-purple-500 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
+            ? 'bg-purple-500/20 text-purple-100 border-purple-400/40'
+            : 'bg-black/30 text-gray-300 border-white/10 hover:bg-white/5',
         ]"
       >
         {{ label }}
@@ -178,12 +237,12 @@
     </div>
 
     <!-- Date Picker (Only for Today/Hourly) -->
-    <div v-if="selectedRange === 1" class="mb-6">
-      <label class="text-white mr-2">Select Day:</label>
+    <div v-if="selectedRange === 1" class="mb-6 flex items-center gap-3">
+      <label class="text-white text-sm">Select Day:</label>
       <input
         type="date"
         v-model="selectedDate"
-        class="bg-gray-800 text-white rounded px-2 py-1"
+        class="bg-black/30 text-white rounded-lg px-3 py-2 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
       />
     </div>
 
@@ -203,15 +262,45 @@
         </div>
 
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">{{ chartTitle }}</h3>
+          <div class="min-w-0">
+            <h3 class="text-white text-lg font-semibold">{{ chartTitle }}</h3>
+            <div class="text-gray-400 text-xs">
+              {{
+                selectedRange === 1
+                  ? humanDayLabel(selectedDate)
+                  : `Last ${selectedRange} days`
+              }}
+            </div>
+          </div>
 
-          <span class="text-gray-400 text-xs">
-            {{
-              selectedRange === 1
-                ? humanDayLabel(selectedDate)
-                : `Last ${selectedRange} days`
-            }}
-          </span>
+          <div class="flex items-center gap-1.5 shrink-0 bg-black/20 border border-white/10 rounded-full p-1">
+            <button
+              type="button"
+              :aria-pressed="chartDisplayType === 'bar'"
+              @click="setChartDisplayType('bar')"
+              :class="[
+                'px-3 py-1 text-xs rounded-full transition-colors',
+                chartDisplayType === 'bar'
+                  ? 'bg-emerald-500/20 text-emerald-200'
+                  : 'text-gray-300 hover:bg-white/5',
+              ]"
+            >
+              Bar
+            </button>
+            <button
+              type="button"
+              :aria-pressed="chartDisplayType === 'line'"
+              @click="setChartDisplayType('line')"
+              :class="[
+                'px-3 py-1 text-xs rounded-full transition-colors',
+                chartDisplayType === 'line'
+                  ? 'bg-emerald-500/20 text-emerald-200'
+                  : 'text-gray-300 hover:bg-white/5',
+              ]"
+            >
+              Line
+            </button>
+          </div>
         </div>
         <div class="chart-wrap ratio-16x9">
           <ClientOnly>
@@ -432,56 +521,43 @@
       <!-- Devices (from server rollups) -->
       <div class="chart-card">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">Devices</h3>
+          <h3 class="text-white text-lg font-semibold">Top Devices</h3>
           <span class="text-gray-400 text-xs"
             >{{ totalDeviceViews }} total</span
           >
         </div>
 
-        <ul
-          v-if="totalDeviceViews > 0"
-          class="text-gray-200 text-sm divide-y divide-gray-800 mb-3"
-        >
-          <li
+        <div v-if="totalDeviceViews > 0" class="mt-3 space-y-2">
+          <div
             v-for="item in deviceBreakdown"
             :key="item.key"
-            class="flex items-center justify-between py-2"
+            class="flex items-center gap-3"
           >
-            <div class="flex items-center gap-2">
-              <span
-                class="inline-block w-3 h-3 rounded-full"
-                :style="{ backgroundColor: item.color }"
-              />
-              <span class="text-white">{{ item.label }}</span>
+            <div class="w-24 sm:w-28 truncate text-white/85 text-sm">
+              {{ item.label }}
             </div>
-            <div class="tabular-nums">
-              <span class="text-white font-medium mr-2">{{ item.count }}</span>
-              <span class="text-gray-400">({{ item.pct }}%)</span>
+            <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+              <div
+                class="h-2 rounded-full"
+                :style="{ width: `${item.pct}%`, backgroundColor: item.color }"
+              ></div>
             </div>
-          </li>
-        </ul>
-        <div v-else class="text-gray-400 text-sm mb-3">No device data yet.</div>
-
-        <div class="chart-wrap square max-w-[700px] mx-auto">
-          <ClientOnly>
-            <canvas
-              ref="deviceCanvas"
-              class="chart-canvas"
-              aria-label="Device distribution"
-              role="img"
-            />
-          </ClientOnly>
+            <div class="w-14 text-right tabular-nums text-white/60 text-sm">
+              {{ item.count }}
+            </div>
+          </div>
         </div>
+        <div v-else class="text-gray-400 text-sm">No device data yet.</div>
       </div>
 
       <!-- 🎬 YouTube Analytics -->
       <div
         v-if="!youtubeData"
-        class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 p-6 text-center shadow-[0_10px_25px_rgba(239,68,68,0.25)]"
+        class="mb-6 rounded-2xl border border-white/10 bg-black/20 p-6 text-center"
       >
         <div class="flex flex-col items-center justify-center gap-4">
           <div
-            class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500 shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
+            class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500/20 border border-red-400/20"
           >
             <svg
               viewBox="0 0 24 24"
@@ -514,7 +590,7 @@
       <!-- ✅ CONNECTED: YouTube Card -->
       <div
         v-else
-        class="mb-6 rounded-xl bg-gradient-to-br from-[#1F2937] via-[#111827] to-black border border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.25)] overflow-hidden"
+        class="mb-6 rounded-2xl border border-white/10 bg-black/20 overflow-hidden"
       >
         <!-- Header -->
         <div
@@ -523,7 +599,7 @@
           <!-- Left: brand + title -->
           <div class="flex items-center gap-3">
             <div
-              class="w-11 h-11 rounded-2xl bg-red-500 flex items-center justify-center shadow-[0_10px_25px_rgba(239,68,68,0.5)]"
+              class="w-11 h-11 rounded-2xl bg-red-500/20 border border-red-400/20 flex items-center justify-center"
               aria-hidden="true"
             >
               <svg
@@ -615,7 +691,7 @@
 
         <!-- Metrics -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 px-6 pb-5">
-          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p
               class="text-xs text-gray-300/80 mb-1"
               v-tooltip="'Channel views (fallback: sum of recent videos)'"
@@ -629,7 +705,7 @@
             </p>
           </div>
 
-          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p
               class="text-xs text-gray-300/80 mb-1"
               v-tooltip="'Number of uploaded videos found in your uploads feed'"
@@ -643,7 +719,7 @@
             </p>
           </div>
 
-          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p
               class="text-xs text-gray-300/80 mb-1"
               v-tooltip="'Average views per video (Total views ÷ videos)'"
@@ -657,7 +733,7 @@
             </p>
           </div>
 
-          <div class="bg-black/10 border border-red-500/20 rounded-lg p-3">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
             <p
               class="text-xs text-gray-300/80 mb-1"
               v-tooltip="'Days since your most recent upload'"
@@ -848,7 +924,7 @@
             <div
               v-for="vid in richYoutube.videos"
               :key="vid.id || vid.title"
-              class="relative flex gap-3 bg-black/10 border border-white/5 rounded-lg p-3"
+              class="relative flex gap-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition p-3 motion-reduce:transition-none"
             >
               <span
                 v-if="(vid.views ?? 0) > 1000"
@@ -861,7 +937,7 @@
                 v-if="vid.thumbnail"
                 :src="vid.thumbnail"
                 alt=""
-                class="w-20 h-14 object-cover rounded-md flex-shrink-0"
+                class="w-20 h-14 object-cover rounded-lg flex-shrink-0 border border-white/10"
                 loading="lazy"
                 decoding="async"
               />
@@ -911,20 +987,20 @@
         </div>
 
         <div v-else>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-            <div class="bg-neutral-900 rounded-lg p-3">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+            <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
               <p class="text-gray-400 text-xs">Total paid</p>
               <p class="text-2xl font-semibold text-white">
                 {{ formatUsd(paymentsTotals.totalPaidAmount) }}
               </p>
             </div>
-            <div class="bg-neutral-900 rounded-lg p-3">
+            <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
               <p class="text-gray-400 text-xs">Payments count</p>
               <p class="text-2xl font-semibold text-white">
                 {{ paymentsTotals.totalPaidCount }}
               </p>
             </div>
-            <div class="bg-neutral-900 rounded-lg p-3">
+            <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
               <p class="text-gray-400 text-xs">Recent payments</p>
               <p class="text-2xl font-semibold text-white">
                 {{ paymentsRecent.length }}
@@ -946,7 +1022,7 @@
                 <tr
                   v-for="row in paymentsRecent"
                   :key="row.id"
-                  class="text-gray-200 border-b border-white/5"
+                  class="text-gray-200 border-b border-white/5 hover:bg-white/5 transition-colors"
                 >
                   <td class="py-2 pr-4 whitespace-nowrap">
                     {{ formatWhen(row.paidAt || row.createdAt) }}
@@ -1021,6 +1097,15 @@ const directives = { tooltip: vTooltip };
 /* ---------- UI state ---------- */
 const tabs = ["Page Views", "Link Clicks", "Songs", "Videos", "QR Scans"] as const;
 const selectedTab = ref<(typeof tabs)[number]>("Page Views");
+
+const chartDisplayType = ref<"bar" | "line">("bar");
+
+function setChartDisplayType(t: "bar" | "line") {
+  chartDisplayType.value = t;
+  try {
+    localStorage.setItem("analytics_chart_type", t);
+  } catch {}
+}
 
 const rangeOptions: Record<number, string> = {
   1: "Daily",
@@ -1107,9 +1192,6 @@ async function fetchPaymentsSummary(bandIdNum: number) {
 /* ---------- canvases / chart handles ---------- */
 const viewsCanvas = ref<HTMLCanvasElement | null>(null);
 let viewsChart: any = null;
-
-const deviceCanvas = ref<HTMLCanvasElement | null>(null);
-let deviceChart: any = null;
 
 /* ---------- helpers (format) ---------- */
 function humanDayLabel(yyyy_mm_dd: string) {
@@ -1218,7 +1300,22 @@ async function connectYoutube() {
     }
   } catch (err) {
     console.error("[YouTube connect error]", err);
-    alert("Error starting YouTube connection.");
+    const anyErr: any = err as any;
+    const status = anyErr?.status || anyErr?.response?.status || null;
+    const msg =
+      anyErr?.data?.error ||
+      anyErr?.response?._data?.error ||
+      anyErr?.message ||
+      "Error starting YouTube connection.";
+
+    if (status === 404 && String(msg).toLowerCase().includes("band")) {
+      alert(
+        `${msg}\n\nTip (local dev): your Nuxt app is pointing at local Strapi, but that band id may only exist in production. Create/import the band in your local DB (same id) or point STRAPI_URL to prod.`
+      );
+      return;
+    }
+
+    alert(msg);
   }
 }
 
@@ -1416,6 +1513,41 @@ const totalClicksInRange = computed(
 const totalQrInRange = computed(
   () => rollups.value?.totals?.qrScans ?? 0
 );
+
+/* ---------- KPI helpers (for the new Performance Overview strip) ---------- */
+const kpiTotalLabel = computed(() => {
+  if (selectedTab.value === "Page Views") return "Page Views";
+  if (selectedTab.value === "Link Clicks") return "Link Clicks";
+  if (selectedTab.value === "Songs") return "Song Plays";
+  if (selectedTab.value === "Videos") return "Video Plays";
+  if (selectedTab.value === "QR Scans") return "QR Scans";
+  return "Total";
+});
+
+const kpiTotalValue = computed(() => {
+  if (selectedTab.value === "Page Views") return totalViewsInRange.value;
+  if (selectedTab.value === "Link Clicks") return totalClicksInRange.value;
+  if (selectedTab.value === "QR Scans") return totalQrInRange.value;
+  if (selectedTab.value === "Songs") return liveMuseSummary.value?.songPlays ?? 0;
+  if (selectedTab.value === "Videos") return liveMuseSummary.value?.videoPlays ?? 0;
+  return totalViewsInRange.value;
+});
+
+const topCityKpi = computed(() => {
+  const first = topCities.value?.[0];
+  return {
+    city: first?.[0] || "—",
+    count: first?.[1] || 0,
+  };
+});
+
+const topPlatformKpi = computed(() => {
+  const list = rollups.value?.platforms;
+  const first = Array.isArray(list) && list.length ? list[0] : null;
+  const platform = first?.[0] || "—";
+  const count = Number(first?.[1] ?? 0) || 0;
+  return { platform, count };
+});
 
 const youtubeData = computed(() => {
   const raw = externalMuse.value?.external?.youtube;
@@ -1791,14 +1923,17 @@ function tsOf(row: any): string | null {
 }
 
 /* ---------- fetch + render ---------- */
-async function fetchAndRender(silent = false) {
+async function fetchAndRender(silent: boolean) {
+  if (!bandId.value) return;
+
   if (silent) {
     isRefreshing.value = true;
   } else {
     isInitialLoading.value = true;
-    museLoading.value = true;
-    museError.value = null;
   }
+  museLoading.value = true;
+  museError.value = null;
+ 
 
   const bandIdNum = Number(route.params.id);
   const rangeKey = `${selectedRange.value}d`;
@@ -1982,17 +2117,12 @@ async function fetchAndRender(silent = false) {
     await ensureChart();
     await nextTick();
     renderViewsChart();
-    renderDeviceDoughnut();
   } catch (e: any) {
     console.error("[analytics] fetchAndRender failed", e);
     museError.value = e?.response?._data || e;
   } finally {
-    if (!silent) {
-      isInitialLoading.value = false;
-      museLoading.value = false;
-    } else {
-      isRefreshing.value = false;
-    }
+    isInitialLoading.value = false;
+    isRefreshing.value = false;
   }
 }
 
@@ -2016,7 +2146,7 @@ function renderViewsChart() {
 
   let labels: string[] = [];
   let data: number[] = [];
-  let chartType: "bar" | "line" = "bar";
+  const chartType: "bar" | "line" = chartDisplayType.value;
   let title = "";
 
   if (selectedRange.value === 1) {
@@ -2073,7 +2203,6 @@ function renderViewsChart() {
 
     labels = hours.map((h) => fmt(new Date(2000, 0, 1, h), "h a"));
     data = hours.map((h) => counts[h] || 0);
-    chartType = "bar";
     title =
       selectedTab.value === "Page Views"
         ? "Page Views (Hourly)"
@@ -2094,8 +2223,6 @@ function renderViewsChart() {
       if (selectedTab.value === "QR Scans") return d.qrScans ?? 0;
       return d.plays ?? 0;
     });
-
-    chartType = "line";
     title =
       selectedTab.value === "Page Views"
         ? `Page Views (Last ${selectedRange.value} Days)`
@@ -2132,7 +2259,7 @@ function renderViewsChart() {
           borderColor: "#10B981",
           backgroundColor:
             chartType === "bar" ? "#10B981" : "rgba(16,185,129,.25)",
-          tension: 0.3,
+          tension: chartType === "line" ? 0.3 : 0,
           pointRadius: chartType === "line" ? 3 : 0,
         },
       ],
@@ -2196,59 +2323,6 @@ function renderViewsChart() {
   });
 }
 
-function renderDeviceDoughnut() {
-  if (!ChartJs) return;
-  const canvas = deviceCanvas.value;
-  if (!canvas) return;
-  const ctx = prepHiDPICanvas(canvas);
-
-  const counts = deviceCounts.value;
-  const labels = deviceLegend.map((x) => x.label);
-  const data = deviceLegend.map((x) => counts[x.key] || 0);
-  const colors = deviceLegend.map((x) => x.color);
-
-  deviceChart?.destroy();
-  deviceChart = new ChartJs(ctx, {
-    type: "doughnut",
-    data: {
-      labels,
-      datasets: [
-        {
-          data,
-          backgroundColor: colors,
-          borderColor: "#0B1220",
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "60%",
-      plugins: {
-        legend: {
-          labels: {
-            color: "#E5E7EB",
-            usePointStyle: true,
-            pointStyle: "circle",
-          },
-          position: "top",
-        },
-        title: { display: false },
-        tooltip: {
-          callbacks: {
-            label(ctx) {
-              const v = ctx.raw as number;
-              const label = ctx.label || "";
-              return `${label}: ${v}`;
-            },
-          },
-        },
-      },
-    },
-  });
-}
-
 /* ---------- DEBUG WATCHES ---------- */
 watch(
   () => [selectedRange.value, selectedDate.value],
@@ -2288,7 +2362,6 @@ watch(
     if (!canvas) return;
     await ensureChart();
     renderViewsChart();
-    renderDeviceDoughnut();
   }
 );
 
@@ -2299,6 +2372,12 @@ onMounted(async () => {
     "🔍 Resolved bandId:",
     route.params.id || route.params.bandId || route.query.bandId
   );
+  try {
+    const saved = localStorage.getItem("analytics_chart_type");
+    if (saved === "bar" || saved === "line") {
+      chartDisplayType.value = saved;
+    }
+  } catch {}
   await ensureChart();
   await fetchAndRender(false);
 });
@@ -2309,31 +2388,38 @@ watch(selectedRange, async () => {
 });
 
 // when tab/date/rollups change → just re-render
-watch([selectedTab, selectedDate, rollups], async () => {
+watch([selectedTab, selectedDate, rollups, chartDisplayType], async () => {
   if (!isInitialLoading.value) {
     await ensureChart();
     renderViewsChart();
-    renderDeviceDoughnut();
   }
 });
 
 onBeforeUnmount(() => {
   viewsChart?.destroy();
-  deviceChart?.destroy();
 });
 </script>
 
 <style scoped>
 .chart-card {
-  background: #111827;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  background:
+    radial-gradient(1200px 400px at 20% -10%, rgba(168, 85, 247, 0.18), transparent 55%),
+    radial-gradient(900px 350px at 85% 0%, rgba(16, 185, 129, 0.14), transparent 55%),
+    rgba(17, 24, 39, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1.05rem;
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
 }
 
 .chart-wrap {
   position: relative;
   width: 100%;
+  border-radius: 0.875rem;
+  overflow: hidden;
 }
 .chart-wrap.ratio-16x9 {
   aspect-ratio: 16 / 9;
