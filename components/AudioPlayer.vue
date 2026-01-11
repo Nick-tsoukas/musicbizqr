@@ -1,6 +1,6 @@
 <template>
   <div class="player-container h-full flex flex-col">
-    <!-- 1) Now Playing (fixed height) -->
+    <!-- Now Playing (fixed height) -->
     <div class="now-playing flex-none">
       <img
         v-if="albumCoverUrl !== props.placeholderImage"
@@ -14,17 +14,23 @@
       </div>
     </div>
 
-    <!-- 2) Controls + Progress (single pinned row) -->
+    <!-- Controls + Progress (single pinned row) -->
     <div class="controls-progress flex-none flex items-center px-4 py-2">
       <!-- Previous -->
       <button @click="previousSong" class="control-button">
-        <img src="@/assets/previous-icon.svg" alt="Previous" />
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+        </svg>
       </button>
 
       <!-- Play/Pause -->
-      <button @click="togglePlay" class="control-button mx-2">
-        <img v-if="!playing" src="@/assets/play-icon.svg" alt="Play" />
-        <img v-else src="@/assets/pause-icon.svg" alt="Pause" />
+      <button @click="togglePlay" class="control-button play-pause mx-2">
+        <svg v-if="!playing" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg v-else class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
       </button>
 
       <!-- Next (if multiple) -->
@@ -33,7 +39,9 @@
         @click="nextSong"
         class="control-button mr-4"
       >
-        <img src="@/assets/next-icon.svg" alt="Next" />
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+        </svg>
       </button>
 
       <!-- Current Time -->
@@ -55,7 +63,7 @@
       <span class="total-time">{{ formatTime(duration) }}</span>
     </div>
 
-    <!-- 3) Song List (fills the rest) -->
+    <!-- Song List (fills the rest) -->
     <ul v-if="songs.length > 1" class="song-list flex-1 overflow-auto">
       <li
         v-for="(song, idx) in songs"
@@ -358,7 +366,7 @@ const formatTime = (time) => {
   justify-content: end;
   background: black;
   color: #fff;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   height: 100%;
   width: 100%;
 }
@@ -367,33 +375,40 @@ const formatTime = (time) => {
 .now-playing {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
-  gap: 0.5rem;
+  padding: 0.75rem;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 .album-cover {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
 .song-info {
   flex: 1;
   min-width: 0;
 }
+
 .song-title {
-  font-size: 0.875rem;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #fff;
 }
+
 .artist-name {
   font-size: 0.75rem;
-  line-height: 1.1;
-  color: #9ca3af;
-  margin: 0;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0.125rem 0 0 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -403,26 +418,42 @@ const formatTime = (time) => {
 .controls-progress {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.75rem;
   width: 100%;
   box-sizing: border-box;
   min-width: 0;
-  /* ensure it's always visible */
 }
+
 .control-button {
   background: none;
   border: none;
-  padding: 0;
+  padding: 0.375rem;
   cursor: pointer;
   flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transition: all 0.15s ease;
 }
-.control-button img {
-  width: 24px;
-  height: 24px;
+
+.control-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
-.play-pause img {
-  width: 32px;
-  height: 32px;
+
+.control-button:active {
+  transform: scale(0.95);
+}
+
+.control-button.play-pause {
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.control-button.play-pause:hover {
+  background: linear-gradient(135deg, #9b6cf6 0%, #b865f7 100%);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
 }
 
 /* Time labels */
@@ -430,8 +461,10 @@ const formatTime = (time) => {
 .total-time {
   width: 2.5rem;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Slider */
@@ -439,14 +472,14 @@ const formatTime = (time) => {
   flex: 1;
   min-width: 0;
   max-width: 100%;
-  height: 8px;
+  height: 6px;
   border-radius: 9999px;
   background: linear-gradient(
     to right,
-    #1db954 0%,
-    #1db954 var(--progress, 0%),
-    #404040 var(--progress, 0%),
-    #404040 100%
+    #8b5cf6 0%,
+    #8b5cf6 var(--progress, 0%),
+    rgba(255, 255, 255, 0.15) var(--progress, 0%),
+    rgba(255, 255, 255, 0.15) 100%
   );
   appearance: none;
   -webkit-appearance: none;
@@ -454,24 +487,55 @@ const formatTime = (time) => {
   cursor: pointer;
   border: 0;
   outline: none;
+  transition: height 0.15s ease;
+}
+
+.progress-bar:hover {
+  height: 8px;
 }
 
 .progress-bar::-webkit-slider-runnable-track {
-  height: 8px;
+  height: 100%;
   background: transparent;
   border-radius: 9999px;
 }
 
 .progress-bar::-moz-range-track {
-  height: 8px;
-  background: #404040;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
 }
 
 .progress-bar::-moz-range-progress {
-  height: 8px;
-  background: #1db954;
+  height: 100%;
+  background: #8b5cf6;
   border-radius: 9999px;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  border: 0;
+  margin-top: -4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.progress-bar:hover::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  border: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 360px) {
@@ -489,23 +553,6 @@ const formatTime = (time) => {
   }
 }
 
-.progress-bar::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #1db954;
-  border-radius: 50%;
-  border: 0;
-  margin-top: -2px;
-}
-
-.progress-bar::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: #1db954;
-  border-radius: 50%;
-}
-
 /* Song List */
 .song-list {
   list-style: none;
@@ -513,23 +560,76 @@ const formatTime = (time) => {
   padding: 0;
   overflow-y: auto;
 }
+
+.song-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.song-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.song-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
 .song-list li {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.625rem 0.75rem;
   cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-.song-list li.active-song,
+
+.song-list li:last-child {
+  border-bottom: none;
+}
+
 .song-list li:hover {
-  background: #282828;
+  background: rgba(255, 255, 255, 0.05);
 }
-.song-index { width: 1.5rem; text-align: center; }
-.song-details { flex: 1; padding: 0 0.5rem; }
+
+.song-list li.active-song {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+.song-list li.active-song .song-title {
+  color: #a78bfa;
+}
+
+.song-index {
+  width: 1.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.song-list li.active-song .song-index {
+  color: #8b5cf6;
+}
+
+.song-details {
+  flex: 1;
+  padding: 0 0.5rem;
+  min-width: 0;
+}
+
+.song-details .song-title {
+  font-size: 0.8rem;
+}
+
+.song-details .artist-name {
+  font-size: 0.7rem;
+}
+
 .song-duration {
   width: 2.5rem;
   text-align: right;
-  font-size: 0.75rem;
-  color: #bbb;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-variant-numeric: tabular-nums;
 }
 </style>
 
