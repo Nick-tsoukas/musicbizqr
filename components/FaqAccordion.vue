@@ -3,18 +3,18 @@
     <div
       v-for="(item, idx) in faqs"
       :key="idx"
-      class="border-b border-gray-200 last:border-none"
+      class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 overflow-hidden mb-3 last:mb-0"
     >
       <button
         @click="toggle(idx)"
-        class="flex justify-between w-full py-4 px-3 focus:outline-none hover:bg-gray-900"
+        class="flex justify-between w-full py-4 px-4 text-left focus:outline-none focus:ring-2 focus:ring-emerald-500/40 hover:bg-white/5 transition"
       >
         <span class="text-left text-lg font-medium text-white">
           {{ item.question }}
         </span>
         <svg
           :class="{'transform rotate-180': openIndex === idx}"
-          class="w-6 h-6 text-whitetransition-transform duration-200"
+          class="w-6 h-6 text-white transition-transform duration-200 shrink-0"
           fill="none"
           stroke="white"
           viewBox="0 0 24 24"
@@ -25,7 +25,7 @@
       </button>
       <div
         v-show="openIndex === idx"
-        class="px-3 pb-4 text-gray-100 prose prose-sm"
+        class="px-4 pb-5 text-white/80 prose prose-invert prose-sm max-w-none"
       >
         {{ item.answer }}
       </div>

@@ -570,52 +570,132 @@
         </section>
 
         <!-- Pricing (adds THB approx) -->
-        <section class="py-10 md:py-20 text-white">
-          <div class="max-w-7xl mx-auto text-center"></div>
+        <section class="relative py-14 md:py-24 text-white overflow-hidden">
+          <div class="pointer-events-none absolute inset-0 -z-10">
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-[520px] w-[520px] rounded-full bg-violet-500/18 blur-3xl"></div>
+            <div class="absolute -bottom-28 right-[-120px] h-[520px] w-[520px] rounded-full bg-emerald-500/12 blur-3xl"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black via-black to-black"></div>
+          </div>
 
-          <div
-            class="grid gap-8 mt-12 max-w-5xl mx-auto grid-cols-1 md:grid-cols-1"
-          >
-            <div class="pricing-card text-center">
-              <h2
-                class="text-5xl font-extrabold pb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500"
-              >
-                <span v-if="!isTH">Simple Pricing</span>
-                <span v-else>แพ็กเกจราคาง่าย ๆ</span>
+          <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center">
+              <div class="flex items-center justify-center">
+                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/85">
+                  <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.35)]"></span>
+                  <span v-if="!isTH">Simple pricing</span>
+                  <span v-else>ราคาง่าย ๆ</span>
+                </span>
+              </div>
+
+              <h2 class="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+                  <span v-if="!isTH">One plan. Everything you need.</span>
+                  <span v-else>แพ็กเดียว ครบทุกอย่างที่ต้องใช้</span>
+                </span>
               </h2>
 
-              <p class="text-4xl font-extrabold mt-6">
-                ${{ USD_PRICE }}<span class="text-lg">/mo</span>
-                <span v-if="isTH" class="ml-2 text-2xl text-white/70">
-                  (~฿{{ approxTHB }}/เดือน)</span
-                >
+              <p v-if="!isTH" class="mt-3 max-w-2xl mx-auto text-white/70 text-lg leading-relaxed">
+                Start with a free trial. Print once, update anytime, and see what fans do after they scan.
               </p>
+              <p v-else class="mt-3 max-w-2xl mx-auto text-white/70 text-lg leading-relaxed">
+                เริ่มทดลองใช้ฟรี พิมพ์ครั้งเดียว แก้ไขปลายทางได้ตลอด และดูสถิติหลังแฟนสแกน
+              </p>
+            </div>
 
-              <ul class="pricing-features pb-6">
-                <li>
-                  ✔ 1 <strong>Dynamic QR Code</strong> (edit destination
-                  anytime)
-                </li>
-                <li>
-                  ✔ All scans tracked in your
-                  <strong>Analytics Dashboard</strong>
-                </li>
-                <li>✔ 1 <strong>Artist Smart Link / Splash Page</strong></li>
-                <li>
-                  ✔ Streaming Buttons: Spotify, Apple Music, YouTube &amp; more
-                </li>
-                <li>✔ Embed 1 Featured Track &amp; 1 Video</li>
-                <li>✔ Merch &amp; Ticket Purchase Links</li>
-                <li>✔ Print-ready PNG / SVG QR downloads</li>
-                <li>✔ Email Support • Cancel anytime</li>
-              </ul>
+            <div class="mt-10 max-w-4xl mx-auto">
+              <div class="relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/6 to-black/50 shadow-[0_25px_60px_rgba(0,0,0,0.55)] overflow-hidden">
+                <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
-              <NuxtLink
-                to="/signup"
-                class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
-              >
-                <span> Free 30 Day Trial</span>
-              </NuxtLink>
+                <div class="p-8 sm:p-10">
+                  <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                    <div>
+                      <div class="text-white font-semibold text-xl">MusicBizQR</div>
+                      <div class="text-white/60 text-sm mt-1">
+                        <span v-if="!isTH">Monthly subscription • cancel anytime</span>
+                        <span v-else>รายเดือน • ยกเลิกได้ทุกเมื่อ</span>
+                      </div>
+                    </div>
+
+                    <div class="text-left md:text-right">
+                      <div class="text-4xl sm:text-5xl font-extrabold tabular-nums text-white">
+                        ${{ USD_PRICE }}<span class="text-lg font-semibold text-white/70">/mo</span>
+                      </div>
+                      <div v-if="isTH" class="text-white/60 text-sm mt-1">
+                        (~฿{{ approxTHB }}/เดือน)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-8 grid sm:grid-cols-2 gap-x-8 gap-y-3 text-white/85">
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>1 <strong>Dynamic QR Code</strong> (edit destination anytime)</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>All scans tracked in your <strong>Analytics Dashboard</strong></div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>1 <strong>Artist Smart Link</strong> page</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>Streaming buttons: Spotify, Apple Music, YouTube &amp; more</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>Embed 1 featured track &amp; 1 video</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>Merch &amp; ticket purchase links</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>Print-ready PNG / SVG QR downloads</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <div>Email support</div>
+                    </div>
+                  </div>
+
+                  <div class="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <NuxtLink
+                      to="/signup"
+                      class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+                    >
+                      <span>Free 30 Day Trial</span>
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M7 17L17 7" />
+                        <path d="M7 7h10v10" />
+                      </svg>
+                    </NuxtLink>
+
+                    <div class="text-xs text-white/55">
+                      <span v-if="!isTH">No credit card required</span>
+                      <span v-else>ไม่ต้องใช้บัตรเครดิต</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -623,59 +703,101 @@
         <!-- CTA repeat -->
         <div
           ref="parallaxRef"
-          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
+          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] kenburns-bg z-50"
         >
           <div
             class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
           >
-            <div
-              class="text-center h-full flex flex-col justify-center items-center md:text-left"
-            >
-              <h2
-                class="text-4xl md:text-6xl font-bold text-white animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
-              >
-                <span v-if="!isTH">Create Your Profile</span>
-                <span v-else>เริ่มสร้างโปรไฟล์ของคุณ</span>
-              </h2>
-              <div
-                class="flex w-full justify-center md:justify-center px-2 gap-6 mt-10 text-white"
-              >
-                <NuxtLink
-                  to="/signup"
-                  class="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
-                >
-                  <span> Free 30 Day Trial</span>
-                </NuxtLink>
+            <div class="w-full max-w-3xl mx-auto px-6">
+              <div class="rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-[0_25px_70px_rgba(0,0,0,0.55)] p-8 sm:p-10 text-center">
+                <div class="flex items-center justify-center">
+                  <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/85">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.35)]"></span>
+                    <span v-if="!isTH">Ready in minutes</span>
+                    <span v-else>พร้อมใช้งานในไม่กี่นาที</span>
+                  </span>
+                </div>
+
+                <h2 class="mt-5 text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
+                  <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+                    <span v-if="!isTH">Create Your Profile</span>
+                    <span v-else>เริ่มสร้างโปรไฟล์ของคุณ</span>
+                  </span>
+                </h2>
+
+                <p v-if="!isTH" class="mt-4 text-white/75 text-lg leading-relaxed">
+                  Start your free trial, generate your QR, and publish a smart link page fans can use at shows.
+                </p>
+                <p v-else class="mt-4 text-white/75 text-lg leading-relaxed">
+                  เริ่มทดลองใช้ฟรี สร้าง QR และเผยแพร่หน้า Smart Link ให้แฟนใช้งานในงานโชว์
+                </p>
+
+                <div class="mt-8 flex w-full justify-center px-2 gap-6 text-white">
+                  <NuxtLink
+                    to="/signup"
+                    class="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+                  >
+                    <span>Free 30 Day Trial</span>
+                  </NuxtLink>
+                </div>
+
+                <div class="mt-5 text-xs text-white/60">
+                  <span v-if="!isTH">No credit card required • Cancel anytime</span>
+                  <span v-else>ไม่ต้องใช้บัตรเครดิต • ยกเลิกได้ทุกเมื่อ</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Articles (unchanged) -->
-        <section class="bg-black text-white px-4 py-16 max-w-5xl mx-auto">
-          <h2 class="text-3xl font-extrabold mb-6 text-gradient">
-            Featured Articles
+        <!-- Articles -->
+        <section class="relative bg-black text-white px-4 py-16 max-w-6xl mx-auto overflow-hidden">
+          <div class="pointer-events-none absolute inset-0 -z-10">
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-[460px] w-[460px] rounded-full bg-violet-500/12 blur-3xl"></div>
+            <div class="absolute -bottom-28 right-[-120px] h-[460px] w-[460px] rounded-full bg-emerald-500/10 blur-3xl"></div>
+          </div>
+
+          <div class="flex items-center justify-center">
+            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/85">
+              <span class="h-2 w-2 rounded-full bg-pink-400 shadow-[0_0_18px_rgba(236,72,153,0.35)]"></span>
+              Featured Articles
+            </span>
+          </div>
+
+          <h2 class="mt-4 text-4xl md:text-5xl font-extrabold text-center tracking-tight">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+              Learn what’s working for artists
+            </span>
           </h2>
 
-          <div
-            v-if="featuredRes?.data?.length"
-            class="grid gap-8 md:grid-cols-1"
-          >
-            <div
-              v-for="post in featuredRes.data"
+          <p class="mt-3 max-w-2xl mx-auto text-center text-white/70 text-lg leading-relaxed">
+            Quick reads on QR strategy, fan conversion, and real-world show workflows.
+          </p>
+
+          <div v-if="featuredRes?.data?.length" class="mt-10 grid gap-4 md:grid-cols-3">
+            <NuxtLink
+              v-for="post in featuredRes.data.slice(0, 3)"
               :key="post.id"
-              class="bg-gray-900 p-6 rounded-lg shadow hover:bg-gray-800 transition"
+              :to="`/article/${post.attributes.category}/${post.attributes.slug}`"
+              class="group rounded-2xl border border-white/10 bg-gradient-to-b from-white/6 to-black/40 p-6 shadow-[0_18px_50px_rgba(0,0,0,0.45)] hover:bg-white/5 transition"
             >
-              <NuxtLink
-                :to="`/article/${post.attributes.category}/${post.attributes.slug}`"
-                class="block mb-2 text-xl font-bold text-pink-400 hover:underline"
-              >
+              <div class="text-xs font-semibold text-white/55">
+                {{ post.attributes.category }}
+              </div>
+              <div class="mt-2 text-lg font-semibold text-white group-hover:text-white">
                 {{ post.attributes.title }}
-              </NuxtLink>
-              <p class="text-sm text-gray-400">
+              </div>
+              <div class="mt-2 text-sm text-white/65 leading-relaxed line-clamp-3">
                 {{ post.attributes.metaDescription }}
-              </p>
-            </div>
+              </div>
+              <div class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-pink-200/90">
+                Read article
+                <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+              </div>
+            </NuxtLink>
           </div>
         </section>
         <TutorialsSection
@@ -695,14 +817,75 @@
         />
 
         <!-- FAQ (unchanged copy) -->
-        <div class="py-12 bg-black tezxt-white max-w-5xl mx-auto min-h-screen">
-          <h2
-            class="text-3xl font-bold text-center md:text-left text-white mb-8"
-          >
-            Frequently Asked Questions
-          </h2>
-          <FaqAccordion :faqs="faqItems" />
-        </div>
+        <section class="relative py-16 bg-black text-white overflow-hidden">
+          <div class="pointer-events-none absolute inset-0 -z-10">
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-[520px] w-[520px] rounded-full bg-violet-500/12 blur-3xl"></div>
+            <div class="absolute -bottom-28 right-[-120px] h-[520px] w-[520px] rounded-full bg-emerald-500/10 blur-3xl"></div>
+          </div>
+
+          <div class="max-w-5xl mx-auto px-6">
+            <div class="flex items-center justify-center">
+              <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/85">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.35)]"></span>
+                FAQ
+              </span>
+            </div>
+
+            <h2 class="mt-4 text-4xl md:text-5xl font-extrabold text-center tracking-tight">
+              <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+                Frequently Asked Questions
+              </span>
+            </h2>
+
+            <p class="mt-3 max-w-2xl mx-auto text-center text-white/70 text-lg leading-relaxed">
+              Clear answers on QR codes, analytics, and how MusicBizQR works.
+            </p>
+
+            <div class="mt-10">
+              <FaqAccordion :faqs="faqItems" />
+            </div>
+          </div>
+        </section>
+
+        <section class="relative py-14 bg-black text-white overflow-hidden">
+          <div class="pointer-events-none absolute inset-0 -z-10">
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-[520px] w-[520px] rounded-full bg-pink-500/10 blur-3xl"></div>
+            <div class="absolute -bottom-28 right-[-120px] h-[520px] w-[520px] rounded-full bg-violet-500/10 blur-3xl"></div>
+          </div>
+
+          <div class="max-w-5xl mx-auto px-6">
+            <div class="rounded-3xl border border-white/10 bg-gradient-to-b from-white/6 to-black/50 shadow-[0_25px_70px_rgba(0,0,0,0.55)] p-8 sm:p-10 text-center">
+              <h3 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-[1.05]">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+                  <span v-if="!isTH">Ready to launch your QR?</span>
+                  <span v-else>พร้อมเริ่มใช้งาน QR แล้วหรือยัง?</span>
+                </span>
+              </h3>
+
+              <p v-if="!isTH" class="mt-4 text-white/75 text-lg leading-relaxed">
+                Start your free trial and publish a smart link page your fans can use tonight.
+              </p>
+              <p v-else class="mt-4 text-white/75 text-lg leading-relaxed">
+                เริ่มทดลองใช้ฟรีและเผยแพร่หน้า Smart Link ให้แฟนใช้งานได้ทันที
+              </p>
+
+              <div class="mt-8 flex justify-center">
+                <NuxtLink
+                  to="/signup"
+                  class="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 hover:from-pink-400 hover:via-fuchsia-500 hover:to-violet-500 px-6 py-3 font-semibold text-white shadow-lg transition duration-200"
+                >
+                  <span v-if="!isTH">Free 30 Day Trial</span>
+                  <span v-else>ทดลองใช้ฟรี 30 วัน</span>
+                </NuxtLink>
+              </div>
+
+              <div class="mt-5 text-xs text-white/60">
+                <span v-if="!isTH">No credit card required • Cancel anytime</span>
+                <span v-else>ไม่ต้องใช้บัตรเครดิต • ยกเลิกได้ทุกเมื่อ</span>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <div class="h-40 flex flex-col justify-center items-center">
@@ -814,7 +997,7 @@ const faqItems = ref([
   {
     question: "📊 What analytics are provided?",
     answer:
-      "Our analytics dashboard tracks engagement by time of day, including page views, song plays, video views, and event interactions. You can view data by day, week, month, or year. We also track interactions with social links and streaming platforms, giving you a full picture of fan behavior — all without tracking user location.",
+      "You get a full post-scan analytics dashboard: page views, QR scans, link clicks, song plays, video plays, top sources, devices, and trends by day/week/month/year. If you connect YouTube (beta), we also surface channel-level performance. On top of the raw numbers, Muse is our intelligent insight generator — it turns your data into clear next steps (what to feature, what to move higher on the page, and when to post).",
   },
   {
     question: "🔒 Is my data private?",
@@ -1356,6 +1539,31 @@ html.th-font {
 <style scoped>
 #tsparticles {
   z-index: -1;
+}
+
+@keyframes kenburns {
+  0% {
+    background-size: 108%;
+    background-position: 50% 50%;
+  }
+  100% {
+    background-size: 122%;
+    background-position: 52% 46%;
+  }
+}
+
+.kenburns-bg {
+  background-size: 108%;
+  background-position: 50% 50%;
+  animation: kenburns 28s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kenburns-bg {
+    animation: none;
+    background-size: cover;
+    background-position: center;
+  }
 }
 .relative {
   position: relative;

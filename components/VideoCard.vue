@@ -47,32 +47,37 @@ const embedUrl = computed(() => {
 <template>
   <div class="group">
     <div
-      class="relative overflow-hidden rounded-2xl shadow-xl bg-neutral-900"
+      class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_18px_50px_rgba(0,0,0,0.45)] transition group-hover:bg-white/5"
       :class="aspect"
     >
       <!-- Thumbnail -->
       <button
         v-if="!isPlaying"
         @click="isPlaying = true"
-        class="w-full h-full relative block text-left"
+        class="w-full h-full relative block text-left focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
         :aria-label="'Play ' + title"
       >
         <img
           :src="thumbUrl"
           :alt="title"
           @error="onThumbError"
-          class="absolute inset-0 w-full h-full object-cover opacity-95 transition duration-300 group-hover:opacity-100"
+          class="absolute inset-0 w-full h-full object-cover opacity-90 transition duration-300 group-hover:opacity-100 scale-[1.02] group-hover:scale-[1.04]"
           loading="lazy"
         />
         <!-- gradient overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
+
+        <div class="pointer-events-none absolute inset-0">
+          <div class="absolute -top-20 -right-20 h-48 w-48 rounded-full bg-violet-500/15 blur-3xl"></div>
+          <div class="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl"></div>
+        </div>
 
         <!-- Play button -->
         <div class="absolute inset-0 flex items-center justify-center">
           <span
-            class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-white/90 shadow-lg group-hover:scale-105 transition"
+            class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-white/10 backdrop-blur border border-white/15 shadow-lg transition group-hover:scale-105 group-hover:bg-white/15"
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-black ml-1">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-white ml-1">
               <path d="M8 5v14l11-7z" />
             </svg>
           </span>
@@ -100,6 +105,8 @@ const embedUrl = computed(() => {
     </div>
 
     <!-- Caption (optional) -->
-    <p v-if="title" class="text-white/90 text-lg font-bold mt-3">{{ title }}</p>
+    <p v-if="title" class="mt-3 text-white/90 text-base font-semibold leading-snug line-clamp-2">
+      {{ title }}
+    </p>
   </div>
 </template>
