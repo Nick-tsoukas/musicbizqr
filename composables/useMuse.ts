@@ -21,8 +21,11 @@ export function useMuse() {
     });
 
 
-    const getMuseSummary = (bandId: number, range = '7d') =>
-  client('/muse/aggregate', { params: { bandId, range } })
+  const getMuseSummary = (bandId: number, range = '7d') =>
+    client('/muse/aggregate', { params: { bandId, range } });
 
-  return { getRollups, getGeo, getTransitions, getMuseSummary  };
+  const getFollows = (bandId: number, range = '30d') =>
+    client('/analytics/follows', { params: { bandId, range } });
+
+  return { getRollups, getGeo, getTransitions, getMuseSummary, getFollows };
 }

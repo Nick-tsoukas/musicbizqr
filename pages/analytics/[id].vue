@@ -550,6 +550,106 @@
         <div v-else class="text-gray-400 text-sm">No device data yet.</div>
       </div>
 
+      <!-- 💜 Follow Analytics -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-white text-lg font-semibold">Follow Attempts</h3>
+            <p class="text-gray-400 text-xs mt-0.5">
+              Fans who clicked "Follow" and were redirected to your platforms
+            </p>
+          </div>
+          <span class="text-gray-400 text-xs">{{ museRangeLabel }}</span>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+            <p class="text-gray-400 text-xs">Redirects</p>
+            <p class="text-2xl font-semibold text-white tabular-nums">
+              {{ followsData?.totals?.redirects ?? 0 }}
+            </p>
+            <p class="text-xs text-gray-500 mt-0.5">Follow attempts</p>
+          </div>
+
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+            <p class="text-gray-400 text-xs">Modal Opens</p>
+            <p class="text-2xl font-semibold text-white tabular-nums">
+              {{ followsData?.totals?.opens ?? 0 }}
+            </p>
+          </div>
+
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+            <p class="text-gray-400 text-xs">Confirms</p>
+            <p class="text-2xl font-semibold text-white tabular-nums">
+              {{ followsData?.totals?.confirms ?? 0 }}
+            </p>
+          </div>
+
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+            <p class="text-gray-400 text-xs">Conversion</p>
+            <p class="text-2xl font-semibold text-white tabular-nums">
+              {{ followsData?.funnel?.overallRate ?? 0 }}%
+            </p>
+            <p class="text-xs text-gray-500 mt-0.5">Opens → Redirects</p>
+          </div>
+        </div>
+
+        <!-- Platform Breakdown -->
+        <div v-if="followsPlatforms.length" class="mb-4">
+          <h4 class="text-white font-medium mb-3 text-sm">Top Platforms</h4>
+          <ul class="text-gray-200 text-sm space-y-2">
+            <li
+              v-for="p in followsPlatforms"
+              :key="p.platformId"
+              class="flex items-center gap-2"
+            >
+              <span class="inline-block w-28 truncate text-white capitalize">{{
+                p.platformId
+              }}</span>
+              <div class="h-2 bg-gray-800 rounded w-full">
+                <div
+                  class="h-2 bg-purple-500 rounded"
+                  :style="{
+                    width:
+                      Math.min(
+                        100,
+                        Math.round(
+                          (p.count / (followsPlatforms[0]?.count || 1)) * 100
+                        )
+                      ) + '%',
+                  }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{
+                p.count
+              }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Funnel Mini -->
+        <div
+          v-if="(followsData?.totals?.opens ?? 0) > 0"
+          class="flex items-center gap-2 text-xs text-gray-400 pt-3 border-t border-white/5"
+        >
+          <span class="text-white font-medium">Funnel:</span>
+          <span>{{ followsData?.totals?.opens ?? 0 }} opens</span>
+          <span>→</span>
+          <span>{{ followsData?.totals?.confirms ?? 0 }} confirms ({{ followsData?.funnel?.confirmRate ?? 0 }}%)</span>
+          <span>→</span>
+          <span>{{ followsData?.totals?.redirects ?? 0 }} redirects</span>
+        </div>
+
+        <!-- Empty state -->
+        <div
+          v-if="!followsData || (followsData?.totals?.redirects === 0 && followsData?.totals?.opens === 0)"
+          class="text-gray-400 text-sm"
+        >
+          No follow activity yet. The "Follow" button on your band page will track fan engagement here.
+        </div>
+      </div>
+
       <!-- 🎬 YouTube Analytics -->
       <div
         v-if="!youtubeData"
@@ -1075,8 +1175,8 @@ const museError = ref<any>(null);
 
 const bandId = computed(() => Number(route.params.id));
 
-/* ---------- Analytics composable (rollups, geo, transitions) ---------- */
-const { getRollups, getGeo, getTransitions } = useMuse();
+/* ---------- Analytics composable (rollups, geo, transitions, follows) ---------- */
+const { getRollups, getGeo, getTransitions, getFollows } = useMuse();
 
 /* ---------- Local directive: v-tooltip ---------- */
 const vTooltip = {
@@ -1121,6 +1221,7 @@ const rollups = ref<any | null>(null);
 const geo = ref<any | null>(null);
 const transitions = ref<any | null>(null);
 const externalMuse = ref<any>(null);
+const followsData = ref<any | null>(null);
 
 /* ---------- raw events (only used for hourly chart + daily split) ---------- */
 const rawPageViews = ref<any[]>([]);
@@ -1149,6 +1250,12 @@ const paymentsTotals = computed(() => {
 const paymentsRecent = computed<any[]>(() => {
   const r = paymentsSummary.value?.recent;
   return Array.isArray(r) ? r : [];
+});
+
+/* ---------- follows computed ---------- */
+const followsPlatforms = computed<{ platformId: string; count: number }[]>(() => {
+  const p = followsData.value?.platforms;
+  return Array.isArray(p) ? p.slice(0, 10) : [];
 });
 
 function formatUsd(n: any) {
@@ -1941,7 +2048,7 @@ async function fetchAndRender(silent: boolean) {
   console.log("[analytics] fetching rollups for", { bandId: bandIdNum, rangeKey });
 
   try {
-    const [r, g, t, m] = await Promise.all([
+    const [r, g, t, m, f] = await Promise.all([
       getRollups(bandIdNum, rangeKey),
       getGeo(bandIdNum, rangeKey),
       getTransitions(bandIdNum, rangeKey),
@@ -1954,13 +2061,19 @@ async function fetchAndRender(silent: boolean) {
         console.warn("[analytics] external muse failed", e);
         return null;
       }),
+      getFollows(bandIdNum, rangeKey).catch((e) => {
+        console.warn("[analytics] follows failed", e);
+        return null;
+      }),
     ]);
 
     rollups.value = r;
     geo.value = g;
     transitions.value = t;
     externalMuse.value = m;
+    followsData.value = f;
     console.log("[muse external]", m);
+    console.log("[follows]", f);
 
     await fetchPaymentsSummary(bandIdNum);
 

@@ -558,10 +558,40 @@
         </section>
       </div>
 
+      <!-- Follow the Band CTA -->
+      <section v-if="followablePlatforms.length > 0" class="mt-16 mb-8 px-6">
+        <div class="max-w-md mx-auto">
+          <button
+            type="button"
+            class="w-full flex items-center justify-center gap-3 rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-900/40 to-violet-900/40 px-6 py-4 text-white font-semibold shadow-lg transition hover:from-purple-900/60 hover:to-violet-900/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            @click="openFollowModal"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span>Follow {{ band.data.name }}</span>
+          </button>
+        </div>
+      </section>
+
       <footer class="h-40 flex justify-center items-center">
         <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
       </footer>
     </div>
+
+    <!-- Follow Band Modal -->
+    <client-only>
+      <FollowBandModal
+        :is-open="followModalOpen"
+        :band-name="band?.data?.name || ''"
+        :band-id="band?.data?.id"
+        :band-slug="currentBandSlug"
+        :platforms="followablePlatforms"
+        @close="followModalOpen = false"
+        @confirm="handleFollowConfirm"
+        @track="handleFollowTrack"
+      />
+    </client-only>
   </div>
 </template>
 
@@ -573,6 +603,7 @@ import { useSavedBands } from "@/composables/useSavedBands";
 import { useRoute, useRouter } from "vue-router";
 import { useNuxtApp } from "#app";
 import AudioPlayer from "@/components/AudioPlayer.vue";
+import FollowBandModal from "@/components/band/FollowBandModal.vue";
 
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
@@ -1509,6 +1540,128 @@ const socialPlatforms = [
   { name: "twitter", img: twitterIcon, label: "Twitter" },
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
+
+/* ---------- Follow the Band ---------- */
+const followModalOpen = ref(false);
+
+const followablePlatforms = computed(() => {
+  const platforms = [];
+  const data = band.value?.data;
+  if (!data) return platforms;
+
+  // Streaming platforms
+  for (const p of streamingPlatforms) {
+    const url = data[p.name];
+    if (url && !isLinkHidden(p.name)) {
+      platforms.push({
+        id: p.name,
+        name: p.label,
+        url,
+        category: 'streaming',
+        icon: p.img,
+      });
+    }
+  }
+
+  // Social platforms
+  for (const p of socialPlatforms) {
+    const url = data[p.name];
+    if (url && !isLinkHidden(p.name)) {
+      platforms.push({
+        id: p.name,
+        name: p.label,
+        url,
+        category: 'social',
+        icon: p.img,
+      });
+    }
+  }
+
+  return platforms;
+});
+
+function openFollowModal() {
+  followModalOpen.value = true;
+}
+
+function handleFollowConfirm(platformIds) {
+  followModalOpen.value = false;
+
+  if (!platformIds || platformIds.length === 0) return;
+
+  const selectedPlatforms = followablePlatforms.value.filter((p) =>
+    platformIds.includes(p.id)
+  );
+
+  if (selectedPlatforms.length === 0) return;
+
+  // Track redirect events before navigating
+  for (const p of selectedPlatforms) {
+    trackFollowRedirect(p.id, p.url);
+  }
+
+  // Safe redirect behavior to avoid popup blockers:
+  // - Open first in current tab (always works)
+  // - Open rest in new tabs (user gesture allows this)
+  const [first, ...rest] = selectedPlatforms;
+
+  // Open additional tabs first (while we still have user gesture context)
+  for (const p of rest) {
+    try {
+      window.open(p.url, '_blank', 'noopener,noreferrer');
+    } catch {
+      // Popup blocked, fail gracefully
+    }
+  }
+
+  // Navigate current tab to first platform
+  if (first?.url) {
+    window.location.href = first.url;
+  }
+}
+
+function handleFollowTrack(trackData) {
+  sendFollowTrackEvent(trackData);
+}
+
+function trackFollowRedirect(platformId, url) {
+  sendFollowTrackEvent({
+    event: 'follow_redirect',
+    bandId: band.value?.data?.id,
+    bandSlug: currentBandSlug.value,
+    platformId,
+    url,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+function sendFollowTrackEvent(data) {
+  const apiUrl = `${config.public.strapiUrl}/api/band-ui-events/track`;
+  const payload = {
+    bandId: data.bandId,
+    bandSlug: data.bandSlug,
+    eventName: data.event,
+    payload: {
+      ...data,
+      event: undefined,
+      bandId: undefined,
+      bandSlug: undefined,
+    },
+  };
+
+  // Use sendBeacon for reliability during navigation
+  if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    navigator.sendBeacon(apiUrl, blob);
+  } else if (typeof fetch !== 'undefined') {
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
+  }
+}
 
 // in the band page <script setup>
 // onMounted(() => {
