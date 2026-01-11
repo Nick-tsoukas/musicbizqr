@@ -4,7 +4,18 @@
       <div class="spinner"></div>
     </div>
     <div class="container-mdc bg-black max-w-5xl">
-      <h1 class="title text-white">Edit Band Profile</h1>
+      <div class="flex items-center justify-between gap-4 mb-4">
+        <h1 class="title text-white mb-0">Edit Band Profile</h1>
+        <NuxtLink
+          :to="`/band-layout/${$route.params.id}`"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-purple-500/40 bg-purple-900/30 text-purple-200 hover:bg-purple-900/50 transition text-sm font-medium"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+          </svg>
+          Edit Layout
+        </NuxtLink>
+      </div>
       <form class="form-group" @submit.prevent="submitForm">
         <div class="bg-[#fff] rounded-md my-10">
           <div

@@ -104,7 +104,7 @@
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
         <!-- Featured Song -->
-        <section v-if="hasFeaturedSong" class="mt-10">
+        <section v-if="hasFeaturedSong && isSectionVisible('audio')" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Song
           </h2>
@@ -156,7 +156,7 @@
         </section>
 
         <!-- Featured Video -->
-        <section v-if="band.data.singlevideo?.youtubeid" class="w-full mt-10">
+        <section v-if="band.data.singlevideo?.youtubeid && isSectionVisible('video')" class="w-full mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Featured Video
           </h2>
@@ -193,7 +193,7 @@
         </section>
 
         <!-- Website Link -->
-        <section v-if="band.data.websitelink" class="mt-10">
+        <section v-if="band.data.websitelink && isSectionVisible('website')" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
             Website Link
           </h2>
@@ -208,11 +208,11 @@
         </section>
 
         <!-- Streaming Links -->
-        <section v-if="hasStreamingLinks" class="mt-10">
+        <section v-if="hasStreamingLinks && isSectionVisible('streaming')" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Streaming Links
           </h2>
-          <template v-for="platform in streamingPlatforms" :key="platform.name">
+          <template v-for="platform in orderedStreamingPlatforms" :key="platform.name">
             <span v-if="band.data[platform.name] && !isLinkHidden(platform.name)">
               <a
                 :href="band.data[platform.name]"
@@ -240,11 +240,11 @@
         </section>
 
         <!-- Social Media -->
-        <section v-if="hasSocialLinks" class="mt-10">
+        <section v-if="hasSocialLinks && isSectionVisible('social')" class="mt-10">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
             Social Media
           </h2>
-          <template v-for="platform in socialPlatforms" :key="platform.name">
+          <template v-for="platform in orderedSocialPlatforms" :key="platform.name">
             <span v-if="band.data[platform.name] && !isLinkHidden(platform.name)">
               <a
                 :href="band.data[platform.name]"
@@ -273,137 +273,173 @@
 
         <!-- Upcoming Events -->
         <section
-          v-if="upcomingEvents.length"
+          v-if="upcomingEvents.length && isSectionVisible('events')"
           id="upcoming-events"
           class="mt-10"
         >
-          <div class="flex items-end justify-between gap-4">
-            <h2 class="text-2xl md:text-3xl font-bold text-white">
-              Upcoming Events
-            </h2>
-            <div class="text-white/50 text-sm">{{ upcomingEvents.length }}</div>
-          </div>
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+            Upcoming Events
+          </h2>
 
-          <div class="mt-4 grid gap-3 md:grid-cols-2">
-            <div
-              v-for="event in upcomingEvents"
-              :key="event.id"
-              class="group rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_18px_50px_rgba(0,0,0,0.45)] overflow-hidden cursor-pointer hover:bg-white/5 transition motion-reduce:transition-none"
-              @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
-            >
-              <div class="p-5">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M8 2v4" />
-                        <path d="M16 2v4" />
-                        <path d="M3 10h18" />
-                        <path d="M5 6h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
-                      </svg>
-                      {{ formatDate(event.date) }}
-                    </div>
-
-                    <div class="mt-3 text-white font-semibold text-lg leading-tight truncate">
-                      {{ event.venue || 'Event' }}
-                    </div>
-                    <div class="mt-1 flex items-center gap-2 text-white/70 text-sm">
-                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-purple-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11z" />
-                        <circle cx="12" cy="10" r="2.5" />
-                      </svg>
-                      <span class="truncate">{{ event.city || 'N/A' }}<span v-if="event.state">, {{ event.state }}</span></span>
-                    </div>
-                  </div>
-
-                  <div class="shrink-0">
-                    <span class="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-semibold text-white/70">
-                      upcoming
-                    </span>
-                  </div>
+          <div class="border border-white/70 bg-black/10 rounded-2xl p-4 md:p-5 hover:border-white transition motion-reduce:transition-none">
+            <!-- Next Show (Featured) -->
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div class="min-w-0">
+                <div class="text-white/70 text-sm font-semibold">Next Show</div>
+                <div class="text-2xl md:text-3xl font-bold text-white mt-1">
+                  {{ nextUpcomingEvent.city || 'TBA' }}<span v-if="nextUpcomingEvent.state">, {{ nextUpcomingEvent.state }}</span>
                 </div>
+                <div class="text-white/85 mt-1 font-semibold">
+                  {{ nextUpcomingEvent.venue || 'Venue TBA' }}
+                </div>
+                <div class="text-purple-300 mt-2 font-semibold">
+                  {{ formatDate(nextUpcomingEvent.date) }}
+                </div>
+              </div>
 
-                <button
-                  type="button"
-                  class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40 motion-reduce:transition-none"
+              <button
+                type="button"
+                class="w-full md:w-auto rounded-xl border border-white bg-transparent font-semibold text-white hover:bg-white/5 active:bg-white/10 px-4 py-3 transition duration-200 ease-out hover:-translate-y-[1px] active:translate-y-0 motion-reduce:transition-none motion-reduce:transform-none"
+                @click.stop="router.push(`/${route.params.bandSlug}/event/${nextUpcomingEvent.slug}`)"
+              >
+                {{ nextUpcomingEvent.ticketLink ? 'Tickets' : 'View Event' }}
+              </button>
+            </div>
+
+            <!-- Other Upcoming Events -->
+            <div v-if="otherUpcomingEvents.length" class="mt-4 border-t border-white/15 pt-4">
+              <!-- Mobile: Card list -->
+              <div class="md:hidden space-y-3">
+                <div
+                  v-for="event in otherUpcomingEvents"
+                  :key="event.id"
+                  class="rounded-xl border border-white/10 bg-black/20 px-4 py-3 cursor-pointer hover:bg-white/5 transition motion-reduce:transition-none"
                   @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                 >
-                  View Event
-                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M7 17L17 7" />
-                    <path d="M7 7h10v10" />
-                  </svg>
-                </button>
+                  <div class="text-purple-300 font-semibold">{{ formatDate(event.date) }}</div>
+                  <div class="text-white font-semibold mt-1">
+                    {{ event.city || 'TBA' }}<span v-if="event.state">, {{ event.state }}</span>
+                  </div>
+                  <div class="text-white/80">{{ event.venue || 'Venue TBA' }}</div>
+                  <button
+                    type="button"
+                    class="mt-3 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-3 font-semibold text-white shadow-sm transition duration-200 ease-out hover:bg-white/10 active:scale-[0.98] motion-reduce:transition-none"
+                    @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+                  >
+                    View Event
+                  </button>
+                </div>
+              </div>
+
+              <!-- Desktop: Table -->
+              <div class="hidden md:block relative overflow-x-auto">
+                <table class="w-full table-fixed bg-transparent text-white rounded-md">
+                  <thead>
+                    <tr class="border-b border-purple-500 border-opacity-30">
+                      <th class="px-2 py-2 text-left w-[7.5rem]">Date</th>
+                      <th class="px-2 py-2 text-left">City</th>
+                      <th class="px-2 py-2 text-left">Venue</th>
+                      <th class="px-2 py-2 text-left w-[6rem]">Tickets</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="event in otherUpcomingEvents"
+                      :key="event.id"
+                      class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900/30 cursor-pointer transition motion-reduce:transition-none"
+                      @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+                    >
+                      <td class="px-2 py-2 text-purple-400">
+                        {{ formatDate(event.date) }}
+                      </td>
+                      <td class="px-2 py-2 text-purple-400 break-words">
+                        {{ event.city || 'TBA' }}<span v-if="event.state">, {{ event.state }}</span>
+                      </td>
+                      <td class="px-2 py-2 text-purple-400 break-words">
+                        {{ event.venue || 'Venue TBA' }}
+                      </td>
+                      <td class="px-2 py-2 text-purple-400">
+                        <button type="button" class="text-purple-400 hover:text-white transition">
+                          View Event
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </section>
 
         <!-- Past Events -->
-        <section v-if="pastEvents.length" class="mt-10">
-          <div class="flex items-end justify-between gap-4">
+        <section v-if="pastEvents.length && isSectionVisible('events')" class="mt-10">
+          <div class="flex items-end justify-between gap-4 mb-4">
             <h2 class="text-2xl md:text-3xl font-bold text-white">
               Past Events
             </h2>
             <div class="text-white/50 text-sm">{{ pastEvents.length }}</div>
           </div>
 
-          <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <!-- Mobile: Simple list -->
+          <div class="md:hidden space-y-2">
             <div
               v-for="event in pastEvents"
               :key="event.id"
-              class="group rounded-2xl border border-white/10 bg-black/30 hover:bg-white/5 transition overflow-hidden cursor-pointer motion-reduce:transition-none"
+              class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 cursor-pointer hover:bg-white/5 transition motion-reduce:transition-none"
               @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
             >
-              <div class="p-5">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-purple-400/20 bg-purple-500/10 px-3 py-1 text-xs font-semibold text-purple-200">
-                      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M8 2v4" />
-                        <path d="M16 2v4" />
-                        <path d="M3 10h18" />
-                        <path d="M5 6h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
-                      </svg>
-                      {{ formatDate(event.date) }}
-                    </div>
-
-                    <div class="mt-3 text-white font-semibold text-lg leading-tight truncate">
-                      {{ event.venue || 'Event' }}
-                    </div>
-                    <div class="mt-1 flex items-center gap-2 text-white/70 text-sm">
-                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11z" />
-                        <circle cx="12" cy="10" r="2.5" />
-                      </svg>
-                      <span class="truncate">{{ event.city || 'N/A' }}<span v-if="event.state">, {{ event.state }}</span></span>
-                    </div>
-                  </div>
-
-                  <div class="shrink-0">
-                    <span class="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-semibold text-white/70">
-                      past
-                    </span>
-                  </div>
+              <div class="min-w-0">
+                <div class="text-white/60 text-sm">{{ formatDate(event.date) }}</div>
+                <div class="text-white font-semibold truncate">
+                  {{ event.city || 'TBA' }}<span v-if="event.state">, {{ event.state }}</span>
                 </div>
+                <div class="text-white/70 text-sm truncate">{{ event.venue || 'Venue' }}</div>
+              </div>
+              <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/40 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </div>
+          </div>
 
-                <button
-                  type="button"
-                  class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-emerald-500/40 motion-reduce:transition-none"
+          <!-- Desktop: Table -->
+          <div class="hidden md:block relative overflow-x-auto rounded-xl border border-white/10 bg-black/20">
+            <table class="w-full table-fixed bg-transparent text-white">
+              <thead>
+                <tr class="border-b border-white/10">
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-white/70 w-[8rem]">Date</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-white/70">City</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-white/70">Venue</th>
+                  <th class="px-4 py-3 text-left text-sm font-semibold text-white/70 w-[5rem]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="event in pastEvents"
+                  :key="event.id"
+                  class="border-b border-white/5 last:border-0 hover:bg-white/5 cursor-pointer transition motion-reduce:transition-none"
                   @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
                 >
-                  View Event
-                  <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M7 17L17 7" />
-                    <path d="M7 7h10v10" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+                  <td class="px-4 py-3 text-white/60 text-sm">
+                    {{ formatDate(event.date) }}
+                  </td>
+                  <td class="px-4 py-3 text-white break-words">
+                    {{ event.city || 'TBA' }}<span v-if="event.state">, {{ event.state }}</span>
+                  </td>
+                  <td class="px-4 py-3 text-white/80 break-words">
+                    {{ event.venue || 'Venue' }}
+                  </td>
+                  <td class="px-4 py-3">
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
-        <section v-if="canShowMerchConcierge" class="mt-10">
+        <section v-if="canShowMerchConcierge && isSectionVisible('merch')" class="mt-10">
           <div class="border border-violet-500/40 bg-gradient-to-br from-violet-900/40 to-black/40 rounded-2xl p-5">
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -482,7 +518,7 @@
           </div>
         </section>
 
-        <section v-if="canShowPayments" class="mt-10">
+        <section v-if="canShowPayments && isSectionVisible('payments')" class="mt-10">
           <div v-if="paymentError" class="text-red-400 mb-3">
             {{ paymentError }}
           </div>
@@ -559,7 +595,7 @@
       </div>
 
       <!-- Follow the Band CTA -->
-      <section v-if="followablePlatforms.length > 0" class="mt-16 mb-8 px-6">
+      <section v-if="followablePlatforms.length > 0 && isSectionVisible('follow')" class="mt-16 mb-8 px-6">
         <div class="max-w-md mx-auto">
           <button
             type="button"
@@ -604,6 +640,10 @@ import { useRoute, useRouter } from "vue-router";
 import { useNuxtApp } from "#app";
 import AudioPlayer from "@/components/AudioPlayer.vue";
 import FollowBandModal from "@/components/band/FollowBandModal.vue";
+import {
+  normalizeLayoutConfig,
+  isSectionEnabled,
+} from "@/utils/bandLayout";
 
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
@@ -932,6 +972,14 @@ const showPage = computed(() => {
 });
 const band = ref(null);
 const events = ref([]);
+
+const layoutConfig = computed(() => {
+  return normalizeLayoutConfig(band.value?.data?.layoutConfig);
+});
+
+const isSectionVisible = (sectionId) => {
+  return isSectionEnabled(layoutConfig.value, sectionId);
+};
 
 const currentBandSlug = computed(() => {
   return (
@@ -1522,6 +1570,12 @@ const pastEvents = computed(() =>
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 );
 
+const nextUpcomingEvent = computed(() => upcomingEvents.value[0] || null);
+
+const otherUpcomingEvents = computed(() =>
+  upcomingEvents.value.length > 1 ? upcomingEvents.value.slice(1) : []
+);
+
 const streamingPlatforms = [
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
   { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
@@ -1540,6 +1594,28 @@ const socialPlatforms = [
   { name: "twitter", img: twitterIcon, label: "Twitter" },
   { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
 ];
+
+const streamingPlatformsMap = Object.fromEntries(
+  streamingPlatforms.map((p) => [p.name, p])
+);
+
+const socialPlatformsMap = Object.fromEntries(
+  socialPlatforms.map((p) => [p.name, p])
+);
+
+const orderedStreamingPlatforms = computed(() => {
+  const order = layoutConfig.value.buttons.streaming;
+  return order
+    .map((id) => streamingPlatformsMap[id])
+    .filter(Boolean);
+});
+
+const orderedSocialPlatforms = computed(() => {
+  const order = layoutConfig.value.buttons.social;
+  return order
+    .map((id) => socialPlatformsMap[id])
+    .filter(Boolean);
+});
 
 /* ---------- Follow the Band ---------- */
 const followModalOpen = ref(false);
