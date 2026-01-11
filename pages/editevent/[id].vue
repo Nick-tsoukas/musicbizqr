@@ -118,6 +118,20 @@
             </label>
             <div class="mdc-line-ripple"></div>
           </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="time"
+              id="edit-event-doors-time"
+              class="mdc-text-field__input"
+              v-model="event.doorsTime"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-doors-time">
+              Doors Time (optional)
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
         </div>
       </div>
 
@@ -131,6 +145,34 @@
           </h2>
         </div>
         <div class="p-6">
+          <div class="mdc-text-field mb-4">
+            <input
+              type="text"
+              id="edit-event-ticket-label"
+              class="mdc-text-field__input"
+              v-model="event.ticketLabel"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-ticket-label">
+              Ticket Button Label (optional)
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="text"
+              id="edit-event-price-line"
+              class="mdc-text-field__input"
+              v-model="event.priceLine"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-price-line">
+              Price Line (optional)
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
           <div class="mdc-text-field mb-4">
             <input
               type="text"
@@ -224,6 +266,119 @@
             >
             <div class="mdc-line-ripple"></div>
           </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="text"
+              id="edit-event-age-restriction"
+              class="mdc-text-field__input"
+              v-model="event.ageRestriction"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-age-restriction">
+              Age Restriction (optional)
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white mt-10">
+        <div
+          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+        >
+          <h2 class="font-semibold text-white text-2xl">Event Social Links (optional)</h2>
+        </div>
+        <div class="p-6">
+          <div class="mdc-text-field mb-4">
+            <input
+              type="url"
+              id="edit-event-facebook"
+              class="mdc-text-field__input"
+              v-model="event.facebook"
+              @blur="event.facebook = normalizeLink(event.facebook)"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-facebook">
+              Facebook URL
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="url"
+              id="edit-event-twitter"
+              class="mdc-text-field__input"
+              v-model="event.twitter"
+              @blur="event.twitter = normalizeLink(event.twitter)"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-twitter">
+              Twitter / X URL
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="url"
+              id="edit-event-instagram"
+              class="mdc-text-field__input"
+              v-model="event.instagram"
+              @blur="event.instagram = normalizeLink(event.instagram)"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-instagram">
+              Instagram URL
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="url"
+              id="edit-event-youtube"
+              class="mdc-text-field__input"
+              v-model="event.youtube"
+              @blur="event.youtube = normalizeLink(event.youtube)"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-youtube">
+              YouTube URL
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="url"
+              id="edit-event-tiktok"
+              class="mdc-text-field__input"
+              v-model="event.tiktok"
+              @blur="event.tiktok = normalizeLink(event.tiktok)"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-tiktok">
+              TikTok URL
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
+
+          <div class="mdc-text-field mb-4">
+            <input
+              type="url"
+              id="edit-event-website"
+              class="mdc-text-field__input"
+              v-model="event.website"
+              @blur="event.website = normalizeLink(event.website)"
+              placeholder=" "
+            />
+            <label class="mdc-floating-label" for="edit-event-website">
+              Website URL
+            </label>
+            <div class="mdc-line-ripple"></div>
+          </div>
         </div>
       </div>
 
@@ -306,13 +461,23 @@ const event = ref({
   description: {} as any, // ← use `any` so it can hold ProseMirror JSON
   date: "",
   time: "",
+  doorsTime: "",
   state: "",
   city: "",
   address: "",
   venue: "",
   link: "",
+  ticketLabel: "",
+  priceLine: "",
   contactEmail: "",
   contactPhone: "",
+  ageRestriction: "",
+  facebook: "",
+  twitter: "",
+  instagram: "",
+  youtube: "",
+  tiktok: "",
+  website: "",
   image: null as File | null,
   imageUrl: null as string | null,
   band: null as number | null,
@@ -382,13 +547,23 @@ const fetchEvent = async () => {
       description: attrs.description || "",
       date: attrs.date,
       time: attrs.time ? attrs.time.slice(0, 5) : "",
+      doorsTime: attrs.doorsTime ? attrs.doorsTime.slice(0, 5) : "",
       state: attrs.state,
       city: attrs.city,
       address: attrs.address,
       venue: attrs.venue,
       contactEmail: attrs.contactEmail,
       contactPhone: attrs.contactPhone,
+      ageRestriction: attrs.ageRestriction || "",
       link: attrs.link,
+      ticketLabel: attrs.ticketLabel || "",
+      priceLine: attrs.priceLine || "",
+      facebook: attrs.facebook || "",
+      twitter: attrs.twitter || "",
+      instagram: attrs.instagram || "",
+      youtube: attrs.youtube || "",
+      tiktok: attrs.tiktok || "",
+      website: attrs.website || "",
       image: null,
       imageUrl: attrs.image?.data?.attributes?.url || null,
       band: attrs.band?.data?.id || null,
@@ -432,13 +607,23 @@ const submitEditEvent = async () => {
       description: descriptionJson, // ← now sending JSON
       date: event.value.date || undefined,
       time: formatTime(event.value.time) || undefined,
+      doorsTime: event.value.doorsTime ? formatTime(event.value.doorsTime) : undefined,
       city: event.value.city || undefined,
       state: event.value.state || undefined,
       venue: event.value.venue || undefined,
       address: event.value.address || undefined,
       contactPhone: event.value.contactPhone || undefined,
       contactEmail: event.value.contactEmail || undefined,
+      ageRestriction: event.value.ageRestriction || undefined,
       link: normalizeLink(event.value.link) || undefined,
+      ticketLabel: event.value.ticketLabel || undefined,
+      priceLine: event.value.priceLine || undefined,
+      facebook: event.value.facebook || undefined,
+      twitter: event.value.twitter || undefined,
+      instagram: event.value.instagram || undefined,
+      youtube: event.value.youtube || undefined,
+      tiktok: event.value.tiktok || undefined,
+      website: event.value.website || undefined,
       users_permissions_user: user.value.id,
     };
 

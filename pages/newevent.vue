@@ -111,6 +111,21 @@
               <div class="mdc-line-ripple"></div>
             </div>
 
+            <!-- Doors Time (optional) -->
+            <div class="mdc-text-field mb-4">
+              <input
+                type="time"
+                id="new-event-doors-time"
+                class="mdc-text-field__input"
+                v-model="newEvent.doorsTime"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="new-event-doors-time">
+                Doors Time (optional)
+              </label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+
             <!-- Venue -->
             <div class="mdc-text-field mb-4">
               <input
@@ -207,7 +222,7 @@
             </div>
 
             <!-- Age Restriction -->
-            <!-- <div class="mdc-text-field mb-4">
+            <div class="mdc-text-field mb-4">
               <input
                 type="text"
                 id="new-event-age-restriction"
@@ -219,7 +234,7 @@
                 Age Restriction
               </label>
               <div class="mdc-line-ripple"></div>
-            </div> -->
+            </div>
           </div>
         </div>
 
@@ -259,6 +274,34 @@
             <h2 class="font-semibold text-white text-2xl">Ticket Link</h2>
           </div>
           <div class="p-6">
+            <div class="mdc-text-field mb-4">
+              <input
+                type="text"
+                id="new-event-ticket-label"
+                class="mdc-text-field__input"
+                v-model="newEvent.ticketLabel"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="new-event-ticket-label">
+                Ticket Button Label (optional)
+              </label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+
+            <div class="mdc-text-field mb-4">
+              <input
+                type="text"
+                id="new-event-price-line"
+                class="mdc-text-field__input"
+                v-model="newEvent.priceLine"
+                placeholder=" "
+              />
+              <label class="mdc-floating-label" for="new-event-price-line">
+                Price Line (optional)
+              </label>
+              <div class="mdc-line-ripple"></div>
+            </div>
+
             <div class="mdc-text-field mb-4">
               <input
                 type="text"
@@ -419,6 +462,7 @@ const newEvent = ref({
   title: '',
   date: '',
   time: '',
+  doorsTime: '',
   venue: '',
   city: '',
   state: '',
@@ -435,7 +479,9 @@ const newEvent = ref({
   band: null as number | null,
   image: null as File | null,
   imageUrl: '' as string | null,
-  link: ''
+  link: '',
+  ticketLabel: '',
+  priceLine: '',
 })
 
 function normalizeLink(link: string): string {
@@ -541,7 +587,10 @@ const submitNewEvent = async () => {
       venue: newEvent.value.venue,
       address: newEvent.value.address,
       time: formatTime(newEvent.value.time),
+      doorsTime: newEvent.value.doorsTime ? formatTime(newEvent.value.doorsTime) : undefined,
       link: normalizeLink(newEvent.value.link),
+      ticketLabel: newEvent.value.ticketLabel || undefined,
+      priceLine: newEvent.value.priceLine || undefined,
       users_permissions_user: user.value.id,
       contactEmail: newEvent.value.contactEmail,
       contactPhone: newEvent.value.contactPhone,

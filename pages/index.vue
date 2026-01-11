@@ -14,125 +14,164 @@
         <!-- Hero -->
      <div class="relative isolate min-h-[100vh]">
           <div
-            class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:gap-x-10 2xl:px-8"
+            class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:items-center 2xl:gap-x-12 2xl:px-8"
           >
             <div
-              class="mx-auto w-full 2xl:w-[45%] lg:mx-0 text-white lg:flex-auto"
+              class="mx-auto w-full 2xl:w-[52%] lg:mx-0 text-white lg:flex-auto"
             >
               <h1
                 data-aos="fade-up"
-                class="font-extrabold tracking-tight leading-none text-center lg:text-left"
+                class="mt-6 font-extrabold tracking-tight leading-[1.05] text-center lg:text-left"
               >
                 <span
-                  class="block text-4xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+                  class="relative z-10 inline-block overflow-visible pt-2 pr-2 pb-2 text-4xl md:text-7xl 2xl:text-8xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400"
                 >
                   MusicBizQR
                 </span>
 
-              
                 <span
                   v-if="!isTH"
-                  class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200"
+                  class="block mt-4 text-xl md:text-2xl font-semibold text-white/90"
                 >
-                  Dynamic QR Codes &amp; Smart Link Pages for Musicians
+                  Turn scans into streams, followers, and ticket clicks.
                 </span>
                 <span
                   v-else
-                  class="block mt-1 text-xl md:text-2xl font-semibold text-gray-200"
+                  class="block mt-4 text-xl md:text-2xl font-semibold text-white/90"
                 >
-                  คิวอาร์โค้ดไดนามิก &
-                  ลิงก์รวมอัจฉริยะสำหรับศิลปินและงานภาพยนตร์
+                  เปลี่ยนการสแกนให้เป็นสตรีม ผู้ติดตาม และยอดคลิกตั๋ว
                 </span>
               </h1>
 
-              <div
-                class="flex justify-center mt-10 items-start mb-12 2xl:hidden"
-              >
-                <img
-                  src="@/assets/qrcode.png"
-                  alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
-                  class="h-[225px] w-[225px]"
-                  data-aos="fade-left"
-                />
+              <p v-if="!isTH" class="mt-4 text-base md:text-lg text-white/75 leading-relaxed text-center lg:text-left">
+                Create a smart link page for your band, connect your platforms, and print one QR code that you can update anytime. Track what fans do after they scan — and double down on what works.
+              </p>
+              <p v-else class="mt-4 text-base md:text-lg text-white/75 leading-relaxed text-center lg:text-left">
+                สร้างหน้า Smart Link สำหรับวงของคุณ เชื่อมต่อแพลตฟอร์ม และพิมพ์ QR ครั้งเดียว แก้ไขปลายทางได้ตลอด พร้อมดูสถิติหลังแฟนสแกน
+              </p>
+
+              <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 p-4">
+                  <div class="flex items-center gap-2 text-white/85 font-semibold">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 20h9" />
+                      <path d="M12 4h9" />
+                      <path d="M4 9h16" />
+                      <path d="M4 15h16" />
+                    </svg>
+                    <span v-if="!isTH">Dynamic QR</span>
+                    <span v-else>QR แบบไดนามิก</span>
+                  </div>
+                  <div class="mt-1 text-sm text-white/70">
+                    <span v-if="!isTH">Print once. Update destinations anytime.</span>
+                    <span v-else>พิมพ์ครั้งเดียว เปลี่ยนปลายทางได้ตลอด</span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 p-4">
+                  <div class="flex items-center gap-2 text-white/85 font-semibold">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5 text-violet-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M8 2v4" />
+                      <path d="M16 2v4" />
+                      <path d="M3 10h18" />
+                      <path d="M5 6h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
+                    </svg>
+                    <span v-if="!isTH">Shows & events</span>
+                    <span v-else>อีเวนต์/งานโชว์</span>
+                  </div>
+                  <div class="mt-1 text-sm text-white/70">
+                    <span v-if="!isTH">Add ticket links + venue details.</span>
+                    <span v-else>เพิ่มลิงก์ตั๋วและรายละเอียดสถานที่</span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 p-4">
+                  <div class="flex items-center gap-2 text-white/85 font-semibold">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 19V5" />
+                      <path d="M8 19V9" />
+                      <path d="M12 19v-6" />
+                      <path d="M16 19v-3" />
+                      <path d="M20 19V7" />
+                    </svg>
+                    <span v-if="!isTH">Analytics</span>
+                    <span v-else>สถิติ</span>
+                  </div>
+                  <div class="mt-1 text-sm text-white/70">
+                    <span v-if="!isTH">See what fans do after they scan.</span>
+                    <span v-else>ดูพฤติกรรมหลังแฟนสแกน</span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 p-4">
+                  <div class="flex items-center gap-2 text-white/85 font-semibold">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5 text-violet-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M8 5v14l11-7z" />
+                      <path d="M4 7h2" />
+                      <path d="M4 17h2" />
+                    </svg>
+                    <span v-if="!isTH">Music + video</span>
+                    <span v-else>เพลง + วิดีโอ</span>
+                  </div>
+                  <div class="mt-1 text-sm text-white/70">
+                    <span v-if="!isTH">Embed a featured track and your latest video.</span>
+                    <span v-else>ฝังเพลงเด่นและวิดีโอล่าสุด</span>
+                  </div>
+                </div>
               </div>
 
-           
-              <ul class="space-y-3 text-lg lg:text-xl text-white mt-6">
-                <li>
-                  <strong
-                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
-                  >
-                    Dynamic QR Codes for Artists & Bands
-                  </strong>
-                  – print once, update destinations anytime.
-                </li>
-                <li>
-                  <strong
-                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
-                  >
-                    Smart Link Splash Pages
-                  </strong>
-                  – pull in Spotify, Apple Music, YouTube & socials in one scan.
-                </li>
-                <li>
-                  <strong
-                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
-                  >
-                    Embed Music & Video
-                  </strong>
-                  – feature a track, playlist, or latest music video instantly.
-                </li>
-                <li>
-                  <strong
-                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
-                  >
-                    Sell Tickets & Merch
-                  </strong>
-                  – add tappable purchase links fans can use at the show.
-                </li>
-                <li>
-                  <strong
-                    class="inline-block font-semibold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent"
-                  >
-                    Real-Time Scan Analytics
-                  </strong>
-                  – see where, when & how fans engage; route tours smarter.
-                </li>
-              </ul>
-
-           
               <div
-                class="mt-16 justify-center mb-10 flex flex-col md:flex-row xl:justify-start items-center gap-x-6"
+                class="mt-10 justify-center mb-6 flex flex-col sm:flex-row lg:justify-start items-stretch sm:items-center gap-3"
               >
                 <NuxtLink
                   to="/signup"
-                  class="mdc-button mb-4 w-full md:mb-0 md:w-auto"
+                  class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl px-6 py-4 font-semibold text-white bg-gradient-to-r from-pink-500 to-violet-500 shadow-[0_18px_50px_rgba(139,92,246,0.25)] hover:opacity-95 transition"
                 >
                   <span v-if="!isTH">Create Account</span>
                   <span v-else>เริ่มต้นใช้งานฟรี</span>
                 </NuxtLink>
-                <NuxtLink to="/login" class="mdc-button w-full md:w-auto">
+                <NuxtLink
+                  to="/login"
+                  class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl px-6 py-4 font-semibold text-white/85 border border-white/15 bg-white/5 hover:bg-white/10 hover:text-white transition"
+                >
                   <span v-if="!isTH">Member Login</span>
                   <span v-else>เข้าสู่ระบบ</span>
                 </NuxtLink>
               </div>
 
-           
-              <p v-if="isTH" class="text-sm text-white/70">
-                รองรับครีเอเตอร์สายเพลงและภาพยนตร์ —
-                สร้างลิงก์รวมสำหรับโปสเตอร์/บัตรเชิญ/หน้าเพจ
-                พร้อมสถิติแบบเรียลไทม์
-              </p>
+              <div class="flex flex-wrap justify-center lg:justify-start gap-2 text-xs text-white/60">
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1">No app required</span>
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1">Mobile-first</span>
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1">Real-time insights</span>
+              </div>
             </div>
 
-            <div
-              class="hidden mt-16 sm:mt-24 2xl:flex md:justify-center md:items-start lg:mt-0 lg:flex-shrink-0 lg:flex-grow"
-            >
-              <img
-                src="@/assets/qrcode.png"
-                alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
-                class="md:h-[425px] md:w-[425px]"
-              />
+            <div class="mt-10 2xl:mt-0 2xl:flex md:justify-center md:items-start lg:flex-shrink-0 lg:flex-grow">
+              <div class="mx-auto w-full max-w-sm 2xl:max-w-md">
+                <div class="relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_25px_60px_rgba(0,0,0,0.55)] p-6">
+                  <div class="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-violet-500/20 blur-3xl"></div>
+                  <div class="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-emerald-500/15 blur-3xl"></div>
+
+                  <div class="flex items-center justify-between">
+                    <div class="text-white font-semibold">Scan to preview</div>
+                    <div class="text-white/50 text-xs">demo QR</div>
+                  </div>
+
+                  <div class="mt-4 rounded-2xl border border-white/10 bg-black/40 p-4 flex items-center justify-center">
+                    <img
+                      src="@/assets/mbqqrcodefinaljan.png"
+                      alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
+                      class="h-[220px] w-[220px]"
+                      data-aos="fade-left"
+                    />
+                  </div>
+
+                  <div class="mt-4 text-sm text-white/70">
+                    <span v-if="!isTH">Point your phone camera at this QR to see the smart link experience.</span>
+                    <span v-else>ใช้กล้องมือถือสแกนเพื่อดูตัวอย่างหน้า Smart Link</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -166,7 +205,9 @@
                 <h1
                   class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight"
                 >
-                  One QR Code. Every Fan. Every Link.
+                  <span class="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+                    One QR Code. Every Fan. Every Link.
+                  </span>
                 </h1>
 
                 <p class="mt-4 text-white/80">
@@ -298,21 +339,25 @@
 
         <!-- Example section (unchanged content, global) -->
         <div class="flex flex-col justify-center">
+          <div class="mt-10 flex items-center justify-center">
+            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/85">
+              <span class="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_18px_rgba(167,139,250,0.35)]"></span>
+              Smart Link Demo
+            </span>
+          </div>
           <h2
-            class="text-4xl lg:text-4xl 2xl:text-5xl font-bold mt-0 pt-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500"
+            class="text-4xl lg:text-4xl 2xl:text-5xl font-bold mt-4 pt-2 pb-2 leading-[1.08] text-center"
           >
-            Artist Smart Link &amp; Smart Link Page Example
+            <span class="relative z-10 inline-block overflow-visible px-2 pb-2 pt-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400">
+              Your smart link page (built for fan conversion)
+            </span>
           </h2>
           <p
-            class="mt-4 max-w-3xl mx-auto text-center text-white/90 text-lg leading-relaxed"
+            class="mt-3 max-w-3xl mx-auto text-center text-white/85 text-lg leading-relaxed"
           >
-            When fans scan one of your
-            <strong>MusicBizQR dynamic QR codes</strong>, they land on a
-            mobile-first <strong>artist smart link page</strong> that pulls in your
-            streaming platforms (Spotify, Apple Music, YouTube), socials,
-            featured tracks or videos, and even
-            <strong>merch &amp; ticket links</strong>—all in one tap-friendly
-            layout you can update anytime and track in real time.
+            When fans scan your <strong>MusicBizQR</strong>, they land on a fast, mobile-first page that brings everything together:
+            streaming links, socials, a featured track or video, plus merch and ticket buttons.
+            Update it anytime — and track every tap and scan in real time.
           </p>
 
           <div class="w-full max-w-md md:max-w-5xl mx-auto">

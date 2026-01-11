@@ -76,6 +76,15 @@
                       {{ formatTime(eventData.time) }}
                     </span>
 
+                    <span v-if="eventData.doorsTime" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1">
+                      <svg viewBox="0 0 24 24" class="h-4 w-4 text-white/70" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 21h18" />
+                        <path d="M7 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16" />
+                        <path d="M10 12h.01" />
+                      </svg>
+                      Doors {{ formatTime(eventData.doorsTime) }}
+                    </span>
+
                     <span v-if="eventData.venue || eventData.city || eventData.state" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1">
                       <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M12 21s7-4.4 7-11a7 7 0 0 0-14 0c0 6.6 7 11 7 11z" />
@@ -99,8 +108,12 @@
                       <path d="M7 15h1" />
                       <path d="M6 19h12a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3z" />
                     </svg>
-                    Tickets
+                    {{ eventData.ticketLabel || 'Tickets' }}
                   </a>
+
+                  <div v-if="eventData.link && eventData.priceLine" class="hidden sm:block text-xs text-white/55">
+                    {{ eventData.priceLine }}
+                  </div>
 
                   <a
                     v-if="eventData.website && !eventData.link"
