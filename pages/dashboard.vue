@@ -2,9 +2,12 @@
   <div class="min-h-screen bg-black pt-[var(--header-height)]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-white">Dashboard</h1>
-        <p class="text-white/60 mt-2">Manage your QR codes, artist pages, and events</p>
+      <div class="mb-8 flex items-start justify-between">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold text-white">Dashboard</h1>
+          <p class="text-white/60 mt-2">Manage your QR codes, artist pages, and events</p>
+        </div>
+        <NotificationBell />
       </div>
 
       <!-- Banners -->
@@ -62,6 +65,8 @@
             :pulse="pulseData"
             :loading="pulseLoading"
             :range-label="`Last ${pulseRange} days`"
+            :show-opt-in="true"
+            :band-id="bandItems[0]?.id"
           />
         </div>
       </section>
