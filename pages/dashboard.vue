@@ -1,8 +1,13 @@
 <template>
-  <div class="bg-[#000] pt-[var(--header-height)]">
-    <div class="container bg-[#000] mx-auto p-4">
-      <h1 class="text-2xl font-semibold mb-4 text-white">Dashboard</h1>
+  <div class="min-h-screen bg-black pt-[var(--header-height)]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-white">Dashboard</h1>
+        <p class="text-white/60 mt-2">Manage your QR codes, artist pages, and events</p>
+      </div>
 
+      <!-- Banners -->
       <PastDueBanner
         :status="subscriptionStatus"
         :days-left="daysLeft"
@@ -21,355 +26,416 @@
         @add-payment="goToBillingPortal"
       />
 
-      <!-- <p v-if="trialError" class="text-red-500">⚠️ {{ trialError }}</p> -->
-
       <!-- QR Codes Section -->
-      <div v-if="loading">
+      <div v-if="loading" class="mb-8">
         <SkeletonLoader />
       </div>
 
-      <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <div
-          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-8 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2
-            class="text-2xl text-white font-extrabold self-start md:flex-grow"
-          >
-            QR Codes
-          </h2>
+      <section v-else class="dashboard-section mb-8">
+        <div class="section-header bg-gradient-to-r from-purple-600 to-violet-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">QR Codes</h2>
+              <p class="text-white/70 text-sm">{{ qrItems.length }} code{{ qrItems.length !== 1 ? 's' : '' }}</p>
+            </div>
+          </div>
           <NuxtLink
             v-if="canCreateMoreQrs"
             to="/createqr"
-            class="mdc-button flex justify-between w-full md:w-[300px]"
+            class="create-button"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
-            Create QR
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Create QR</span>
           </NuxtLink>
-
           <button
             v-else
-            class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
+            class="create-button opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
-            Only {{ maxQrAllowed }} QR{{ maxQrAllowed > 1 ? "s" : "" }} allowed
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Limit reached</span>
           </button>
         </div>
 
-        <ul v-if="qrItems.length" class="px-6 py-6">
-          <li
-            v-for="(qr, idx) in qrItems"
-            :key="qr.id"
-            class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
-          >
-            <!-- simple preview image -->
-            <NuxtImg
-              provider="ipx"
-              format="webp"
-              :src="normalizeImg(qr.imageUrl)"
-              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
-              width="100"
-              height="100"
-              :loading="idx === 0 ? 'eager' : 'lazy'"
-              decoding="async"
-              :fetchpriority="idx === 0 ? 'high' : 'auto'"
-              :modifiers="{ fit: 'cover' }"
-            />
+        <div class="section-content">
+          <div v-if="qrItems.length" class="space-y-4">
+            <div
+              v-for="(qr, idx) in qrItems"
+              :key="qr.id"
+              class="item-card"
+            >
+              <!-- Image with skeleton loading -->
+              <div class="item-image-wrapper">
+                <div class="item-image-skeleton"></div>
+                <NuxtImg
+                  provider="ipx"
+                  format="webp"
+                  :src="normalizeImg(qr.imageUrl)"
+                  class="item-image"
+                  width="80"
+                  height="80"
+                  :loading="idx === 0 ? 'eager' : 'lazy'"
+                  decoding="async"
+                  :fetchpriority="idx === 0 ? 'high' : 'auto'"
+                  :modifiers="{ fit: 'cover' }"
+                  @load="(e) => e.target.classList.add('loaded')"
+                />
+              </div>
 
-            <div class="flex-grow">
-              <span
-                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
-              >
-                {{ qr.title }}
-              </span>
+              <div class="item-info">
+                <h3 class="item-title">{{ qr.title }}</h3>
+                <p class="item-subtitle">QR Code</p>
+              </div>
+
+              <div class="item-actions">
+                <button @click="openDownloadForQr(qr.id)" class="action-btn-labeled">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span>Download</span>
+                </button>
+
+                <button
+                  v-if="!qr.isShared"
+                  @click="editItem(qr.id, 'editqr')"
+                  class="action-btn-labeled"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>Edit</span>
+                </button>
+
+                <button
+                  @click="router.push(`/analyticsqr/${qr.id}`)"
+                  class="action-btn-labeled text-emerald-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span>Analytics</span>
+                </button>
+
+                <button
+                  v-if="!qr.isShared"
+                  @click="deleteItem(qr.id, 'qr')"
+                  class="action-btn-labeled text-red-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </div>
             </div>
+          </div>
 
-            <div class="flex flex-col md:flex-row gap-2 mt-4">
-              <!-- keep your existing simple viewer -->
-              <!-- <button @click="viewQr(qr.imageUrl)" class="action-button">
-                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
-                <span>View</span>
-              </button> -->
-
-              <!-- NEW: open the download modal (PNG/JPEG/SVG) -->
-              <button @click="openDownloadForQr(qr.id)" class="action-button">
-                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
-                <span>Download</span>
-              </button>
-
-              <button
-                v-if="!qr.isShared"
-                @click="editItem(qr.id, 'editqr')"
-                class="action-button"
-              >
-                <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
-                <span>Edit</span>
-              </button>
-
-              <button
-                @click="router.push(`/analyticsqr/${qr.id}`)"
-                class="action-button text-green-400 hover:text-green-200"
-              >
-                <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
-                <span>Analytics</span>
-              </button>
-
-              <button
-                v-if="!qr.isShared"
-                @click="deleteItem(qr.id, 'qr')"
-                class="action-button text-red-400 hover:text-red-200"
-              >
-                <img src="@/assets/delete-icon.svg" class="h-5 w-5" />
-                <span>Delete</span>
-              </button>
+          <div v-else class="empty-state">
+            <div class="empty-icon bg-purple-500/20">
+              <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
             </div>
-          </li>
-        </ul>
-
-        <div v-else class="px-6 py-6 text-center text-white">
-          Create Your First QR Code
+            <h3 class="text-white font-semibold mt-4">No QR codes yet</h3>
+            <p class="text-white/50 text-sm mt-1">Create your first QR code to get started</p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <!-- Bands Section -->
-      <div v-if="loading" class="mt-6">
+      <div v-if="loading" class="mb-8">
         <SkeletonLoader />
       </div>
-      <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <div
-          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-green-500 to-teal-500 py-8 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2
-            class="text-2xl text-white font-extrabold self-start md:flex-grow"
-          >
-            Artist Smart Link Page
-          </h2>
+
+      <section v-else class="dashboard-section mb-8">
+        <div class="section-header bg-gradient-to-r from-emerald-600 to-teal-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Artist Pages</h2>
+              <p class="text-white/70 text-sm">{{ bandItems.length }} page{{ bandItems.length !== 1 ? 's' : '' }}</p>
+            </div>
+          </div>
           <NuxtLink
             v-if="!hasBand || isSpecialUser"
             to="/createband"
-            class="mdc-button flex justify-between w-full md:w-[300px]"
+            class="create-button"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
-            Create Artist Page
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Create Artist Page</span>
           </NuxtLink>
           <button
             v-else
-            class="mdc-button flex justify-between w-full md:w-[300px] opacity-50 cursor-not-allowed"
+            class="create-button opacity-50 cursor-not-allowed"
             disabled
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />
-            Only one artist allowed
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Limit reached</span>
           </button>
         </div>
 
-        <ul v-if="bandItems.length" class="px-6 py-6">
-          <li
-            v-for="(band, idx) in bandItems"
-            :key="band.id"
-            class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
-          >
-            <NuxtImg
-              provider="ipx"
-              format="webp"
-              :src="normalizeImg(band.imageUrl)"
-              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
-              width="100"
-              height="100"
-              :loading="idx === 0 ? 'eager' : 'lazy'"
-              decoding="async"
-              :fetchpriority="idx === 0 ? 'high' : 'auto'"
-              :modifiers="{ fit: 'cover' }"
-            />
+        <div class="section-content">
+          <div v-if="bandItems.length" class="space-y-4">
+            <div
+              v-for="(band, idx) in bandItems"
+              :key="band.id"
+              class="item-card"
+            >
+              <!-- Image with skeleton loading -->
+              <div class="item-image-wrapper">
+                <div class="item-image-skeleton"></div>
+                <NuxtImg
+                  provider="ipx"
+                  format="webp"
+                  :src="normalizeImg(band.imageUrl)"
+                  class="item-image"
+                  width="80"
+                  height="80"
+                  :loading="idx === 0 ? 'eager' : 'lazy'"
+                  decoding="async"
+                  :fetchpriority="idx === 0 ? 'high' : 'auto'"
+                  :modifiers="{ fit: 'cover' }"
+                  @load="(e) => e.target.classList.add('loaded')"
+                />
+              </div>
 
-            <div class="flex-grow">
-              <span
-                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
-              >
-                {{ band.title }}
-              </span>
-              <div class="text-xs text-white/70 mt-1">
-                Payouts:
-                <span v-if="band.paymentsEnabled === true && band.stripeOnboardingComplete === true">
-                  Enabled
-                </span>
-                <span v-else-if="band.stripeAccountId">
-                  Setup required
-                </span>
-                <span v-else>
-                  Not connected
-                </span>
+              <div class="item-info">
+                <h3 class="item-title">{{ band.title }}</h3>
+                <div class="flex items-center gap-2 mt-1">
+                  <span 
+                    class="status-badge"
+                    :class="band.paymentsEnabled && band.stripeOnboardingComplete ? 'status-success' : band.stripeAccountId ? 'status-warning' : 'status-neutral'"
+                  >
+                    <span class="status-dot"></span>
+                    {{ band.paymentsEnabled && band.stripeOnboardingComplete ? 'Payouts enabled' : band.stripeAccountId ? 'Setup required' : 'No payouts' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="item-actions">
+                <button
+                  @click="router.push(`/${band.slug}`)"
+                  class="action-btn-labeled"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <span>View</span>
+                </button>
+
+                <button
+                  @click="router.push(`/editband/${band.id}`)"
+                  class="action-btn-labeled"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>Edit</span>
+                </button>
+
+                <button
+                  @click="router.push(`/analytics/${band.id}`)"
+                  class="action-btn-labeled text-emerald-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span>Analytics</span>
+                </button>
+
+                <button
+                  @click="copyToClipboard(`${config.public.baseUrl}/${band.slug}`)"
+                  class="action-btn-labeled text-amber-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  <span>Share</span>
+                </button>
+
+                <button
+                  @click="startPayoutOnboarding(band.id)"
+                  class="action-btn-labeled text-purple-400"
+                  :disabled="payoutLoadingId === band.id"
+                >
+                  <svg v-if="payoutLoadingId !== band.id" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg v-else class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Payouts</span>
+                </button>
+
+                <button
+                  @click="deleteItem(band.id, 'band')"
+                  class="action-btn-labeled text-red-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Delete</span>
+                </button>
               </div>
             </div>
+          </div>
 
-            <!-- ✅ Band Action Buttons -->
-            <div class="flex flex-col md:flex-row flex-wrap gap-2 mt-4">
-              <button
-                @click="router.push(`/${band.slug}`)"
-                class="action-button"
-              >
-                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
-                <span>View</span>
-              </button>
-
-              <button
-                @click="router.push(`/editband/${band.id}`)"
-                class="action-button"
-              >
-                <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
-                <span>Edit</span>
-              </button>
-
-              <button
-                @click="router.push(`/analytics/${band.id}`)"
-                class="action-button text-green-400 hover:text-green-200"
-              >
-                <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
-                <span>Analytics</span>
-              </button>
-
-              <button
-                @click="
-                  copyToClipboard(`${config.public.baseUrl}/${band.slug}`)
-                "
-                class="action-button text-yellow-400 hover:text-yellow-200"
-              >
-                <img src="@/assets/share-icon.svg" class="h-5 w-5" />
-                <span>Share</span>
-              </button>
-
-              <button
-                @click="startPayoutOnboarding(band.id)"
-                class="action-button text-purple-300 hover:text-purple-200"
-                :disabled="payoutLoadingId === band.id"
-              >
-                <span>
-                  {{ payoutLoadingId === band.id ? "Loading…" : (band.stripeOnboardingComplete ? "Manage Payouts" : "Set Up Payouts") }}
-                </span>
-              </button>
-
-              <button
-                @click="deleteItem(band.id, 'band')"
-                class="action-button text-red-400 hover:text-red-200"
-              >
-                <img src="@/assets/delete-icon.svg" class="h-5 w-5" />
-                <span>Delete</span>
-              </button>
+          <div v-else class="empty-state">
+            <div class="empty-icon bg-emerald-500/20">
+              <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
             </div>
-          </li>
-        </ul>
-
-        <div v-else class="px-6 py-6 text-center text-white">
-          Create Artist Page
+            <h3 class="text-white font-semibold mt-4">No artist pages yet</h3>
+            <p class="text-white/50 text-sm mt-1">Create your artist page to showcase your music</p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <!-- Events Section -->
-      <div v-if="loading" class="mt-6">
+      <div v-if="loading" class="mb-8">
         <SkeletonLoader />
       </div>
-      <div v-else class="mb-6 border-2 border-white rounded-lg">
-        <div
-          class="flex flex-col px-6 border-b-2 bg-gradient-to-r from-blue-500 to-indigo-500 py-8 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2
-            class="text-2xl text-white font-extrabold self-start md:flex-grow"
-          >
-            Events
-          </h2>
+
+      <section v-else class="dashboard-section mb-8">
+        <div class="section-header bg-gradient-to-r from-blue-600 to-indigo-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Events</h2>
+              <p class="text-white/70 text-sm">{{ eventItems.length }} event{{ eventItems.length !== 1 ? 's' : '' }}</p>
+            </div>
+          </div>
           <NuxtLink
             to="/newevent"
-            class="mdc-button flex justify-between w-full md:w-[300px]"
+            class="create-button"
           >
-            <img class="pr-2" src="@/assets/create-icon.svg" alt="" />Create
-            Event
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Create Event</span>
           </NuxtLink>
         </div>
 
-        <ul v-if="eventItems.length" class="px-6 py-6">
-          <li
-            v-for="ev in eventItems"
-            :key="ev.id"
-            class="flex flex-col gap-6 md:gap-0 justify-between items-center mb-4 p-4 bg-gray-800 rounded-lg md:flex-row"
-          >
-            <!-- <img
-              :src="ev.imageUrl"
-              alt=""
-              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
-            /> -->
-            <NuxtImg
-              provider="ipx"
-              format="webp"
-              :src="normalizeImg(ev.imageUrl)"
-              class="mx-auto h-full w-full md:h-[100px] md:w-[100px] object-cover rounded mr-4"
-              width="100"
-              height="100"
-              loading="lazy"
-              decoding="async"
-              fetchpriority="low"
-              :modifiers="{ fit: 'cover' }"
-            />
+        <div class="section-content">
+          <div v-if="eventItems.length" class="space-y-4">
+            <div
+              v-for="(ev, idx) in eventItems"
+              :key="ev.id"
+              class="item-card"
+            >
+              <!-- Image with skeleton loading -->
+              <div class="item-image-wrapper">
+                <div class="item-image-skeleton"></div>
+                <NuxtImg
+                  provider="ipx"
+                  format="webp"
+                  :src="normalizeImg(ev.imageUrl)"
+                  class="item-image"
+                  width="80"
+                  height="80"
+                  loading="lazy"
+                  decoding="async"
+                  fetchpriority="low"
+                  :modifiers="{ fit: 'cover' }"
+                  @load="(e) => e.target.classList.add('loaded')"
+                />
+              </div>
 
-            <div class="flex-grow">
-              <span
-                class="text-white break-words pt-4 md:pt-0 text-wrap font-semibold"
-              >
-                {{ ev.title }}
-              </span>
+              <div class="item-info">
+                <h3 class="item-title">{{ ev.title }}</h3>
+                <p class="item-subtitle">Event</p>
+              </div>
+
+              <div class="item-actions">
+                <button
+                  @click="router.push(`/${ev.bandSlug}/event/${ev.slug}`)"
+                  class="action-btn-labeled"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <span>View</span>
+                </button>
+
+                <button
+                  @click="router.push(`/editevent/${ev.id}`)"
+                  class="action-btn-labeled"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>Edit</span>
+                </button>
+
+                <button
+                  @click="copyToClipboard(`${config.public.baseUrl}/${ev.bandSlug}/event/${ev.slug}`)"
+                  class="action-btn-labeled text-amber-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  <span>Share</span>
+                </button>
+
+                <button
+                  @click="router.push(`/event-analytics/${ev.id}`)"
+                  class="action-btn-labeled text-emerald-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span>Analytics</span>
+                </button>
+
+                <button
+                  @click="deleteItem(ev.id, 'event')"
+                  class="action-btn-labeled text-red-400"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </div>
             </div>
+          </div>
 
-            <!-- ✅ Event Action Buttons -->
-            <div class="flex flex-col md:flex-row flex-wrap gap-2 mt-4">
-              <button
-                @click="router.push(`/${ev.bandSlug}/event/${ev.slug}`)"
-                class="action-button"
-              >
-                <img src="@/assets/view-icon.svg" class="h-5 w-5" />
-                <span>View</span>
-              </button>
-
-              <button
-                @click="router.push(`/editevent/${ev.id}`)"
-                class="action-button"
-              >
-                <img src="@/assets/edit-icon.svg" class="h-5 w-5" />
-                <span>Edit</span>
-              </button>
-
-              <button
-                @click="
-                  copyToClipboard(
-                    `${config.public.baseUrl}/${ev.bandSlug}/event/${ev.slug}`
-                  )
-                "
-                class="action-button text-yellow-400 hover:text-yellow-200"
-              >
-                <img src="@/assets/share-icon.svg" class="h-5 w-5" />
-                <span>Share</span>
-              </button>
-
-              <button
-                @click="router.push(`/event-analytics/${ev.id}`)"
-                class="action-button text-green-400 hover:text-green-200"
-              >
-                <img src="@/assets/analytics-icon.svg" class="h-5 w-5" />
-                <span>Analytics</span>
-              </button>
-
-              <button
-                @click="deleteItem(ev.id, 'event')"
-                class="action-button text-red-400 hover:text-red-200"
-              >
-                <img src="@/assets/delete-icon.svg" class="h-5 w-5" />
-                <span>Delete</span>
-              </button>
+          <div v-else class="empty-state">
+            <div class="empty-icon bg-blue-500/20">
+              <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
-          </li>
-        </ul>
-
-        <div v-else class="px-6 py-6 text-center text-white">
-          Create Your First Event
+            <h3 class="text-white font-semibold mt-4">No events yet</h3>
+            <p class="text-white/50 text-sm mt-1">Create your first event to promote your shows</p>
+          </div>
         </div>
-      </div>
+      </section>
       <!-- Download modal (client-only component) -->
 
       <ClientOnly>
@@ -380,6 +446,17 @@
           :key="showDownload ? activeQrName : 'closed'"
         />
       </ClientOnly>
+
+      <!-- Delete Confirmation Modal -->
+      <DeleteConfirmModal
+        v-model="showDeleteModal"
+        :item-id="deleteTarget.id"
+        :item-name="deleteTarget.name"
+        :item-type="deleteTarget.type"
+        :item-image="deleteTarget.image"
+        ref="deleteModalRef"
+        @confirm="confirmDelete"
+      />
       <!-- VIEW QR Popup -->
       <!-- <div
         v-if="qrView"
@@ -506,6 +583,16 @@ let toastTimeout = null;
 const showDownload = ref(false);
 const activeQrOptions = ref(null);
 const activeQrName = ref("qr-code");
+
+// Delete modal state
+const showDeleteModal = ref(false);
+const deleteModalRef = ref(null);
+const deleteTarget = ref({
+  id: null,
+  name: '',
+  type: '',
+  image: '',
+});
 
 const normalizeImg = (u) => {
   if (!u) return "";
@@ -824,21 +911,57 @@ async function fetchScansForQrIds(qrIds) {
   return Array.isArray(resp.data) ? resp.data : [];
 }
 
-const deleteItem = async (id, type) => {
-  if (!confirm(`Delete this ${type}?`)) return;
-  loading.value = true;
+// Open delete confirmation modal
+const deleteItem = (id, type) => {
+  // Find the item to get its name and image
+  let item = null;
+  if (type === 'qr') {
+    item = qrItems.value.find(q => q.id === id);
+  } else if (type === 'band') {
+    item = bandItems.value.find(b => b.id === id);
+  } else if (type === 'event') {
+    item = eventItems.value.find(e => e.id === id);
+  }
+
+  deleteTarget.value = {
+    id,
+    type,
+    name: item?.title || 'Untitled',
+    image: item?.imageUrl || '',
+  };
+  showDeleteModal.value = true;
+};
+
+// Actually perform the delete after confirmation
+const confirmDelete = async ({ id, type }) => {
   try {
     await client(`/${type}s/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${useStrapiToken().value}` },
     });
+    showDeleteModal.value = false;
     await fetchData();
-    alert(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted.`);
+    
+    // Show success toast
+    const typeLabels = { qr: 'QR Code', band: 'Artist Page', event: 'Event' };
+    toastMessage.value = `✅ ${typeLabels[type] || type} deleted successfully`;
+    showToast.value = true;
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      showToast.value = false;
+    }, 3000);
   } catch (e) {
     console.error(e);
-    alert(`Failed to delete ${type}.`);
-  } finally {
-    loading.value = false;
+    // Reset the modal's deleting state
+    if (deleteModalRef.value) {
+      deleteModalRef.value.resetDeleting();
+    }
+    toastMessage.value = `❌ Failed to delete. Please try again.`;
+    showToast.value = true;
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      showToast.value = false;
+    }, 3000);
   }
 };
 
@@ -974,11 +1097,10 @@ async function goToBillingPortal() {
 </script>
 
 <style scoped lang="css">
+/* Toast animation */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .fade-slide-enter-from,
 .fade-slide-leave-to {
@@ -986,32 +1108,239 @@ async function goToBillingPortal() {
   transform: translateY(20px);
 }
 
-.action-button {
-  @apply flex items-center gap-2 px-4 py-2 border rounded-md text-white text-sm hover:bg-white/10 transition;
+/* Dashboard Section */
+.dashboard-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  overflow: hidden;
 }
-.mdc-button {
-  border: 1px solid white;
-  background: transparent;
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.section-content {
+  padding: 1.5rem;
+}
+
+/* Create Button */
+.create-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
   color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  text-decoration: none;
 }
-.mdc-button img {
-  height: 20px;
+
+.create-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
-.mdc-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+
+/* Item Card */
+.item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  transition: all 0.2s;
 }
-img {
+
+.item-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+@media (min-width: 640px) {
+  .item-card {
+    flex-direction: row;
+    gap: 1.25rem;
+  }
+}
+
+/* Image with skeleton */
+.item-image-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.item-image-skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.item-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-.text-white {
-  color: #fff;
+
+.item-image.loaded {
+  opacity: 1;
 }
-.border-white {
-  border-color: #fff;
+
+/* Item Info */
+.item-info {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
 }
-.container {
-  max-width: 1200px;
+
+@media (min-width: 640px) {
+  .item-info {
+    text-align: left;
+  }
+}
+
+.item-title {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.item-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: rgb(52, 211, 153);
+}
+.status-success .status-dot {
+  background: rgb(52, 211, 153);
+}
+
+.status-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: rgb(251, 191, 36);
+}
+.status-warning .status-dot {
+  background: rgb(251, 191, 36);
+}
+
+.status-neutral {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+.status-neutral .status-dot {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Item Actions */
+.item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .item-actions {
+    flex-wrap: nowrap;
+  }
+}
+
+.action-btn-labeled {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.action-btn-labeled:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.action-btn-labeled:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
