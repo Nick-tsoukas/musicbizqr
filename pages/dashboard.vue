@@ -26,6 +26,46 @@
         @add-payment="goToBillingPortal"
       />
 
+      <!-- MBQ Pulse Section -->
+      <section v-if="hasBand && !loading" class="dashboard-section mb-8">
+        <div class="section-header bg-gradient-to-r from-violet-600 to-purple-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">MBQ Pulse</h2>
+              <p class="text-white/70 text-sm">Your fan momentum at a glance</p>
+            </div>
+          </div>
+          <!-- Range Selector -->
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="(label, days) in pulseRangeOptions"
+              :key="days"
+              @click="pulseRange = Number(days)"
+              :class="[
+                'px-3 py-1 text-xs rounded-full border transition-colors',
+                pulseRange === Number(days)
+                  ? 'bg-white/20 text-white border-white/30'
+                  : 'bg-transparent text-white/70 border-white/20 hover:bg-white/10',
+              ]"
+            >
+              {{ label }}
+            </button>
+          </div>
+        </div>
+        <div class="section-content">
+          <MbqPulseCard
+            :pulse="pulseData"
+            :loading="pulseLoading"
+            :range-label="`Last ${pulseRange} days`"
+          />
+        </div>
+      </section>
+
       <!-- QR Codes Section -->
       <div v-if="loading" class="mb-8">
         <SkeletonLoader />
@@ -572,6 +612,17 @@ const scans = ref([]);
 const bands = ref([]);
 const events = ref([]);
 
+// MBQ Pulse state
+const pulseData = ref(null);
+const pulseLoading = ref(false);
+const pulseRange = ref(30);
+const pulseRangeOptions = {
+  7: '7 Days',
+  30: '30 Days',
+  90: '90 Days',
+  365: '1 Year',
+};
+
 const payoutLoadingId = ref(null);
 
 const hasQr = computed(() => qrItems.value.length > 0);
@@ -840,6 +891,28 @@ const fetchData = async () => {
   }
 };
 
+// Fetch MBQ Pulse for user's band
+async function fetchPulse() {
+  const bandId = bandItems.value[0]?.id;
+  if (!bandId) {
+    pulseData.value = null;
+    pulseLoading.value = false;
+    return;
+  }
+  pulseLoading.value = true;
+  try {
+    const data = await client('/analytics/pulse', {
+      params: { entityType: 'band', entityId: bandId, range: `${pulseRange.value}d` }
+    });
+    pulseData.value = data?.pulse || null;
+  } catch (err) {
+    console.error('[Dashboard] Failed to fetch pulse:', err);
+    pulseData.value = null;
+  } finally {
+    pulseLoading.value = false;
+  }
+}
+
 const qrDetailCache = new Map() // id -> full row with options
 
 
@@ -1052,12 +1125,18 @@ onMounted(async () => {
   }
 
   await fetchData(); // show lists first
+  fetchPulse(); // fetch pulse after bands are loaded
 
   const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
   idle(() => {
     fetchBillingInfo();
     fetchTrialInfo();
   });
+});
+
+// Re-fetch pulse when range changes
+watch(pulseRange, () => {
+  fetchPulse();
 });
 
 watch(
