@@ -1,446 +1,467 @@
 <template>
-  <div class="container mx-auto max-w-5xl pt-[var(--header-height)]">
-    <h1 class="text-white text-3xl font-bold mb-10">Edit Event</h1>
-    <form @submit.prevent="submitEditEvent">
-      <!-- Event Details Section -->
-      <div class="bg-white mb-10">
-        <div
-          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-2xl">Event Details</h2>
-        </div>
-        <div class="p-6">
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-title"
-              class="mdc-text-field__input"
-              v-model="event.title"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-title">
-              Event Title
-            </label>
-            <div class="mdc-line-ripple"></div>
+  <div class="min-h-screen bg-black pt-[var(--header-height)]">
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 border-3 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+        <span class="text-white/70 text-sm">Saving changes...</span>
+      </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-6 py-10">
+      <!-- Header -->
+      <div class="mb-10">
+        <NuxtLink to="/dashboard" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm mb-4 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Dashboard
+        </NuxtLink>
+        <h1 class="text-3xl md:text-4xl font-bold text-white">Edit Event</h1>
+        <p class="text-white/60 mt-2">Update your event details</p>
+      </div>
+
+      <form @submit.prevent="submitEditEvent" class="space-y-6">
+        <!-- Event Details Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-blue-500 to-indigo-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Event Details</h2>
+              <p class="form-section-subtitle">Basic information about your event</p>
+            </div>
           </div>
 
-          <!-- Tiptap block -->
-          <div class="mb-4">
-            <label for="edit-event-description" class="block text-black mb-1">
-              Event Description
-            </label>
-            <client-only>
-              <div
-                v-if="editor"
-                class="bg-white rounded-md border border-gray-300 p-2"
-              >
-                <!-- Toolbar Buttons -->
-                <div class="flex space-x-2 mb-2">
-                  <button
-                    type="button"
-                    :class="[
-                      'px-2 py-1 border rounded',
-                      editor.isActive('bold') ? 'bg-gray-200' : 'bg-white',
-                    ]"
-                    @click="toggleBold"
-                  >
-                    <strong>B</strong>
-                  </button>
-                  <button
-                    type="button"
-                    :class="[
-                      'px-2 py-1 border rounded',
-                      editor.isActive('italic') ? 'bg-gray-200' : 'bg-white',
-                    ]"
-                    @click="toggleItalic"
-                  >
-                    <em>I</em>
-                  </button>
-                  <button
-                    type="button"
-                    :class="[
-                      'px-2 py-1 border rounded',
-                      editor.isActive('underline') ? 'bg-gray-200' : 'bg-white',
-                    ]"
-                    @click="toggleUnderline"
-                  >
-                    <u>U</u>
-                  </button>
+          <div class="form-section-content">
+            <div class="form-field">
+              <label for="edit-event-title" class="form-label">Event Title</label>
+              <input
+                type="text"
+                id="edit-event-title"
+                v-model="event.title"
+                class="form-input"
+                placeholder="Enter event title"
+              />
+            </div>
+
+            <!-- Description (Rich Text via Tiptap JSON) -->
+            <div class="form-field">
+              <label class="form-label">Event Description</label>
+              <client-only>
+                <div v-if="editor" class="editor-wrapper">
+                  <div class="editor-toolbar">
+                    <button
+                      type="button"
+                      :class="['editor-btn', editor.isActive('bold') && 'active']"
+                      @click="toggleBold"
+                    >
+                      <strong>B</strong>
+                    </button>
+                    <button
+                      type="button"
+                      :class="['editor-btn', editor.isActive('italic') && 'active']"
+                      @click="toggleItalic"
+                    >
+                      <em>I</em>
+                    </button>
+                    <button
+                      type="button"
+                      :class="['editor-btn', editor.isActive('underline') && 'active']"
+                      @click="toggleUnderline"
+                    >
+                      <u>U</u>
+                    </button>
+                  </div>
+                  <EditorContent
+                    class="editor-content"
+                    :editor="editor"
+                  />
                 </div>
-                <!-- Editable Content Area -->
-                <EditorContent
-                  class="min-h-[150px] focus:outline-none"
-                  :editor="editor"
+                <div v-else class="editor-loading">
+                  <div class="w-5 h-5 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+                  <span>Loading editor...</span>
+                </div>
+              </client-only>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="edit-event-date" class="form-label">Event Date</label>
+                <input
+                  type="date"
+                  id="edit-event-date"
+                  v-model="event.date"
+                  class="form-input"
                 />
               </div>
-              <div
-                v-else
-                class="bg-white rounded-md border border-gray-300 p-4 text-center text-gray-500"
-              >
-                Loading editor…
+
+              <div class="form-field">
+                <label for="edit-event-time" class="form-label">Event Time</label>
+                <input
+                  type="time"
+                  id="edit-event-time"
+                  v-model="event.time"
+                  class="form-input"
+                />
               </div>
-            </client-only>
-          </div>
-        </div>
-      </div>
+            </div>
 
-      <!-- Event Date and Time Section -->
-      <div class="bg-white">
-        <div
-          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
+            <div class="form-field">
+              <label for="edit-event-doors-time" class="form-label">Doors Time</label>
+              <input
+                type="time"
+                id="edit-event-doors-time"
+                v-model="event.doorsTime"
+                class="form-input"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Venue Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-emerald-500 to-teal-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Venue & Location</h2>
+              <p class="form-section-subtitle">Where is your event taking place?</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="form-field">
+              <label for="edit-event-venue" class="form-label">Venue Name</label>
+              <input
+                type="text"
+                id="edit-event-venue"
+                v-model="event.venue"
+                class="form-input"
+                placeholder="e.g., The Fillmore"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="edit-event-address" class="form-label">Street Address</label>
+              <input
+                type="text"
+                id="edit-event-address"
+                v-model="event.address"
+                class="form-input"
+                placeholder="123 Main Street"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="edit-event-city" class="form-label">City</label>
+                <input
+                  type="text"
+                  id="edit-event-city"
+                  v-model="event.city"
+                  class="form-input"
+                  placeholder="City"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-state" class="form-label">State</label>
+                <input
+                  type="text"
+                  id="edit-event-state"
+                  v-model="event.state"
+                  class="form-input"
+                  placeholder="State"
+                />
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="edit-event-age-restriction" class="form-label">Age Restriction</label>
+              <input
+                type="text"
+                id="edit-event-age-restriction"
+                v-model="event.ageRestriction"
+                class="form-input"
+                placeholder="e.g., 21+"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Event Image Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-purple-500 to-violet-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Event Image</h2>
+              <p class="form-section-subtitle">Upload a poster or flyer for your event</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="form-field">
+              <div v-if="event.imageUrl" class="mb-4">
+                <img
+                  :src="event.imageUrl"
+                  alt="Event Image"
+                  class="w-full h-auto max-w-[300px] mx-auto rounded-xl shadow-lg"
+                />
+              </div>
+              <label class="file-upload-area">
+                <input
+                  type="file"
+                  id="edit-event-image"
+                  class="hidden"
+                  @change="handleEventImageUpload"
+                  accept="image/*"
+                />
+                <div class="file-upload-content">
+                  <svg class="w-10 h-10 text-white/30 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <span class="text-white/70 font-medium">Click to upload event image</span>
+                  <span class="text-white/40 text-sm mt-1">PNG, JPG up to 10MB</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Ticket Link Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-amber-500 to-orange-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Tickets</h2>
+              <p class="form-section-subtitle">Link to your ticket sales page</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="form-field">
+              <label for="edit-event-link" class="form-label">Ticket Link</label>
+              <input
+                type="text"
+                id="edit-event-link"
+                v-model="event.link"
+                @blur="event.link = normalizeLink(event.link)"
+                class="form-input"
+                placeholder="https://tickets.example.com"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="edit-event-ticket-label" class="form-label">Button Label</label>
+                <input
+                  type="text"
+                  id="edit-event-ticket-label"
+                  v-model="event.ticketLabel"
+                  class="form-input"
+                  placeholder="e.g., Get Tickets"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-price-line" class="form-label">Price Info</label>
+                <input
+                  type="text"
+                  id="edit-event-price-line"
+                  v-model="event.priceLine"
+                  class="form-input"
+                  placeholder="e.g., $25 - $50"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-pink-500 to-rose-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Contact Information</h2>
+              <p class="form-section-subtitle">How can attendees reach you?</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="edit-event-email" class="form-label">Contact Email</label>
+                <input
+                  type="email"
+                  id="edit-event-email"
+                  v-model="event.contactEmail"
+                  class="form-input"
+                  placeholder="contact@example.com"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-phone" class="form-label">Contact Phone</label>
+                <input
+                  type="tel"
+                  id="edit-event-phone"
+                  v-model="event.contactPhone"
+                  class="form-input"
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Social Media Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-cyan-500 to-blue-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Social Media</h2>
+              <p class="form-section-subtitle">Connect your social profiles</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="edit-event-facebook" class="form-label">Facebook</label>
+                <input
+                  type="url"
+                  id="edit-event-facebook"
+                  v-model="event.facebook"
+                  @blur="event.facebook = normalizeLink(event.facebook)"
+                  class="form-input"
+                  placeholder="https://facebook.com/..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-instagram" class="form-label">Instagram</label>
+                <input
+                  type="url"
+                  id="edit-event-instagram"
+                  v-model="event.instagram"
+                  @blur="event.instagram = normalizeLink(event.instagram)"
+                  class="form-input"
+                  placeholder="https://instagram.com/..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-twitter" class="form-label">Twitter / X</label>
+                <input
+                  type="url"
+                  id="edit-event-twitter"
+                  v-model="event.twitter"
+                  @blur="event.twitter = normalizeLink(event.twitter)"
+                  class="form-input"
+                  placeholder="https://twitter.com/..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-tiktok" class="form-label">TikTok</label>
+                <input
+                  type="url"
+                  id="edit-event-tiktok"
+                  v-model="event.tiktok"
+                  @blur="event.tiktok = normalizeLink(event.tiktok)"
+                  class="form-input"
+                  placeholder="https://tiktok.com/..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-youtube" class="form-label">YouTube</label>
+                <input
+                  type="url"
+                  id="edit-event-youtube"
+                  v-model="event.youtube"
+                  @blur="event.youtube = normalizeLink(event.youtube)"
+                  class="form-input"
+                  placeholder="https://youtube.com/..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="edit-event-website" class="form-label">Website</label>
+                <input
+                  type="url"
+                  id="edit-event-website"
+                  v-model="event.website"
+                  @blur="event.website = normalizeLink(event.website)"
+                  class="form-input"
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Band Selection Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-violet-500 to-purple-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Link to Artist</h2>
+              <p class="form-section-subtitle">Connect this event to your artist page</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="form-field">
+              <label for="edit-event-band" class="form-label">Select Artist</label>
+              <select v-model="event.band" id="edit-event-band" class="form-input">
+                <option value="" disabled>Select an artist (optional)</option>
+                <option v-for="band in bands" :key="band.id" :value="band.id">
+                  {{ band.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-lg shadow-lg shadow-blue-500/25 transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
-          <h2 class="font-semibold text-white text-2xl">Event Details</h2>
-        </div>
-        <div class="p-6">
-          <div class="mdc-text-field mb-4">
-            <input
-              type="date"
-              id="edit-event-date"
-              class="mdc-text-field__input"
-              v-model="event.date"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-date">
-              Event Date
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input
-              type="time"
-              id="edit-event-time"
-              class="mdc-text-field__input"
-              v-model="event.time"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-time">
-              Event Time
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="time"
-              id="edit-event-doors-time"
-              class="mdc-text-field__input"
-              v-model="event.doorsTime"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-doors-time">
-              Doors Time (optional)
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Event Location and Link Section -->
-      <div class="bg-white mt-10">
-        <div
-          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-2xl">
-            Event Location and Link
-          </h2>
-        </div>
-        <div class="p-6">
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-ticket-label"
-              class="mdc-text-field__input"
-              v-model="event.ticketLabel"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-ticket-label">
-              Ticket Button Label (optional)
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-price-line"
-              class="mdc-text-field__input"
-              v-model="event.priceLine"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-price-line">
-              Price Line (optional)
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-venue"
-              class="mdc-text-field__input"
-              v-model="event.venue"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-venue">
-              Venue
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-city"
-              class="mdc-text-field__input"
-              v-model="event.city"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-city">City</label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-state"
-              class="mdc-text-field__input"
-              v-model="event.state"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-state"
-              >State</label
-            >
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-address"
-              class="mdc-text-field__input"
-              v-model="event.address"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-address">
-              Street Address
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-link"
-              class="mdc-text-field__input"
-              v-model="event.link"
-              @blur="event.link = normalizeLink(event.link)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-link"
-              >Ticket Link</label
-            >
-            <div class="mdc-line-ripple"></div>
-          </div>
-          <!-- Contact Phone -->
-          <div class="mdc-text-field mb-4">
-            <input
-              type="tel"
-              id="edit-event-phone"
-              class="mdc-text-field__input"
-              v-model="event.contactPhone"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-phone"
-              >Contact Phone</label
-            >
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <!-- Contact Email -->
-          <div class="mdc-text-field mb-4">
-            <input
-              type="email"
-              id="edit-event-email"
-              class="mdc-text-field__input"
-              v-model="event.contactEmail"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-email"
-              >Contact Email</label
-            >
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="text"
-              id="edit-event-age-restriction"
-              class="mdc-text-field__input"
-              v-model="event.ageRestriction"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-age-restriction">
-              Age Restriction (optional)
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white mt-10">
-        <div
-          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-2xl">Event Social Links (optional)</h2>
-        </div>
-        <div class="p-6">
-          <div class="mdc-text-field mb-4">
-            <input
-              type="url"
-              id="edit-event-facebook"
-              class="mdc-text-field__input"
-              v-model="event.facebook"
-              @blur="event.facebook = normalizeLink(event.facebook)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-facebook">
-              Facebook URL
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="url"
-              id="edit-event-twitter"
-              class="mdc-text-field__input"
-              v-model="event.twitter"
-              @blur="event.twitter = normalizeLink(event.twitter)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-twitter">
-              Twitter / X URL
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="url"
-              id="edit-event-instagram"
-              class="mdc-text-field__input"
-              v-model="event.instagram"
-              @blur="event.instagram = normalizeLink(event.instagram)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-instagram">
-              Instagram URL
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="url"
-              id="edit-event-youtube"
-              class="mdc-text-field__input"
-              v-model="event.youtube"
-              @blur="event.youtube = normalizeLink(event.youtube)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-youtube">
-              YouTube URL
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="url"
-              id="edit-event-tiktok"
-              class="mdc-text-field__input"
-              v-model="event.tiktok"
-              @blur="event.tiktok = normalizeLink(event.tiktok)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-tiktok">
-              TikTok URL
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-
-          <div class="mdc-text-field mb-4">
-            <input
-              type="url"
-              id="edit-event-website"
-              class="mdc-text-field__input"
-              v-model="event.website"
-              @blur="event.website = normalizeLink(event.website)"
-              placeholder=" "
-            />
-            <label class="mdc-floating-label" for="edit-event-website">
-              Website URL
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Event Image Section -->
-      <div class="mt-10 bg-white">
-        <div
-          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-2xl">Event Image</h2>
-        </div>
-        <div class="mb-4 p-6">
-          <div v-if="event.imageUrl" class="mb-4 mx-auto max-w-[500px]">
-            <img
-              :src="event.imageUrl"
-              alt="Event Image"
-              class="w-full h-auto rounded-lg shadow-md"
-            />
-          </div>
-          <input
-            type="file"
-            id="edit-event-image"
-            class="styled-file-input"
-            @change="handleEventImageUpload"
-            accept="image/*"
-          />
-          <label
-            for="edit-event-image"
-            class="styled-file-label w-full text-center"
-          >
-            Choose Event Image
-          </label>
-        </div>
-      </div>
-
-      <!-- Select Band Section -->
-      <div class="mt-10 bg-white">
-        <div
-          class="flex flex-col bg-[#000] p-6 mb-6 border-b-2 bg-gradient-to-r from-pink-500 to-violet-500 py-6 gap-2 items-center md:flex-row md:gap-0"
-        >
-          <h2 class="font-semibold text-white text-2xl">Choose Band</h2>
-        </div>
-        <div class="p-6">
-          <div class="mdc-text-field mb-4">
-            <select v-model="event.band" class="mdc-text-field__input">
-              <option value="" disabled>Select Band (Optional)</option>
-              <option v-for="band in bands" :key="band.id" :value="band.id">
-                {{ band.name }}
-              </option>
-            </select>
-            <label class="mdc-floating-label" for="edit-event-band">
-              Select Band
-            </label>
-            <div class="mdc-line-ripple"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Save Changes Button -->
-      <button type="submit" class="mdc-button mb-4 w-full mt-10">
-        Save Changes
-      </button>
-    </form>
+          Save Changes
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -686,126 +707,197 @@ watch(
 </script>
 
 <style scoped>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.container-mdc {
-  max-width: 90vw;
-  margin: 1rem auto;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Form Section */
+.form-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  overflow: hidden;
 }
 
-.ProseMirror {
-  white-space: pre-wrap;
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+.form-section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.form-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
   color: white;
 }
 
-.mdc-text-field {
-  position: relative;
-  margin-bottom: 1.5rem;
-  display: inline-block;
-  width: 100%;
-}
-.mdc-text-field__input::placeholder {
-  color: transparent;
-}
-.mdc-text-field__input:focus::placeholder {
-  color: #aaa;
-}
-.mdc-text-field__input {
-  font-size: 1rem;
-  line-height: 1.5;
-  padding: 0.75rem 0.5rem;
-  border: 1px solid #000;
-  border-radius: 10px;
-  outline: none;
-  width: 100%;
-}
-.mdc-floating-label {
-  position: absolute;
-  z-index: 99999;
-  top: 0.75rem;
-  left: 0.5rem;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  font-size: 1rem;
-  background: white;
-  line-height: 1;
-  color: #aaa;
-  pointer-events: none;
-  transition:
-    transform 0.2s,
-    color 0.2s;
-}
-.mdc-text-field__input:focus + .mdc-floating-label,
-.mdc-text-field__input:not(:placeholder-shown) + .mdc-floating-label {
-  transform: translateY(-1.5rem);
-  color: #6200ee;
-}
-.mdc-line-ripple {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #6200ee;
-  transform: scaleX(0);
-  transition: transform 0.2s;
-}
-.mdc-text-field__input:focus ~ .mdc-line-ripple {
-  transform: scaleX(1);
+.form-section-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.125rem;
 }
 
-.mdc-button {
-  display: inline-flex;
+.form-section-content {
+  padding: 1.5rem;
+}
+
+/* Form Field */
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.form-field:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Editor */
+.editor-wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.editor-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #2c2c2c;
-  border: none;
-  border-radius: 4px;
+  border-radius: 0.375rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-.mdc-button:hover {
-  background-color: #3700b3;
-}
-.mdc-button:focus {
-  outline: none;
+  transition: all 0.2s;
 }
 
-.styled-file-input {
-  display: none;
+.editor-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
-.styled-file-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.0892857143em;
-  color: #fff;
-  background-color: #2c2c2c;
-  border: none;
-  border-radius: 4px;
+
+.editor-btn.active {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: rgba(99, 102, 241, 0.5);
+  color: white;
+}
+
+.editor-content {
+  min-height: 150px;
+  padding: 1rem;
+  color: white;
+}
+
+.editor-content :deep(.ProseMirror) {
+  outline: none;
+  min-height: 120px;
+}
+
+.editor-content :deep(.ProseMirror p) {
+  margin: 0;
+}
+
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* File Upload */
+.file-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
-.styled-file-label:hover {
-  background-color: #3700b3;
+
+.file-upload-area:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.file-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Select styling */
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.5)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+select.form-input option {
+  background: #1a1a1a;
+  color: white;
 }
 </style>
