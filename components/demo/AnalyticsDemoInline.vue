@@ -370,6 +370,156 @@
           </div>
         </div>
 
+        <div class="mt-4 rounded-2xl border border-white/10 bg-black/20 overflow-hidden">
+          <div class="px-4 py-4 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-400/20 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M7 7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3H7V7zm0 5h16v5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-5z"
+                    opacity="0.25"
+                  />
+                  <path d="M5 6.5A2.5 2.5 0 0 1 7.5 4H19a1 1 0 0 1 0 2H7.5A.5.5 0 0 0 7 6.5V7H5v-.5z" />
+                  <path d="M9 15.5a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1z" />
+                </svg>
+              </div>
+
+              <div class="min-w-0">
+                <div class="text-white font-semibold">Payments & payouts (beta)</div>
+                <div class="text-white/60 text-xs mt-0.5">
+                  Track tips, merch, and ticket revenue — see net payout performance over time.
+                </div>
+              </div>
+            </div>
+
+            <div class="shrink-0 text-right">
+              <span
+                :class="[
+                  'inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold tracking-wide',
+                  paymentsDemo.status === 'ready'
+                    ? 'bg-emerald-500/10 text-emerald-200 border-emerald-400/25'
+                    : paymentsDemo.status === 'pending'
+                      ? 'bg-amber-500/10 text-amber-200 border-amber-400/25'
+                      : 'bg-red-500/10 text-red-200 border-red-400/25',
+                ]"
+              >
+                {{ paymentsDemo.statusLabel }}
+              </span>
+              <div class="text-white/50 text-[11px] mt-1">next payout {{ paymentsDemo.nextPayout }}</div>
+            </div>
+          </div>
+
+          <div class="px-4 pb-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+                <div class="text-white/60 text-xs">Gross</div>
+                <div class="text-xl sm:text-2xl font-semibold tabular-nums text-white">
+                  {{ formatUsd(paymentsDemo.kpis.gross) }}
+                </div>
+                <div class="text-white/50 text-xs mt-1">{{ selectedRangeLabel }}</div>
+              </div>
+              <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+                <div class="text-white/60 text-xs">Fees</div>
+                <div class="text-xl sm:text-2xl font-semibold tabular-nums text-white">
+                  {{ formatUsd(paymentsDemo.kpis.fees) }}
+                </div>
+                <div class="text-white/50 text-xs mt-1">processing + platform</div>
+              </div>
+              <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+                <div class="text-white/60 text-xs">Net</div>
+                <div class="text-xl sm:text-2xl font-semibold tabular-nums text-white">
+                  {{ formatUsd(paymentsDemo.kpis.net) }}
+                </div>
+                <div class="text-white/50 text-xs mt-1">paid out</div>
+              </div>
+              <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+                <div class="text-white/60 text-xs">Pending</div>
+                <div class="text-xl sm:text-2xl font-semibold tabular-nums text-white">
+                  {{ formatUsd(paymentsDemo.kpis.pending) }}
+                </div>
+                <div class="text-white/50 text-xs mt-1">clearing</div>
+              </div>
+            </div>
+
+            <div class="mt-4 grid md:grid-cols-2 gap-3">
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-white font-semibold flex items-center justify-between gap-3">
+                  <span>Payout sources</span>
+                  <span class="text-white/50 text-xs">{{ selectedRangeLabel }}</span>
+                </div>
+                <div class="mt-3 space-y-2">
+                  <div
+                    v-for="row in paymentsDemo.sources"
+                    :key="row.name"
+                    class="flex items-center gap-3"
+                  >
+                    <div class="w-28 truncate text-white/85 text-sm">{{ row.label }}</div>
+                    <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        class="h-2 rounded-full bg-emerald-400/80"
+                        :style="{ width: `${row.pct}%` }"
+                      ></div>
+                    </div>
+                    <div class="w-16 text-right tabular-nums text-white/60 text-sm">{{ formatUsd(row.amount) }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-white font-semibold flex items-center justify-between gap-3">
+                  <span>Payments insights</span>
+                  <span class="text-white/50 text-xs">{{ paymentsDemo.payoutCount }} payouts</span>
+                </div>
+                <ul class="mt-3 list-disc pl-5 text-white/80 text-sm space-y-1">
+                  <li v-for="(b, i) in paymentsDemo.insights" :key="i">{{ b }}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div class="text-white font-semibold flex items-center justify-between gap-3">
+                <span>Recent payouts</span>
+                <span class="text-white/50 text-xs">{{ paymentsDemo.recent.length }}</span>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                <div
+                  v-for="p in paymentsDemo.recent"
+                  :key="p.id"
+                  class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
+                >
+                  <div class="min-w-0">
+                    <div class="text-white/90 text-sm font-semibold truncate">
+                      {{ p.label }}
+                    </div>
+                    <div class="text-white/55 text-xs mt-0.5">
+                      {{ p.dateLabel }}
+                      <span class="mx-1">•</span>
+                      {{ p.method }}
+                    </div>
+                  </div>
+
+                  <div class="shrink-0 text-right">
+                    <div class="text-white tabular-nums font-semibold">{{ formatUsd(p.amount) }}</div>
+                    <div
+                      :class="[
+                        'text-[11px] mt-0.5 font-semibold',
+                        p.status === 'paid'
+                          ? 'text-emerald-200'
+                          : p.status === 'processing'
+                            ? 'text-amber-200'
+                            : 'text-white/60',
+                      ]"
+                    >
+                      {{ p.statusLabel }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="mt-4 grid md:grid-cols-2 gap-3">
           <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
             <div class="text-white font-semibold">Top Sources</div>
@@ -787,6 +937,104 @@ const youtubeDemo = computed(() => {
     },
     insights,
     videos,
+  }
+})
+
+function formatUsd(amount: number) {
+  const v = Number(amount) || 0
+  return v.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+}
+
+const paymentsDemo = computed(() => {
+  const seed = hashSeed(`payments|${selectedRange.value}|${selectedTab.value}`)
+  const rand = mulberry32(seed)
+
+  const statusRoll = rand()
+  const status = statusRoll > 0.12 ? 'ready' : statusRoll > 0.05 ? 'pending' : 'not_ready'
+  const statusLabel =
+    status === 'ready'
+      ? 'payouts enabled'
+      : status === 'pending'
+        ? 'verification pending'
+        : 'payouts disabled'
+
+  const nextDays = status === 'ready' ? Math.max(1, Math.round(1 + rand() * 6)) : null
+  const nextPayout =
+    status === 'ready'
+      ? nextDays === 1
+        ? 'tomorrow'
+        : `in ${nextDays} days`
+      : '—'
+
+  const gross = Math.round((220 + rand() * 2200) * (selectedRange.value === 365 ? 8.5 : 1) * (selectedRange.value === 1 ? 0.35 : 1))
+  const feeRate = 0.045 + rand() * 0.035
+  const fees = Math.round(gross * feeRate)
+  const pending = Math.round(gross * (0.08 + rand() * 0.18))
+  const net = Math.max(0, gross - fees - pending)
+
+  const sourcesBase = [
+    { name: 'tips', label: 'Tips', base: 0.42 },
+    { name: 'merch', label: 'Merch', base: 0.34 },
+    { name: 'tickets', label: 'Tickets', base: 0.18 },
+    { name: 'subs', label: 'Subs', base: 0.06 },
+  ]
+    .map((r, i) => {
+      const r2 = mulberry32(hashSeed(`${seed}|src|${i}`))
+      return { ...r, weight: Math.max(0.03, r.base * (0.75 + r2() * 0.7)) }
+    })
+
+  const sumW = sourcesBase.reduce((a, b) => a + b.weight, 0) || 1
+  const sourcesRaw = sourcesBase.map((s) => ({
+    ...s,
+    amount: Math.round(gross * (s.weight / sumW)),
+  }))
+  const maxAmt = Math.max(...sourcesRaw.map((s) => s.amount), 1)
+  const sources = sourcesRaw
+    .sort((a, b) => b.amount - a.amount)
+    .map((s) => ({
+      name: s.name,
+      label: s.label,
+      amount: s.amount,
+      pct: Math.max(6, Math.round((s.amount / maxAmt) * 100)),
+    }))
+
+  const payoutCount = Math.max(2, Math.round(2 + rand() * (selectedRange.value === 365 ? 28 : 10)))
+  const insights = [
+    'Fans tip more when the CTA is above the fold — try “Support the band” near the top link block.',
+    'Your best conversion happens after shows. Enable QR codes at merch table and stage corners.',
+    'Merch bundles lift average order value. Pair a tee + sticker pack and highlight it first.',
+  ].slice(0, 3)
+
+  const methods = ['instant payout', 'standard payout', 'manual transfer']
+  const recent = Array.from({ length: 4 }, (_v, i) => {
+    const r = mulberry32(hashSeed(`${seed}|payout|${i}`))
+    const amt = Math.round(28 + r() * 620)
+    const daysAgo = Math.max(1, Math.round(1 + r() * 21))
+    const statusRoll2 = r()
+    const pStatus = statusRoll2 > 0.22 ? 'paid' : 'processing'
+    const statusLabel2 = pStatus === 'paid' ? 'paid' : 'processing'
+    const method = methods[Math.floor(r() * methods.length)] || methods[0]
+    const label = i === 0 ? 'Weekly payout' : i === 1 ? 'Show night tips' : i === 2 ? 'Merch batch' : 'Ticket split'
+    return {
+      id: `${seed}-${i}`,
+      label,
+      amount: amt,
+      dateLabel: daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`,
+      method,
+      status: pStatus,
+      statusLabel: statusLabel2,
+    }
+  })
+
+  return {
+    status,
+    statusLabel,
+    nextPayout,
+    payoutCount,
+    kpis: { gross, fees, net, pending },
+    sources,
+    insights,
+    recent,
   }
 })
 </script>

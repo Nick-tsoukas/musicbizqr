@@ -325,9 +325,10 @@
             <div class="px-6 md:px-10">
               <div class="mt-8 flex items-center justify-center">
                 <span
-                  class="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/80"
+                  class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold tracking-wide text-white/85"
                 >
-                  Interactive Analytics Demo
+                  <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.35)]"></span>
+                  Analytics & Revenue Insights
                 </span>
               </div>
               <h3
@@ -340,8 +341,23 @@
                 </span>
               </h3>
               <p class="mt-3 max-w-3xl mx-auto text-center text-white/80 text-lg leading-relaxed">
-                Toggle between metrics, date ranges, and bar/line views to preview the dashboard your band gets—so you can spot what’s working and double down.
+                Toggle between metrics, date ranges, and bar/line views to preview your band’s dashboard — track engagement after scans, YouTube performance, and payout trends so you can spot what’s working and double down.
               </p>
+
+              <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/80">
+                  Post-scan journey
+                </span>
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/80">
+                  YouTube analytics
+                </span>
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/80">
+                  Tips, merch & payouts
+                </span>
+                <span class="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold text-white/80">
+                  Top sources & devices
+                </span>
+              </div>
             </div>
 
             <AnalyticsDemoInline />
