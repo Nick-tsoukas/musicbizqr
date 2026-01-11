@@ -71,11 +71,18 @@
       </button>
     </div>
 
-    <!-- Loading State -->
+    <!-- Loading State (initial only) -->
     <div v-if="isLoading" class="text-white py-8 text-center">🔄 Loading analytics…</div>
 
     <!-- Main Content -->
-    <div v-else class="space-y-6">
+    <div v-else class="space-y-6 relative">
+      <!-- Refresh overlay for range changes -->
+      <div
+        v-if="isRefreshing"
+        class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg"
+      >
+        <span class="text-gray-200 text-sm">Refreshing…</span>
+      </div>
       <!-- Views Time Series Chart -->
       <div class="chart-card">
         <div class="flex items-center justify-between mb-2">
@@ -272,6 +279,7 @@ const rangeOptions = {
 const rangeLabel = computed(() => `Last ${selectedRange.value} days`);
 
 const isLoading = ref(true);
+const isRefreshing = ref(false);
 const rollups = ref(null);
 const geoList = ref([]);
 const eventInfo = ref({ title: '', id: null });
@@ -396,9 +404,9 @@ function renderViewsChart() {
 onMounted(loadData);
 
 watch(selectedRange, async () => {
-  isLoading.value = true;
+  isRefreshing.value = true;
   await Promise.all([fetchRollups(), fetchGeo()]);
-  isLoading.value = false;
+  isRefreshing.value = false;
   await nextTick();
   renderViewsChart();
 });

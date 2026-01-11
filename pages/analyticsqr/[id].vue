@@ -1,402 +1,439 @@
 <template>
-  <div
-    class="bg-black pt-[var(--header-height)] text-white min-h-screen mx-auto p-4 w-full sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-3xl"
-  >
-    <h1 class="text-2xl font-bold mb-4">QR Scans Analytics</h1>
-
-    <div v-if="!isInitialLoading" class="text-xl font-semibold mb-6 space-y-2">
-      <p>
-        Total Scans (All Time):
-        <span class="text-purple-400">{{ totalScans }}</span>
-      </p>
+  <div class="px-4 sm:px-6 py-10 bg-gradient-to-b from-black via-slate-950 to-black min-h-screen pt-[var(--header-height)] max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4 mb-6">
+      <div class="min-w-0">
+        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">QR Analytics</h2>
+        <div class="text-gray-400 text-sm mt-1" v-if="qrInfo.name">
+          {{ qrInfo.name }}
+        </div>
+      </div>
+      <NuxtLink
+        to="/dashboard"
+        class="shrink-0 px-3 py-1.5 text-sm rounded-full border border-white/10 bg-black/30 text-gray-300 hover:bg-white/5 transition-colors"
+      >
+        ← Back
+      </NuxtLink>
     </div>
 
-    <!-- Controls -->
-    <div class="flex flex-wrap items-center gap-2 mb-8">
+    <!-- Summary Cards -->
+    <div class="chart-card mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-white text-lg font-semibold">Performance Overview</h3>
+        <span class="text-gray-400 text-xs">{{ rangeLabel }}</span>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Total Scans</p>
+          <p class="text-2xl font-semibold text-white tabular-nums">
+            {{ rollups?.totals?.scans ?? 0 }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top Source</p>
+          <p class="text-lg font-semibold text-white truncate capitalize">
+            {{ topSource }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top Country</p>
+          <p class="text-lg font-semibold text-white truncate uppercase">
+            {{ topCountry }}
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
+          <p class="text-gray-400 text-xs">Top Device</p>
+          <p class="text-lg font-semibold text-white capitalize">
+            {{ topDevice }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Range Selector -->
+    <div class="flex flex-wrap gap-2 mb-4">
       <button
         v-for="(label, days) in rangeOptions"
         :key="days"
-        @click="() => handleRangeClick(Number(days))"
+        @click="selectedRange = Number(days)"
         :class="[
-          'px-3 py-1 text-sm rounded',
-          selectedRange === Number(days) && !selectedDate && !viewToday
-            ? 'bg-purple-500 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
+          'px-3 py-1.5 text-sm rounded-full border transition-colors shadow-sm',
+          selectedRange === Number(days)
+            ? 'bg-purple-500/20 text-purple-100 border-purple-400/40'
+            : 'bg-black/30 text-gray-300 border-white/10 hover:bg-white/5',
         ]"
       >
         {{ label }}
       </button>
-
-      <button
-        @click="handleTodayClick"
-        :class="[
-          'px-3 py-1 text-sm rounded',
-          viewToday && !selectedDate
-            ? 'bg-teal-600 text-white'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
-        ]"
-      >
-        View Today
-      </button>
-
-      <!-- Date Picker -->
-      <div class="flex items-center gap-2 ml-auto">
-        <input
-          type="date"
-          v-model="selectedDate"
-          :max="todayStr"
-          class="bg-gray-800 text-white text-sm px-3 py-1 rounded border border-gray-700"
-          @change="handleDateChange"
-        />
-        <button
-          v-if="selectedDate"
-          @click="clearDate"
-          class="px-3 py-1 text-sm rounded bg-gray-700 text-gray-200 hover:bg-gray-600"
-          title="Clear selected date"
-        >
-          Clear
-        </button>
-      </div>
     </div>
 
-    <!-- first load -->
-    <div v-if="isInitialLoading" class="text-white">🔄 Loading data…</div>
+    <!-- Loading State (initial only) -->
+    <div v-if="isLoading" class="text-white py-8 text-center">🔄 Loading analytics…</div>
 
-    <!-- after first load, never collapse -->
-    <div v-else class="space-y-8">
-      <!-- Chart card (match band style) -->
-      <div class="bg-[#111827] rounded-lg p-4 shadow-lg relative">
-        <!-- overlay on refresh -->
-        <div
-          v-if="isRefreshing"
-          class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg"
-        >
-          <span class="text-gray-200 text-sm">Refreshing…</span>
-        </div>
-
+    <!-- Main Content -->
+    <div v-else class="space-y-6 relative">
+      <!-- Refresh overlay for range changes -->
+      <div
+        v-if="isRefreshing"
+        class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg"
+      >
+        <span class="text-gray-200 text-sm">Refreshing…</span>
+      </div>
+      <!-- Scans Time Series Chart -->
+      <div class="chart-card">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-lg font-semibold text-white">
-            {{ chartTitle }}
-          </h2>
-          <span class="text-xs text-gray-400">
-            {{ chartSubtitle }}
-          </span>
+          <h3 class="text-white text-lg font-semibold">Scans Over Time</h3>
+          <span class="text-gray-400 text-xs">{{ rangeLabel }}</span>
+        </div>
+        <div class="chart-wrap">
+          <ClientOnly>
+            <canvas ref="scansCanvas" class="chart-canvas" />
+          </ClientOnly>
+        </div>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Traffic Sources -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Traffic Sources</h3>
+          </div>
+          <ul v-if="rollups?.sources?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.sources.slice(0, 8)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white capitalize">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-purple-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.sources[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No source data yet.</div>
         </div>
 
-        <!-- same ratio box as band page -->
-        <div class="chart-wrap ratio-16x9">
-          <canvas ref="chartCanvas" class="chart-canvas" />
+        <!-- Devices -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Devices</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div v-for="(count, device) in rollups?.devices || {}" :key="device" class="bg-white/5 border border-white/10 rounded-lg p-3">
+              <p class="text-gray-400 text-xs capitalize">{{ device }}</p>
+              <p class="text-xl font-semibold text-white tabular-nums">{{ count }}</p>
+            </div>
+          </div>
         </div>
+
+        <!-- Countries -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Top Countries</h3>
+          </div>
+          <ul v-if="rollups?.countries?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.countries.slice(0, 8)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white uppercase">{{ name || 'Unknown' }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-emerald-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.countries[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No geo data yet.</div>
+        </div>
+
+        <!-- Browsers -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Browsers</h3>
+          </div>
+          <ul v-if="rollups?.browsers?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.browsers.slice(0, 6)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white capitalize">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-blue-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.browsers[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No browser data yet.</div>
+        </div>
+
+        <!-- Entry Types -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Entry Type</h3>
+          </div>
+          <ul v-if="rollups?.entryTypes?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.entryTypes" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white uppercase">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-amber-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.entryTypes[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No entry type data yet.</div>
+        </div>
+
+        <!-- OS -->
+        <div class="chart-card">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white text-lg font-semibold">Operating Systems</h3>
+          </div>
+          <ul v-if="rollups?.osList?.length" class="text-gray-200 text-sm space-y-2">
+            <li v-for="[name, count] in rollups.osList.slice(0, 6)" :key="name" class="flex items-center gap-2">
+              <span class="inline-block w-24 truncate text-white capitalize">{{ name }}</span>
+              <div class="h-2 bg-gray-800 rounded flex-1">
+                <div
+                  class="h-2 bg-pink-500 rounded"
+                  :style="{ width: Math.round((count / (rollups.osList[0]?.[1] || 1)) * 100) + '%' }"
+                />
+              </div>
+              <span class="text-gray-400 w-10 text-right tabular-nums">{{ count }}</span>
+            </li>
+          </ul>
+          <div v-else class="text-gray-400 text-sm">No OS data yet.</div>
+        </div>
+      </div>
+
+      <!-- Geo Locations Section -->
+      <div class="chart-card">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-white text-lg font-semibold">Top Locations</h3>
+        </div>
+        <ul v-if="geoList.length" class="text-gray-200 text-sm space-y-2 max-h-64 overflow-y-auto">
+          <li v-for="loc in geoList.slice(0, 15)" :key="`${loc.city}-${loc.country}`" class="flex items-center gap-2">
+            <span class="inline-block w-40 truncate text-white">
+              {{ loc.city }}{{ loc.region ? `, ${loc.region}` : '' }}{{ loc.country ? ` (${loc.country})` : '' }}
+            </span>
+            <div class="h-2 bg-gray-800 rounded flex-1">
+              <div
+                class="h-2 bg-cyan-500 rounded"
+                :style="{ width: Math.round((loc.count / (geoList[0]?.count || 1)) * 100) + '%' }"
+              />
+            </div>
+            <span class="text-gray-400 w-10 text-right tabular-nums">{{ loc.count }}</span>
+          </li>
+        </ul>
+        <div v-else class="text-gray-400 text-sm">No location data yet.</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
-import { useRoute, useRuntimeConfig } from '#imports'
-import { format, subDays, parseISO } from 'date-fns'
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
+import { useRoute, useStrapiClient } from '#imports'
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js'
 
-/**
- * We now match the band page:
- * - ensureChart() for lazy import
- * - prepHiDPICanvas() for sharp chart
- * - render when canvas actually exists
- */
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
+
 const route = useRoute()
-const config = useRuntimeConfig()
+const client = useStrapiClient()
 const qrId = route.params.id as string
 
-const selectedRange = ref<number>(7)
-const viewToday = ref(false)
-const selectedDate = ref<string | null>(null)
-const todayStr = format(new Date(), 'yyyy-MM-dd')
-
+const selectedRange = ref(30)
 const rangeOptions: Record<number, string> = {
-  7: 'Last 7 Days',
-  30: 'Last 30 Days',
-  90: 'Last 90 Days',
-  365: 'Last 1 Year'
+  7: '7 Days',
+  30: '30 Days',
+  90: '90 Days',
+  365: '1 Year',
 }
 
-const isInitialLoading = ref(true)
+const rangeLabel = computed(() => `Last ${selectedRange.value} days`)
+
+const isLoading = ref(true)
 const isRefreshing = ref(false)
+const rollups = ref<any>(null)
+const geoList = ref<any[]>([])
+const qrInfo = ref({ name: '', id: null })
 
-const analyticsData = ref<any[]>([])
+const scansCanvas = ref<HTMLCanvasElement | null>(null)
+let scansChart: any = null
 
-/* ---------- chart refs ---------- */
-const chartCanvas = ref<HTMLCanvasElement | null>(null)
-let chartInstance: any = null
-let ChartJs: any = null
+// Computed helpers
+const topSource = computed(() => {
+  const src = rollups.value?.sources?.[0]
+  return src ? src[0] : 'N/A'
+})
 
-async function ensureChart() {
-  if (process.server) return null
-  if (!ChartJs) {
-    ChartJs = (await import('chart.js/auto')).default
-  }
-  return ChartJs
-}
+const topCountry = computed(() => {
+  const c = rollups.value?.countries?.[0]
+  return c ? c[0] : 'N/A'
+})
 
-/* ---------- HiDPI canvas ---------- */
-function prepHiDPICanvas(canvas: HTMLCanvasElement) {
-  const dpr = Math.max(1, window.devicePixelRatio || 1)
-  const rect = canvas.getBoundingClientRect()
-  canvas.width = Math.round(rect.width * dpr)
-  canvas.height = Math.round(rect.height * dpr)
-  const ctx = canvas.getContext('2d')!
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  return ctx
-}
+const topDevice = computed(() => {
+  const devices = rollups.value?.devices || {}
+  const entries = Object.entries(devices) as [string, number][]
+  if (!entries.length) return 'N/A'
+  entries.sort((a, b) => b[1] - a[1])
+  return entries[0][0]
+})
 
-/* ---------- fetch ---------- */
-async function fetchAnalyticsData() {
-  const res = await fetch(
-    `${config.public.strapiUrl}/api/scans?filters[qr][id][$eq]=${qrId}&pagination[pageSize]=1000`
-  )
-  if (!res.ok) throw new Error(`Status ${res.status}`)
-  const json = await res.json()
-  analyticsData.value = json.data || []
-}
-
-const totalScans = computed(() => analyticsData.value.length)
-
-/* ---------- series builders ---------- */
-function getLastNDates(n: number): string[] {
-  const today = new Date()
-  return Array.from({ length: n }, (_, i) => {
-    const d = subDays(today, n - 1 - i)
-    return format(d, 'yyyy-MM-dd')
-  })
-}
-
-function buildDailySeries() {
-  const lastDates = getLastNDates(selectedRange.value)
-  const counts: Record<string, number> = Object.fromEntries(lastDates.map((d) => [d, 0]))
-
-  analyticsData.value.forEach((scan) => {
-    const ts: string | undefined = scan.attributes?.date ?? scan.attributes?.createdAt
-    if (!ts) return
-    const localKey = format(parseISO(ts), 'yyyy-MM-dd')
-    if (counts[localKey] !== undefined) counts[localKey]++
-  })
-
-  const labels = lastDates.map((d) => format(new Date(d), 'MMM d'))
-  const data = lastDates.map((d) => counts[d])
-  return { labels, data, mode: 'daily' as const }
-}
-
-function buildHourlySeries(dayStr: string) {
-  const hours = Array.from({ length: 24 }, (_, i) => i)
-  const counts: Record<number, number> = Object.fromEntries(hours.map((h) => [h, 0]))
-
-  analyticsData.value.forEach((scan) => {
-    const ts: string | undefined = scan.attributes?.date ?? scan.attributes?.createdAt
-    if (!ts) return
-    const localDayKey = format(parseISO(ts), 'yyyy-MM-dd')
-    if (localDayKey === dayStr) {
-      const hour = parseISO(ts).getHours()
-      counts[hour] = (counts[hour] ?? 0) + 1
+async function fetchQrInfo() {
+  try {
+    const { data } = await client(`/qrs/${qrId}`, {
+      params: { fields: ['name', 'q_type'] }
+    })
+    if (data?.attributes) {
+      qrInfo.value = { name: data.attributes.name || `QR #${data.id}`, id: data.id }
     }
-  })
-
-  const labels = hours.map((h) => format(new Date(2000, 0, 1, h), 'h a'))
-  const data = hours.map((h) => counts[h] ?? 0)
-  return { labels, data, mode: 'hourly' as const }
+  } catch (err) {
+    console.error('Failed to fetch QR info:', err)
+  }
 }
 
-function buildTimeSeries() {
-  if (selectedDate.value) return buildHourlySeries(selectedDate.value)
-  if (viewToday.value) return buildHourlySeries(todayStr)
-  return buildDailySeries()
+async function fetchRollups() {
+  try {
+    const data = await client('/analytics/qr-rollups', {
+      params: { qrId, range: `${selectedRange.value}d` }
+    })
+    rollups.value = data
+  } catch (err) {
+    console.error('Failed to fetch QR rollups:', err)
+    rollups.value = null
+  }
 }
 
-/* ---------- UI labels ---------- */
-const selectedLabel = computed(() => {
-  if (selectedDate.value) return format(parseISO(selectedDate.value), 'MMM d, yyyy')
-  if (viewToday.value) return 'Today'
-  return rangeOptions[selectedRange.value] || `Last ${selectedRange.value} days`
-})
+async function fetchGeo() {
+  try {
+    const data = await client('/analytics/qr-geo', {
+      params: { qrId, range: `${selectedRange.value}d` }
+    })
+    geoList.value = data?.list || []
+  } catch (err) {
+    console.error('Failed to fetch QR geo:', err)
+    geoList.value = []
+  }
+}
 
-const chartTitle = computed(() => {
-  if (selectedDate.value) return 'QR Scans (Hourly)'
-  if (viewToday.value) return 'QR Scans (Today, Hourly)'
-  return `QR Scans (Last ${selectedRange.value} Days)`
-})
+async function loadData() {
+  isLoading.value = true
+  await Promise.all([fetchQrInfo(), fetchRollups(), fetchGeo()])
+  isLoading.value = false
+  await nextTick()
+  renderScansChart()
+}
 
-const chartSubtitle = computed(() => {
-  if (selectedDate.value) return selectedLabel.value
-  if (viewToday.value) return format(new Date(), 'EEE, MMM d')
-  return selectedLabel.value
-})
+function renderScansChart() {
+  const ctx = scansCanvas.value?.getContext('2d')
+  if (!ctx) return
 
-/* ---------- chart render ---------- */
-function renderChart() {
-  if (!ChartJs) return
-  const canvas = chartCanvas.value
-  if (!canvas) return
-  const ctx = prepHiDPICanvas(canvas)
+  const series = rollups.value?.series || []
+  const labels = series.map((s: any) => s.date?.slice(5) || '') // MM-DD format
+  const data = series.map((s: any) => s.scans || 0)
 
-  const series = buildTimeSeries()
-  const { labels, data, mode } = series
-
-  const datasetLabel = mode === 'hourly' ? 'Scans (per hour)' : 'Scans (per day)'
-
-  chartInstance?.destroy()
-  chartInstance = new ChartJs(ctx, {
-    type: mode === 'hourly' ? 'bar' : 'line',
+  scansChart?.destroy()
+  scansChart = new Chart(ctx, {
+    type: 'line',
     data: {
       labels,
-      datasets: [
-        {
-          label: datasetLabel,
-          data,
-          borderWidth: 2,
-          borderColor: '#8B5CF6',
-          backgroundColor: mode === 'hourly' ? '#8B5CF6' : 'rgba(139,92,246,.25)',
-          tension: 0.3,
-          pointRadius: mode === 'hourly' ? 0 : 3
-        }
-      ]
+      datasets: [{
+        label: 'Scans',
+        data,
+        borderColor: '#8B5CF6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+      }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: 6 },
+      interaction: { intersect: false, mode: 'index' },
       scales: {
         x: {
-          ticks: { color: '#E5E7EB', maxRotation: 0, autoSkip: true, autoSkipPadding: 8 },
-          grid: { color: '#30343b', drawTicks: false }
+          ticks: { color: '#9CA3AF', maxTicksLimit: 10 },
+          grid: { color: 'rgba(255,255,255,0.05)' }
         },
         y: {
           beginAtZero: true,
-          ticks: { color: '#E5E7EB', precision: 0, stepSize: 1 },
-          grid: { color: '#30343b' }
+          ticks: { color: '#9CA3AF' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
         }
       },
       plugins: {
-        legend: {
-          labels: { color: '#E5E7EB', usePointStyle: true, pointStyle: 'circle' },
-          position: 'bottom'
-        },
-        title: {
-          display: true,
-          text: chartTitle.value,
-          color: 'white',
-          font: { size: 16, weight: '600' }
-        },
+        legend: { display: false },
         tooltip: {
-          callbacks: {
-            title(items) {
-              return items[0]?.label || ''
-            },
-            label(ctx) {
-              const v = ctx.raw as number
-              return `${v} scan${v === 1 ? '' : 's'}`
-            }
-          }
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleColor: '#fff',
+          bodyColor: '#9CA3AF',
         }
       }
     }
   })
 }
 
-/* ---------- fetch + render orchestration ---------- */
-async function fetchAndRender(silent = false) {
-  try {
-    if (silent) {
-      isRefreshing.value = true
-    } else {
-      isInitialLoading.value = true
-    }
+onMounted(loadData)
 
-    await fetchAnalyticsData()
-    await ensureChart()
-    await nextTick()
-    renderChart()
-  } catch (err) {
-    console.error('Error fetching scan data:', err)
-  } finally {
-    if (silent) {
-      isRefreshing.value = false
-    } else {
-      isInitialLoading.value = false
-    }
-  }
-}
-
-/* ---------- event handlers ---------- */
-function handleRangeClick(days: number) {
-  selectedDate.value = null
-  viewToday.value = false
-  selectedRange.value = days
-  fetchAndRender(true)
-}
-
-function handleTodayClick() {
-  selectedDate.value = null
-  viewToday.value = true
-  fetchAndRender(true)
-}
-
-function handleDateChange() {
-  if (selectedDate.value) {
-    viewToday.value = false
-  }
-  fetchAndRender(true)
-}
-
-function clearDate() {
-  selectedDate.value = null
-  fetchAndRender(true)
-}
-
-/* ---------- lifecycle ---------- */
-onMounted(async () => {
-  await ensureChart()
-  await fetchAndRender(false)
-})
-
-/**
- * 🔑 this is the piece that was making the band chart “just work”
- * If the canvas wasn't ready on first render, we try again as soon as it exists
- */
-watch(
-  () => chartCanvas.value,
-  async (canvas) => {
-    if (!canvas) return
-    if (!isInitialLoading.value && !isRefreshing.value) {
-      await ensureChart()
-      renderChart()
-    }
-  }
-)
-
-// if user changes just the reactive filters → re-render only
-watch([selectedRange, viewToday, selectedDate], async () => {
-  if (!isInitialLoading.value && !isRefreshing.value) {
-    await ensureChart()
-    renderChart()
-  }
+watch(selectedRange, async () => {
+  isRefreshing.value = true
+  await Promise.all([fetchRollups(), fetchGeo()])
+  isRefreshing.value = false
+  await nextTick()
+  renderScansChart()
 })
 
 onBeforeUnmount(() => {
-  chartInstance?.destroy()
+  scansChart?.destroy()
 })
 </script>
 
 <style scoped>
+.chart-card {
+  @apply bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-lg;
+}
+
 .chart-wrap {
   position: relative;
   width: 100%;
+  height: 280px;
 }
-.chart-wrap.ratio-16x9 {
-  aspect-ratio: 16 / 9;
-}
+
 .chart-canvas {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 input[type='date']::-webkit-calendar-picker-indicator {

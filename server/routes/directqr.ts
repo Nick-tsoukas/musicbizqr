@@ -62,20 +62,60 @@ export default defineEventHandler(async (event) => {
     const bandRel = attrs.band?.data
     const bandId: number | null = bandRel ? bandRel.id : null
 
-    // 3) create scan in Strapi (non-blocking-ish)
+    // 3) create scan in Strapi with rich analytics data (non-blocking-ish)
     let createdScanId: number | null = null
+    const eventRel = attrs.event?.data
+    const eventId: number | null = eventRel ? eventRel.id : null
+    
+    // Extract UTM params from incoming request
+    const incoming = getQuery(event) as Record<string, string | string[]>
+    const utmSource = typeof incoming.utm_source === 'string' ? incoming.utm_source : null
+    const utmMedium = typeof incoming.utm_medium === 'string' ? incoming.utm_medium : null
+    const utmCampaign = typeof incoming.utm_campaign === 'string' ? incoming.utm_campaign : null
+    const utmTerm = typeof incoming.utm_term === 'string' ? incoming.utm_term : null
+    const utmContent = typeof incoming.utm_content === 'string' ? incoming.utm_content : null
+    const gclid = typeof incoming.gclid === 'string' ? incoming.gclid : null
+    const fbclid = typeof incoming.fbclid === 'string' ? incoming.fbclid : null
+    const ttclid = typeof incoming.ttclid === 'string' ? incoming.ttclid : null
+    const twclid = typeof incoming.twclid === 'string' ? incoming.twclid : null
+
+    // Get referrer from request headers
+    const reqHeaders = event.node.req.headers || {}
+    const referrer = reqHeaders.referer || reqHeaders.referrer || null
+    const userAgent = reqHeaders['user-agent'] || null
+
     try {
       const scanBody = {
-        data: {
-          date: new Date().toISOString(),
-          qr: qrId,
-          band: bandId, // helps QR analytics → band analytics
-        },
+        date: new Date().toISOString(),
+        qr: qrId,
+        band: bandId,
+        event: eventId,
+        entryType: 'qr',
+        referrer,
+        userAgent,
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmTerm,
+        utmContent,
+        gclid,
+        fbclid,
+        ttclid,
+        twclid,
       }
 
-      const scanRes: any = await $fetch(`${strapiBase}/api/scans`, {
+      // Use the new /track endpoint which extracts CF headers server-side
+      const scanRes: any = await $fetch(`${strapiBase}/api/scans/track`, {
         method: 'POST',
         body: scanBody,
+        headers: {
+          // Forward Cloudflare headers if present
+          'cf-ipcountry': reqHeaders['cf-ipcountry'] || '',
+          'cf-ipcity': reqHeaders['cf-ipcity'] || '',
+          'cf-region': reqHeaders['cf-region'] || '',
+          'cf-iplatitude': reqHeaders['cf-iplatitude'] || '',
+          'cf-iplongitude': reqHeaders['cf-iplongitude'] || '',
+        },
       })
       createdScanId = scanRes?.data?.id ?? null
     } catch {
