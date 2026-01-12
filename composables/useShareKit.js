@@ -240,7 +240,12 @@ export function useShareKit() {
     console.log('[useShareKit] loadImage called with:', url)
     
     // Strategy 1: Use backend proxy for external images (most reliable)
-    if (url.includes('cloudinary.com') || url.includes('res.cloudinary')) {
+    const needsProxy = url.includes('cloudinary.com') || 
+                       url.includes('res.cloudinary') || 
+                       url.includes('.s3.') || 
+                       url.includes('s3.amazonaws.com')
+    
+    if (needsProxy) {
       try {
         const proxyUrl = `${runtimeConfig.public.strapiUrl}/api/image-proxy?url=${encodeURIComponent(url)}`
         console.log('[useShareKit] Trying proxy URL:', proxyUrl)
