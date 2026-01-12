@@ -68,6 +68,17 @@
             :show-opt-in="true"
             :band-id="bandItems[0]?.id"
           />
+          
+          <!-- After-Show Recap Panel -->
+          <AfterShowRecapPanel
+            v-if="bandItems[0]?.id"
+            :band-id="bandItems[0].id"
+            :band-slug="bandItems[0].slug || ''"
+            :band-name="bandItems[0].name || 'This Artist'"
+            :band-image-url="bandItems[0].bandImg?.url || null"
+            :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
+            class="mt-4"
+          />
         </div>
       </section>
 
@@ -956,7 +967,7 @@ async function fetchQrsLite() {
 async function fetchBandsLite() {
   const resp = await find("bands", {
     filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name", "slug", "stripeAccountId", "paymentsEnabled", "stripeOnboardingComplete"],
+    fields: ["name", "slug", "stripeAccountId", "paymentsEnabled", "stripeOnboardingComplete", "isBandNameInLogo"],
     populate: { bandImg: { fields: ["url", "formats"] } },
     sort: ["updatedAt:desc"],
     pagination: { pageSize: 50 },
@@ -1059,8 +1070,11 @@ const bandItems = computed(() =>
     ? bands.value.map((b) => ({
         id: b.id,
         title: b.name,
+        name: b.name,
         slug: b.slug,
         imageUrl: b.bandImg?.formats?.medium?.url || b.bandImg?.url || "",
+        bandImg: b.bandImg ? { url: b.bandImg.url } : null,
+        isBandNameInLogo: b.isBandNameInLogo ?? false,
         stripeAccountId: b.stripeAccountId ?? b.attributes?.stripeAccountId ?? null,
         paymentsEnabled: b.paymentsEnabled ?? b.attributes?.paymentsEnabled ?? null,
         stripeOnboardingComplete: b.stripeOnboardingComplete ?? b.attributes?.stripeOnboardingComplete ?? null,

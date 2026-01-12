@@ -3,6 +3,8 @@
  * Provides helpers for Web Share API, clipboard, downloads, and social sharing
  */
 
+import { useRuntimeConfig } from '#imports'
+
 export function useShareKit() {
   /**
    * Build the share URL for a band
@@ -217,12 +219,74 @@ export function useShareKit() {
     }
   }
 
+  // Get runtime config for proxy URL
+  const runtimeConfig = useRuntimeConfig()
+
   /**
-   * Load an image from URL
+   * Load an image from URL (handles CORS via backend proxy)
    * @param {string} url
    * @returns {Promise<HTMLImageElement>}
    */
-  function loadImage(url) {
+  async function loadImage(url) {
+    
+    // Strategy 1: Try direct load with crossOrigin first (fastest if CORS headers exist)
+    try {
+      const img = await loadImageDirect(url)
+      return img
+    } catch (e) {
+      console.warn('[useShareKit] Direct image load failed, trying proxy...', e)
+    }
+
+    // Strategy 2: Use backend proxy for CORS-blocked images
+    if (url.includes('cloudinary.com') || url.includes('res.cloudinary')) {
+      try {
+        const proxyUrl = `${runtimeConfig.public.strapiUrl}/api/image-proxy?url=${encodeURIComponent(url)}`
+        const img = await loadImageDirect(proxyUrl)
+        return img
+      } catch (e) {
+        console.warn('[useShareKit] Proxy load failed:', e)
+      }
+    }
+
+    // Strategy 3: Try fetching as blob directly
+    try {
+      const response = await fetch(url, { mode: 'cors' })
+      if (response.ok) {
+        const blob = await response.blob()
+        const objectUrl = URL.createObjectURL(blob)
+        
+        const img = await new Promise((resolve, reject) => {
+          const image = new Image()
+          image.onload = () => {
+            URL.revokeObjectURL(objectUrl)
+            resolve(image)
+          }
+          image.onerror = () => {
+            URL.revokeObjectURL(objectUrl)
+            reject(new Error('Blob image load failed'))
+          }
+          image.src = objectUrl
+        })
+        return img
+      }
+    } catch (fetchErr) {
+      console.warn('[useShareKit] Fetch blob failed:', fetchErr)
+    }
+
+    // Strategy 4: Load without crossOrigin (canvas will be tainted but image shows)
+    console.warn('[useShareKit] All CORS strategies failed, loading without crossOrigin')
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = url
+    })
+  }
+
+  /**
+   * Direct image load with crossOrigin
+   */
+  function loadImageDirect(url) {
     return new Promise((resolve, reject) => {
       const img = new Image()
       img.crossOrigin = 'anonymous'
