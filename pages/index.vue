@@ -925,6 +925,7 @@ import {
 import SmartLinkDemoPhone from "@/components/demo/SmartLinkDemoPhone.vue";
 import SmartLinkDemoInline from "@/components/demo/SmartLinkDemoInline.vue";
 import AnalyticsDemoInline from "@/components/demo/AnalyticsDemoInline.vue";
+import MomentumEngineSection from "@/components/demo/MomentumEngineSection.vue";
 
 import deezer from "@/assets/dezzer.svg";
 
