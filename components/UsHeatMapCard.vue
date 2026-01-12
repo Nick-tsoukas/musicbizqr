@@ -1,8 +1,22 @@
 <template>
   <div class="chart-card">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-white">USA Heat Map</h3>
-      <div class="flex items-center gap-2">
+    <div class="flex items-center justify-between mb-2">
+      <button
+        @click="isExpanded = !isExpanded"
+        class="flex items-center gap-2 text-lg font-semibold text-white hover:text-emerald-400 transition-colors"
+      >
+        <svg
+          class="w-4 h-4 transition-transform duration-200"
+          :class="{ 'rotate-90': isExpanded }"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        USA Heat Map
+      </button>
+      <div v-if="isExpanded" class="flex items-center gap-2">
         <!-- Metric selector -->
         <select
           v-model="selectedMetric"
@@ -26,25 +40,34 @@
       </div>
     </div>
     
-    <div v-if="loading" class="flex items-center justify-center h-48">
+    <!-- Collapsed state summary -->
+    <div v-if="!isExpanded && data && data.total > 0" class="text-sm text-slate-400 mt-1">
+      {{ data.total.toLocaleString() }} {{ metricLabel }} across {{ data.states.length }} states
+      <span v-if="topState" class="text-emerald-400">• Top: {{ topState.state }}</span>
+    </div>
+    <div v-else-if="!isExpanded" class="text-sm text-slate-500 mt-1">
+      Click to expand map
+    </div>
+    
+    <div v-if="isExpanded && loading" class="flex items-center justify-center h-48">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
     </div>
     
-    <div v-else-if="error" class="flex items-center justify-center h-48 text-red-400 text-sm">
+    <div v-else-if="isExpanded && error" class="flex items-center justify-center h-48 text-red-400 text-sm">
       {{ error }}
     </div>
     
-    <div v-else-if="!data || data.total === 0" class="flex flex-col items-center justify-center h-48 text-slate-400">
+    <div v-else-if="isExpanded && (!data || data.total === 0)" class="flex flex-col items-center justify-center h-48 text-slate-400">
       <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
       </svg>
       <p class="text-sm">No US data for this period</p>
     </div>
     
-    <div v-else>
+    <div v-else-if="isExpanded && data">
       <UsChoroplethMap
-        :states="data.states"
-        :max="data.max"
+        :states="data?.states ?? []"
+        :max="data?.max ?? 0"
         :metric="selectedMetric"
         @state-selected="handleStateSelected"
         @state-hover="handleStateHover"
@@ -53,11 +76,11 @@
       <!-- Stats summary -->
       <div class="mt-3 grid grid-cols-3 gap-3 text-center">
         <div>
-          <div class="text-2xl font-bold text-white">{{ data.total.toLocaleString() }}</div>
+          <div class="text-2xl font-bold text-white">{{ (data?.total ?? 0).toLocaleString() }}</div>
           <div class="text-xs text-slate-400">Total {{ metricLabel }}</div>
         </div>
         <div>
-          <div class="text-2xl font-bold text-white">{{ data.states.length }}</div>
+          <div class="text-2xl font-bold text-white">{{ data?.states?.length ?? 0 }}</div>
           <div class="text-xs text-slate-400">States</div>
         </div>
         <div v-if="topState">
@@ -67,7 +90,7 @@
       </div>
       
       <!-- Top states list -->
-      <div v-if="data.states.length > 0" class="mt-3">
+      <div v-if="(data?.states?.length ?? 0) > 0" class="mt-3">
         <div class="text-xs text-slate-400 mb-1">Top States</div>
         <div class="flex flex-wrap gap-2">
           <div
@@ -123,6 +146,7 @@ const data = ref<GeoStatesResponse | null>(null)
 const selectedRange = ref('30d')
 const selectedMetric = ref('views')
 const selectedState = ref<string | null>(null)
+const isExpanded = ref(false)
 
 const metricOptions = computed(() => {
   // Only metrics with region/country geo data are supported

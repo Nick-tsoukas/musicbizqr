@@ -371,11 +371,14 @@
       <div class="chart-card">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-white text-lg font-semibold">🌎 Top Cities</h3>
+          <span v-if="topCities.length" class="text-gray-400 text-xs">
+            {{ topCities.length }} total
+          </span>
         </div>
 
-        <ul v-if="topCities.length" class="text-gray-200 text-sm space-y-2">
+        <ul v-if="paginatedCities.length" class="text-gray-200 text-sm space-y-2">
           <li
-            v-for="[city, count] in topCities"
+            v-for="[city, count] in paginatedCities"
             :key="city"
             class="flex items-center gap-2"
           >
@@ -402,6 +405,29 @@
           </li>
         </ul>
         <p v-else class="text-gray-400 text-sm">No city data yet.</p>
+        
+        <!-- Pagination -->
+        <div v-if="totalCityPages > 1" class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+          <button
+            @click="cityPage = Math.max(1, cityPage - 1)"
+            :disabled="cityPage === 1"
+            class="px-3 py-1 text-xs rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            :class="cityPage === 1 ? 'border-white/10 text-gray-500' : 'border-white/20 text-gray-300 hover:bg-white/5'"
+          >
+            ← Prev
+          </button>
+          <span class="text-xs text-gray-400">
+            Page {{ cityPage }} of {{ totalCityPages }}
+          </span>
+          <button
+            @click="cityPage = Math.min(totalCityPages, cityPage + 1)"
+            :disabled="cityPage === totalCityPages"
+            class="px-3 py-1 text-xs rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            :class="cityPage === totalCityPages ? 'border-white/10 text-gray-500' : 'border-white/20 text-gray-300 hover:bg-white/5'"
+          >
+            Next →
+          </button>
+        </div>
       </div>
 
       <!-- Sources / Mediums / Referrers (from server rollups) -->
@@ -1711,6 +1737,20 @@ const topCities = computed<[string, number][]>(() => {
     string,
     number
   ][];
+});
+
+// Pagination for Top Cities
+const cityPage = ref(1);
+const citiesPerPage = 8;
+const totalCityPages = computed(() => Math.ceil(topCities.value.length / citiesPerPage));
+const paginatedCities = computed(() => {
+  const start = (cityPage.value - 1) * citiesPerPage;
+  return topCities.value.slice(start, start + citiesPerPage);
+});
+
+// Reset page when data changes
+watch(topCities, () => {
+  cityPage.value = 1;
 });
 
 /* ---------- devices (from rollups) ---------- */

@@ -230,9 +230,10 @@
       <div class="chart-card">
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-white text-lg font-semibold">Top Locations</h3>
+          <span v-if="geoList.length" class="text-gray-400 text-xs">{{ geoList.length }} total</span>
         </div>
-        <ul v-if="geoList.length" class="text-gray-200 text-sm space-y-2 max-h-64 overflow-y-auto">
-          <li v-for="loc in geoList.slice(0, 15)" :key="`${loc.city}-${loc.country}`" class="flex items-center gap-2">
+        <ul v-if="paginatedLocations.length" class="text-gray-200 text-sm space-y-2">
+          <li v-for="loc in paginatedLocations" :key="`${loc.city}-${loc.country}`" class="flex items-center gap-2">
             <span class="inline-block w-40 truncate text-white">
               {{ loc.city }}{{ loc.region ? `, ${loc.region}` : '' }}{{ loc.country ? ` (${loc.country})` : '' }}
             </span>
@@ -246,6 +247,29 @@
           </li>
         </ul>
         <div v-else class="text-gray-400 text-sm">No location data yet.</div>
+        
+        <!-- Pagination -->
+        <div v-if="totalLocationPages > 1" class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+          <button
+            @click="locationPage = Math.max(1, locationPage - 1)"
+            :disabled="locationPage === 1"
+            class="px-3 py-1 text-xs rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            :class="locationPage === 1 ? 'border-white/10 text-gray-500' : 'border-white/20 text-gray-300 hover:bg-white/5'"
+          >
+            ← Prev
+          </button>
+          <span class="text-xs text-gray-400">
+            Page {{ locationPage }} of {{ totalLocationPages }}
+          </span>
+          <button
+            @click="locationPage = Math.min(totalLocationPages, locationPage + 1)"
+            :disabled="locationPage === totalLocationPages"
+            class="px-3 py-1 text-xs rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            :class="locationPage === totalLocationPages ? 'border-white/10 text-gray-500' : 'border-white/20 text-gray-300 hover:bg-white/5'"
+          >
+            Next →
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -297,6 +321,15 @@ const isRefreshing = ref(false);
 const rollups = ref(null);
 const geoList = ref([]);
 const eventInfo = ref({ title: '', id: null });
+
+// Pagination for Top Locations
+const locationPage = ref(1);
+const locationsPerPage = 8;
+const totalLocationPages = computed(() => Math.ceil(geoList.value.length / locationsPerPage));
+const paginatedLocations = computed(() => {
+  const start = (locationPage.value - 1) * locationsPerPage;
+  return geoList.value.slice(start, start + locationsPerPage);
+});
 
 const eventId = computed(() => Number(route.params.eventId));
 
