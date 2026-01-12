@@ -1,30 +1,26 @@
 <template>
   <div class="us-choropleth-map" ref="mapContainer">
-    <div v-if="loading" class="flex items-center justify-center h-48">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-    </div>
-    <div v-else-if="error" class="flex items-center justify-center h-48 text-red-400 text-sm">
-      {{ error }}
-    </div>
-    <div v-else class="relative">
+    <div class="relative w-full" style="max-width: 100%; aspect-ratio: 1.6;">
       <svg
-        :viewBox="viewBox"
-        class="w-full h-auto"
+        viewBox="0 0 960 600"
+        class="w-full h-full"
         preserveAspectRatio="xMidYMid meet"
       >
-        <path
-          v-for="state in statesData"
-          :key="state.id"
-          :id="state.id"
-          :d="state.d"
-          :fill="getStateFill(state.id)"
-          :stroke="selectedState === state.id ? '#10b981' : '#374151'"
-          :stroke-width="selectedState === state.id ? 2 : 0.5"
-          class="state-path cursor-pointer transition-all duration-200"
-          @mouseenter="handleHover(state.id, $event)"
-          @mouseleave="handleHoverEnd"
-          @click="handleClick(state.id)"
-        />
+        <g class="states">
+          <path
+            v-for="(d, id) in US_STATE_PATHS"
+            :key="id"
+            :id="String(id)"
+            :d="d"
+            :fill="getStateFill(String(id))"
+            :stroke="selectedState === String(id) ? '#10b981' : '#475569'"
+            :stroke-width="selectedState === String(id) ? 1.5 : 0.5"
+            class="state-path cursor-pointer transition-colors duration-150"
+            @mouseenter="handleHover(String(id), $event)"
+            @mouseleave="handleHoverEnd"
+            @click="handleClick(String(id))"
+          />
+        </g>
       </svg>
       
       <!-- Tooltip -->
@@ -36,19 +32,20 @@
         <div class="font-medium text-white">{{ getStateName(hoveredState) }}</div>
         <div class="text-slate-300">{{ getStateCount(hoveredState).toLocaleString() }} {{ metricLabel }}</div>
       </div>
-      
-      <!-- Legend -->
-      <div class="flex items-center justify-center mt-2 gap-2 text-xs text-slate-400">
-        <span>Low</span>
-        <div class="w-24 h-1.5 rounded" :style="{ background: legendGradient }"></div>
-        <span>High</span>
-      </div>
+    </div>
+    
+    <!-- Legend -->
+    <div class="flex items-center justify-center mt-1 gap-2 text-xs text-slate-400">
+      <span>Low</span>
+      <div class="w-20 h-1 rounded" :style="{ background: legendGradient }"></div>
+      <span>High</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed } from 'vue'
+import { US_STATE_PATHS, STATE_NAMES } from '~/composables/useUsStatesMap'
 
 interface StateCount {
   state: string
@@ -75,28 +72,9 @@ const emit = defineEmits<{
 }>()
 
 const mapContainer = ref<HTMLElement | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
-const statesData = ref<Array<{ id: string; d: string; name: string }>>([])
-const viewBox = ref('0 0 959 593')
 const hoveredState = ref<string | null>(null)
 const selectedState = ref<string | null>(null)
 const tooltipPos = ref<{ x: number; y: number } | null>(null)
-
-// State name lookup
-const STATE_NAMES: Record<string, string> = {
-  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
-  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
-  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
-  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
-  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
-  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
-  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
-  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
-  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
-  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
-  DC: 'District of Columbia'
-}
 
 // Create count lookup
 const countLookup = computed(() => {
@@ -176,102 +154,6 @@ function handleClick(stateId: string) {
   selectedState.value = selectedState.value === stateId ? null : stateId
   emit('stateSelected', selectedState.value)
 }
-
-async function loadMapData() {
-  loading.value = true
-  error.value = null
-  
-  try {
-    // Fetch SVG from a reliable CDN
-    const response = await fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json')
-    if (!response.ok) throw new Error('Failed to load map data')
-    
-    const geojson = await response.json()
-    
-    // Convert GeoJSON to SVG paths
-    statesData.value = geojson.features.map((feature: any) => {
-      const stateCode = getStateCodeFromName(feature.properties.name)
-      return {
-        id: stateCode,
-        name: feature.properties.name,
-        d: geoJsonToSvgPath(feature.geometry)
-      }
-    }).filter((s: any) => s.id && s.d)
-    
-  } catch (err) {
-    console.error('[UsChoroplethMap] Error loading map:', err)
-    // Fallback to simplified inline paths
-    loadFallbackPaths()
-  } finally {
-    loading.value = false
-  }
-}
-
-function getStateCodeFromName(name: string): string {
-  const nameToCode: Record<string, string> = {
-    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
-    'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
-    'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
-    'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
-    'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-    'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
-    'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
-    'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
-    'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY',
-    'District of Columbia': 'DC'
-  }
-  return nameToCode[name] || ''
-}
-
-function geoJsonToSvgPath(geometry: any): string {
-  if (!geometry || !geometry.coordinates) return ''
-  
-  const coords = geometry.type === 'MultiPolygon' 
-    ? geometry.coordinates.flat() 
-    : geometry.coordinates
-  
-  // Simple projection (Albers USA approximation)
-  const project = (lon: number, lat: number): [number, number] => {
-    const x = (lon + 125) * 7.5
-    const y = (52 - lat) * 10
-    return [x, y]
-  }
-  
-  let path = ''
-  for (const ring of coords) {
-    if (!Array.isArray(ring) || ring.length === 0) continue
-    const points = ring.map((coord: number[]) => project(coord[0], coord[1]))
-    path += 'M' + points.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('L') + 'Z'
-  }
-  
-  return path
-}
-
-function loadFallbackPaths() {
-  // Simplified rectangular representation as fallback
-  const cols = 11, rows = 5
-  const w = 80, h = 100
-  const states = Object.keys(STATE_NAMES)
-  
-  statesData.value = states.map((id, i) => {
-    const col = i % cols
-    const row = Math.floor(i / cols)
-    const x = col * w + 10
-    const y = row * h + 10
-    return {
-      id,
-      name: STATE_NAMES[id],
-      d: `M${x},${y}h${w-5}v${h-5}h${-(w-5)}Z`
-    }
-  })
-  
-  viewBox.value = `0 0 ${cols * w + 20} ${rows * h + 20}`
-}
-
-onMounted(() => {
-  loadMapData()
-})
 </script>
 
 <style scoped>

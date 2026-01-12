@@ -23,14 +23,6 @@
       :range-label="rangeLabel"
     />
 
-    <!-- USA Heat Map -->
-    <UsHeatMapCard
-      v-if="qrId"
-      entity-type="qr"
-      :entity-id="qrId"
-      class="mb-6"
-    />
-
     <!-- Summary Cards -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-3">
@@ -226,6 +218,13 @@
           <div v-else class="text-gray-400 text-sm">No OS data yet.</div>
         </div>
       </div>
+
+      <!-- USA Heat Map -->
+      <UsHeatMapCard
+        v-if="qrId"
+        entity-type="qr"
+        :entity-id="qrId"
+      />
 
       <!-- Geo Locations Section -->
       <div class="chart-card">

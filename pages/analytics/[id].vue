@@ -18,14 +18,6 @@
       :range-label="museRangeLabel"
     />
 
-    <!-- USA Heat Map -->
-    <UsHeatMapCard
-      v-if="bandId"
-      entity-type="band"
-      :entity-id="bandId"
-      class="mb-6"
-    />
-
     <!-- Insights (MUSE) -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-2">
@@ -367,6 +359,13 @@
 
         <p v-else class="text-gray-400 text-sm">No clicks in this range.</p>
       </div>
+
+      <!-- USA Heat Map -->
+      <UsHeatMapCard
+        v-if="bandId"
+        entity-type="band"
+        :entity-id="bandId"
+      />
 
       <!-- Top Cities (from /analytics/geo) -->
       <div class="chart-card">
