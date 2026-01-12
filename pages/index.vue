@@ -405,9 +405,12 @@
               </div>
             </div>
 
-            <AnalyticsDemoInline />
+            <AnalyticsDemoInline data-section="analytics-demo" />
           </div>
         </div>
+
+        <!-- Momentum Engine Section -->
+        <MomentumEngineSection />
 
         <!-- Embed section (unused) -->
         <section
