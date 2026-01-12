@@ -293,7 +293,7 @@
               <!-- Mobile: Card list -->
               <div class="md:hidden space-y-3">
                 <div
-                  v-for="event in otherUpcomingEvents"
+                  v-for="event in paginatedUpcomingEvents"
                   :key="event.id"
                   class="rounded-xl border border-white/10 bg-black/20 px-4 py-3 cursor-pointer hover:bg-white/5 transition motion-reduce:transition-none"
                   @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
@@ -326,7 +326,7 @@
                   </thead>
                   <tbody>
                     <tr
-                      v-for="event in otherUpcomingEvents"
+                      v-for="event in paginatedUpcomingEvents"
                       :key="event.id"
                       class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900/30 cursor-pointer transition motion-reduce:transition-none"
                       @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
@@ -349,6 +349,29 @@
                   </tbody>
                 </table>
               </div>
+              
+              <!-- Pagination for Upcoming Events -->
+              <div v-if="totalUpcomingPages > 1" class="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
+                <button
+                  @click="upcomingEventsPage = Math.max(1, upcomingEventsPage - 1)"
+                  :disabled="upcomingEventsPage === 1"
+                  class="px-3 py-1.5 text-sm rounded-lg border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  :class="upcomingEventsPage === 1 ? 'border-white/10 text-white/40' : 'border-white/20 text-white hover:bg-white/5'"
+                >
+                  ← Prev
+                </button>
+                <span class="text-sm text-white/60">
+                  {{ upcomingEventsPage }} of {{ totalUpcomingPages }}
+                </span>
+                <button
+                  @click="upcomingEventsPage = Math.min(totalUpcomingPages, upcomingEventsPage + 1)"
+                  :disabled="upcomingEventsPage === totalUpcomingPages"
+                  class="px-3 py-1.5 text-sm rounded-lg border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  :class="upcomingEventsPage === totalUpcomingPages ? 'border-white/10 text-white/40' : 'border-white/20 text-white hover:bg-white/5'"
+                >
+                  Next →
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -359,13 +382,13 @@
             <h2 class="text-2xl md:text-3xl font-bold text-white">
               Past Events
             </h2>
-            <div class="text-white/50 text-sm">{{ pastEvents.length }}</div>
+            <div class="text-white/50 text-sm">{{ pastEvents.length }} total</div>
           </div>
 
           <!-- Mobile: Simple list -->
           <div class="md:hidden space-y-2">
             <div
-              v-for="event in pastEvents"
+              v-for="event in paginatedPastEvents"
               :key="event.id"
               class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 cursor-pointer hover:bg-white/5 transition motion-reduce:transition-none"
               @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
@@ -396,7 +419,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="event in pastEvents"
+                  v-for="event in paginatedPastEvents"
                   :key="event.id"
                   class="border-b border-white/5 last:border-0 hover:bg-white/5 cursor-pointer transition motion-reduce:transition-none"
                   @click.stop="router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
@@ -418,6 +441,29 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          
+          <!-- Pagination for Past Events -->
+          <div v-if="totalPastPages > 1" class="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
+            <button
+              @click="pastEventsPage = Math.max(1, pastEventsPage - 1)"
+              :disabled="pastEventsPage === 1"
+              class="px-3 py-1.5 text-sm rounded-lg border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              :class="pastEventsPage === 1 ? 'border-white/10 text-white/40' : 'border-white/20 text-white hover:bg-white/5'"
+            >
+              ← Prev
+            </button>
+            <span class="text-sm text-white/60">
+              {{ pastEventsPage }} of {{ totalPastPages }}
+            </span>
+            <button
+              @click="pastEventsPage = Math.min(totalPastPages, pastEventsPage + 1)"
+              :disabled="pastEventsPage === totalPastPages"
+              class="px-3 py-1.5 text-sm rounded-lg border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              :class="pastEventsPage === totalPastPages ? 'border-white/10 text-white/40' : 'border-white/20 text-white hover:bg-white/5'"
+            >
+              Next →
+            </button>
           </div>
         </section>
 
@@ -1591,6 +1637,23 @@ const nextUpcomingEvent = computed(() => upcomingEvents.value[0] || null);
 const otherUpcomingEvents = computed(() =>
   upcomingEvents.value.length > 1 ? upcomingEvents.value.slice(1) : []
 );
+
+// Pagination for Other Upcoming Events
+const upcomingEventsPage = ref(1);
+const eventsPerPage = 3;
+const totalUpcomingPages = computed(() => Math.ceil(otherUpcomingEvents.value.length / eventsPerPage));
+const paginatedUpcomingEvents = computed(() => {
+  const start = (upcomingEventsPage.value - 1) * eventsPerPage;
+  return otherUpcomingEvents.value.slice(start, start + eventsPerPage);
+});
+
+// Pagination for Past Events
+const pastEventsPage = ref(1);
+const totalPastPages = computed(() => Math.ceil(pastEvents.value.length / eventsPerPage));
+const paginatedPastEvents = computed(() => {
+  const start = (pastEventsPage.value - 1) * eventsPerPage;
+  return pastEvents.value.slice(start, start + eventsPerPage);
+});
 
 const streamingPlatforms = [
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
