@@ -79,6 +79,16 @@
             :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
             class="mt-4"
           />
+          
+          <!-- Momentum Prompts Panel -->
+          <MomentumPromptsPanel
+            v-if="bandItems[0]?.id"
+            :band-id="bandItems[0].id"
+            :band-slug="bandItems[0].slug || ''"
+            :band-name="bandItems[0].name || 'This Artist'"
+            :band-image-url="bandItems[0].bandImg?.url || null"
+            class="mt-6"
+          />
         </div>
       </section>
 
