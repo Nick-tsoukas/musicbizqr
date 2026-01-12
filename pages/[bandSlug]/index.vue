@@ -670,7 +670,31 @@
             </div>
           </Transition>
         </client-only>
+
+        <!-- Share Band Button (styled to match Follow/Save) -->
+        <ShareBandStrip
+          v-if="band?.data?.id"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          placement="FOOTER"
+          full-width
+        />
       </div>
+
+      <!-- Fan Moment Section (shows only when moment is earned) -->
+      <client-only>
+        <FanMomentSection
+          v-if="band?.data?.id"
+          ref="fanMomentRef"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          :pulse-data="pulseData"
+        />
+      </client-only>
 
       <footer class="h-40 flex justify-center items-center">
         <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
@@ -702,6 +726,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useNuxtApp } from "#app";
 import AudioPlayer from "@/components/AudioPlayer.vue";
 import FollowBandModal from "@/components/band/FollowBandModal.vue";
+import FanMomentSection from "@/components/FanMomentSection.vue";
+import ShareBandStrip from "@/components/ShareBandStrip.vue";
 import {
   normalizeLayoutConfig,
   isSectionEnabled,
@@ -981,6 +1007,9 @@ async function handlePaymentQuery() {
     paymentBannerVisible.value = true;
     paymentBannerTitle.value = "Payment successful";
     paymentBannerDetail.value = sm ? `Support moment #${sm}` : "";
+    
+    // Trigger fan moment for payment
+    triggerFanMomentForPayment();
 
     if (sm) {
       try {
@@ -1507,6 +1536,8 @@ async function playVideo() {
 }
 
 function handleClick(bandId, platform, url) {
+  // Trigger fan moment for link click
+  triggerFanMomentForLinkClick();
   trackClick(bandId, platform, url);
 }
 
@@ -1696,6 +1727,37 @@ const orderedSocialPlatforms = computed(() => {
     .filter(Boolean);
 });
 
+/* ---------- Fan Moment ---------- */
+const fanMomentRef = ref(null);
+const pulseData = ref(null);
+
+// Trigger fan moment for link clicks
+function triggerFanMomentForLinkClick() {
+  if (fanMomentRef.value?.earnMoment) {
+    fanMomentRef.value.earnMoment('link_click', {
+      landingPath: window.location.pathname,
+    });
+  }
+}
+
+// Trigger fan moment for follow
+function triggerFanMomentForFollow() {
+  if (fanMomentRef.value?.earnMoment) {
+    fanMomentRef.value.earnMoment('follow', {
+      landingPath: window.location.pathname,
+    });
+  }
+}
+
+// Trigger fan moment for payment
+function triggerFanMomentForPayment() {
+  if (fanMomentRef.value?.earnMoment) {
+    fanMomentRef.value.earnMoment('payment', {
+      landingPath: window.location.pathname,
+    });
+  }
+}
+
 /* ---------- Follow the Band ---------- */
 const followModalOpen = ref(false);
 
@@ -1749,6 +1811,9 @@ function handleFollowConfirm(platformIds) {
   );
 
   if (selectedPlatforms.length === 0) return;
+
+  // Trigger fan moment for follow action
+  triggerFanMomentForFollow();
 
   // Track redirect events before navigating
   for (const p of selectedPlatforms) {
