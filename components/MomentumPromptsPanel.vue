@@ -164,12 +164,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRuntimeConfig } from '#imports'
-import { 
-  generateShareImage, 
-  downloadBlob, 
-  copyToClipboard, 
-  openFacebookSharer 
-} from '@/composables/useShareKit'
+import { useShareKit } from '@/composables/useShareKit'
+
+const { downloadBlob, copyToClipboard, openFacebookSharer } = useShareKit()
 
 const props = defineProps({
   bandId: { type: [Number, String], required: true },
