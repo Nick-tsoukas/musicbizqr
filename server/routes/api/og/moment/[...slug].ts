@@ -6,9 +6,11 @@ const WIDTH = 1200
 const HEIGHT = 630
 
 export default defineEventHandler(async (event) => {
-  // Get the slug from the catch-all param and remove .png extension
-  const slugParam = getRouterParam(event, 'slug') || ''
-  const momentId = slugParam.replace(/\.png$/, '')
+  // Get the slug from the catch-all param (returns array) and remove .png extension
+  const slugParam = getRouterParam(event, 'slug')
+  // Handle both array (catch-all) and string formats
+  const rawSlug = Array.isArray(slugParam) ? slugParam.join('/') : (slugParam || '')
+  const momentId = rawSlug.replace(/\.png$/, '')
   
   if (!momentId) {
     throw createError({ statusCode: 400, message: 'Missing momentId' })
