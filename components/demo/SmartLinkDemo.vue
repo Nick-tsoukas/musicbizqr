@@ -421,12 +421,14 @@
           </div>
         </div>
         <div class="rounded-xl border border-white/10 bg-white/5 shadow-sm">
-          <AudioPlayer
-            :album="demoAlbum"
-            :placeholder-image="neonPoster"
-            @play="onAudioPlay"
-            class="rounded-xl"
-          />
+          <div :class="isPhone ? 'overflow-hidden' : ''">
+            <AudioPlayer
+              :album="demoAlbum"
+              :placeholder-image="neonPoster"
+              @play="onAudioPlay"
+              class="rounded-xl"
+            />
+          </div>
         </div>
       </div>
 
