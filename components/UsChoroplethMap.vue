@@ -1,9 +1,9 @@
 <template>
   <div class="us-choropleth-map" ref="mapContainer">
-    <div v-if="loading" class="flex items-center justify-center h-64">
+    <div v-if="loading" class="flex items-center justify-center h-48">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
     </div>
-    <div v-else-if="error" class="flex items-center justify-center h-64 text-red-400 text-sm">
+    <div v-else-if="error" class="flex items-center justify-center h-48 text-red-400 text-sm">
       {{ error }}
     </div>
     <div v-else class="relative">
@@ -38,9 +38,9 @@
       </div>
       
       <!-- Legend -->
-      <div class="flex items-center justify-center mt-4 gap-2 text-xs text-slate-400">
+      <div class="flex items-center justify-center mt-2 gap-2 text-xs text-slate-400">
         <span>Low</span>
-        <div class="w-32 h-2 rounded" :style="{ background: legendGradient }"></div>
+        <div class="w-24 h-1.5 rounded" :style="{ background: legendGradient }"></div>
         <span>High</span>
       </div>
     </div>

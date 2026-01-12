@@ -26,15 +26,15 @@
       </div>
     </div>
     
-    <div v-if="loading" class="flex items-center justify-center h-64">
+    <div v-if="loading" class="flex items-center justify-center h-48">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
     </div>
     
-    <div v-else-if="error" class="flex items-center justify-center h-64 text-red-400 text-sm">
+    <div v-else-if="error" class="flex items-center justify-center h-48 text-red-400 text-sm">
       {{ error }}
     </div>
     
-    <div v-else-if="!data || data.total === 0" class="flex flex-col items-center justify-center h-64 text-slate-400">
+    <div v-else-if="!data || data.total === 0" class="flex flex-col items-center justify-center h-48 text-slate-400">
       <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
       </svg>
@@ -51,7 +51,7 @@
       />
       
       <!-- Stats summary -->
-      <div class="mt-4 grid grid-cols-3 gap-4 text-center">
+      <div class="mt-3 grid grid-cols-3 gap-3 text-center">
         <div>
           <div class="text-2xl font-bold text-white">{{ data.total.toLocaleString() }}</div>
           <div class="text-xs text-slate-400">Total {{ metricLabel }}</div>
@@ -67,8 +67,8 @@
       </div>
       
       <!-- Top states list -->
-      <div v-if="data.states.length > 0" class="mt-4">
-        <div class="text-xs text-slate-400 mb-2">Top States</div>
+      <div v-if="data.states.length > 0" class="mt-3">
+        <div class="text-xs text-slate-400 mb-1">Top States</div>
         <div class="flex flex-wrap gap-2">
           <div
             v-for="state in topStates"
@@ -125,12 +125,11 @@ const selectedMetric = ref('views')
 const selectedState = ref<string | null>(null)
 
 const metricOptions = computed(() => {
+  // Only metrics with region/country geo data are supported
   if (props.entityType === 'band') {
     return [
       { value: 'views', label: 'Page Views' },
       { value: 'qrScans', label: 'QR Scans' },
-      { value: 'linkClicks', label: 'Link Clicks' },
-      { value: 'follows', label: 'Follows' },
     ]
   } else if (props.entityType === 'event') {
     return [
