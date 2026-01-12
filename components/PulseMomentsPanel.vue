@@ -63,6 +63,29 @@
         <p class="text-gray-300 text-sm">{{ moment.shareText }}</p>
       </div>
 
+      <!-- Caption Style Toggle -->
+      <div class="mb-4">
+        <div class="text-white/40 text-xs uppercase tracking-wider mb-2">Caption Style</div>
+        <div class="flex gap-2">
+          <button
+            v-for="variant in captionVariants"
+            :key="variant.key"
+            @click="captionStyle = variant.key"
+            :class="[
+              'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              captionStyle === variant.key
+                ? 'bg-purple-600 text-white'
+                : 'bg-white/5 text-white/60 hover:bg-white/10'
+            ]"
+          >
+            {{ variant.label }}
+          </button>
+        </div>
+        <div class="mt-2 p-2 bg-black/30 rounded-lg text-white/80 text-sm italic">
+          "{{ selectedCaption }}"
+        </div>
+      </div>
+
       <!-- Context info -->
       <div v-if="moment.context" class="text-xs text-gray-500 mb-4 space-y-0.5">
         <p v-if="moment.context.velocity">Velocity: {{ moment.context.velocity }}x baseline</p>
@@ -203,6 +226,38 @@ const evaluating = ref(false)
 const toastMessage = ref('')
 const canvasRef = ref(null)
 const cachedImageBlob = ref(null)
+const captionStyle = ref('hype')
+
+// Caption variants
+const captionVariants = [
+  { key: 'hype', label: '🔥 Hype' },
+  { key: 'grateful', label: '🙏 Grateful' },
+  { key: 'tease', label: '👀 Tease' },
+]
+
+// Generate caption based on style
+const selectedCaption = computed(() => {
+  if (!moment.value) return ''
+  const bandName = props.bandName || 'the band'
+  const velocity = moment.value.context?.velocity || ''
+  const cityName = moment.value.context?.cityName || ''
+  const baseText = moment.value.shareText || ''
+  
+  switch (captionStyle.value) {
+    case 'hype':
+      if (cityName) return `${cityName} is going off right now 🔥 ${bandName} is heating up!`
+      if (velocity) return `${velocity}x the normal energy 🔥 ${bandName} is surging!`
+      return `Something's happening with ${bandName} 🔥`
+    case 'grateful':
+      if (cityName) return `${cityName}, we see you 🙏 Thank you for the love.`
+      return `Thank you for being part of this moment 🙏`
+    case 'tease':
+      if (cityName) return `${cityName}… we might need to come see you 👀`
+      return `Something's building… stay close 👀`
+    default:
+      return baseText
+  }
+})
 
 // Check if dev mode
 const isDev = computed(() => {
@@ -310,7 +365,7 @@ function getShareUrl() {
 }
 
 function getCaption() {
-  return moment.value?.shareText || `Check out ${props.bandName}!`
+  return selectedCaption.value || moment.value?.shareText || `Check out ${props.bandName}!`
 }
 
 function getFilename() {

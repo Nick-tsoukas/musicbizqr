@@ -49,8 +49,31 @@
           </div>
         </div>
         
+        <!-- Caption Style Toggle -->
+        <div class="mt-4 mb-4">
+          <div class="text-white/40 text-xs uppercase tracking-wider mb-2">Caption Style</div>
+          <div class="flex gap-2 justify-center">
+            <button
+              v-for="variant in captionVariants"
+              :key="variant.key"
+              @click="captionStyle = variant.key"
+              :class="[
+                'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                captionStyle === variant.key
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              ]"
+            >
+              {{ variant.label }}
+            </button>
+          </div>
+          <div class="mt-2 p-2 bg-black/30 rounded-lg text-white/80 text-sm italic text-center">
+            "{{ selectedCaption }}"
+          </div>
+        </div>
+        
         <!-- Share Buttons -->
-        <div class="mt-6 space-y-3">
+        <div class="mt-4 space-y-3">
           <button
             @click="handleShare"
             :disabled="sharing"
@@ -195,6 +218,40 @@ const canvasRef = ref(null)
 const hasEarnedThisSession = ref(false)
 const toastMessage = ref('')
 const cachedImageBlob = ref(null)
+const captionStyle = ref('hype')
+
+// Caption variants
+const captionVariants = [
+  { key: 'hype', label: '🔥 Hype' },
+  { key: 'grateful', label: '🙏 Grateful' },
+  { key: 'tease', label: '👀 Tease' },
+]
+
+// Generate caption based on style
+const selectedCaption = computed(() => {
+  if (!moment.value) return ''
+  const bandName = props.bandName || 'the band'
+  const baseText = moment.value.share?.text || moment.value.shareText || ''
+  const actionType = moment.value.actionType || ''
+  
+  switch (captionStyle.value) {
+    case 'hype':
+      if (actionType === 'qr_scan') return `I was there for ${bandName} 🔥 Live show energy!`
+      if (actionType === 'link_click') return `Just discovered ${bandName} 🔥 You need to check them out!`
+      if (actionType === 'follow') return `Just followed ${bandName} 🔥 Join the fanbase!`
+      if (actionType === 'payment') return `I backed ${bandName} 🔥 Real fans support real music!`
+      return `I was part of the moment for ${bandName} 🔥`
+    case 'grateful':
+      if (actionType === 'qr_scan') return `Thanks for the show ${bandName} 🙏 Incredible night.`
+      if (actionType === 'payment') return `Proud to support ${bandName} 🙏 Every bit helps.`
+      return `Grateful to be part of ${bandName}'s journey 🙏`
+    case 'tease':
+      if (actionType === 'qr_scan') return `${bandName}… that was just the beginning 👀`
+      return `Something's happening with ${bandName}… stay close 👀`
+    default:
+      return baseText
+  }
+})
 
 // Computed - use rich share content from API
 const momentHeadline = computed(() => {
@@ -376,10 +433,11 @@ function getShareUrl() {
   return buildShareUrl({ bandSlug: props.bandSlug })
 }
 
-// Get moment-specific caption
+// Get moment-specific caption (uses selected caption style)
 function getMomentCaption() {
   if (!moment.value) return ''
-  return buildCaption({
+  // Use the selected caption from caption style toggle
+  return selectedCaption.value || buildCaption({
     bandName: moment.value.context.bandName || props.bandName,
     momentType: moment.value.momentType,
   })

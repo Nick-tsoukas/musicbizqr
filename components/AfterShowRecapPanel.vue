@@ -60,6 +60,29 @@
         <p class="text-gray-300 text-sm">{{ recap.shareText }}</p>
       </div>
 
+      <!-- Caption Style Toggle -->
+      <div class="mb-4">
+        <div class="text-white/40 text-xs uppercase tracking-wider mb-2">Caption Style</div>
+        <div class="flex gap-2">
+          <button
+            v-for="variant in captionVariants"
+            :key="variant.key"
+            @click="captionStyle = variant.key"
+            :class="[
+              'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              captionStyle === variant.key
+                ? 'bg-amber-600 text-white'
+                : 'bg-white/5 text-white/60 hover:bg-white/10'
+            ]"
+          >
+            {{ variant.label }}
+          </button>
+        </div>
+        <div class="mt-2 p-2 bg-black/30 rounded-lg text-white/80 text-sm italic">
+          "{{ selectedCaption }}"
+        </div>
+      </div>
+
       <!-- Recap details from context -->
       <div v-if="recap.context" class="text-xs text-gray-500 mb-4 space-y-1">
         <p v-if="recap.context.venueName" class="flex items-center gap-1">
@@ -212,6 +235,36 @@ const evaluating = ref(false)
 const toastMessage = ref('')
 const canvasRef = ref(null)
 const cachedImageBlob = ref(null)
+const captionStyle = ref('hype')
+
+// Caption variants
+const captionVariants = [
+  { key: 'hype', label: '🔥 Hype' },
+  { key: 'grateful', label: '🙏 Grateful' },
+  { key: 'tease', label: '👀 Tease' },
+]
+
+// Generate caption based on style
+const selectedCaption = computed(() => {
+  if (!recap.value) return ''
+  const bandName = props.bandName || 'the band'
+  const venue = recap.value.context?.venueName || ''
+  const baseText = recap.value.shareText || ''
+  
+  switch (captionStyle.value) {
+    case 'hype':
+      if (venue) return `${venue} was on fire last night 🔥 ${bandName} brought the energy!`
+      return `Last night was incredible 🔥 ${bandName} brought the energy!`
+    case 'grateful':
+      if (venue) return `Thank you ${venue} for an amazing night 🙏 We felt every moment.`
+      return `Thank you for showing up 🙏 We felt every moment with you.`
+    case 'tease':
+      if (venue) return `${venue}… that was just the beginning 👀`
+      return `That was just the beginning… stay close 👀`
+    default:
+      return baseText
+  }
+})
 
 // Check if dev mode
 const isDev = computed(() => {
@@ -300,7 +353,7 @@ function getShareUrl() {
 }
 
 function getCaption() {
-  return recap.value?.shareText || `Check out ${props.bandName}!`
+  return selectedCaption.value || recap.value?.shareText || `Check out ${props.bandName}!`
 }
 
 function getFilename() {
