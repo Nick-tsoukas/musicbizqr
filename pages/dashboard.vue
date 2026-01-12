@@ -87,6 +87,7 @@
             :band-slug="bandItems[0].slug || ''"
             :band-name="bandItems[0].name || 'This Artist'"
             :band-image-url="bandItems[0].bandImg?.url || null"
+            :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
             class="mt-6"
           />
         </div>

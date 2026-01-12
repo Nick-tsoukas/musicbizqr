@@ -173,6 +173,7 @@ const props = defineProps({
   bandName: { type: String, default: '' },
   bandSlug: { type: String, default: '' },
   bandImageUrl: { type: String, default: null },
+  isBandNameInLogo: { type: Boolean, default: false },
 })
 
 const config = useRuntimeConfig()
@@ -337,7 +338,7 @@ async function generateMomentumImage(card, caption) {
   canvas.height = 1080
   const ctx = canvas.getContext('2d')
 
-  // Background gradient
+  // Background gradient (cleaner, no circles)
   const gradient = ctx.createLinearGradient(0, 0, 1080, 1080)
   gradient.addColorStop(0, '#1a0a2e')
   gradient.addColorStop(0.5, '#0f0f0f')
@@ -345,52 +346,122 @@ async function generateMomentumImage(card, caption) {
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, 1080, 1080)
 
-  // Decorative circles
-  ctx.beginPath()
-  ctx.arc(900, 150, 120, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(139, 92, 246, 0.2)'
-  ctx.fill()
+  // Track vertical position
+  let yPos = 120
 
-  ctx.beginPath()
-  ctx.arc(180, 900, 100, 0, Math.PI * 2)
-  ctx.fillStyle = 'rgba(16, 185, 129, 0.15)'
-  ctx.fill()
+  // Band profile image at top (if available)
+  if (props.bandImageUrl) {
+    try {
+      const img = await loadImage(props.bandImageUrl)
+      const imgSize = 180
+      const imgX = (1080 - imgSize) / 2
+      
+      // Draw circular clipped image
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(imgX + imgSize / 2, yPos + imgSize / 2, imgSize / 2, 0, Math.PI * 2)
+      ctx.closePath()
+      ctx.clip()
+      ctx.drawImage(img, imgX, yPos, imgSize, imgSize)
+      ctx.restore()
+      
+      // Border around image
+      ctx.beginPath()
+      ctx.arc(imgX + imgSize / 2, yPos + imgSize / 2, imgSize / 2, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
+      ctx.lineWidth = 3
+      ctx.stroke()
+      
+      yPos += imgSize + 40
+    } catch (err) {
+      // If image fails to load, continue without it
+      yPos += 40
+    }
+  } else {
+    yPos += 80
+  }
 
-  // Card title
+  // Fire emoji + title (strip existing emoji from title, use fire)
+  const titleWithoutEmoji = card.title.replace(/^[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]\s*/u, '').trim()
   ctx.fillStyle = '#ffffff'
-  ctx.font = 'bold 64px Inter, system-ui, sans-serif'
+  ctx.font = 'bold 56px Inter, system-ui, sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText(card.title, 540, 350)
+  ctx.fillText(`🔥 ${titleWithoutEmoji}`, 540, yPos)
+  yPos += 60
 
   // Why line
   ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  ctx.font = '36px Inter, system-ui, sans-serif'
-  wrapText(ctx, card.why, 540, 430, 900, 44)
+  ctx.font = '32px Inter, system-ui, sans-serif'
+  const whyLines = wrapTextAndReturn(ctx, card.why, 900, 40)
+  whyLines.forEach(line => {
+    ctx.fillText(line, 540, yPos)
+    yPos += 40
+  })
+  yPos += 30
 
   // Stat
   ctx.fillStyle = '#a78bfa'
-  ctx.font = 'bold 48px Inter, system-ui, sans-serif'
-  ctx.fillText(card.stat, 540, 550)
+  ctx.font = 'bold 44px Inter, system-ui, sans-serif'
+  ctx.fillText(card.stat, 540, yPos)
+  yPos += 70
 
   // Caption
   ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
-  ctx.font = 'italic 32px Inter, system-ui, sans-serif'
-  wrapText(ctx, `"${caption}"`, 540, 680, 900, 40)
+  ctx.font = 'italic 30px Inter, system-ui, sans-serif'
+  const captionLines = wrapTextAndReturn(ctx, `"${caption}"`, 900, 38)
+  captionLines.forEach(line => {
+    ctx.fillText(line, 540, yPos)
+    yPos += 38
+  })
+  yPos += 50
 
-  // Band name
-  ctx.fillStyle = '#c4b5fd'
-  ctx.font = 'bold 40px Inter, system-ui, sans-serif'
-  ctx.fillText(props.bandName || 'Artist', 540, 850)
+  // Band name (only if NOT in logo)
+  if (!props.isBandNameInLogo && props.bandName) {
+    ctx.fillStyle = '#c4b5fd'
+    ctx.font = 'bold 38px Inter, system-ui, sans-serif'
+    ctx.fillText(props.bandName, 540, yPos)
+  }
 
   // Watermark
   ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
-  ctx.font = '24px Inter, system-ui, sans-serif'
+  ctx.font = '22px Inter, system-ui, sans-serif'
   ctx.textAlign = 'right'
   ctx.fillText('via MusicBizQR', 1040, 1040)
 
   return new Promise((resolve) => {
     canvas.toBlob(resolve, 'image/png')
   })
+}
+
+// Load image helper
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
+
+// Wrap text and return lines array
+function wrapTextAndReturn(ctx, text, maxWidth, lineHeight) {
+  const words = text.split(' ')
+  const lines = []
+  let line = ''
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + ' '
+    const metrics = ctx.measureText(testLine)
+    if (metrics.width > maxWidth && i > 0) {
+      lines.push(line.trim())
+      line = words[i] + ' '
+    } else {
+      line = testLine
+    }
+  }
+  lines.push(line.trim())
+  return lines
 }
 
 // Text wrapping helper
