@@ -228,6 +228,7 @@ const {
 // State
 const loading = ref(true)
 const recap = ref(null)
+const recapKind = ref(null) // 'real' | 'mini' | null
 const sharing = ref(false)
 const downloadingImage = ref(false)
 const preparingIG = ref(false)
@@ -303,20 +304,23 @@ function formatExpiry(expiresAt) {
   return `in ${diffMins}m`
 }
 
-// Fetch active recap
+// Fetch active recap (with mini fallback)
 async function fetchRecap() {
   loading.value = true
   try {
-    const res = await fetch(`${config.public.strapiUrl}/api/fan-moments/recap-active?bandId=${props.bandId}`)
+    const res = await fetch(`${config.public.strapiUrl}/api/fan-moments/recap-active?bandId=${props.bandId}&allowMini=true`)
     const data = await res.json()
     if (data.ok && data.recap) {
       recap.value = data.recap
+      recapKind.value = data.kind || 'real'
     } else {
       recap.value = null
+      recapKind.value = null
     }
   } catch (err) {
     console.error('[AfterShowRecapPanel] Failed to fetch recap:', err)
     recap.value = null
+    recapKind.value = null
   } finally {
     loading.value = false
   }

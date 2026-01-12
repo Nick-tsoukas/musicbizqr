@@ -69,6 +69,17 @@
             :band-id="bandItems[0]?.id"
           />
           
+          <!-- Pulse Moments Panel (Auto-generated shareable moments) -->
+          <PulseMomentsPanel
+            v-if="bandItems[0]?.id"
+            :band-id="bandItems[0].id"
+            :band-slug="bandItems[0].slug || ''"
+            :band-name="bandItems[0].name || 'This Artist'"
+            :band-image-url="bandItems[0].bandImg?.url || null"
+            :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
+            class="mt-4"
+          />
+          
           <!-- After-Show Recap Panel -->
           <AfterShowRecapPanel
             v-if="bandItems[0]?.id"
@@ -89,6 +100,13 @@
             :band-image-url="bandItems[0].bandImg?.url || null"
             :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
             class="mt-6"
+          />
+          
+          <!-- System Status Card -->
+          <SystemStatusCard
+            v-if="bandItems[0]?.id"
+            :band-id="bandItems[0].id"
+            @refresh="refreshPanels"
           />
         </div>
       </section>
@@ -938,6 +956,13 @@ async function fetchPulse() {
   } finally {
     pulseLoading.value = false;
   }
+}
+
+// Refresh all moment panels (called after running evaluators)
+function refreshPanels() {
+  // This triggers a re-fetch in child components by updating a key
+  // Components will re-fetch on mount, so we just need to trigger re-render
+  fetchPulse();
 }
 
 const qrDetailCache = new Map() // id -> full row with options
