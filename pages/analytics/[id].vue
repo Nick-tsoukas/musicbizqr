@@ -11,6 +11,16 @@
       </div>
     </div>
 
+    <!-- Pulse Moments Panel (Auto-generated shareable moments) -->
+    <PulseMomentsPanel
+      v-if="bandId"
+      :band-id="bandId"
+      :band-slug="bandSlug"
+      :band-name="bandName"
+      :band-image-url="bandImageUrl"
+      :is-band-name-in-logo="isBandNameInLogo"
+    />
+
     <!-- MBQ Pulse Card -->
     <MbqPulseCard
       :pulse="pulseData"
@@ -1214,6 +1224,36 @@ const museLoading = ref(false);
 const museError = ref<any>(null);
 
 const bandId = computed(() => Number(route.params.id));
+
+/* ---------- Band info for PulseMomentsPanel ---------- */
+const bandInfo = ref<{ name: string; slug: string; imageUrl: string | null; isBandNameInLogo: boolean } | null>(null);
+const bandName = computed(() => bandInfo.value?.name || 'This Artist');
+const bandSlug = computed(() => bandInfo.value?.slug || '');
+const bandImageUrl = computed(() => bandInfo.value?.imageUrl || null);
+const isBandNameInLogo = computed(() => bandInfo.value?.isBandNameInLogo || false);
+
+async function fetchBandInfo() {
+  if (!bandId.value) return;
+  try {
+    const res: any = await client(`/bands/${bandId.value}`, {
+      params: { 
+        fields: ['name', 'slug', 'isBandNameInLogo'],
+        populate: ['bandImg'],
+      },
+    });
+    if (res?.data) {
+      const attrs = res.data.attributes || res.data;
+      bandInfo.value = {
+        name: attrs.name || 'This Artist',
+        slug: attrs.slug || '',
+        imageUrl: attrs.bandImg?.data?.attributes?.url || attrs.bandImg?.url || null,
+        isBandNameInLogo: attrs.isBandNameInLogo || false,
+      };
+    }
+  } catch (err) {
+    console.warn('[analytics] Failed to fetch band info:', err);
+  }
+}
 
 /* ---------- Analytics composable (rollups, geo, transitions, follows) ---------- */
 const { getRollups, getGeo, getTransitions, getFollows } = useMuse();
@@ -2570,6 +2610,7 @@ onMounted(async () => {
   await ensureChart();
   await fetchAndRender(false);
   fetchPulse(); // non-blocking pulse fetch after initial load
+  fetchBandInfo(); // fetch band info for PulseMomentsPanel
 });
 
 // when range changes → silent refresh

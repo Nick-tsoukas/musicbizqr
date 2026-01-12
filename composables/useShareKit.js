@@ -53,9 +53,10 @@ export function useShareKit() {
    * @param {string|null} options.bandImageUrl - Optional band image URL
    * @param {string|null} options.momentTitle - Optional moment title (e.g., "You were part of this moment")
    * @param {string|null} options.subtitle - Optional subtitle (e.g., location)
+   * @param {boolean} options.isBandNameInLogo - If true, hide band name text (it's in the logo)
    * @returns {Promise<Blob|null>}
    */
-  async function generateShareImage({ canvasEl, bandName, bandImageUrl = null, momentTitle = null, subtitle = null }) {
+  async function generateShareImage({ canvasEl, bandName, bandImageUrl = null, momentTitle = null, subtitle = null, isBandNameInLogo = false }) {
     if (!canvasEl) return null
 
     try {
@@ -84,54 +85,120 @@ export function useShareKit() {
 
       ctx.textAlign = 'center'
 
-      // If moment title exists, draw it above band name
-      if (momentTitle) {
-        ctx.fillStyle = '#ffffff'
-        ctx.font = 'bold 56px system-ui, -apple-system, sans-serif'
-        ctx.fillText(momentTitle, width / 2, height * 0.32)
-      }
+      // Calculate layout based on whether we have an image
+      const hasImage = !!bandImageUrl
+      const showBandNameText = !isBandNameInLogo
+      
+      // Image dimensions and position
+      const imageSize = 320
+      const imageY = hasImage ? (momentTitle ? height * 0.22 : height * 0.18) : 0
 
-      // Band name - large and centered
-      ctx.fillStyle = momentTitle ? '#c4b5fd' : '#ffffff'
-      ctx.font = `bold ${momentTitle ? 64 : 80}px system-ui, -apple-system, sans-serif`
-
-      // Word wrap band name if too long
-      const maxWidth = width - 120
-      const words = bandName.split(' ')
-      let lines = []
-      let currentLine = ''
-
-      for (const word of words) {
-        const testLine = currentLine ? `${currentLine} ${word}` : word
-        const metrics = ctx.measureText(testLine)
-        if (metrics.width > maxWidth && currentLine) {
-          lines.push(currentLine)
-          currentLine = word
-        } else {
-          currentLine = testLine
+      // Load and draw band image if available
+      if (bandImageUrl) {
+        try {
+          const img = await loadImage(bandImageUrl)
+          
+          // Draw circular clipped image
+          ctx.save()
+          ctx.beginPath()
+          ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+          ctx.closePath()
+          ctx.clip()
+          
+          // Draw image centered and cover the circle
+          const imgAspect = img.width / img.height
+          let drawWidth, drawHeight, drawX, drawY
+          
+          if (imgAspect > 1) {
+            drawHeight = imageSize
+            drawWidth = imageSize * imgAspect
+            drawX = width / 2 - drawWidth / 2
+            drawY = imageY
+          } else {
+            drawWidth = imageSize
+            drawHeight = imageSize / imgAspect
+            drawX = width / 2 - imageSize / 2
+            drawY = imageY - (drawHeight - imageSize) / 2
+          }
+          
+          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
+          ctx.restore()
+          
+          // Add subtle border around image
+          ctx.beginPath()
+          ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+          ctx.lineWidth = 3
+          ctx.stroke()
+        } catch (imgErr) {
+          console.warn('[useShareKit] Failed to load band image:', imgErr)
         }
       }
-      if (currentLine) lines.push(currentLine)
 
-      // Draw band name lines
-      const lineHeight = momentTitle ? 75 : 95
-      const startY = momentTitle ? height * 0.48 : height * 0.42
-      const adjustedStartY = startY - ((lines.length - 1) * lineHeight) / 2
-      lines.forEach((line, i) => {
-        ctx.fillText(line, width / 2, adjustedStartY + i * lineHeight)
-      })
+      // Calculate text positions based on image presence
+      const textStartY = hasImage ? imageY + imageSize + 50 : (momentTitle ? height * 0.32 : height * 0.35)
 
-      // Subtitle (location) if provided
-      if (subtitle) {
+      // If moment title exists, draw it
+      if (momentTitle) {
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 48px system-ui, -apple-system, sans-serif'
+        ctx.fillText(momentTitle, width / 2, hasImage ? textStartY : height * 0.32)
+      }
+
+      // Band name - only if not in logo
+      if (showBandNameText) {
+        const bandNameY = momentTitle 
+          ? (hasImage ? textStartY + 70 : height * 0.48)
+          : (hasImage ? textStartY + 20 : height * 0.42)
+        
+        ctx.fillStyle = momentTitle ? '#c4b5fd' : '#ffffff'
+        ctx.font = `bold ${hasImage ? 56 : (momentTitle ? 64 : 80)}px system-ui, -apple-system, sans-serif`
+
+        // Word wrap band name if too long
+        const maxWidth = width - 120
+        const words = bandName.split(' ')
+        let lines = []
+        let currentLine = ''
+
+        for (const word of words) {
+          const testLine = currentLine ? `${currentLine} ${word}` : word
+          const metrics = ctx.measureText(testLine)
+          if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine)
+            currentLine = word
+          } else {
+            currentLine = testLine
+          }
+        }
+        if (currentLine) lines.push(currentLine)
+
+        // Draw band name lines
+        const lineHeight = hasImage ? 65 : (momentTitle ? 75 : 95)
+        const adjustedStartY = bandNameY - ((lines.length - 1) * lineHeight) / 2
+        lines.forEach((line, i) => {
+          ctx.fillText(line, width / 2, adjustedStartY + i * lineHeight)
+        })
+
+        // Subtitle (location) if provided
+        if (subtitle) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+          ctx.font = '32px system-ui, -apple-system, sans-serif'
+          ctx.fillText(subtitle, width / 2, adjustedStartY + lines.length * lineHeight + 25)
+        }
+      } else if (subtitle) {
+        // If no band name text but we have subtitle, show it below image/moment title
+        const subtitleY = momentTitle 
+          ? (hasImage ? textStartY + 70 : height * 0.48)
+          : (hasImage ? textStartY + 20 : height * 0.50)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
         ctx.font = '32px system-ui, -apple-system, sans-serif'
-        ctx.fillText(subtitle, width / 2, adjustedStartY + lines.length * lineHeight + 20)
+        ctx.fillText(subtitle, width / 2, subtitleY)
       }
 
       // Tagline
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
       ctx.font = '36px system-ui, -apple-system, sans-serif'
-      ctx.fillText('Scan • Listen • Follow', width / 2, height * 0.72)
+      ctx.fillText('Scan • Listen • Follow', width / 2, height * 0.82)
 
       // MusicBizQR branding
       ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
@@ -148,6 +215,21 @@ export function useShareKit() {
       console.error('[useShareKit] Failed to generate image:', err)
       return null
     }
+  }
+
+  /**
+   * Load an image from URL
+   * @param {string} url
+   * @returns {Promise<HTMLImageElement>}
+   */
+  function loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = url
+    })
   }
 
   /**

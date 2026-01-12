@@ -678,6 +678,7 @@
           :band-slug="currentBandSlug"
           :band-name="band.data.name || 'This Artist'"
           :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
           placement="FOOTER"
           full-width
         />
@@ -692,6 +693,7 @@
           :band-slug="currentBandSlug"
           :band-name="band.data.name || 'This Artist'"
           :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
           :pulse-data="pulseData"
         />
       </client-only>

@@ -159,6 +159,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  isBandNameInLogo: {
+    type: Boolean,
+    default: false,
+  },
   placement: {
     type: String,
     required: true,
@@ -231,6 +235,7 @@ async function getOrGenerateImage() {
     canvasEl: canvasRef.value,
     bandName: props.bandName,
     bandImageUrl: props.bandImageUrl,
+    isBandNameInLogo: props.isBandNameInLogo,
   })
   
   if (blob) {

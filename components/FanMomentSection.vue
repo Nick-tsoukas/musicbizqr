@@ -157,6 +157,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  isBandNameInLogo: {
+    type: Boolean,
+    default: false,
+  },
   pulseData: {
     type: Object,
     default: null,
@@ -368,6 +372,7 @@ async function getOrGenerateImage() {
     bandImageUrl: props.bandImageUrl,
     momentTitle: momentHeadline.value,
     subtitle: locationText.value,
+    isBandNameInLogo: props.isBandNameInLogo,
   })
   
   if (blob) {
