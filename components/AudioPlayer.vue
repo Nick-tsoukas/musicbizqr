@@ -446,14 +446,14 @@ const formatTime = (time) => {
 
 .control-button.play-pause {
   color: #fff;
-  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.5rem;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .control-button.play-pause:hover {
-  background: linear-gradient(135deg, #9b6cf6 0%, #b865f7 100%);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* Time labels */
