@@ -96,42 +96,51 @@ export function useShareKit() {
       const imageY = hasImage ? (momentTitle ? height * 0.22 : height * 0.18) : 0
 
       // Load and draw band image if available
+      let imageLoaded = false
       if (bandImageUrl) {
         try {
+          console.log('[useShareKit] Loading band image:', bandImageUrl)
           const img = await loadImage(bandImageUrl)
           
-          // Draw circular clipped image
-          ctx.save()
-          ctx.beginPath()
-          ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
-          ctx.closePath()
-          ctx.clip()
-          
-          // Draw image centered and cover the circle
-          const imgAspect = img.width / img.height
-          let drawWidth, drawHeight, drawX, drawY
-          
-          if (imgAspect > 1) {
-            drawHeight = imageSize
-            drawWidth = imageSize * imgAspect
-            drawX = width / 2 - drawWidth / 2
-            drawY = imageY
+          if (img && img.width > 0 && img.height > 0) {
+            // Draw circular clipped image
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+            ctx.closePath()
+            ctx.clip()
+            
+            // Draw image centered and cover the circle
+            const imgAspect = img.width / img.height
+            let drawWidth, drawHeight, drawX, drawY
+            
+            if (imgAspect > 1) {
+              drawHeight = imageSize
+              drawWidth = imageSize * imgAspect
+              drawX = width / 2 - drawWidth / 2
+              drawY = imageY
+            } else {
+              drawWidth = imageSize
+              drawHeight = imageSize / imgAspect
+              drawX = width / 2 - imageSize / 2
+              drawY = imageY - (drawHeight - imageSize) / 2
+            }
+            
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
+            ctx.restore()
+            
+            // Add subtle border around image
+            ctx.beginPath()
+            ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+            ctx.lineWidth = 3
+            ctx.stroke()
+            
+            imageLoaded = true
+            console.log('[useShareKit] Band image drawn successfully')
           } else {
-            drawWidth = imageSize
-            drawHeight = imageSize / imgAspect
-            drawX = width / 2 - imageSize / 2
-            drawY = imageY - (drawHeight - imageSize) / 2
+            console.warn('[useShareKit] Image loaded but has invalid dimensions')
           }
-          
-          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
-          ctx.restore()
-          
-          // Add subtle border around image
-          ctx.beginPath()
-          ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
-          ctx.lineWidth = 3
-          ctx.stroke()
         } catch (imgErr) {
           console.warn('[useShareKit] Failed to load band image:', imgErr)
         }
@@ -228,28 +237,34 @@ export function useShareKit() {
    * @returns {Promise<HTMLImageElement>}
    */
   async function loadImage(url) {
+    console.log('[useShareKit] loadImage called with:', url)
     
-    // Strategy 1: Try direct load with crossOrigin first (fastest if CORS headers exist)
-    try {
-      const img = await loadImageDirect(url)
-      return img
-    } catch (e) {
-      console.warn('[useShareKit] Direct image load failed, trying proxy...', e)
-    }
-
-    // Strategy 2: Use backend proxy for CORS-blocked images
+    // Strategy 1: Use backend proxy for external images (most reliable)
     if (url.includes('cloudinary.com') || url.includes('res.cloudinary')) {
       try {
         const proxyUrl = `${runtimeConfig.public.strapiUrl}/api/image-proxy?url=${encodeURIComponent(url)}`
+        console.log('[useShareKit] Trying proxy URL:', proxyUrl)
         const img = await loadImageDirect(proxyUrl)
+        console.log('[useShareKit] Proxy load succeeded')
         return img
       } catch (e) {
         console.warn('[useShareKit] Proxy load failed:', e)
       }
     }
+    
+    // Strategy 2: Try direct load with crossOrigin
+    try {
+      console.log('[useShareKit] Trying direct load with crossOrigin')
+      const img = await loadImageDirect(url)
+      console.log('[useShareKit] Direct load succeeded')
+      return img
+    } catch (e) {
+      console.warn('[useShareKit] Direct image load failed:', e)
+    }
 
     // Strategy 3: Try fetching as blob directly
     try {
+      console.log('[useShareKit] Trying fetch as blob')
       const response = await fetch(url, { mode: 'cors' })
       if (response.ok) {
         const blob = await response.blob()
@@ -267,6 +282,7 @@ export function useShareKit() {
           }
           image.src = objectUrl
         })
+        console.log('[useShareKit] Blob load succeeded')
         return img
       }
     } catch (fetchErr) {
@@ -284,14 +300,25 @@ export function useShareKit() {
   }
 
   /**
-   * Direct image load with crossOrigin
+   * Direct image load with crossOrigin and timeout
    */
-  function loadImageDirect(url) {
+  function loadImageDirect(url, timeoutMs = 10000) {
     return new Promise((resolve, reject) => {
       const img = new Image()
       img.crossOrigin = 'anonymous'
-      img.onload = () => resolve(img)
-      img.onerror = reject
+      
+      const timeout = setTimeout(() => {
+        reject(new Error('Image load timeout'))
+      }, timeoutMs)
+      
+      img.onload = () => {
+        clearTimeout(timeout)
+        resolve(img)
+      }
+      img.onerror = (err) => {
+        clearTimeout(timeout)
+        reject(err || new Error('Image load error'))
+      }
       img.src = url
     })
   }
