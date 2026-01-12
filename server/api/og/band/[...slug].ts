@@ -6,50 +6,33 @@ const WIDTH = 1200
 const HEIGHT = 630
 
 export default defineEventHandler(async (event) => {
-  const momentId = getRouterParam(event, 'momentId')?.replace('.png', '')
+  // Get the slug from the catch-all param (returns array) and remove .png extension
+  const slugParam = getRouterParam(event, 'slug')
+  // Handle both array (catch-all) and string formats
+  const rawSlug = Array.isArray(slugParam) ? slugParam.join('/') : (slugParam || '')
+  const bandSlug = rawSlug.replace(/\.png$/, '')
   
-  if (!momentId) {
-    throw createError({ statusCode: 400, message: 'Missing momentId' })
+  if (!bandSlug) {
+    throw createError({ statusCode: 400, message: 'Missing bandSlug' })
   }
 
   const config = useRuntimeConfig()
   const strapiUrl = config.public.strapiUrl || 'http://localhost:1337'
 
-  // Fetch moment data from Strapi
-  let moment: any = null
+  // Fetch band data from Strapi
   let band: any = null
   try {
     const res = await fetch(
-      `${strapiUrl}/api/fan-moments/${momentId}?populate=band.bandImg`
+      `${strapiUrl}/api/bands?filters[slug][$eq]=${bandSlug}&populate=bandImg`
     )
     const json = await res.json()
-    moment = json.data
-    band = moment?.band || moment?.attributes?.band?.data
+    band = json.data?.[0]
   } catch (err) {
-    console.error('[og/moment] Failed to fetch moment:', err)
+    console.error('[og/band] Failed to fetch band:', err)
   }
 
-  const shareTitle = moment?.shareTitle || moment?.attributes?.shareTitle || 'Fan Moment'
-  const shareText = moment?.shareText || moment?.attributes?.shareText || ''
-  const momentType = moment?.momentType || moment?.attributes?.momentType || ''
-  const bandName = band?.name || band?.attributes?.name || 'Artist'
+  const bandName = band?.name || band?.attributes?.name || bandSlug
   const bandImageUrl = band?.bandImg?.url || band?.attributes?.bandImg?.data?.attributes?.url || null
-
-  // Truncate shareText if too long
-  const truncatedText = shareText.length > 100 ? shareText.substring(0, 97) + '...' : shareText
-
-  // Get emoji based on moment type
-  const getEmoji = (type: string) => {
-    switch (type) {
-      case 'I_WAS_THERE': return '🎸'
-      case 'FUELED_MOMENTUM': return '⚡'
-      case 'PULSE_SURGE': return '🔥'
-      case 'CITY_HEAT': return '🌆'
-      case 'MOMENT_MATTERED': return '💫'
-      case 'AFTER_SHOW_RECAP': return '🎤'
-      default: return '✨'
-    }
-  }
 
   // Generate SVG using Satori
   const svg = await satori(
@@ -64,8 +47,7 @@ export default defineEventHandler(async (event) => {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'linear-gradient(135deg, #1a0a2e 0%, #0f0f0f 50%, #0a1a1a 100%)',
-          fontFamily: 'sans-serif',
-          padding: '60px',
+          fontFamily: 'Inter',
         },
         children: [
           // Decorative circle top right
@@ -104,54 +86,13 @@ export default defineEventHandler(async (event) => {
             props: {
               src: bandImageUrl.startsWith('http') ? bandImageUrl : `${strapiUrl}${bandImageUrl}`,
               style: {
-                width: '120px',
-                height: '120px',
+                width: '180px',
+                height: '180px',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '3px solid rgba(255, 255, 255, 0.2)',
-                marginBottom: '24px',
+                border: '4px solid rgba(255, 255, 255, 0.2)',
+                marginBottom: '30px',
               },
-            },
-          } : null,
-          // Emoji
-          {
-            type: 'div',
-            props: {
-              style: {
-                fontSize: '48px',
-                marginBottom: '16px',
-              },
-              children: getEmoji(momentType),
-            },
-          },
-          // Share title
-          {
-            type: 'div',
-            props: {
-              style: {
-                fontSize: '56px',
-                fontWeight: 'bold',
-                color: '#ffffff',
-                textAlign: 'center',
-                maxWidth: '1000px',
-                lineHeight: 1.2,
-              },
-              children: shareTitle,
-            },
-          },
-          // Share text (truncated)
-          truncatedText ? {
-            type: 'div',
-            props: {
-              style: {
-                fontSize: '28px',
-                color: '#a1a1aa',
-                textAlign: 'center',
-                maxWidth: '900px',
-                marginTop: '20px',
-                lineHeight: 1.4,
-              },
-              children: truncatedText,
             },
           } : null,
           // Band name
@@ -159,11 +100,26 @@ export default defineEventHandler(async (event) => {
             type: 'div',
             props: {
               style: {
-                fontSize: '32px',
-                color: '#c4b5fd',
-                marginTop: '30px',
+                fontSize: '72px',
+                fontWeight: 700,
+                color: '#ffffff',
+                textAlign: 'center',
+                maxWidth: '1000px',
+                lineHeight: 1.1,
               },
               children: bandName,
+            },
+          },
+          // Tagline
+          {
+            type: 'div',
+            props: {
+              style: {
+                fontSize: '32px',
+                color: '#c4b5fd',
+                marginTop: '20px',
+              },
+              children: 'Scan • Listen • Follow',
             },
           },
           // Watermark
@@ -177,7 +133,7 @@ export default defineEventHandler(async (event) => {
                 fontSize: '20px',
                 color: 'rgba(255, 255, 255, 0.4)',
               },
-              children: 'via MusicBizQR',
+              children: 'MusicBizQR',
             },
           },
         ].filter(Boolean),
@@ -188,13 +144,13 @@ export default defineEventHandler(async (event) => {
       height: HEIGHT,
       fonts: [
         {
-          name: 'sans-serif',
+          name: 'Inter',
           data: await loadDefaultFont(),
           weight: 400,
           style: 'normal',
         },
         {
-          name: 'sans-serif',
+          name: 'Inter',
           data: await loadDefaultFont(),
           weight: 700,
           style: 'normal',
@@ -225,7 +181,7 @@ async function loadDefaultFont(): Promise<ArrayBuffer> {
     const res = await fetch(fontUrl)
     return await res.arrayBuffer()
   } catch (err) {
-    console.error('[og/moment] Failed to load font:', err)
+    console.error('[og/band] Failed to load font:', err)
     return new ArrayBuffer(0)
   }
 }
