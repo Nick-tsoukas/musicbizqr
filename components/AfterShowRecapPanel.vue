@@ -13,10 +13,10 @@
     <div class="flex items-center justify-between mb-4">
       <div>
         <h3 class="text-white text-lg font-semibold flex items-center gap-2">
-          <span class="text-xl">🎤</span>
-          After-Show Recap
+          <span class="text-xl">{{ recapKind === 'mini' ? '📊' : '🎤' }}</span>
+          {{ recapKind === 'mini' ? 'Activity Snapshot' : 'After-Show Recap' }}
         </h3>
-        <p class="text-gray-400 text-xs mt-0.5">Share your show highlights with fans</p>
+        <p class="text-gray-400 text-xs mt-0.5">{{ recapKind === 'mini' ? 'Your last 24 hours at a glance' : 'Share your show highlights with fans' }}</p>
       </div>
       
       <!-- Dev-only: Run Recap Evaluator button -->
@@ -24,7 +24,7 @@
         v-if="isDev"
         @click="runEvaluator"
         :disabled="evaluating"
-        class="px-3 py-1.5 rounded-lg border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/10 transition-colors disabled:opacity-50"
+        class="px-3 py-1.5 rounded-lg border border-purple-500/30 text-purple-400 text-xs hover:bg-purple-500/10 transition-colors disabled:opacity-50"
       >
         {{ evaluating ? 'Evaluating...' : 'Run Recap Evaluator' }}
       </button>
@@ -43,10 +43,10 @@
     </div>
 
     <!-- Active recap card -->
-    <div v-else class="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-amber-900/20 via-black/40 to-orange-900/10 p-4">
+    <div v-else class="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-purple-900/20 via-black/40 to-violet-900/10 p-4">
       <!-- Recap type badge -->
       <div class="flex items-center gap-2 mb-3">
-        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
           {{ energyBadge }}
         </span>
         <span class="text-gray-500 text-xs">
@@ -71,7 +71,7 @@
             :class="[
               'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
               captionStyle === variant.key
-                ? 'bg-amber-600 text-white'
+                ? 'bg-purple-600 text-white'
                 : 'bg-white/5 text-white/60 hover:bg-white/10'
             ]"
           >
@@ -108,7 +108,7 @@
         <button
           @click="handleShare"
           :disabled="sharing"
-          class="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold text-sm hover:from-amber-500 hover:to-orange-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          class="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold text-sm hover:from-purple-500 hover:to-violet-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
         >
           <svg v-if="!sharing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -178,7 +178,7 @@
       </div>
 
       <!-- Decorative elements -->
-      <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
     </div>
 
     <!-- Hidden canvas for image generation -->

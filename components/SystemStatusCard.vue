@@ -57,7 +57,7 @@
       <button
         @click="runEvaluator('recap')"
         :disabled="runningRecap"
-        class="px-2 py-1 rounded text-[10px] bg-amber-600/20 text-amber-400 border border-amber-500/30 hover:bg-amber-600/30 disabled:opacity-50"
+        class="px-2 py-1 rounded text-[10px] bg-violet-600/20 text-violet-400 border border-violet-500/30 hover:bg-violet-600/30 disabled:opacity-50"
       >
         {{ runningRecap ? 'Running...' : 'Run Recap' }}
       </button>
