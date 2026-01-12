@@ -12,7 +12,7 @@
           <!-- HERO: mobile-first, balanced type, HTML-only -->
 
         <!-- Hero -->
-     <div class="relative isolate min-h-[100vh]">
+     <div class="relative isolate min-h-screen">
           <div
             class="mx-auto w-[90vw] px-6 py-10 2xl:flex 2xl:items-center 2xl:gap-x-12 2xl:px-8"
           >
@@ -146,8 +146,8 @@
               </div>
             </div>
 
-            <div class="mt-10 2xl:mt-0 2xl:flex md:justify-center md:items-start lg:flex-shrink-0 lg:flex-grow">
-              <div class="mx-auto w-full max-w-sm 2xl:max-w-md">
+            <div class="mt-10 2xl:mt-0 flex justify-center md:justify-center md:items-start lg:flex-shrink-0 lg:flex-grow">
+              <div class="w-full max-w-xs sm:max-w-sm 2xl:max-w-md">
                 <div class="relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_25px_60px_rgba(0,0,0,0.55)] p-6">
                   <div class="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-violet-500/20 blur-3xl"></div>
                   <div class="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-emerald-500/15 blur-3xl"></div>
@@ -157,11 +157,11 @@
                     <div class="text-white/50 text-xs">demo QR</div>
                   </div>
 
-                  <div class="mt-4 rounded-2xl border border-white/10 bg-black/40 p-4 flex items-center justify-center">
+                  <div class="mt-4 rounded-2xl border border-white/10 bg-black/40 p-3 sm:p-4 flex items-center justify-center">
                     <img
                       src="@/assets/mbqqrcodefinaljan.png"
                       alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
-                      class="h-[220px] w-[220px]"
+                      class="h-[180px] w-[180px] sm:h-[220px] sm:w-[220px]"
                       data-aos="fade-left"
                     />
                   </div>
