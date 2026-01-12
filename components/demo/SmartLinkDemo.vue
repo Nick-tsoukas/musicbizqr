@@ -1,12 +1,13 @@
 <template>
-  <div
-    ref="rootEl"
-    :class="[
-      'w-full text-white',
-      variant === 'phone' ? 'text-sm' : 'text-base md:text-lg',
-      containerClass,
-    ]"
-  >
+ <div
+  ref="rootEl"
+  :class="[
+    'w-full text-white',
+    variant === 'phone' ? 'text-sm' : 'text-base md:text-lg',
+    containerClass,
+  ]"
+  :style="phoneScaleStyle"
+>
     <template v-if="variant === 'inline' || variant === 'phone'">
       <div class="w-full mx-auto">
         <div
@@ -558,6 +559,14 @@ let mobileMql = null
 let onMobileMqlChange = null
 
 const isPhone = computed(() => props.variant === 'phone')
+
+const phoneScaleStyle = computed(() => {
+  if (!isPhone.value) return {}
+  return {
+    transform: 'scale(0.92)',
+    transformOrigin: 'top center',
+  }
+})
 
 const heroHeightClass = computed(() => {
   return isPhone.value ? 'h-[165px]' : 'h-[35vh] md:h-[60vh]'
