@@ -33,17 +33,29 @@ export default defineEventHandler(async (event) => {
     console.error('[og/moment] Failed to fetch moment:', err)
   }
 
+  // Extract rich share content (new format) or fallback to legacy
   const shareTitle = moment?.shareTitle || moment?.attributes?.shareTitle || 'Fan Moment'
+  const shareSubtitle = moment?.shareSubtitle || moment?.attributes?.shareSubtitle || ''
   const shareText = moment?.shareText || moment?.attributes?.shareText || ''
+  const shareEmoji = moment?.shareEmoji || moment?.attributes?.shareEmoji || ''
+  const shareCallToAction = moment?.shareCallToAction || moment?.attributes?.shareCallToAction || 'Check them out'
   const momentType = moment?.momentType || moment?.attributes?.momentType || ''
+  const triggerReason = moment?.triggerReason || moment?.attributes?.triggerReason || ''
+  const fanPosition = moment?.fanPosition || moment?.attributes?.fanPosition || null
   const bandName = band?.name || band?.attributes?.name || 'Artist'
   const bandImageUrl = band?.bandImg?.url || band?.attributes?.bandImg?.data?.attributes?.url || null
+  
+  // Context data for additional info
+  const context = moment?.context || moment?.attributes?.context || {}
+  const velocity = context?.velocity || null
+  const cityName = context?.cityName || null
 
   // Truncate shareText if too long
   const truncatedText = shareText.length > 100 ? shareText.substring(0, 97) + '...' : shareText
 
-  // Get emoji based on moment type
-  const getEmoji = (type: string) => {
+  // Use stored emoji or fallback based on moment type
+  const getEmoji = (type: string, storedEmoji: string) => {
+    if (storedEmoji) return storedEmoji
     switch (type) {
       case 'I_WAS_THERE': return '🎸'
       case 'FUELED_MOMENTUM': return '⚡'
@@ -54,6 +66,8 @@ export default defineEventHandler(async (event) => {
       default: return '✨'
     }
   }
+  
+  const emoji = getEmoji(momentType, shareEmoji)
 
   // Generate SVG using Satori
   const svg = await satori(
@@ -125,7 +139,7 @@ export default defineEventHandler(async (event) => {
                 fontSize: '48px',
                 marginBottom: '16px',
               },
-              children: getEmoji(momentType),
+              children: emoji,
             },
           },
           // Share title
@@ -143,19 +157,48 @@ export default defineEventHandler(async (event) => {
               children: shareTitle,
             },
           },
+          // Share subtitle (if available)
+          shareSubtitle ? {
+            type: 'div',
+            props: {
+              style: {
+                fontSize: '24px',
+                color: '#10b981',
+                textAlign: 'center',
+                marginTop: '8px',
+              },
+              children: shareSubtitle,
+            },
+          } : null,
           // Share text (truncated)
           truncatedText ? {
             type: 'div',
             props: {
               style: {
-                fontSize: '28px',
+                fontSize: '26px',
                 color: '#a1a1aa',
                 textAlign: 'center',
                 maxWidth: '900px',
-                marginTop: '20px',
+                marginTop: '16px',
                 lineHeight: 1.4,
               },
               children: truncatedText,
+            },
+          } : null,
+          // Fan position badge (if available)
+          fanPosition && fanPosition <= 100 ? {
+            type: 'div',
+            props: {
+              style: {
+                fontSize: '20px',
+                color: '#fbbf24',
+                textAlign: 'center',
+                marginTop: '12px',
+                padding: '6px 16px',
+                background: 'rgba(251, 191, 36, 0.15)',
+                borderRadius: '20px',
+              },
+              children: fanPosition <= 10 ? `Fan #${fanPosition}` : `Top ${fanPosition} fans`,
             },
           } : null,
           // Band name
@@ -165,7 +208,7 @@ export default defineEventHandler(async (event) => {
               style: {
                 fontSize: '32px',
                 color: '#c4b5fd',
-                marginTop: '30px',
+                marginTop: '24px',
               },
               children: bandName,
             },

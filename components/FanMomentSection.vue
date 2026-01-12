@@ -35,11 +35,17 @@
           <div class="text-lg font-semibold text-purple-300">
             {{ moment.context.bandName }}
           </div>
+          <div v-if="fanPositionText" class="text-emerald-400/80 text-sm mt-1 font-medium">
+            {{ fanPositionText }}
+          </div>
           <div v-if="locationText" class="text-white/60 text-sm mt-1">
             {{ locationText }}
           </div>
           <div v-if="moment.context.eventName" class="text-white/50 text-xs mt-1">
             {{ moment.context.eventName }}
+          </div>
+          <div v-if="moment.context.velocity" class="text-orange-400/70 text-xs mt-1">
+            {{ moment.context.velocity }}x activity right now
           </div>
         </div>
         
@@ -190,9 +196,13 @@ const hasEarnedThisSession = ref(false)
 const toastMessage = ref('')
 const cachedImageBlob = ref(null)
 
-// Computed
+// Computed - use rich share content from API
 const momentHeadline = computed(() => {
   if (!moment.value) return ''
+  // Use the rich share title from API, fallback to legacy logic
+  if (moment.value.share?.title) {
+    return moment.value.share.title
+  }
   return moment.value.momentType === 'FUELED_MOMENTUM'
     ? 'You fueled the moment'
     : 'You were part of this moment'
@@ -200,14 +210,43 @@ const momentHeadline = computed(() => {
 
 const momentSubtext = computed(() => {
   if (!moment.value) return ''
+  // Use the rich share subtitle from API, fallback to legacy logic
+  if (moment.value.share?.subtitle) {
+    return moment.value.share.subtitle
+  }
+  // Use triggerReason as fallback
+  if (moment.value.triggerReason) {
+    return moment.value.triggerReason
+  }
   return moment.value.momentType === 'FUELED_MOMENTUM'
     ? 'Your action helped tonight\'s momentum.'
     : 'Thanks for showing up.'
 })
 
+const momentEmoji = computed(() => {
+  if (!moment.value) return '✨'
+  return moment.value.share?.emoji || '✨'
+})
+
+const momentCallToAction = computed(() => {
+  if (!moment.value) return 'Check them out'
+  return moment.value.share?.callToAction || 'Check them out'
+})
+
+const fanPositionText = computed(() => {
+  if (!moment.value?.fanPosition) return ''
+  const pos = moment.value.fanPosition
+  if (pos <= 10) return `Fan #${pos} today`
+  if (pos <= 50) return `One of the first ${pos} fans today`
+  if (pos <= 100) return `Top 100 fans today`
+  return ''
+})
+
 const locationText = computed(() => {
   if (!moment.value?.context) return ''
-  const { city, state } = moment.value.context
+  const { city, state, cityName } = moment.value.context
+  // cityName is used for CITY_HEAT moments
+  if (cityName) return cityName
   if (city && state) return `${city}, ${state}`
   if (city) return city
   if (state) return state
