@@ -721,7 +721,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from "vue";
-import { useRuntimeConfig } from "#imports";
+import { useRuntimeConfig, useHead } from "#imports";
 import { useBeacon } from "@/composables/useBeacon";
 import { useSavedBands } from "@/composables/useSavedBands";
 import { useRoute, useRouter } from "vue-router";
@@ -1081,6 +1081,36 @@ const currentBandSlug = computed(() => {
     ""
   );
 });
+
+// Dynamic OG tags for social sharing
+const siteUrl = 'https://musicbizqr.com'
+const ogBandName = computed(() => band.value?.data?.name || currentBandSlug.value)
+const ogDescription = computed(() => band.value?.data?.description || 'Scan • Listen • Follow')
+const ogUpdatedAt = computed(() => band.value?.data?.updatedAt || '')
+const ogCacheVersion = computed(() => ogUpdatedAt.value ? new Date(ogUpdatedAt.value).getTime() : Date.now())
+const ogImageUrl = computed(() => `${siteUrl}/api/og/band/${currentBandSlug.value}.png?v=${ogCacheVersion.value}`)
+const ogCanonicalUrl = computed(() => `${siteUrl}/${currentBandSlug.value}`)
+
+useHead({
+  title: () => ogBandName.value,
+  meta: [
+    { name: 'description', content: () => ogDescription.value },
+    { property: 'og:title', content: () => ogBandName.value },
+    { property: 'og:description', content: () => ogDescription.value },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: () => ogCanonicalUrl.value },
+    { property: 'og:image', content: () => ogImageUrl.value },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: () => ogBandName.value },
+    { name: 'twitter:description', content: () => ogDescription.value },
+    { name: 'twitter:image', content: () => ogImageUrl.value },
+  ],
+  link: [
+    { rel: 'canonical', href: () => ogCanonicalUrl.value },
+  ],
+})
 
 const isCurrentBandSaved = computed(() => {
   const slug = currentBandSlug.value;

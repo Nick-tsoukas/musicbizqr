@@ -380,12 +380,14 @@ async function handleInstagramKit() {
   }
 }
 
-// Facebook helper: open sharer + copy caption
+// Facebook helper: open sharer with OG-enabled share URL + copy caption
 async function handleFacebookShare() {
-  const shareUrl = getShareUrl()
+  // Use share landing page URL for proper OG tags
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
+  const fbShareUrl = `${origin}/share/band/${props.bandSlug}`
   const caption = getCaption()
   
-  openFacebookSharer(shareUrl)
+  openFacebookSharer(fbShareUrl)
   await copyToClipboard(caption)
   
   showToast('Facebook opened + caption copied', 2500)

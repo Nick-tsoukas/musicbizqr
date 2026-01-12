@@ -412,7 +412,14 @@ async function handleInstagramKit() {
 }
 
 async function handleFacebookShare() {
-  openFacebookSharer(getShareUrl())
+  // Use share landing page URL for proper OG tags
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
+  const momentId = moment.value?.id
+  const fbShareUrl = momentId 
+    ? `${origin}/share/moment/${momentId}`
+    : `${origin}/share/band/${props.bandSlug}`
+  
+  openFacebookSharer(fbShareUrl)
   await copyToClipboard(getCaption())
   showToast('Facebook opened + caption copied', 2500)
 }

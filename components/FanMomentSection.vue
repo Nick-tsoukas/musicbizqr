@@ -478,12 +478,17 @@ async function handleInstagramKit() {
   }
 }
 
-// Facebook helper: open sharer + copy caption
+// Facebook helper: open sharer with OG-enabled moment URL + copy caption
 async function handleFacebookShare() {
-  const shareUrl = getShareUrl()
+  // Use share landing page URL for proper OG tags with moment-specific image
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
+  const momentId = moment.value?.id
+  const fbShareUrl = momentId 
+    ? `${origin}/share/moment/${momentId}`
+    : `${origin}/share/band/${props.bandSlug}`
   const caption = getMomentCaption()
   
-  openFacebookSharer(shareUrl)
+  openFacebookSharer(fbShareUrl)
   await copyToClipboard(caption)
   
   showToast('Facebook opened + caption copied', 2500)
