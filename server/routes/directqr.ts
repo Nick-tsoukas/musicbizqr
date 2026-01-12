@@ -171,8 +171,7 @@ export default defineEventHandler(async (event) => {
     }
     // else stays on site root
 
-    // 7) preserve UTMs from the incoming request
-    const incoming = getQuery(event) as Record<string, string | string[]>
+    // 7) preserve UTMs from the incoming request (reuse incoming from above)
     const out = new URL(dest)
     for (const [k, v] of Object.entries(incoming)) {
       if (k.startsWith('utm_') && typeof v === 'string' && !out.searchParams.has(k)) {
