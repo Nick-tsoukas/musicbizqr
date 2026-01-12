@@ -23,6 +23,14 @@
       :range-label="rangeLabel"
     />
 
+    <!-- USA Heat Map -->
+    <UsHeatMapCard
+      v-if="qrId"
+      entity-type="qr"
+      :entity-id="qrId"
+      class="mb-6"
+    />
+
     <!-- Summary Cards -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-3">
@@ -274,7 +282,8 @@ Chart.register(
 
 const route = useRoute()
 const client = useStrapiClient()
-const qrId = route.params.id as string
+const qrIdStr = route.params.id as string
+const qrId = computed(() => Number(qrIdStr))
 
 const selectedRange = ref(30)
 const rangeOptions: Record<number, string> = {
@@ -320,7 +329,7 @@ const topDevice = computed(() => {
 
 async function fetchQrInfo() {
   try {
-    const { data } = await client(`/qrs/${qrId}`, {
+    const { data } = await client(`/qrs/${qrIdStr}`, {
       params: { fields: ['name', 'q_type'] }
     })
     if (data?.attributes) {
@@ -334,7 +343,7 @@ async function fetchQrInfo() {
 async function fetchRollups() {
   try {
     const data = await client('/analytics/qr-rollups', {
-      params: { qrId, range: `${selectedRange.value}d` }
+      params: { qrId: qrIdStr, range: `${selectedRange.value}d` }
     })
     rollups.value = data
   } catch (err) {
@@ -346,7 +355,7 @@ async function fetchRollups() {
 async function fetchGeo() {
   try {
     const data = await client('/analytics/qr-geo', {
-      params: { qrId, range: `${selectedRange.value}d` }
+      params: { qrId: qrIdStr, range: `${selectedRange.value}d` }
     })
     geoList.value = data?.list || []
   } catch (err) {
@@ -359,7 +368,7 @@ async function fetchPulse() {
   pulseLoading.value = true
   try {
     const data = await client('/analytics/pulse', {
-      params: { entityType: 'qr', entityId: qrId, range: `${selectedRange.value}d` }
+      params: { entityType: 'qr', entityId: qrIdStr, range: `${selectedRange.value}d` }
     })
     pulseData.value = data?.pulse || null
   } catch (err) {

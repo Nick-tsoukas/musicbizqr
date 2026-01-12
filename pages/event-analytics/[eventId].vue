@@ -23,6 +23,14 @@
       :range-label="rangeLabel"
     />
 
+    <!-- USA Heat Map -->
+    <UsHeatMapCard
+      v-if="eventId"
+      entity-type="event"
+      :entity-id="eventId"
+      class="mb-6"
+    />
+
     <!-- Summary Cards -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-3">
@@ -290,6 +298,8 @@ const isRefreshing = ref(false);
 const rollups = ref(null);
 const geoList = ref([]);
 const eventInfo = ref({ title: '', id: null });
+
+const eventId = computed(() => Number(route.params.eventId));
 
 // Pulse data
 const pulseData = ref(null);

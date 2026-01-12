@@ -18,6 +18,14 @@
       :range-label="museRangeLabel"
     />
 
+    <!-- USA Heat Map -->
+    <UsHeatMapCard
+      v-if="bandId"
+      entity-type="band"
+      :entity-id="bandId"
+      class="mb-6"
+    />
+
     <!-- Insights (MUSE) -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-2">
