@@ -358,12 +358,18 @@ function getShareUrl() {
 }
 
 function getOgUrl() {
-  // Use attribution URL for Facebook OG
-  if (props.item?.id && props.item?.band?.slug) {
-    return buildShareUrlWithAttribution({
-      bandSlug: props.item.band.slug,
-      shareableId: props.item.id,
+  // Build shareable share URL with OG image params for Facebook
+  if (props.item?.id && props.item?.band?.id) {
+    const params = new URLSearchParams({
+      bandId: String(props.item.band.id),
+      bandSlug: props.item.band.slug || '',
+      type: props.item.type || 'MILESTONE_DROP',
+      hero: encodeURIComponent(props.item.hero || ''),
+      headline: encodeURIComponent(props.item.headline || ''),
+      proof: encodeURIComponent(props.item.proof || ''),
+      accent: props.item.accent || 'violet',
     })
+    return `https://musicbizqr.com/share/shareable/${props.item.id}?${params.toString()}`
   }
   return props.item?.share?.ogUrl || ''
 }
