@@ -274,24 +274,24 @@ function showToast(message, duration = 2000) {
 }
 
 // Image loader helper (for fan share image generator)
-// Fetches image as blob to bypass CORS restrictions
+// Uses backend proxy to bypass CORS restrictions for S3 images
 async function loadImageDirect(url, timeoutMs = 15000) {
   // Skip if no URL
   if (!url) {
     throw new Error('No URL provided')
   }
 
-  console.log('[loadImageDirect] Fetching image as blob:', url)
+  console.log('[loadImageDirect] Loading image via proxy:', url)
 
   try {
-    // Fetch image as blob to bypass CORS
+    // Use backend proxy for S3/CORS-restricted images
+    const proxyUrl = `${config.public.strapiUrl}/api/image-proxy?url=${encodeURIComponent(url)}`
+    
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
     
-    const response = await fetch(url, {
+    const response = await fetch(proxyUrl, {
       signal: controller.signal,
-      mode: 'cors',
-      credentials: 'omit',
     })
     
     clearTimeout(timeoutId)
@@ -308,9 +308,7 @@ async function loadImageDirect(url, timeoutMs = 15000) {
       const img = new Image()
       
       img.onload = () => {
-        console.log('[loadImageDirect] Image loaded from blob:', img.width, 'x', img.height)
-        // Don't revoke URL yet - we need it for canvas drawing
-        // It will be garbage collected when the image is no longer referenced
+        console.log('[loadImageDirect] Image loaded via proxy:', img.width, 'x', img.height)
         resolve(img)
       }
       img.onerror = (err) => {
@@ -322,7 +320,7 @@ async function loadImageDirect(url, timeoutMs = 15000) {
       img.src = objectUrl
     })
   } catch (err) {
-    console.warn('[loadImageDirect] Fetch failed:', err.message)
+    console.warn('[loadImageDirect] Proxy fetch failed:', err.message)
     throw err
   }
 }
