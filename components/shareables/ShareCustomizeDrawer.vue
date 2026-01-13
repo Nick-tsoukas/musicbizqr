@@ -4,7 +4,7 @@
     <Transition name="fade">
       <div
         v-if="modelValue"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
         @click="close"
       ></div>
     </Transition>
@@ -14,7 +14,7 @@
       <div
         v-if="modelValue && item"
         :class="[
-          'fixed z-[101] bg-gradient-to-br from-gray-900 via-black to-gray-900 border-white/10 overflow-y-auto',
+          'fixed z-[9999] bg-gradient-to-br from-gray-900 via-black to-gray-900 border-white/10 overflow-y-auto',
           isMobile
             ? 'inset-x-0 bottom-0 rounded-t-2xl border-t max-h-[85vh]'
             : 'top-0 right-0 bottom-0 w-full max-w-[420px] border-l'
