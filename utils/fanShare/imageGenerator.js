@@ -243,6 +243,7 @@ export async function generateFanShareImage({
 
     console.log('[fanShareImage] bandImageUrl:', bandImageUrl, 'loadImage:', !!loadImage)
 
+    // Try to load and draw the band image
     if (bandImageUrl && loadImage) {
       try {
         console.log('[fanShareImage] Attempting to load image...')
@@ -284,14 +285,17 @@ export async function generateFanShareImage({
           ctx.stroke()
           
           imageDrawn = true
+          console.log('[fanShareImage] Band image drawn successfully')
         }
       } catch (imgErr) {
         console.warn('[fanShareImage] Failed to load band image:', imgErr)
+        imageDrawn = false
       }
     }
     
-    // Always draw placeholder if image wasn't drawn
+    // ALWAYS draw placeholder if image wasn't drawn successfully
     if (!imageDrawn) {
+      console.log('[fanShareImage] Drawing placeholder (imageDrawn=false)')
       drawPlaceholder()
     }
 
