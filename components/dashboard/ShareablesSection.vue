@@ -115,6 +115,95 @@
       :item="activeItem"
     />
 
+    <!-- DEV DEBUG PANEL (visible only in dev mode) -->
+    <div 
+      v-if="isDev"
+      class="mt-4 border border-dashed border-white/20 rounded-lg overflow-hidden"
+    >
+      <!-- Toggle header -->
+      <button
+        @click="showDebugPanel = !showDebugPanel"
+        class="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors text-xs"
+      >
+        <span class="text-white/50 font-mono">🛠️ Debug Panel</span>
+        <span class="text-white/30">{{ showDebugPanel ? '▼' : '▶' }}</span>
+      </button>
+
+      <!-- Panel content -->
+      <div v-if="showDebugPanel" class="p-3 space-y-3 bg-black/40 text-xs font-mono">
+        <!-- Mode indicator -->
+        <div class="flex items-center gap-2">
+          <span class="text-white/40">Mode:</span>
+          <span 
+            class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+            :class="{
+              'bg-emerald-500/20 text-emerald-400': dataMode === 'live',
+              'bg-amber-500/20 text-amber-400': dataMode === 'mock',
+              'bg-rose-500/20 text-rose-400': dataMode === 'edge',
+            }"
+          >
+            {{ dataMode }}
+          </span>
+        </div>
+
+        <!-- Stats -->
+        <div class="text-white/40 space-y-1">
+          <div>generatedAt: <span class="text-white/60">{{ generatedAt || 'N/A' }}</span></div>
+          <div>Total cards: <span class="text-white/60">{{ cards.length }}</span></div>
+          <div>Recommended: <span class="text-white/60">{{ recommended.length }}</span></div>
+        </div>
+
+        <!-- Card list -->
+        <div class="max-h-32 overflow-y-auto bg-black/30 rounded p-2 space-y-1">
+          <div 
+            v-for="card in cards" 
+            :key="card.id"
+            class="flex items-center justify-between text-[10px]"
+          >
+            <span class="text-white/50 truncate max-w-[180px]">{{ card.id }}</span>
+            <span class="text-purple-400">{{ card.score }}</span>
+          </div>
+          <div v-if="cards.length === 0" class="text-white/30 text-center py-2">
+            No cards loaded
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex gap-2 flex-wrap">
+          <button
+            @click="refresh"
+            :disabled="refreshing"
+            class="px-2 py-1 rounded bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-colors disabled:opacity-50"
+          >
+            {{ refreshing ? '...' : '↻ Reload' }}
+          </button>
+          <button
+            @click="debugLoadMock"
+            class="px-2 py-1 rounded bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+          >
+            Load Mock
+          </button>
+          <button
+            @click="debugLoadEdge"
+            class="px-2 py-1 rounded bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 transition-colors"
+          >
+            Load Edge
+          </button>
+          <button
+            @click="debugLoadLive"
+            class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
+          >
+            Load Live
+          </button>
+        </div>
+
+        <!-- Usage hint -->
+        <div class="text-white/30 text-[10px] border-t border-white/10 pt-2">
+          URL params: <code class="text-white/50">?shareables=mock</code> or <code class="text-white/50">?shareables=edge</code>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast -->
     <Teleport to="body">
       <Transition name="toast">
@@ -130,14 +219,41 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRuntimeConfig } from '#imports'
+/**
+ * ============================================================
+ * MBQ Shareables Section — V1
+ * ============================================================
+ * 
+ * QA GATES (all must pass before feature is complete):
+ * 
+ * [ ] QA-1: All 10 card types render without overflow
+ * [ ] QA-2: Headlines wrap to max 2 lines (never clip)
+ * [ ] QA-3: Hero text never clips (shrinks if needed)
+ * [ ] QA-4: Missing microCaption falls back safely (empty string)
+ * [ ] QA-5: Missing band image uses placeholder circle
+ * [ ] QA-6: Unknown accent uses safe default (violet)
+ * [ ] QA-7: Clicking ANY card opens Customize drawer
+ * [ ] QA-8: Clicking Share button opens Customize drawer
+ * [ ] QA-9: Mock and Live modes behave identically
+ * [ ] QA-10: Edge cases render without errors
+ * 
+ * ============================================================
+ */
+
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRuntimeConfig, useRoute } from '#imports'
 import { useShareKit } from '~/composables/useShareKit'
 import { 
-  SHAREABLE_TABS, 
-  normalizeShareCard, 
-  filterCardsByTab 
-} from '~/composables/useShareableTypes'
+  TAB_DEFS, 
+  filterCardsByTab,
+  getTabCounts,
+  getAccentConfig,
+} from '~/utils/shareables/mappings'
+import { 
+  mockShareCards, 
+  mockEdgeCases, 
+  buildMockApiResponse,
+} from '~/utils/shareables/fixtures'
 import ShareableCard from '~/components/dashboard/shareables/ShareableCard.vue'
 import ShareCustomizeDrawer from '~/components/shareables/ShareCustomizeDrawer.vue'
 
@@ -165,17 +281,50 @@ const props = defineProps({
 })
 
 const config = useRuntimeConfig()
+const route = useRoute()
 const { copyToClipboard, webShare } = useShareKit()
 
-// State
+// ============================================================
+// DEV MODE TOGGLE
+// ============================================================
+
+const isDev = process.dev === true
+
+/**
+ * Determine if mock mode is active
+ * Mock mode enabled when:
+ * - process.dev === true AND ?shareables=mock query param
+ * - OR ?shareables=mock query param (for testing in prod preview)
+ */
+const useMockData = computed(() => {
+  const queryParam = route.query?.shareables
+  return queryParam === 'mock' || queryParam === 'edge'
+})
+
+const useEdgeCases = computed(() => {
+  return route.query?.shareables === 'edge'
+})
+
+const dataMode = computed(() => {
+  if (useEdgeCases.value) return 'edge'
+  if (useMockData.value) return 'mock'
+  return 'live'
+})
+
+// ============================================================
+// STATE
+// ============================================================
+
 const loading = ref(true)
 const refreshing = ref(false)
 const activeTab = ref('recommended')
 const cards = ref([])
 const recommended = ref([])
+const generatedAt = ref(null)
 const drawerOpen = ref(false)
 const activeItem = ref(null)
 const toastMessage = ref('')
+const showDebugPanel = ref(false)
 
 // Band context for normalization
 const bandContext = computed(() => ({
@@ -186,18 +335,22 @@ const bandContext = computed(() => ({
   isBandNameInLogo: props.isBandNameInLogo,
 }))
 
+// ============================================================
+// COMPUTED
+// ============================================================
+
 // Tabs with counts
 const tabsWithCounts = computed(() => {
-  return SHAREABLE_TABS.map(tab => ({
+  const counts = getTabCounts(cards.value)
+  return TAB_DEFS.map(tab => ({
     ...tab,
-    count: filterCardsByTab(cards.value, tab.key).length,
+    count: counts[tab.key] || 0,
   }))
 })
 
 // Filtered cards for current tab
 const filteredCards = computed(() => {
   if (activeTab.value === 'recommended') {
-    // Use API recommended if available, otherwise sort all by score
     return recommended.value.length > 0 
       ? recommended.value 
       : [...cards.value].sort((a, b) => (b.score || 0) - (a.score || 0))
@@ -205,21 +358,146 @@ const filteredCards = computed(() => {
   return filterCardsByTab(cards.value, activeTab.value)
 })
 
-// Toast helper
+// Debug info
+const debugInfo = computed(() => ({
+  mode: dataMode.value,
+  generatedAt: generatedAt.value,
+  totalCards: cards.value.length,
+  recommendedCount: recommended.value.length,
+  cards: cards.value.map(c => ({ id: c.id, type: c.type, score: c.score })),
+}))
+
+// ============================================================
+// HELPERS
+// ============================================================
+
 function showToast(message, duration = 2500) {
   toastMessage.value = message
   setTimeout(() => { toastMessage.value = '' }, duration)
 }
 
-// Get band URL
 function getBandUrl() {
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
   return `${origin}/${props.bandSlug}`
 }
 
-// Open customize drawer
+/**
+ * Normalize a card from API/mock to UI format
+ * Handles missing fields gracefully (QA-4, QA-5, QA-6)
+ */
+function normalizeCard(card) {
+  const accent = getAccentConfig(card.accent, card.type)
+  
+  return {
+    ...card,
+    // QA-4: Fallback for missing microCaption
+    microCaption: card.microCaption || { hype: '', grateful: '', tease: '' },
+    // QA-6: Ensure valid accent
+    accent: card.accent && ['violet', 'blue', 'emerald', 'amber', 'rose'].includes(card.accent) 
+      ? card.accent 
+      : 'violet',
+    // Add band context
+    band: {
+      id: props.bandId,
+      slug: props.bandSlug,
+      name: props.bandName,
+      // QA-5: bandImageUrl can be null (card handles placeholder)
+      imageUrl: props.bandImageUrl,
+      isBandNameInLogo: props.isBandNameInLogo,
+    },
+    share: {
+      shareUrl: getBandUrl(),
+      ogUrl: `${getBandUrl()}/share/band/${props.bandSlug}`,
+    },
+    selectedCaptionStyle: 'hype',
+  }
+}
+
+// ============================================================
+// DATA FETCHING
+// ============================================================
+
+/**
+ * Load mock data (fixtures)
+ */
+function loadMockData() {
+  const sourceCards = useEdgeCases.value ? mockEdgeCases : mockShareCards
+  const mockResponse = buildMockApiResponse(sourceCards, props.bandId)
+  
+  cards.value = mockResponse.cards.map(normalizeCard)
+  recommended.value = mockResponse.recommended.map(normalizeCard)
+  generatedAt.value = mockResponse.generatedAt
+  
+  if (isDev) {
+    console.log(`[ShareablesSection] Loaded ${dataMode.value} data:`, {
+      cards: cards.value.length,
+      recommended: recommended.value.length,
+    })
+  }
+}
+
+/**
+ * Fetch live data from API
+ */
+async function fetchLiveData() {
+  const strapiUrl = config.public.strapiUrl
+  
+  try {
+    const response = await fetch(
+      `${strapiUrl}/api/pulse/shareables?bandId=${props.bandId}`
+    )
+    const data = await response.json()
+    
+    if (data.ok) {
+      cards.value = (data.cards || []).map(normalizeCard)
+      recommended.value = (data.recommended || []).map(normalizeCard)
+      generatedAt.value = data.generatedAt || new Date().toISOString()
+      
+      if (isDev) {
+        console.log('[ShareablesSection] Loaded live data:', {
+          cards: cards.value.length,
+          recommended: recommended.value.length,
+        })
+      }
+    } else {
+      console.warn('[ShareablesSection] API returned ok=false:', data)
+      cards.value = []
+      recommended.value = []
+    }
+  } catch (err) {
+    console.error('[ShareablesSection] Failed to fetch cards:', err)
+    cards.value = []
+    recommended.value = []
+  }
+}
+
+/**
+ * Main data loader - switches between mock and live
+ */
+async function fetchData() {
+  if (useMockData.value) {
+    loadMockData()
+  } else {
+    await fetchLiveData()
+  }
+}
+
+async function refresh() {
+  refreshing.value = true
+  await fetchData()
+  refreshing.value = false
+  showToast('Refreshed!')
+}
+
+// ============================================================
+// DRAWER / SHARE ACTIONS
+// ============================================================
+
+/**
+ * Open customize drawer for a card
+ * QA-7, QA-8: Both card click and share button open drawer
+ */
 function openCustomize(card) {
-  // Transform to drawer format
   activeItem.value = {
     id: card.id,
     kind: card.type,
@@ -240,7 +518,6 @@ function openCustomize(card) {
   drawerOpen.value = true
 }
 
-// Quick share actions
 async function handleQuickShare() {
   const result = await webShare({
     title: props.bandName,
@@ -256,47 +533,43 @@ async function handleCopyLink() {
   showToast('Band link copied!')
 }
 
-// Fetch data from new API
-async function fetchData() {
-  const strapiUrl = config.public.strapiUrl
-  
-  try {
-    const response = await fetch(
-      `${strapiUrl}/api/pulse/shareables?bandId=${props.bandId}`
-    )
-    const data = await response.json()
-    
-    if (data.ok) {
-      // Normalize cards
-      const allCards = (data.cards || []).map(card => 
-        normalizeShareCard(card, bandContext.value)
-      )
-      cards.value = allCards
-      
-      // Normalize recommended
-      recommended.value = (data.recommended || []).map(card =>
-        normalizeShareCard(card, bandContext.value)
-      )
-    } else {
-      console.warn('[ShareablesSection] API returned ok=false:', data)
-      cards.value = []
-      recommended.value = []
-    }
-  } catch (err) {
-    console.error('[ShareablesSection] Failed to fetch cards:', err)
-    cards.value = []
-    recommended.value = []
-  }
+// ============================================================
+// DEBUG PANEL ACTIONS (DEV ONLY)
+// ============================================================
+
+function debugLoadMock() {
+  loadMockData()
+  showToast('Loaded mock fixtures')
 }
 
-async function refresh() {
-  refreshing.value = true
-  await fetchData()
-  refreshing.value = false
-  showToast('Refreshed!')
+function debugLoadEdge() {
+  const mockResponse = buildMockApiResponse(mockEdgeCases, props.bandId)
+  cards.value = mockResponse.cards.map(normalizeCard)
+  recommended.value = mockResponse.recommended.map(normalizeCard)
+  generatedAt.value = mockResponse.generatedAt
+  showToast('Loaded edge case fixtures')
 }
+
+async function debugLoadLive() {
+  await fetchLiveData()
+  showToast('Loaded live API data')
+}
+
+// ============================================================
+// LIFECYCLE
+// ============================================================
+
+// Watch for query param changes (allows switching without reload)
+watch(() => route.query?.shareables, async () => {
+  loading.value = true
+  await fetchData()
+  loading.value = false
+}, { immediate: false })
 
 onMounted(async () => {
+  if (isDev) {
+    console.log('[ShareablesSection] Mode:', dataMode.value)
+  }
   loading.value = true
   await fetchData()
   loading.value = false

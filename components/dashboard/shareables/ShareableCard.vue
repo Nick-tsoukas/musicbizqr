@@ -87,8 +87,18 @@
 </template>
 
 <script setup>
+/**
+ * ShareableCard — Unified card component for V1 Shareables
+ * 
+ * QA GATES handled by this component:
+ * - QA-2: Headlines wrap to max 2 lines (line-clamp-2)
+ * - QA-3: Hero text uses flex centering (never clips)
+ * - QA-4: Missing microCaption falls back to empty string
+ * - QA-6: Unknown accent uses safe default (violet)
+ */
+
 import { computed } from 'vue'
-import { ACCENT_COLORS, CARD_TYPE_ACCENTS } from '~/composables/useShareableTypes'
+import { ACCENT_COLORS, TYPE_TO_ACCENT, getAccentConfig } from '~/utils/shareables/mappings'
 
 const props = defineProps({
   item: {
@@ -103,13 +113,9 @@ const props = defineProps({
 
 defineEmits(['click', 'share'])
 
-// Get accent color
-const accentKey = computed(() => {
-  return props.item.accent || CARD_TYPE_ACCENTS[props.item.type] || 'violet'
-})
-
+// QA-6: Get accent color with safe fallback
 const accent = computed(() => {
-  return ACCENT_COLORS[accentKey.value] || ACCENT_COLORS.violet
+  return getAccentConfig(props.item.accent, props.item.type)
 })
 
 const accentColor = computed(() => accent.value.primary)
@@ -139,10 +145,12 @@ const heroStyle = computed(() => ({
   backgroundClip: 'text',
 }))
 
-// Display caption based on selected style
+// QA-4: Display caption with safe fallback for missing microCaption
 const displayCaption = computed(() => {
   const style = props.item.selectedCaptionStyle || 'hype'
-  return props.item.microCaption?.[style] || props.item.microCaption?.hype || ''
+  // Handle null/undefined microCaption gracefully
+  if (!props.item.microCaption) return ''
+  return props.item.microCaption[style] || props.item.microCaption.hype || ''
 })
 </script>
 
