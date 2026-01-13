@@ -1,0 +1,467 @@
+<template>
+  <!-- Backdrop -->
+  <Teleport to="body">
+    <Transition name="fade">
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+        @click="close"
+      ></div>
+    </Transition>
+
+    <!-- Panel - Bottom sheet on mobile, right drawer on desktop -->
+    <Transition :name="isMobile ? 'slide-up' : 'slide-right'">
+      <div
+        v-if="modelValue && item"
+        :class="[
+          'fixed z-[101] bg-gradient-to-br from-gray-900 via-black to-gray-900 border-white/10 overflow-y-auto',
+          isMobile
+            ? 'inset-x-0 bottom-0 rounded-t-2xl border-t max-h-[85vh]'
+            : 'top-0 right-0 bottom-0 w-full max-w-[420px] border-l'
+        ]"
+        @keydown.esc="close"
+      >
+        <!-- Handle bar (mobile only) -->
+        <div v-if="isMobile" class="flex justify-center pt-3 pb-2 sticky top-0 bg-gradient-to-b from-gray-900 to-transparent z-10">
+          <div class="w-10 h-1 rounded-full bg-white/20"></div>
+        </div>
+
+        <!-- Header -->
+        <div class="flex items-start justify-between p-5 border-b border-white/10">
+          <div class="flex-1 pr-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span 
+                class="px-2 py-0.5 rounded-full text-xs font-medium"
+                :class="badgeClass"
+              >
+                {{ item.windowLabel }}
+              </span>
+              <span class="text-white/40 text-xs">{{ item.kind }}</span>
+            </div>
+            <h3 class="text-xl font-bold text-white">{{ item.title }}</h3>
+          </div>
+          <button
+            @click="close"
+            class="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-5 space-y-5">
+          <!-- Stats -->
+          <div class="space-y-2">
+            <div v-if="item.primaryStat" class="flex items-center gap-2 text-sm">
+              <span class="text-purple-400 font-semibold">{{ item.primaryStat }}</span>
+            </div>
+            <div v-if="item.secondaryStat" class="flex items-center gap-2 text-sm text-white/50">
+              <span>{{ item.secondaryStat }}</span>
+            </div>
+            <div v-if="item.context?.venueName" class="flex items-center gap-2 text-xs text-white/40">
+              <span>📍</span>
+              <span>{{ item.context.venueName }}</span>
+            </div>
+          </div>
+
+          <!-- Caption Style Toggle -->
+          <div>
+            <div class="text-white/40 text-xs uppercase tracking-wider mb-3">Caption Style</div>
+            <div class="flex gap-2 flex-wrap">
+              <button
+                v-for="variant in captionVariants"
+                :key="variant.key"
+                @click="captionStyle = variant.key"
+                :class="[
+                  'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                  captionStyle === variant.key
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                    : 'bg-white/5 text-white/60 hover:bg-white/10'
+                ]"
+              >
+                {{ variant.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Caption Preview -->
+          <div class="p-4 bg-black/40 rounded-xl border border-white/5">
+            <p class="text-white/80 text-sm leading-relaxed">"{{ selectedCaption }}"</p>
+          </div>
+
+          <!-- Primary Share Button -->
+          <button
+            @click="handleShare"
+            :disabled="sharing"
+            class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-base hover:from-purple-500 hover:to-blue-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
+          >
+            <svg v-if="!sharing" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            <div v-else class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            {{ sharing ? 'Sharing...' : 'Share Now' }}
+          </button>
+
+          <!-- Share Kit Actions - 2x2 grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              @click="handleCopyLink"
+              class="py-3 px-4 rounded-xl border border-white/15 text-white/70 text-sm font-medium hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              Copy Link
+            </button>
+
+            <button
+              @click="handleCopyCaption"
+              class="py-3 px-4 rounded-xl border border-white/15 text-white/70 text-sm font-medium hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy Caption
+            </button>
+
+            <button
+              @click="handleDownloadImage"
+              :disabled="downloadingImage"
+              class="py-3 px-4 rounded-xl border border-white/15 text-white/70 text-sm font-medium hover:bg-white/5 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <svg v-if="!downloadingImage" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <div v-else class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              Download Image
+            </button>
+
+            <button
+              @click="handleInstagramKit"
+              :disabled="preparingIG"
+              class="py-3 px-4 rounded-xl border border-pink-500/30 text-pink-400/80 text-sm font-medium hover:bg-pink-500/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <svg v-if="!preparingIG" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              <div v-else class="w-4 h-4 border-2 border-pink-400/30 border-t-pink-400 rounded-full animate-spin"></div>
+              Instagram Kit
+            </button>
+          </div>
+
+          <!-- Facebook Share -->
+          <button
+            @click="handleFacebookShare"
+            class="w-full py-3 px-4 rounded-xl border border-blue-500/30 text-blue-400/80 text-sm font-medium hover:bg-blue-500/10 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Share on Facebook
+          </button>
+        </div>
+
+        <!-- Hidden canvas for image generation -->
+        <canvas ref="canvasRef" class="hidden" width="1080" height="1080"></canvas>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- Toast notification -->
+  <Teleport to="body">
+    <Transition name="toast">
+      <div
+        v-if="toastMessage"
+        class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[102] px-4 py-2.5 rounded-xl bg-black/90 border border-white/20 text-white text-sm shadow-xl backdrop-blur-sm"
+      >
+        {{ toastMessage }}
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
+<script setup>
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useShareKit } from '~/composables/useShareKit'
+
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  item: {
+    type: Object,
+    default: null,
+  },
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const {
+  generateShareImage,
+  webShare,
+  copyToClipboard,
+  downloadBlob,
+  openFacebookSharer,
+} = useShareKit()
+
+// State
+const isMobile = ref(false)
+const captionStyle = ref('hype')
+const sharing = ref(false)
+const downloadingImage = ref(false)
+const preparingIG = ref(false)
+const toastMessage = ref('')
+const canvasRef = ref(null)
+const cachedImageBlob = ref(null)
+
+// Caption variants
+const captionVariants = [
+  { key: 'hype', label: '🔥 Hype' },
+  { key: 'grateful', label: '🙏 Grateful' },
+  { key: 'tease', label: '👀 Tease' },
+]
+
+// Computed
+const badgeClass = computed(() => {
+  if (!props.item) return ''
+  switch (props.item.source) {
+    case 'recap':
+      return 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+    case 'spike':
+      return 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+    case 'prompt':
+      return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+    default:
+      return 'bg-white/10 text-white/60 border border-white/20'
+  }
+})
+
+const selectedCaption = computed(() => {
+  if (!props.item?.share?.captions) return ''
+  return props.item.share.captions[captionStyle.value] || props.item.share.captions.hype || ''
+})
+
+// Methods
+function close() {
+  emit('update:modelValue', false)
+}
+
+function showToast(message, duration = 2500) {
+  toastMessage.value = message
+  setTimeout(() => { toastMessage.value = '' }, duration)
+}
+
+function getShareUrl() {
+  return props.item?.share?.shareUrl || ''
+}
+
+function getOgUrl() {
+  return props.item?.share?.ogUrl || ''
+}
+
+function getFilename() {
+  const slug = props.item?.band?.slug || 'share'
+  return `${slug}-${props.item?.source || 'moment'}.png`
+}
+
+async function getOrGenerateImage() {
+  if (cachedImageBlob.value) return cachedImageBlob.value
+
+  const band = props.item?.band
+  if (!band) return null
+
+  const blob = await generateShareImage({
+    canvasEl: canvasRef.value,
+    bandName: band.name,
+    bandImageUrl: band.imageUrl,
+    momentTitle: props.item?.title,
+    subtitle: props.item?.secondaryStat || null,
+    isBandNameInLogo: band.isBandNameInLogo,
+  })
+
+  if (blob) {
+    cachedImageBlob.value = blob
+    setTimeout(() => { cachedImageBlob.value = null }, 30000)
+  }
+
+  return blob
+}
+
+// Track drawer open
+function trackDrawerOpen() {
+  if (!props.item) return
+  console.log('[ShareCustomizeDrawer] SHARE_DRAWER_OPENED', {
+    bandId: props.item.band?.id,
+    itemId: props.item.id,
+    source: props.item.source,
+    kind: props.item.kind,
+  })
+}
+
+// Share handlers
+async function handleShare() {
+  if (!props.item) return
+  sharing.value = true
+
+  try {
+    const shareUrl = getShareUrl()
+    const shareText = `${selectedCaption.value} ${shareUrl}`
+    const imageBlob = await getOrGenerateImage()
+
+    const result = await webShare({
+      title: props.item.title,
+      text: shareText,
+      url: shareUrl,
+      imageBlob,
+      filename: getFilename(),
+    })
+
+    if (result.ok) {
+      showToast('Shared!')
+      return
+    }
+
+    // Fallback
+    await copyToClipboard(shareUrl)
+    showToast('Link copied!')
+    if (imageBlob) {
+      downloadBlob(imageBlob, getFilename())
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error('[ShareCustomizeDrawer] Share failed:', err)
+    }
+  } finally {
+    sharing.value = false
+  }
+}
+
+async function handleCopyLink() {
+  const success = await copyToClipboard(getShareUrl())
+  if (success) showToast('Link copied!')
+}
+
+async function handleCopyCaption() {
+  const success = await copyToClipboard(selectedCaption.value)
+  if (success) showToast('Caption copied!')
+}
+
+async function handleDownloadImage() {
+  downloadingImage.value = true
+  try {
+    const imageBlob = await getOrGenerateImage()
+    if (imageBlob) {
+      downloadBlob(imageBlob, getFilename())
+      showToast('Image downloaded!')
+    }
+  } finally {
+    downloadingImage.value = false
+  }
+}
+
+async function handleInstagramKit() {
+  preparingIG.value = true
+  try {
+    const imageBlob = await getOrGenerateImage()
+    if (imageBlob) {
+      downloadBlob(imageBlob, getFilename())
+    }
+    await copyToClipboard(selectedCaption.value)
+    showToast('Ready for Instagram: image downloaded + caption copied', 3000)
+  } finally {
+    preparingIG.value = false
+  }
+}
+
+async function handleFacebookShare() {
+  openFacebookSharer(getOgUrl())
+  await copyToClipboard(selectedCaption.value)
+  showToast('Facebook opened + caption copied', 2500)
+}
+
+// Check mobile
+function checkMobile() {
+  isMobile.value = window.innerWidth < 768
+}
+
+// Handle escape key
+function handleEscape(e) {
+  if (e.key === 'Escape' && props.modelValue) {
+    close()
+  }
+}
+
+// Clear cache when item changes
+watch(() => props.item, () => {
+  cachedImageBlob.value = null
+  captionStyle.value = props.item?.share?.defaultCaptionStyle || 'hype'
+})
+
+// Track when drawer opens
+watch(() => props.modelValue, (isOpen) => {
+  if (isOpen) {
+    document.body.style.overflow = 'hidden'
+    trackDrawerOpen()
+  } else {
+    document.body.style.overflow = ''
+  }
+})
+
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+  window.addEventListener('keydown', handleEscape)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
+  window.removeEventListener('keydown', handleEscape)
+  document.body.style.overflow = ''
+})
+</script>
+
+<style scoped>
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Slide up transition (mobile bottom sheet) */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(100%);
+}
+
+/* Slide right transition (desktop drawer) */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+  transform: translateX(100%);
+}
+
+/* Toast transition */
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 10px);
+}
+</style>

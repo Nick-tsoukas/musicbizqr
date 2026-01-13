@@ -69,8 +69,8 @@
             :band-id="bandItems[0]?.id"
           />
           
-          <!-- Shareables Hub (unified: recaps, spikes, prompts) -->
-          <ShareablesHub
+          <!-- Shareables Feed (unified horizontal carousel) -->
+          <ShareablesFeed
             v-if="bandItems[0]?.id"
             :band-id="bandItems[0].id"
             :band-slug="bandItems[0].slug || ''"
@@ -567,7 +567,7 @@ import {
 } from "vue";
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
-import ShareablesHub from '~/components/dashboard/ShareablesHub.vue';
+import ShareablesFeed from '~/components/shareables/ShareablesFeed.vue';
 
 // rebuild
 
