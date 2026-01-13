@@ -183,6 +183,51 @@ export async function generateFanShareImage({
     const imageSize = 340
     const imageY = 200
 
+    // Helper to draw placeholder with initials
+    function drawPlaceholder() {
+      console.log('[fanShareImage] Drawing placeholder, bandName:', bandName)
+      
+      // Draw circle background
+      ctx.beginPath()
+      ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+      ctx.closePath()
+      const placeholderGradient = ctx.createLinearGradient(
+        width / 2 - imageSize / 2, imageY,
+        width / 2 + imageSize / 2, imageY + imageSize
+      )
+      placeholderGradient.addColorStop(0, accent.primary + '60')
+      placeholderGradient.addColorStop(1, accent.primary + '30')
+      ctx.fillStyle = placeholderGradient
+      ctx.fill()
+      
+      // Draw border
+      ctx.beginPath()
+      ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+      ctx.strokeStyle = accent.primary + '50'
+      ctx.lineWidth = 3
+      ctx.stroke()
+
+      // Draw initials
+      if (bandName && bandName.trim()) {
+        const initials = bandName
+          .trim()
+          .split(' ')
+          .filter(w => w.length > 0)
+          .map(w => w[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase()
+        
+        if (initials) {
+          ctx.font = 'bold 100px system-ui, -apple-system, sans-serif'
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
+          ctx.fillText(initials, width / 2, imageY + imageSize / 2 + 35)
+        }
+      }
+    }
+
+    let imageDrawn = false
+
     if (bandImageUrl && loadImage) {
       try {
         const img = await loadImage(bandImageUrl)
@@ -220,35 +265,17 @@ export async function generateFanShareImage({
           ctx.strokeStyle = accent.primary + '40'
           ctx.lineWidth = 3
           ctx.stroke()
+          
+          imageDrawn = true
         }
       } catch (imgErr) {
         console.warn('[fanShareImage] Failed to load band image:', imgErr)
       }
-    } else {
-      // Placeholder circle with initials
-      ctx.beginPath()
-      ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
-      const placeholderGradient = ctx.createLinearGradient(
-        width / 2 - imageSize / 2, imageY,
-        width / 2 + imageSize / 2, imageY + imageSize
-      )
-      placeholderGradient.addColorStop(0, accent.primary + '40')
-      placeholderGradient.addColorStop(1, accent.primary + '20')
-      ctx.fillStyle = placeholderGradient
-      ctx.fill()
-
-      // Draw initials
-      if (bandName) {
-        const initials = bandName
-          .split(' ')
-          .map(w => w[0])
-          .join('')
-          .slice(0, 2)
-          .toUpperCase()
-        ctx.font = 'bold 100px system-ui, -apple-system, sans-serif'
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
-        ctx.fillText(initials, width / 2, imageY + imageSize / 2 + 35)
-      }
+    }
+    
+    // Always draw placeholder if image wasn't drawn
+    if (!imageDrawn) {
+      drawPlaceholder()
     }
 
     // === DECORATIVE LINE ===
