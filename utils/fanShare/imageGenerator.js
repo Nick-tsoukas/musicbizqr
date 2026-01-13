@@ -360,10 +360,17 @@ export async function generateFanShareImage({
     ctx.fillText('via MusicBizQR', width / 2, height - 55)
 
     // Convert to blob
+    console.log('[fanShareImage] Converting canvas to blob...')
     return new Promise((resolve) => {
-      canvasEl.toBlob((blob) => {
-        resolve(blob)
-      }, 'image/png')
+      try {
+        canvasEl.toBlob((blob) => {
+          console.log('[fanShareImage] Blob created:', blob ? `${blob.size} bytes` : 'null')
+          resolve(blob)
+        }, 'image/png')
+      } catch (toBlobErr) {
+        console.error('[fanShareImage] toBlob failed (likely CORS tainted canvas):', toBlobErr)
+        resolve(null)
+      }
     })
   } catch (err) {
     console.error('[fanShareImage] Failed to generate image:', err)
