@@ -105,17 +105,20 @@ export default defineEventHandler(async (event) => {
       }
 
       // Use the new /track endpoint which extracts CF headers server-side
+      // Build headers object, only including non-empty Cloudflare headers
+      const forwardHeaders: Record<string, string> = {}
+      const cfHeaderKeys = ['cf-ipcountry', 'cf-ipcity', 'cf-region', 'cf-iplatitude', 'cf-iplongitude']
+      for (const key of cfHeaderKeys) {
+        const val = reqHeaders[key]
+        if (val && typeof val === 'string') {
+          forwardHeaders[key] = val
+        }
+      }
+      
       const scanRes: any = await $fetch(`${strapiBase}/api/scans/track`, {
         method: 'POST',
         body: scanBody,
-        headers: {
-          // Forward Cloudflare headers if present
-          'cf-ipcountry': reqHeaders['cf-ipcountry'] || '',
-          'cf-ipcity': reqHeaders['cf-ipcity'] || '',
-          'cf-region': reqHeaders['cf-region'] || '',
-          'cf-iplatitude': reqHeaders['cf-iplatitude'] || '',
-          'cf-iplongitude': reqHeaders['cf-iplongitude'] || '',
-        },
+        headers: forwardHeaders,
       })
       createdScanId = scanRes?.data?.id ?? null
     } catch {
