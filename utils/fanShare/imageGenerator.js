@@ -136,7 +136,20 @@ export async function generateFanShareImage({
   momentType = 'DEFAULT',
   loadImage,
 }) {
-  if (!canvasEl) return null
+  console.log('[fanShareImage] generateFanShareImage called with:', {
+    hasCanvas: !!canvasEl,
+    headline,
+    bandName,
+    bandImageUrl,
+    isBandNameInLogo,
+    momentType,
+    hasLoadImage: !!loadImage,
+  })
+
+  if (!canvasEl) {
+    console.error('[fanShareImage] No canvas element provided')
+    return null
+  }
 
   try {
     const ctx = canvasEl.getContext('2d')
