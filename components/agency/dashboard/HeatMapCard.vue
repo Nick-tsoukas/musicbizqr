@@ -12,8 +12,9 @@
       <div 
         v-for="(city, idx) in topCities" 
         :key="city.name"
-        class="flex items-center gap-3 p-2 rounded-lg"
+        class="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-800/50 transition-colors"
         :class="idx === 0 ? 'bg-violet-600/10' : 'bg-gray-800/30'"
+        @click="$emit('openCity', city)"
       >
         <div 
           class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
@@ -67,6 +68,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+import { safeInt, isValidNumber } from '~/utils/agencyPortal/validateMockData'
+
+defineEmits(['openCity'])
 
 const store = useAgencyPortalStore()
 

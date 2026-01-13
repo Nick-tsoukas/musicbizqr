@@ -18,22 +18,25 @@
         </button>
       </div>
 
+      <!-- Daily Brief Strip -->
+      <AgencyDailyBriefStrip />
+
       <!-- Dashboard Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <!-- Roster Momentum Trend -->
-        <AgencyDashboardRosterMomentumTrendCard />
+        <AgencyDashboardRosterMomentumTrendCard @click="navigateToMomentumSignals" />
 
         <!-- Platform Pull Mix -->
-        <AgencyDashboardPlatformPullMixCard />
+        <AgencyDashboardPlatformPullMixCard @filter-platform="navigateToPlatformSignals" />
 
         <!-- Heat Map -->
-        <AgencyDashboardHeatMapCard />
+        <AgencyDashboardHeatMapCard @open-city="navigateToCity" />
 
         <!-- City Stacks -->
         <AgencyDashboardCityStackCard @open-city="openCityDetail" />
 
         <!-- After-Show Lift -->
-        <AgencyDashboardAfterShowLiftCard />
+        <AgencyDashboardAfterShowLiftCard @click="navigateToAfterShowSignals" />
 
         <!-- Top Movers -->
         <AgencyDashboardTopMoversCard 
@@ -60,8 +63,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAgencyPortalStore } from '~/stores/agencyPortal'
+import { validateMockData } from '~/utils/agencyPortal/validateMockData'
 
 definePageMeta({
   layout: 'agency'
@@ -75,18 +80,47 @@ useHead({
 })
 
 const router = useRouter()
+const store = useAgencyPortalStore()
 
 const cityDetailOpen = ref(false)
 const selectedCity = ref(null)
 const briefsDrawerOpen = ref(false)
+
+// Dev-only: Validate mock data on mount
+onMounted(() => {
+  if (process.env.NODE_ENV !== 'production') {
+    validateMockData(store)
+  }
+})
 
 function openCityDetail(city) {
   selectedCity.value = city
   cityDetailOpen.value = true
 }
 
+function navigateToCity(city) {
+  if (city?.name) {
+    router.push(`/agency/cities?city=${encodeURIComponent(city.name)}`)
+  } else {
+    router.push('/agency/cities')
+  }
+}
+
 function openArtist(bandId) {
   cityDetailOpen.value = false
   router.push(`/agency/artists/${bandId}`)
+}
+
+// V1.3: OS Actions - click-through navigation
+function navigateToMomentumSignals() {
+  router.push('/agency/signals?sort=priority&chip=needsAction')
+}
+
+function navigateToPlatformSignals(platform) {
+  router.push(`/agency/signals?type=PLATFORM_PULL&platform=${encodeURIComponent(platform)}`)
+}
+
+function navigateToAfterShowSignals() {
+  router.push('/agency/signals?type=AFTER_SHOW_ENERGY')
 }
 </script>

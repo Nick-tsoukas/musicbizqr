@@ -63,24 +63,36 @@
       </div>
     </div>
 
-    <!-- Legend -->
+    <!-- Legend (clickable) -->
     <div class="grid grid-cols-2 gap-2">
-      <div class="flex items-center gap-2">
+      <div 
+        class="flex items-center gap-2 cursor-pointer hover:bg-gray-800/50 rounded p-1 -m-1 transition-colors"
+        @click="$emit('filterPlatform', 'Spotify')"
+      >
         <div class="w-3 h-3 rounded bg-emerald-500" />
         <span class="text-xs text-gray-400">Spotify</span>
         <span class="text-xs text-white font-medium ml-auto">{{ formatNumber(mix.totals.spotify) }}</span>
       </div>
-      <div class="flex items-center gap-2">
+      <div 
+        class="flex items-center gap-2 cursor-pointer hover:bg-gray-800/50 rounded p-1 -m-1 transition-colors"
+        @click="$emit('filterPlatform', 'YouTube')"
+      >
         <div class="w-3 h-3 rounded bg-red-500" />
         <span class="text-xs text-gray-400">YouTube</span>
         <span class="text-xs text-white font-medium ml-auto">{{ formatNumber(mix.totals.youtube) }}</span>
       </div>
-      <div class="flex items-center gap-2">
+      <div 
+        class="flex items-center gap-2 cursor-pointer hover:bg-gray-800/50 rounded p-1 -m-1 transition-colors"
+        @click="$emit('filterPlatform', 'Tickets')"
+      >
         <div class="w-3 h-3 rounded bg-amber-500" />
         <span class="text-xs text-gray-400">Tickets</span>
         <span class="text-xs text-white font-medium ml-auto">{{ formatNumber(mix.totals.tickets) }}</span>
       </div>
-      <div class="flex items-center gap-2">
+      <div 
+        class="flex items-center gap-2 cursor-pointer hover:bg-gray-800/50 rounded p-1 -m-1 transition-colors"
+        @click="$emit('filterPlatform', 'Instagram')"
+      >
         <div class="w-3 h-3 rounded bg-pink-500" />
         <span class="text-xs text-gray-400">Instagram</span>
         <span class="text-xs text-white font-medium ml-auto">{{ formatNumber(mix.totals.instagram) }}</span>
@@ -98,6 +110,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+
+defineEmits(['filterPlatform'])
 
 const store = useAgencyPortalStore()
 const days = ref(7)

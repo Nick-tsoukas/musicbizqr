@@ -85,8 +85,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 
 definePageMeta({
@@ -101,6 +101,7 @@ useHead({
 })
 
 const router = useRouter()
+const route = useRoute()
 const store = useAgencyPortalStore()
 
 const searchQuery = ref('')
@@ -116,6 +117,27 @@ const filteredCities = computed(() => {
   const q = searchQuery.value.toLowerCase()
   return cities.value.filter(city => city.name.toLowerCase().includes(q))
 })
+
+// V1.2: Handle query param for auto-opening city drawer
+onMounted(() => {
+  checkQueryParam()
+})
+
+watch(() => route.query.city, () => {
+  checkQueryParam()
+})
+
+function checkQueryParam() {
+  const cityName = route.query.city
+  if (cityName) {
+    const city = cities.value.find(c => c.name === cityName)
+    if (city) {
+      openCityDetail(city)
+    }
+    // Clear the query param after opening
+    router.replace({ query: {} })
+  }
+}
 
 function openCityDetail(city) {
   selectedCity.value = city

@@ -155,14 +155,21 @@ const briefsDrawerOpen = ref(false)
 const selectedBandId = ref(null)
 const selectedSignal = ref(null)
 
-// V1.2: Daily Brief Strip data
+// V1.2: Daily Brief Strip data with safe number formatting
 const topMover = computed(() => store.topMovers[0] || null)
 const hottestCity = computed(() => store.cityHeatScores[0] || null)
-const overdueCount = computed(() => store.overdueTasks.length)
-const needsActionCount = computed(() => store.triageBuckets.needsAction.length)
+const overdueCount = computed(() => {
+  const count = store.overdueTasks?.length
+  return Number.isFinite(count) ? count : 0
+})
+const needsActionCount = computed(() => {
+  const count = store.triageBuckets?.needsAction?.length
+  return Number.isFinite(count) ? count : 0
+})
 
 function formatVelocity(v) {
-  return v >= 0 ? `+${v}` : `${v}`
+  if (v === null || v === undefined || !Number.isFinite(v)) return '—'
+  return v >= 0 ? `+${Math.round(v)}` : `${Math.round(v)}`
 }
 
 const filteredBuckets = computed(() => {

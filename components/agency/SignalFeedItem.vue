@@ -1,7 +1,7 @@
 <template>
   <div 
     class="bg-gray-900/60 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all"
-    :class="{ 'opacity-50': isHandled }"
+    :class="{ 'opacity-70': isHandled }"
   >
     <div class="flex items-start gap-3">
       <!-- Band Avatar -->
@@ -19,7 +19,18 @@
           <span class="text-xs px-2 py-0.5 rounded-full" :class="typeClass">
             {{ formatType(signal.type) }}
           </span>
-          <span v-if="isHandled" class="text-xs text-emerald-400">✓ Handled</span>
+          <span 
+            v-if="isHandled" 
+            class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+          >
+            ✓ Handled
+          </span>
+          <span 
+            v-if="!owner" 
+            class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30"
+          >
+            Unassigned
+          </span>
         </div>
 
         <div class="mt-2">
@@ -31,6 +42,11 @@
             <span class="text-gray-500 text-xs">{{ signal.windowLabel }}</span>
           </div>
           <p class="text-gray-400 text-xs mt-1">{{ signal.proof }}</p>
+          
+          <!-- V1.2: Why Now micro-line -->
+          <p class="text-gray-500 text-xs mt-2 italic">
+            💡 {{ whyNow }}
+          </p>
         </div>
 
         <!-- Meta -->
@@ -43,6 +59,12 @@
           </span>
           <span>{{ timeAgo }}</span>
           <span>Score: {{ signal.score }}</span>
+          <span v-if="owner" class="flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            {{ owner.name.split(' ')[0] }}
+          </span>
         </div>
       </div>
 
@@ -51,17 +73,35 @@
         <button 
           @click="$emit('open', signal.bandId)"
           class="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
-          title="Open Artist"
+          title="Open Artist Command"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
         </button>
         <button 
+          @click="$emit('assign', signal.bandId)"
+          class="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+          title="Assign Owner"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+        </button>
+        <button 
+          @click="$emit('proof', signal)"
+          class="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+          title="Share Proof"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+        </button>
+        <button 
           v-if="!isHandled"
           @click="$emit('handle', signal.id)"
           class="p-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-lg transition-colors"
-          title="Mark Handled"
+          title="Mark as Handled"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -70,7 +110,7 @@
         <button 
           @click="$emit('task', signal)"
           class="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
-          title="Create Task"
+          title="Create Task from Signal"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -85,6 +125,22 @@
 import { computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 
+// V1.2: Why Now mapping by signal type
+const WHY_NOW_MAP = {
+  CITY_CLAIM: 'City pull is rising — run a city-specific push while attention is hot.',
+  CITY_STACK: 'Multiple artists heating here — coordinate a territory move.',
+  NEW_CITY_UNLOCKED: 'New market detected — test a lightweight activation.',
+  MOMENTUM_SURGE: 'Velocity jumped above baseline — amplify before it cools.',
+  AFTER_SHOW_ENERGY: 'Post-show attention spike — convert within 24–48h.',
+  SHARE_CHAIN: 'Sharing is active — strengthen the chain and pin the best link.',
+  ENGAGED_SESSIONS: 'Fans are staying longer — route them to a single conversion.',
+  RETURNING_FANS: 'Repeat intent is up — ask for follows/saves and capture contacts.',
+  PLATFORM_PULL: 'Fans are choosing a platform lane — reinforce it immediately.',
+  PEAK_HOUR: 'Peak hour identified — schedule the push inside this window.',
+  SOURCE_SURGE: 'Traffic source surged — double down on what\'s working.',
+  MILESTONE_DROP: 'Milestone proof unlocked — package and share with stakeholders.'
+}
+
 const props = defineProps({
   signal: {
     type: Object,
@@ -92,12 +148,18 @@ const props = defineProps({
   }
 })
 
-defineEmits(['open', 'handle', 'task'])
+defineEmits(['open', 'handle', 'task', 'assign', 'proof'])
 
 const store = useAgencyPortalStore()
 
 const band = computed(() => store.getBandById(props.signal.bandId))
 const isHandled = computed(() => store.isSignalHandled(props.signal.id))
+const owner = computed(() => store.getOwnerForBand(props.signal.bandId))
+
+// V1.2: Why Now micro-line
+const whyNow = computed(() => {
+  return WHY_NOW_MAP[props.signal.type] || 'Signal detected — review and take action.'
+})
 
 const accentClass = computed(() => {
   const classes = {

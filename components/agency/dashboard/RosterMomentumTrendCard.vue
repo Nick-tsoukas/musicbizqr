@@ -1,5 +1,8 @@
 <template>
-  <div class="bg-gray-900/60 border border-gray-800 rounded-2xl p-5">
+  <div 
+    class="bg-gray-900/60 border border-gray-800 rounded-2xl p-5 cursor-pointer hover:border-gray-700 transition-colors"
+    @click="$emit('click')"
+  >
     <div class="flex items-center justify-between mb-4">
       <div>
         <h3 class="text-white font-semibold">Roster Momentum</h3>
@@ -80,22 +83,31 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+import { safeInt, isValidNumber } from '~/utils/agencyPortal/validateMockData'
+
+defineEmits(['click'])
 
 const store = useAgencyPortalStore()
 const days = ref(7)
 
-const trendData = computed(() => store.rosterMomentumTrend(days.value))
+const trendData = computed(() => {
+  const data = store.rosterMomentumTrend(days.value)
+  // Filter out invalid data points
+  return (data || []).filter(d => isValidNumber(d?.avgIndex))
+})
 
 const currentAvg = computed(() => {
-  if (!trendData.value.length) return 0
-  return trendData.value[trendData.value.length - 1].avgIndex
+  if (!trendData.value.length) return '—'
+  const val = trendData.value[trendData.value.length - 1]?.avgIndex
+  return isValidNumber(val) ? safeInt(val) : '—'
 })
 
 const trendDirection = computed(() => {
   if (trendData.value.length < 2) return 0
-  const first = trendData.value[0].avgIndex
-  const last = trendData.value[trendData.value.length - 1].avgIndex
-  return last - first
+  const first = trendData.value[0]?.avgIndex
+  const last = trendData.value[trendData.value.length - 1]?.avgIndex
+  if (!isValidNumber(first) || !isValidNumber(last)) return 0
+  return Math.round(last - first)
 })
 
 const linePoints = computed(() => {
