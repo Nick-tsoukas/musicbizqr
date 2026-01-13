@@ -69,8 +69,8 @@
             :band-id="bandItems[0]?.id"
           />
           
-          <!-- Pulse Moments Panel (Auto-generated shareable moments) -->
-          <PulseMomentsPanel
+          <!-- Shareables Hub (unified: recaps, spikes, prompts) -->
+          <ShareablesHub
             v-if="bandItems[0]?.id"
             :band-id="bandItems[0].id"
             :band-slug="bandItems[0].slug || ''"
@@ -78,28 +78,6 @@
             :band-image-url="bandItems[0].bandImg?.url || null"
             :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
             class="mt-4"
-          />
-          
-          <!-- After-Show Recap Panel -->
-          <AfterShowRecapPanel
-            v-if="bandItems[0]?.id"
-            :band-id="bandItems[0].id"
-            :band-slug="bandItems[0].slug || ''"
-            :band-name="bandItems[0].name || 'This Artist'"
-            :band-image-url="bandItems[0].bandImg?.url || null"
-            :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
-            class="mt-4"
-          />
-          
-          <!-- Momentum Prompts Panel -->
-          <MomentumPromptsPanel
-            v-if="bandItems[0]?.id"
-            :band-id="bandItems[0].id"
-            :band-slug="bandItems[0].slug || ''"
-            :band-name="bandItems[0].name || 'This Artist'"
-            :band-image-url="bandItems[0].bandImg?.url || null"
-            :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
-            class="mt-6"
           />
           
           <!-- System Status Card -->
@@ -589,6 +567,7 @@ import {
 } from "vue";
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
+import ShareablesHub from '~/components/dashboard/ShareablesHub.vue';
 
 // rebuild
 
