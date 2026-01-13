@@ -252,9 +252,15 @@ const {
   generateShareImage,
   generateShareCardImage,
   webShare,
+  webShareWithTracking,
   copyToClipboard,
+  copyLinkWithTracking,
   downloadBlob,
+  downloadImageWithTracking,
   openFacebookSharer,
+  openFacebookSharerWithTracking,
+  buildShareUrlWithAttribution,
+  trackShareAction,
   ACCENT_COLORS,
 } = useShareKit()
 
@@ -341,11 +347,41 @@ function showToast(message, duration = 2500) {
 }
 
 function getShareUrl() {
+  // Use attribution URL for shareables
+  if (props.item?.id && props.item?.band?.slug) {
+    return buildShareUrlWithAttribution({
+      bandSlug: props.item.band.slug,
+      shareableId: props.item.id,
+    })
+  }
   return props.item?.share?.shareUrl || ''
 }
 
 function getOgUrl() {
+  // Use attribution URL for Facebook OG
+  if (props.item?.id && props.item?.band?.slug) {
+    return buildShareUrlWithAttribution({
+      bandSlug: props.item.band.slug,
+      shareableId: props.item.id,
+    })
+  }
   return props.item?.share?.ogUrl || ''
+}
+
+/**
+ * Build tracking payload for share actions
+ */
+function getTrackingPayload() {
+  if (!props.item) return null
+  return {
+    bandId: props.item.band?.id,
+    shareableId: props.item.id,
+    cardType: props.item.type || props.item.kind,
+    window: props.item.window,
+    accent: props.item.accent,
+    captionStyle: captionStyle.value,
+    placement: 'drawer',
+  }
 }
 
 function getFilename() {
@@ -398,7 +434,7 @@ function trackDrawerOpen() {
   })
 }
 
-// Share handlers
+// Share handlers with tracking
 async function handleShare() {
   if (!props.item) return
   sharing.value = true
@@ -407,13 +443,15 @@ async function handleShare() {
     const shareUrl = getShareUrl()
     const shareText = `${selectedCaption.value} ${shareUrl}`
     const imageBlob = await getOrGenerateImage()
+    const trackingPayload = getTrackingPayload()
 
-    const result = await webShare({
+    const result = await webShareWithTracking({
       title: props.item.title,
       text: shareText,
       url: shareUrl,
       imageBlob,
       filename: getFilename(),
+      trackingPayload,
     })
 
     if (result.ok) {
@@ -421,9 +459,11 @@ async function handleShare() {
       return
     }
 
-    // Fallback
-    await copyToClipboard(shareUrl)
-    showToast('Link copied!')
+    // Fallback: copy link with tracking
+    const copied = await copyLinkWithTracking(shareUrl, trackingPayload)
+    if (copied) {
+      showToast('Link copied!')
+    }
     if (imageBlob) {
       downloadBlob(imageBlob, getFilename())
     }
@@ -437,13 +477,21 @@ async function handleShare() {
 }
 
 async function handleCopyLink() {
-  const success = await copyToClipboard(getShareUrl())
+  const trackingPayload = getTrackingPayload()
+  const success = await copyLinkWithTracking(getShareUrl(), trackingPayload)
   if (success) showToast('Link copied!')
 }
 
 async function handleCopyCaption() {
   const success = await copyToClipboard(selectedCaption.value)
-  if (success) showToast('Caption copied!')
+  if (success) {
+    showToast('Caption copied!')
+    // Track caption copy as well
+    const trackingPayload = getTrackingPayload()
+    if (trackingPayload) {
+      trackShareAction({ ...trackingPayload, action: 'copyCaption' })
+    }
+  }
 }
 
 async function handleDownloadImage() {
@@ -451,7 +499,8 @@ async function handleDownloadImage() {
   try {
     const imageBlob = await getOrGenerateImage()
     if (imageBlob) {
-      downloadBlob(imageBlob, getFilename())
+      const trackingPayload = getTrackingPayload()
+      downloadImageWithTracking(imageBlob, getFilename(), trackingPayload)
       showToast('Image downloaded!')
     }
   } finally {
@@ -463,10 +512,18 @@ async function handleInstagramKit() {
   preparingIG.value = true
   try {
     const imageBlob = await getOrGenerateImage()
+    const trackingPayload = getTrackingPayload()
+    
     if (imageBlob) {
       downloadBlob(imageBlob, getFilename())
     }
     await copyToClipboard(selectedCaption.value)
+    
+    // Track Instagram kit action
+    if (trackingPayload) {
+      trackShareAction({ ...trackingPayload, action: 'instagram' })
+    }
+    
     showToast('Ready for Instagram: image downloaded + caption copied', 3000)
   } finally {
     preparingIG.value = false
@@ -474,7 +531,8 @@ async function handleInstagramKit() {
 }
 
 async function handleFacebookShare() {
-  openFacebookSharer(getOgUrl())
+  const trackingPayload = getTrackingPayload()
+  openFacebookSharerWithTracking(getOgUrl(), trackingPayload)
   await copyToClipboard(selectedCaption.value)
   showToast('Facebook opened + caption copied', 2500)
 }

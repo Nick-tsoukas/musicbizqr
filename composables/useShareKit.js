@@ -747,17 +747,161 @@ export function useShareKit() {
     }
   }
 
+  // ============================================================
+  // SHARE TRACKING (V1 Shareables)
+  // ============================================================
+
+  /**
+   * Build share URL with attribution params
+   * @param {Object} options
+   * @param {string} options.bandSlug
+   * @param {string} options.shareableId - Optional shareable card ID
+   * @returns {string}
+   */
+  function buildShareUrlWithAttribution({ bandSlug, shareableId = null }) {
+    if (typeof window === 'undefined') return ''
+    const baseUrl = `${window.location.origin}/${bandSlug}`
+    
+    if (shareableId) {
+      return `${baseUrl}?src=shareable&sid=${encodeURIComponent(shareableId)}`
+    }
+    return baseUrl
+  }
+
+  /**
+   * Track a share action to the backend
+   * @param {Object} payload
+   * @returns {Promise<{ ok: boolean }>}
+   */
+  async function trackShareAction(payload) {
+    const {
+      bandId,
+      shareableId,
+      cardType,
+      window: windowKey,
+      accent,
+      captionStyle,
+      placement,
+      action,
+    } = payload
+
+    if (!bandId) {
+      console.warn('[useShareKit] trackShareAction: bandId required')
+      return { ok: false }
+    }
+
+    try {
+      const strapiUrl = runtimeConfig.public.strapiUrl
+      const response = await fetch(`${strapiUrl}/api/pulse/shareables/track`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bandId,
+          shareableId,
+          cardType,
+          window: windowKey,
+          accent,
+          captionStyle,
+          placement,
+          action,
+        }),
+      })
+
+      const data = await response.json()
+      return { ok: data.ok === true }
+    } catch (err) {
+      console.error('[useShareKit] Failed to track share:', err)
+      return { ok: false }
+    }
+  }
+
+  /**
+   * Enhanced webShare with tracking
+   */
+  async function webShareWithTracking({
+    title,
+    text,
+    url,
+    imageBlob = null,
+    filename = 'share.png',
+    trackingPayload = null,
+  }) {
+    const result = await webShare({ title, text, url, imageBlob, filename })
+    
+    // Track if share was successful
+    if (result.ok && trackingPayload) {
+      await trackShareAction({
+        ...trackingPayload,
+        action: 'webShare',
+      })
+    }
+
+    return result
+  }
+
+  /**
+   * Copy link with tracking
+   */
+  async function copyLinkWithTracking(url, trackingPayload = null) {
+    const success = await copyToClipboard(url)
+    
+    if (success && trackingPayload) {
+      await trackShareAction({
+        ...trackingPayload,
+        action: 'copyLink',
+      })
+    }
+
+    return success
+  }
+
+  /**
+   * Download image with tracking
+   */
+  function downloadImageWithTracking(blob, filename, trackingPayload = null) {
+    const success = downloadBlob(blob, filename)
+    
+    if (success && trackingPayload) {
+      trackShareAction({
+        ...trackingPayload,
+        action: 'download',
+      })
+    }
+
+    return success
+  }
+
+  /**
+   * Open Facebook sharer with tracking
+   */
+  function openFacebookSharerWithTracking(shareUrl, trackingPayload = null) {
+    openFacebookSharer(shareUrl)
+    
+    if (trackingPayload) {
+      trackShareAction({
+        ...trackingPayload,
+        action: 'facebook',
+      })
+    }
+  }
+
   return {
     buildShareUrl,
+    buildShareUrlWithAttribution,
     buildCaption,
     buildShareText,
     generateShareImage,
     generateShareCardImage,
     webShare,
+    webShareWithTracking,
     copyToClipboard,
+    copyLinkWithTracking,
     downloadBlob,
+    downloadImageWithTracking,
     openFacebookSharer,
+    openFacebookSharerWithTracking,
     getShareFilename,
+    trackShareAction,
     ACCENT_COLORS,
   }
 }
