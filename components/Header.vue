@@ -39,6 +39,7 @@
         </p>
         <NuxtLink to="/article" class="nav-link">Articles</NuxtLink>
         <NuxtLink to="/agency" class="nav-link">Agency</NuxtLink>
+        <NuxtLink to="/demo" class="nav-link">Demo</NuxtLink>
         <NuxtLink to="/saved" class="nav-link">
           Saved
           <client-only>
@@ -142,6 +143,9 @@
         >
         <NuxtLink to="/agency" @click="toggleMenu" class="mobile-nav-link"
           >Agency</NuxtLink
+        >
+        <NuxtLink to="/demo" @click="toggleMenu" class="mobile-nav-link"
+          >Demo</NuxtLink
         >
         <NuxtLink
           v-if="user"
