@@ -284,6 +284,7 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  LineController,
   BarElement,
   Title,
   Tooltip,
@@ -296,6 +297,7 @@ Chart.register(
   LinearScale,
   PointElement,
   LineElement,
+  LineController,
   BarElement,
   Title,
   Tooltip,
@@ -420,14 +422,20 @@ async function loadData() {
 }
 
 function renderScansChart() {
-  const ctx = scansCanvas.value?.getContext('2d')
+  const canvas = scansCanvas.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
   if (!ctx) return
 
   const series = rollups.value?.series || []
   const labels = series.map((s: any) => s.date?.slice(5) || '') // MM-DD format
   const data = series.map((s: any) => s.scans || 0)
 
+  // Destroy any existing chart on this canvas
   scansChart?.destroy()
+  const existingChart = Chart.getChart(canvas)
+  if (existingChart) existingChart.destroy()
+
   scansChart = new Chart(ctx, {
     type: 'line',
     data: {
