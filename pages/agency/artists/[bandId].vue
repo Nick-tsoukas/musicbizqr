@@ -24,7 +24,7 @@
               <span :class="tierClass" class="text-xs px-2 py-1 rounded-lg font-medium">
                 Tier {{ band.tier }}
               </span>
-              <SignalPill v-if="momentumState" :state="momentumState" />
+              <AgencySignalPill v-if="momentumState" :state="momentumState" />
             </div>
             <div class="flex items-center gap-4 mt-2 text-sm text-gray-400">
               <span>{{ band.genre }}</span>
@@ -82,7 +82,7 @@
 
       <!-- Suggested Playbook -->
       <div v-if="suggestedPlaybook" class="mb-6">
-        <PlaybookPanel 
+        <AgencyPlaybookPanel 
           :playbook="suggestedPlaybook" 
           @create-task="openTaskDrawer(topSignals[0])"
         />
@@ -92,7 +92,7 @@
       <div class="mb-6">
         <h2 class="text-white font-semibold mb-3">Recent Signals</h2>
         <div class="space-y-3">
-          <SignalFeedItem
+          <AgencySignalFeedItem
             v-for="signal in signals"
             :key="signal.id"
             :signal="signal"
@@ -160,19 +160,19 @@
     </div>
 
     <!-- Drawers -->
-    <AssignOwnerDrawer
+    <AgencyAssignOwnerDrawer
       :is-open="assignDrawerOpen"
       :band-id="bandId"
       @close="assignDrawerOpen = false"
     />
 
-    <ProofDrawer
+    <AgencyProofDrawer
       :is-open="proofDrawerOpen"
       :signal="selectedSignal"
       @close="proofDrawerOpen = false"
     />
 
-    <TaskDrawer
+    <AgencyTaskDrawer
       :is-open="taskDrawerOpen"
       :band-id="bandId"
       :signal="selectedSignal"
@@ -187,6 +187,10 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 import { getPlaybookForSignalType, getMomentumState } from '~/utils/agencyPortal/mockData'
+
+definePageMeta({
+  layout: 'agency'
+})
 
 useHead({
   title: 'Artist Command - Agency Portal',

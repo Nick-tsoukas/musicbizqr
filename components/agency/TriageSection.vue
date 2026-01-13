@@ -30,7 +30,7 @@
     <!-- Content -->
     <Transition name="collapse">
       <div v-if="expanded" class="mt-3 space-y-3">
-        <ArtistInboxCard
+        <AgencyArtistInboxCard
           v-for="item in displayedItems"
           :key="item.band.bandId"
           :item="item"

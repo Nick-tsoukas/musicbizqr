@@ -15,8 +15,13 @@ import {
   mockMembers,
   mockRosterBands,
   mockSignals,
+  bandDailyMetrics,
   getTriageBucket,
-  getMomentumState
+  getMomentumState,
+  getMomentumStateFromVelocity,
+  getConfidenceLabel,
+  calculateMomentumIndex,
+  SIGNAL_SUPPRESSION_HOURS
 } from '~/utils/agencyPortal/mockData'
 
 const STORAGE_KEY = 'mbq_agency_portal'
@@ -227,6 +232,310 @@ export const useAgencyPortalStore = defineStore('agencyPortal', {
         overdue: state.tasks.filter(t => t.status === 'open' && new Date(t.dueAt) < now),
         done: state.tasks.filter(t => t.status === 'done')
       }
+    },
+
+    // V1.1: Get band daily metrics
+    getBandDailyMetrics: () => (bandId) => {
+      return bandDailyMetrics[bandId] || []
+    },
+
+    // V1.1: Get momentum index for a band on a specific day (0 = today, 1 = yesterday, etc)
+    getBandMomentumIndex: () => (bandId, daysAgo = 0) => {
+      const metrics = bandDailyMetrics[bandId]
+      if (!metrics || !metrics.length) return 0
+      const idx = metrics.length - 1 - daysAgo
+      if (idx < 0 || idx >= metrics.length) return 0
+      return calculateMomentumIndex(metrics[idx])
+    },
+
+    // V1.1: Get 7-day velocity for a band
+    getBandVelocity7d: () => (bandId) => {
+      const metrics = bandDailyMetrics[bandId]
+      if (!metrics || metrics.length < 8) return 0
+      
+      const todayIndex = calculateMomentumIndex(metrics[metrics.length - 1])
+      const last7 = metrics.slice(-8, -1)
+      const avg7d = last7.reduce((sum, m) => sum + calculateMomentumIndex(m), 0) / 7
+      
+      return Math.round(todayIndex - avg7d)
+    },
+
+    // V1.1: Get momentum state for a band using velocity
+    getBandMomentumState: () => (bandId) => {
+      const metrics = bandDailyMetrics[bandId]
+      if (!metrics || metrics.length < 8) return 'steady'
+      
+      const todayIndex = calculateMomentumIndex(metrics[metrics.length - 1])
+      const last7 = metrics.slice(-8, -1)
+      const avg7d = last7.reduce((sum, m) => sum + calculateMomentumIndex(m), 0) / 7
+      const velocity = todayIndex - avg7d
+      
+      return getMomentumStateFromVelocity(velocity, todayIndex)
+    },
+
+    // V1.1: Get 14-day sparkline data for a band
+    getBandSparkline: () => (bandId) => {
+      const metrics = bandDailyMetrics[bandId]
+      if (!metrics) return []
+      return metrics.slice(-14).map(m => calculateMomentumIndex(m))
+    },
+
+    // V1.1: Get roster momentum trend (avg across all bands by day)
+    rosterMomentumTrend: (state) => (days = 30) => {
+      const result = []
+      for (let i = days - 1; i >= 0; i--) {
+        let sum = 0
+        let count = 0
+        state.rosterBands.forEach(band => {
+          const metrics = bandDailyMetrics[band.bandId]
+          if (metrics && metrics.length > i) {
+            const idx = metrics.length - 1 - i
+            if (idx >= 0) {
+              sum += calculateMomentumIndex(metrics[idx])
+              count++
+            }
+          }
+        })
+        result.push({
+          daysAgo: i,
+          avgIndex: count > 0 ? Math.round(sum / count) : 0,
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        })
+      }
+      return result
+    },
+
+    // V1.1: Get city heat scores
+    cityHeatScores: (state) => {
+      const cityMap = {}
+      
+      state.rosterBands.forEach(band => {
+        const metrics = bandDailyMetrics[band.bandId]
+        if (!metrics || !metrics.length) return
+        
+        // Use last 7 days
+        const recent = metrics.slice(-7)
+        recent.forEach(day => {
+          if (!day.topCity?.city) return
+          const city = day.topCity.city
+          const momentumIndex = calculateMomentumIndex(day)
+          
+          if (!cityMap[city]) {
+            cityMap[city] = {
+              name: city,
+              region: day.topCity.region,
+              country: day.topCity.country,
+              activeBands: new Set(),
+              highMomentumBands: new Set(),
+              totalMomentum: 0,
+              dayCount: 0
+            }
+          }
+          
+          if (momentumIndex >= 60) {
+            cityMap[city].activeBands.add(band.bandId)
+          }
+          if (momentumIndex >= 75) {
+            cityMap[city].highMomentumBands.add(band.bandId)
+          }
+          cityMap[city].totalMomentum += momentumIndex
+          cityMap[city].dayCount++
+        })
+      })
+      
+      // Calculate heat scores
+      return Object.values(cityMap).map(city => {
+        const activeCount = city.activeBands.size
+        const highCount = city.highMomentumBands.size
+        const avgMomentum = city.dayCount > 0 ? city.totalMomentum / city.dayCount : 0
+        
+        // Stack boost
+        let stackBoost = 0
+        if (highCount >= 4) stackBoost = 18
+        else if (highCount >= 2) stackBoost = 10
+        
+        const heatScore = Math.min(100, Math.round(avgMomentum + stackBoost))
+        
+        return {
+          name: city.name,
+          region: city.region,
+          country: city.country,
+          heatScore,
+          activeArtists: activeCount,
+          highMomentumArtists: highCount,
+          isStack: highCount >= 2,
+          activeBandIds: Array.from(city.activeBands),
+          highMomentumBandIds: Array.from(city.highMomentumBands)
+        }
+      }).sort((a, b) => b.heatScore - a.heatScore)
+    },
+
+    // V1.1: Get top movers (bands by velocity)
+    topMovers: (state) => {
+      return state.rosterBands.map(band => {
+        const metrics = bandDailyMetrics[band.bandId]
+        if (!metrics || metrics.length < 8) {
+          return { band, velocity: 0, momentumIndex: 0, topCity: null, topSignal: null }
+        }
+        
+        const todayIndex = calculateMomentumIndex(metrics[metrics.length - 1])
+        const last7 = metrics.slice(-8, -1)
+        const avg7d = last7.reduce((sum, m) => sum + calculateMomentumIndex(m), 0) / 7
+        const velocity = Math.round(todayIndex - avg7d)
+        
+        const topCity = metrics[metrics.length - 1]?.topCity?.city || band.homeCity
+        const signals = state.signalsByBandId[band.bandId] || []
+        const topSignal = signals.length ? signals.reduce((top, s) => s.score > top.score ? s : top, signals[0]) : null
+        
+        return { band, velocity, momentumIndex: todayIndex, topCity, topSignal }
+      }).sort((a, b) => b.velocity - a.velocity)
+    },
+
+    // V1.1: Get platform pull mix (aggregated across roster)
+    platformPullMix: (state) => (days = 7) => {
+      const totals = { spotify: 0, youtube: 0, tickets: 0, instagram: 0 }
+      
+      state.rosterBands.forEach(band => {
+        const metrics = bandDailyMetrics[band.bandId]
+        if (!metrics) return
+        
+        const recent = metrics.slice(-days)
+        recent.forEach(day => {
+          if (day.platformClicks) {
+            totals.spotify += day.platformClicks.spotify || 0
+            totals.youtube += day.platformClicks.youtube || 0
+            totals.tickets += day.platformClicks.tickets || 0
+            totals.instagram += day.platformClicks.instagram || 0
+          }
+        })
+      })
+      
+      const total = totals.spotify + totals.youtube + totals.tickets + totals.instagram
+      
+      return {
+        totals,
+        percentages: {
+          spotify: total > 0 ? Math.round(totals.spotify / total * 100) : 0,
+          youtube: total > 0 ? Math.round(totals.youtube / total * 100) : 0,
+          tickets: total > 0 ? Math.round(totals.tickets / total * 100) : 0,
+          instagram: total > 0 ? Math.round(totals.instagram / total * 100) : 0
+        },
+        total
+      }
+    },
+
+    // V1.1: Get after-show lift data
+    afterShowLift: (state) => {
+      let afterShowDays = []
+      let baselineDays = []
+      
+      state.rosterBands.forEach(band => {
+        const metrics = bandDailyMetrics[band.bandId]
+        if (!metrics) return
+        
+        metrics.forEach(day => {
+          const index = calculateMomentumIndex(day)
+          if (day.isAfterShow) {
+            afterShowDays.push(index)
+          } else {
+            baselineDays.push(index)
+          }
+        })
+      })
+      
+      const avgAfterShow = afterShowDays.length > 0 
+        ? Math.round(afterShowDays.reduce((a, b) => a + b, 0) / afterShowDays.length)
+        : 0
+      const avgBaseline = baselineDays.length > 0
+        ? Math.round(baselineDays.reduce((a, b) => a + b, 0) / baselineDays.length)
+        : 0
+      
+      const lift = avgBaseline > 0 ? Math.round((avgAfterShow - avgBaseline) / avgBaseline * 100) : 0
+      
+      return {
+        avgAfterShow,
+        avgBaseline,
+        lift,
+        afterShowCount: afterShowDays.length,
+        baselineCount: baselineDays.length
+      }
+    },
+
+    // V1.1: Apply signal hygiene (dedupe, suppression)
+    hygieneSignals: (state) => (signals, options = {}) => {
+      const { maxPerBand = null, showHandled = false } = options
+      
+      // Filter handled if needed
+      let filtered = showHandled 
+        ? signals 
+        : signals.filter(s => !state.handledSignals[s.id])
+      
+      // DEDUPE: Only top signal per (bandId + type + windowLabel)
+      const dedupeMap = {}
+      filtered.forEach(signal => {
+        const key = `${signal.bandId}:${signal.type}:${signal.windowLabel}`
+        if (!dedupeMap[key] || signal.score > dedupeMap[key].score) {
+          dedupeMap[key] = signal
+        }
+      })
+      filtered = Object.values(dedupeMap)
+      
+      // SUPPRESSION: Hide repeated (bandId + type) within suppression window
+      const suppressionMap = {}
+      const now = new Date()
+      filtered = filtered.filter(signal => {
+        const key = `${signal.bandId}:${signal.type}`
+        const suppressionHours = SIGNAL_SUPPRESSION_HOURS[signal.type] || SIGNAL_SUPPRESSION_HOURS.default
+        const signalTime = new Date(signal.createdAt)
+        const hoursSince = (now - signalTime) / (1000 * 60 * 60)
+        
+        if (suppressionMap[key]) {
+          const lastTime = new Date(suppressionMap[key].createdAt)
+          const hoursBetween = (signalTime - lastTime) / (1000 * 60 * 60)
+          if (Math.abs(hoursBetween) < suppressionHours) {
+            // Keep the higher scoring one
+            if (signal.score > suppressionMap[key].score) {
+              suppressionMap[key] = signal
+            }
+            return false
+          }
+        }
+        suppressionMap[key] = signal
+        return true
+      })
+      
+      // Sort by score descending
+      filtered.sort((a, b) => b.score - a.score)
+      
+      // INBOX CAP: Max signals per band
+      if (maxPerBand) {
+        const bandCounts = {}
+        filtered = filtered.filter(signal => {
+          bandCounts[signal.bandId] = (bandCounts[signal.bandId] || 0) + 1
+          return bandCounts[signal.bandId] <= maxPerBand
+        })
+      }
+      
+      // Add confidence label
+      filtered = filtered.map(signal => ({
+        ...signal,
+        confidence: getConfidenceLabel(signal.score)
+      }))
+      
+      return filtered
+    },
+
+    // V1.1: Get hygiene-filtered signals for inbox (max 3 per band)
+    inboxSignals: (state) => {
+      const allSignals = Object.values(state.signalsByBandId).flat()
+      return state.hygieneSignals(allSignals, { maxPerBand: 3 })
+    },
+
+    // V1.1: Get hygiene-filtered signals for feed
+    feedSignals: (state) => (options = {}) => {
+      const { showHandled = false } = options
+      const allSignals = Object.values(state.signalsByBandId).flat()
+      return state.hygieneSignals(allSignals, { showHandled })
     }
   },
 

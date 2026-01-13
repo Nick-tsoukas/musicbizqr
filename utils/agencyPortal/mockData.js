@@ -231,14 +231,15 @@ export function getPlaybookForSignalType(signalType) {
   return mapping[signalType] || playbooks.MOMENTUM_SURGE
 }
 
-// Triage bucket logic
+// Triage bucket logic - V1.1 updated to include PLATFORM_PULL
 export function getTriageBucket(signal) {
   const actionTypes = [
     SIGNAL_TYPES.MOMENTUM_SURGE,
     SIGNAL_TYPES.AFTER_SHOW_ENERGY,
     SIGNAL_TYPES.CITY_CLAIM,
     SIGNAL_TYPES.SHARE_CHAIN,
-    SIGNAL_TYPES.PEAK_HOUR
+    SIGNAL_TYPES.PEAK_HOUR,
+    SIGNAL_TYPES.PLATFORM_PULL
   ]
   
   if (signal.score >= 85 && actionTypes.includes(signal.type)) {
@@ -253,12 +254,192 @@ export function getTriageBucket(signal) {
   return 'cooling'
 }
 
-// Get momentum state from top signal
+// Get momentum state from top signal (legacy - use getMomentumStateFromVelocity for V1.1)
 export function getMomentumState(score) {
   if (score >= 85) return 'surging'
   if (score >= 70) return 'warming'
   if (score >= 55) return 'steady'
   return 'cooling'
+}
+
+// V1.1: Get momentum state from velocity
+export function getMomentumStateFromVelocity(velocity7d, index) {
+  if (velocity7d >= 12 || index >= 85) return 'surging'
+  if (velocity7d >= 5) return 'warming'
+  if (velocity7d >= -4) return 'steady'
+  return 'cooling'
+}
+
+// V1.1: Signal suppression windows (hours)
+export const SIGNAL_SUPPRESSION_HOURS = {
+  [SIGNAL_TYPES.CITY_CLAIM]: 24,
+  [SIGNAL_TYPES.MOMENTUM_SURGE]: 24,
+  [SIGNAL_TYPES.AFTER_SHOW_ENERGY]: 12,
+  [SIGNAL_TYPES.SHARE_CHAIN]: 24,
+  [SIGNAL_TYPES.PEAK_HOUR]: 12,
+  [SIGNAL_TYPES.PLATFORM_PULL]: 24,
+  default: 24
+}
+
+// V1.1: Get confidence label from score
+export function getConfidenceLabel(score) {
+  if (score >= 85) return 'strong'
+  if (score >= 70) return 'moderate'
+  return 'early'
+}
+
+// V1.1: Cities for city stack scenarios
+const STACK_CITIES = ['Austin', 'Los Angeles', 'Nashville', 'Chicago', 'Atlanta']
+
+// V1.1: Generate 30 days of daily metrics for a band
+function generateBandDailyMetrics(bandId, bandConfig) {
+  const metrics = []
+  const today = new Date()
+  
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    const dateISO = date.toISOString().split('T')[0]
+    
+    // Base values with some randomness based on band tier/activity
+    const baseMultiplier = bandConfig.baseMultiplier || 1
+    const trend = bandConfig.trend || 0 // positive = growing, negative = declining
+    const trendFactor = 1 + (trend * (29 - i) / 100)
+    
+    // Add weekly pattern (weekends higher)
+    const dayOfWeek = date.getDay()
+    const weekendBoost = (dayOfWeek === 0 || dayOfWeek === 6) ? 1.3 : 1
+    
+    // Random daily variance
+    const variance = 0.7 + Math.random() * 0.6
+    
+    const multiplier = baseMultiplier * trendFactor * weekendBoost * variance
+    
+    // Check if this is an after-show day
+    const isAfterShow = bandConfig.showDays?.includes(i)
+    const showBoost = isAfterShow ? 2.5 : 1
+    
+    const sessions = Math.round(150 * multiplier * showBoost)
+    const qrScans = Math.round(40 * multiplier * showBoost)
+    const linkClicks = Math.round(90 * multiplier * showBoost)
+    const engagedSessions = Math.round(50 * multiplier * showBoost)
+    const returningFans = Math.round(25 * multiplier)
+    const shares = Math.round(15 * multiplier * (isAfterShow ? 1.8 : 1))
+    const paymentsCount = Math.round(3 * multiplier * (isAfterShow ? 2 : 1))
+    
+    // Platform clicks with variety
+    const platformClicks = {
+      spotify: Math.round(35 * multiplier * (bandConfig.spotifyWeight || 1)),
+      youtube: Math.round(20 * multiplier * (bandConfig.youtubeWeight || 1)),
+      tickets: Math.round(15 * multiplier * (isAfterShow ? 0.5 : 1)),
+      instagram: Math.round(25 * multiplier * (bandConfig.instagramWeight || 1))
+    }
+    
+    // Top city - use stack city if configured, otherwise home city
+    const topCity = bandConfig.stackCity && i < 14 
+      ? { city: bandConfig.stackCity, region: bandConfig.stackRegion || 'TX', country: 'US' }
+      : { city: bandConfig.homeCity, region: bandConfig.homeRegion || 'TX', country: 'US' }
+    
+    metrics.push({
+      dateISO,
+      sessions,
+      qrScans,
+      linkClicks,
+      engagedSessions,
+      returningFans,
+      shares,
+      paymentsCount,
+      platformClicks,
+      topCity,
+      isAfterShow: isAfterShow || false
+    })
+  }
+  
+  return metrics
+}
+
+// V1.1: Band configurations for metric generation
+const bandConfigs = {
+  band_001: { baseMultiplier: 2.2, trend: 15, homeCity: 'Austin', homeRegion: 'TX', stackCity: 'Austin', stackRegion: 'TX', showDays: [3, 10], spotifyWeight: 1.5 },
+  band_002: { baseMultiplier: 2.0, trend: 8, homeCity: 'Los Angeles', homeRegion: 'CA', stackCity: 'Los Angeles', stackRegion: 'CA', showDays: [1, 7], instagramWeight: 1.8 },
+  band_003: { baseMultiplier: 1.8, trend: 5, homeCity: 'Nashville', homeRegion: 'TN', stackCity: 'Nashville', stackRegion: 'TN', showDays: [5], spotifyWeight: 1.3 },
+  band_004: { baseMultiplier: 1.2, trend: 2, homeCity: 'Phoenix', homeRegion: 'AZ', showDays: [], youtubeWeight: 1.4 },
+  band_005: { baseMultiplier: 1.4, trend: 10, homeCity: 'Miami', homeRegion: 'FL', stackCity: 'Austin', stackRegion: 'TX', showDays: [8], instagramWeight: 1.6 },
+  band_006: { baseMultiplier: 2.1, trend: 12, homeCity: 'Chicago', homeRegion: 'IL', stackCity: 'Chicago', stackRegion: 'IL', showDays: [2, 9], spotifyWeight: 1.2 },
+  band_007: { baseMultiplier: 1.0, trend: -2, homeCity: 'Portland', homeRegion: 'OR', showDays: [], youtubeWeight: 1.3 },
+  band_008: { baseMultiplier: 0.7, trend: -8, homeCity: 'Brooklyn', homeRegion: 'NY', showDays: [], instagramWeight: 1.1 },
+  band_009: { baseMultiplier: 1.1, trend: 0, homeCity: 'Denver', homeRegion: 'CO', showDays: [12], spotifyWeight: 1.1 },
+  band_010: { baseMultiplier: 2.5, trend: 20, homeCity: 'Atlanta', homeRegion: 'GA', stackCity: 'Atlanta', stackRegion: 'GA', showDays: [4, 11], instagramWeight: 2.0 },
+  band_011: { baseMultiplier: 0.9, trend: 8, homeCity: 'Austin', homeRegion: 'TX', stackCity: 'Austin', stackRegion: 'TX', showDays: [], spotifyWeight: 0.9 },
+  band_012: { baseMultiplier: 1.3, trend: 3, homeCity: 'Seattle', homeRegion: 'WA', showDays: [6], youtubeWeight: 1.5 },
+  band_013: { baseMultiplier: 0.6, trend: -5, homeCity: 'Nashville', homeRegion: 'TN', stackCity: 'Nashville', stackRegion: 'TN', showDays: [], spotifyWeight: 1.0 },
+  band_014: { baseMultiplier: 1.1, trend: 1, homeCity: 'San Francisco', homeRegion: 'CA', showDays: [], instagramWeight: 1.2 },
+  band_015: { baseMultiplier: 1.7, trend: 6, homeCity: 'Los Angeles', homeRegion: 'CA', stackCity: 'Los Angeles', stackRegion: 'CA', showDays: [13], instagramWeight: 1.7 },
+  band_016: { baseMultiplier: 0.5, trend: -10, homeCity: 'Memphis', homeRegion: 'TN', showDays: [], youtubeWeight: 1.2 },
+  band_017: { baseMultiplier: 1.4, trend: 7, homeCity: 'Austin', homeRegion: 'TX', stackCity: 'Austin', stackRegion: 'TX', showDays: [3], spotifyWeight: 1.4 },
+  band_018: { baseMultiplier: 0.6, trend: -6, homeCity: 'New Orleans', homeRegion: 'LA', showDays: [], youtubeWeight: 1.1 },
+  band_019: { baseMultiplier: 1.2, trend: 4, homeCity: 'Philadelphia', homeRegion: 'PA', showDays: [7], instagramWeight: 1.3 },
+  band_020: { baseMultiplier: 0.8, trend: -3, homeCity: 'Minneapolis', homeRegion: 'MN', showDays: [], spotifyWeight: 1.0 }
+}
+
+// V1.1: Generate bandDailyMetrics for all bands
+export const bandDailyMetrics = {}
+mockRosterBands.forEach(band => {
+  const config = bandConfigs[band.bandId] || { baseMultiplier: 1, trend: 0, homeCity: band.homeCity, homeRegion: 'XX' }
+  bandDailyMetrics[band.bandId] = generateBandDailyMetrics(band.bandId, config)
+})
+
+// V1.1: Momentum Index scoring caps
+export const MOMENTUM_CAPS = {
+  sessions: 2000,
+  qrScans: 500,
+  linkClicks: 1200,
+  engagedSessions: 600,
+  returningFans: 250,
+  shares: 200,
+  paymentsCount: 50
+}
+
+// V1.1: Momentum Index weights
+export const MOMENTUM_WEIGHTS = {
+  sessions: 0.20,
+  qrScans: 0.15,
+  linkClicks: 0.20,
+  engagedSessions: 0.15,
+  returningFans: 0.10,
+  shares: 0.10,
+  paymentsCount: 0.10
+}
+
+// V1.1: Calculate normalized value with log scaling
+export function normalizeMetric(value, cap) {
+  return Math.min(1, Math.log10(1 + value) / Math.log10(1 + cap))
+}
+
+// V1.1: Calculate Momentum Index for a single day's metrics
+export function calculateMomentumIndex(dayMetrics) {
+  if (!dayMetrics) return 0
+  
+  const normalized = {
+    sessions: normalizeMetric(dayMetrics.sessions || 0, MOMENTUM_CAPS.sessions),
+    qrScans: normalizeMetric(dayMetrics.qrScans || 0, MOMENTUM_CAPS.qrScans),
+    linkClicks: normalizeMetric(dayMetrics.linkClicks || 0, MOMENTUM_CAPS.linkClicks),
+    engagedSessions: normalizeMetric(dayMetrics.engagedSessions || 0, MOMENTUM_CAPS.engagedSessions),
+    returningFans: normalizeMetric(dayMetrics.returningFans || 0, MOMENTUM_CAPS.returningFans),
+    shares: normalizeMetric(dayMetrics.shares || 0, MOMENTUM_CAPS.shares),
+    paymentsCount: normalizeMetric(dayMetrics.paymentsCount || 0, MOMENTUM_CAPS.paymentsCount)
+  }
+  
+  const weightedSum = 
+    normalized.sessions * MOMENTUM_WEIGHTS.sessions +
+    normalized.qrScans * MOMENTUM_WEIGHTS.qrScans +
+    normalized.linkClicks * MOMENTUM_WEIGHTS.linkClicks +
+    normalized.engagedSessions * MOMENTUM_WEIGHTS.engagedSessions +
+    normalized.returningFans * MOMENTUM_WEIGHTS.returningFans +
+    normalized.shares * MOMENTUM_WEIGHTS.shares +
+    normalized.paymentsCount * MOMENTUM_WEIGHTS.paymentsCount
+  
+  return Math.round(100 * weightedSum)
 }
 
 export default {
@@ -269,7 +450,15 @@ export default {
   playbooks,
   SIGNAL_TYPES,
   SIGNAL_ACCENTS,
+  SIGNAL_SUPPRESSION_HOURS,
+  MOMENTUM_CAPS,
+  MOMENTUM_WEIGHTS,
+  bandDailyMetrics,
   getPlaybookForSignalType,
   getTriageBucket,
-  getMomentumState
+  getMomentumState,
+  getMomentumStateFromVelocity,
+  getConfidenceLabel,
+  normalizeMetric,
+  calculateMomentumIndex
 }

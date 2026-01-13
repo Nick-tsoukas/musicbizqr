@@ -54,7 +54,7 @@
 
       <!-- Cities Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CityTile
+        <AgencyCityTile
           v-for="city in filteredCities"
           :key="city.name"
           :city="city"
@@ -75,7 +75,7 @@
     </div>
 
     <!-- City Detail Drawer -->
-    <CityDetailDrawer
+    <AgencyCityDetailDrawer
       :is-open="cityDetailOpen"
       :city="selectedCity"
       @close="cityDetailOpen = false"
@@ -88,6 +88,10 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+
+definePageMeta({
+  layout: 'agency'
+})
 
 useHead({
   title: 'Cities Hub - Agency Portal',
@@ -103,7 +107,8 @@ const searchQuery = ref('')
 const cityDetailOpen = ref(false)
 const selectedCity = ref(null)
 
-const cities = computed(() => store.activeCities)
+// V1.1: Use cityHeatScores instead of activeCities for proper ranking
+const cities = computed(() => store.cityHeatScores)
 const cityStacks = computed(() => cities.value.filter(c => c.isStack))
 
 const filteredCities = computed(() => {

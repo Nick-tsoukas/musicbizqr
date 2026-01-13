@@ -7,16 +7,14 @@
       <div class="flex items-center gap-3">
         <div 
           class="w-10 h-10 rounded-xl flex items-center justify-center"
-          :class="city.isStack ? 'bg-violet-600/20' : 'bg-gray-800'"
+          :class="heatBgClass"
         >
-          <svg class="w-5 h-5" :class="city.isStack ? 'text-violet-400' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <!-- V1.1: Show heat score in icon -->
+          <span class="text-sm font-bold" :class="heatTextClass">{{ city.heatScore || 0 }}</span>
         </div>
         <div>
           <h3 class="text-white font-medium">{{ city.name }}</h3>
-          <p class="text-gray-500 text-xs">{{ city.artistCount }} active artist{{ city.artistCount !== 1 ? 's' : '' }}</p>
+          <p class="text-gray-500 text-xs">{{ city.activeArtists || 0 }} active artist{{ city.activeArtists !== 1 ? 's' : '' }}</p>
         </div>
       </div>
       
@@ -29,13 +27,34 @@
       </span>
     </div>
 
-    <!-- Top Signal -->
-    <div v-if="city.topSignal" class="bg-gray-800/50 rounded-xl p-3 mb-3">
-      <div class="text-xs text-gray-500 mb-1">Strongest Signal</div>
-      <div class="text-sm text-white font-medium">{{ city.topSignal.headline }}</div>
-      <div class="flex items-center gap-2 mt-1">
-        <span class="text-lg font-bold" :class="accentClass">{{ city.topSignal.hero }}</span>
-        <span class="text-xs text-gray-500">{{ city.topSignal.windowLabel }}</span>
+    <!-- V1.1: Heat Score Bar -->
+    <div class="mb-3">
+      <div class="flex items-center justify-between text-xs mb-1">
+        <span class="text-gray-500">City Heat</span>
+        <span :class="heatTextClass" class="font-medium">{{ city.heatScore || 0 }}</span>
+      </div>
+      <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div 
+          class="h-full rounded-full transition-all"
+          :class="heatBarClass"
+          :style="{ width: `${city.heatScore || 0}%` }"
+        />
+      </div>
+    </div>
+
+    <!-- V1.1: Artist Stats -->
+    <div class="bg-gray-800/50 rounded-xl p-3 mb-3">
+      <div class="grid grid-cols-2 gap-3 text-center">
+        <div>
+          <div class="text-lg font-bold text-white">{{ city.activeArtists || 0 }}</div>
+          <div class="text-xs text-gray-500">Active</div>
+        </div>
+        <div>
+          <div class="text-lg font-bold" :class="city.highMomentumArtists >= 2 ? 'text-emerald-400' : 'text-gray-400'">
+            {{ city.highMomentumArtists || 0 }}
+          </div>
+          <div class="text-xs text-gray-500">High Momentum</div>
+        </div>
       </div>
     </div>
 
@@ -43,21 +62,20 @@
     <div class="flex items-center gap-2">
       <div class="flex -space-x-2">
         <div 
-          v-for="(artist, idx) in city.artists.slice(0, 4)" 
-          :key="artist.bandId"
+          v-for="bandId in displayBandIds" 
+          :key="bandId"
           class="w-7 h-7 rounded-full bg-gray-700 border-2 border-gray-900 flex items-center justify-center text-xs text-gray-300"
-          :title="artist.name"
+          :title="getBandName(bandId)"
         >
-          {{ artist.name.charAt(0) }}
+          {{ getBandInitial(bandId) }}
         </div>
         <div 
-          v-if="city.artists.length > 4"
+          v-if="totalBands > 4"
           class="w-7 h-7 rounded-full bg-gray-800 border-2 border-gray-900 flex items-center justify-center text-xs text-gray-400"
         >
-          +{{ city.artists.length - 4 }}
+          +{{ totalBands - 4 }}
         </div>
       </div>
-      <span class="text-xs text-gray-500 ml-auto">Score: {{ city.topScore }}</span>
     </div>
 
     <!-- Open Button -->
@@ -72,6 +90,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useAgencyPortalStore } from '~/stores/agencyPortal'
 
 const props = defineProps({
   city: {
@@ -82,15 +101,49 @@ const props = defineProps({
 
 defineEmits(['open'])
 
-const accentClass = computed(() => {
-  const accent = props.city.topSignal?.accent || 'violet'
-  const classes = {
-    violet: 'text-violet-400',
-    blue: 'text-blue-400',
-    emerald: 'text-emerald-400',
-    amber: 'text-amber-400',
-    rose: 'text-rose-400'
-  }
-  return classes[accent] || classes.violet
+const store = useAgencyPortalStore()
+
+// V1.1: Heat-based styling
+const heatScore = computed(() => props.city.heatScore || 0)
+
+const heatBgClass = computed(() => {
+  if (heatScore.value >= 80) return 'bg-rose-500/20'
+  if (heatScore.value >= 60) return 'bg-amber-500/20'
+  if (heatScore.value >= 40) return 'bg-blue-500/20'
+  return 'bg-gray-800'
 })
+
+const heatTextClass = computed(() => {
+  if (heatScore.value >= 80) return 'text-rose-400'
+  if (heatScore.value >= 60) return 'text-amber-400'
+  if (heatScore.value >= 40) return 'text-blue-400'
+  return 'text-gray-400'
+})
+
+const heatBarClass = computed(() => {
+  if (heatScore.value >= 80) return 'bg-gradient-to-r from-rose-600 to-rose-400'
+  if (heatScore.value >= 60) return 'bg-gradient-to-r from-amber-600 to-amber-400'
+  if (heatScore.value >= 40) return 'bg-gradient-to-r from-blue-600 to-blue-400'
+  return 'bg-gray-600'
+})
+
+// V1.1: Get band IDs from new structure
+const displayBandIds = computed(() => {
+  const ids = props.city.activeBandIds || props.city.highMomentumBandIds || []
+  return ids.slice(0, 4)
+})
+
+const totalBands = computed(() => {
+  return (props.city.activeBandIds || []).length
+})
+
+function getBandName(bandId) {
+  const band = store.getBandById(bandId)
+  return band?.name || 'Unknown'
+}
+
+function getBandInitial(bandId) {
+  const band = store.getBandById(bandId)
+  return band?.name?.charAt(0) || '?'
+}
 </script>

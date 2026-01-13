@@ -82,10 +82,10 @@
         </div>
       </div>
 
-      <!-- Signals List -->
+      <!-- Signals List (V1.1: Paginated) -->
       <div class="space-y-3">
-        <SignalFeedItem
-          v-for="signal in filteredSignals"
+        <AgencySignalFeedItem
+          v-for="signal in paginatedSignals"
           :key="signal.id"
           :signal="signal"
           @open="openArtist"
@@ -94,8 +94,18 @@
         />
       </div>
 
+      <!-- V1.1: Load More Button -->
+      <div v-if="hasMoreSignals" class="text-center mt-6">
+        <button 
+          @click="loadMore"
+          class="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-xl transition-colors"
+        >
+          Load more ({{ remainingCount }} remaining)
+        </button>
+      </div>
+
       <!-- Empty State -->
-      <div v-if="!filteredSignals.length" class="text-center py-12">
+      <div v-if="!paginatedSignals.length" class="text-center py-12">
         <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -107,7 +117,7 @@
     </div>
 
     <!-- Task Drawer -->
-    <TaskDrawer
+    <AgencyTaskDrawer
       :is-open="taskDrawerOpen"
       :band-id="selectedSignal?.bandId"
       :signal="selectedSignal"
@@ -121,6 +131,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 import { SIGNAL_TYPES } from '~/utils/agencyPortal/mockData'
+
+definePageMeta({
+  layout: 'agency'
+})
 
 useHead({
   title: 'Signals Feed - Agency Portal',
@@ -139,6 +153,10 @@ const showHandled = ref(false)
 const taskDrawerOpen = ref(false)
 const selectedSignal = ref(null)
 
+// V1.1: Pagination
+const PAGE_SIZE = 20
+const displayCount = ref(PAGE_SIZE)
+
 const signalTypes = Object.values(SIGNAL_TYPES)
 
 const cities = computed(() => {
@@ -153,8 +171,10 @@ const hasFilters = computed(() => {
   return filterType.value || filterCity.value || filterScore.value || showHandled.value
 })
 
+// V1.1: Use hygiene-filtered signals from store
 const filteredSignals = computed(() => {
-  let signals = [...store.allSignals]
+  // Get hygiene-filtered signals
+  let signals = store.feedSignals({ showHandled: showHandled.value })
   
   // Sort by createdAt descending
   signals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -175,13 +195,25 @@ const filteredSignals = computed(() => {
     signals = signals.filter(s => s.score >= minScore)
   }
   
-  // Filter handled
-  if (!showHandled.value) {
-    signals = signals.filter(s => !store.isSignalHandled(s.id))
-  }
-  
   return signals
 })
+
+// V1.1: Paginated signals
+const paginatedSignals = computed(() => {
+  return filteredSignals.value.slice(0, displayCount.value)
+})
+
+const hasMoreSignals = computed(() => {
+  return filteredSignals.value.length > displayCount.value
+})
+
+const remainingCount = computed(() => {
+  return filteredSignals.value.length - displayCount.value
+})
+
+function loadMore() {
+  displayCount.value += PAGE_SIZE
+}
 
 const highScoreCount = computed(() => filteredSignals.value.filter(s => s.score >= 85).length)
 const handledCount = computed(() => store.allSignals.filter(s => store.isSignalHandled(s.id)).length)

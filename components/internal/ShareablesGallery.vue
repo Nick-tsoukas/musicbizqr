@@ -92,7 +92,7 @@
 
         <!-- Band Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <ShareablesTile
+          <InternalShareablesTile
             v-for="card in filteredBandCards"
             :key="card.id"
             :ref="el => setBandTileRef(card.id, el)"
@@ -133,7 +133,7 @@
 
         <!-- Fan Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <ShareablesTile
+          <InternalShareablesTile
             v-for="item in filteredFanItems"
             :key="item.id"
             :ref="el => setFanTileRef(item.id, el)"
@@ -169,7 +169,6 @@ import { getBandDemoCards } from '~/utils/shareables/demoDeck'
 import { getFanDemoItems, DEMO_BAND } from '~/utils/fanShare/demoContexts'
 import { useShareKit } from '~/composables/useShareKit'
 import { generateFanShareImage } from '~/utils/fanShare/imageGenerator'
-import ShareablesTile from './ShareablesTile.vue'
 
 const { generateShareCardImage } = useShareKit()
 

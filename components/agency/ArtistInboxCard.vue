@@ -13,7 +13,15 @@
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
           <h3 class="text-white font-medium text-sm truncate">{{ item.band.name }}</h3>
-          <SignalPill :state="item.momentumState" />
+          <AgencySignalPill :state="momentumState" />
+          <!-- V1.1: Velocity indicator -->
+          <span 
+            v-if="velocity !== 0"
+            class="text-xs font-medium"
+            :class="velocity >= 0 ? 'text-emerald-400' : 'text-red-400'"
+          >
+            {{ velocity >= 0 ? '+' : '' }}{{ velocity }}
+          </span>
         </div>
 
         <!-- Top Signal -->
@@ -38,6 +46,20 @@
 
         <!-- Meta Row -->
         <div class="flex items-center gap-3 mt-3 flex-wrap">
+          <!-- V1.1: Mini Sparkline -->
+          <div class="w-16 h-4" v-if="sparklineData.length">
+            <svg class="w-full h-full" viewBox="0 0 64 16" preserveAspectRatio="none">
+              <polyline 
+                :points="sparklinePoints" 
+                fill="none" 
+                :stroke="sparklineColor" 
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+
           <!-- Top City -->
           <span v-if="topCity" class="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded-lg">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,6 +124,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useAgencyPortalStore } from '~/stores/agencyPortal'
 
 const props = defineProps({
   item: {
@@ -111,6 +134,35 @@ const props = defineProps({
 })
 
 defineEmits(['open', 'assign', 'proof', 'handle'])
+
+const store = useAgencyPortalStore()
+
+// V1.1: Get velocity and momentum state from store
+const velocity = computed(() => store.getBandVelocity7d(props.item.band.bandId))
+const momentumState = computed(() => store.getBandMomentumState(props.item.band.bandId))
+
+// V1.1: Sparkline data
+const sparklineData = computed(() => store.getBandSparkline(props.item.band.bandId))
+
+const sparklinePoints = computed(() => {
+  if (!sparklineData.value.length) return ''
+  const data = sparklineData.value
+  const max = Math.max(...data, 100)
+  const min = Math.min(...data, 0)
+  const range = max - min || 1
+  
+  return data.map((val, i) => {
+    const x = (i / (data.length - 1)) * 64
+    const y = 16 - ((val - min) / range) * 16
+    return `${x},${y}`
+  }).join(' ')
+})
+
+const sparklineColor = computed(() => {
+  if (velocity.value >= 5) return '#34d399' // emerald
+  if (velocity.value <= -5) return '#f87171' // red
+  return '#8b5cf6' // violet
+})
 
 const accentTextClass = computed(() => {
   const accent = props.item.topSignal?.accent || 'violet'

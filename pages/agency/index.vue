@@ -23,7 +23,7 @@
       </div>
 
       <!-- Triage Buckets -->
-      <TriageSection
+      <AgencyTriageSection
         bucket="needsAction"
         :items="filteredBuckets.needsAction"
         :initial-expanded="true"
@@ -33,7 +33,7 @@
         @handle="handleSignal"
       />
 
-      <TriageSection
+      <AgencyTriageSection
         bucket="heatingUp"
         :items="filteredBuckets.heatingUp"
         :initial-expanded="true"
@@ -43,7 +43,7 @@
         @handle="handleSignal"
       />
 
-      <TriageSection
+      <AgencyTriageSection
         bucket="watching"
         :items="filteredBuckets.watching"
         :initial-expanded="false"
@@ -53,7 +53,7 @@
         @handle="handleSignal"
       />
 
-      <TriageSection
+      <AgencyTriageSection
         bucket="cooling"
         :items="filteredBuckets.cooling"
         :initial-expanded="false"
@@ -76,13 +76,13 @@
     </div>
 
     <!-- Drawers -->
-    <AssignOwnerDrawer
+    <AgencyAssignOwnerDrawer
       :is-open="assignDrawerOpen"
       :band-id="selectedBandId"
       @close="assignDrawerOpen = false"
     />
 
-    <ProofDrawer
+    <AgencyProofDrawer
       :is-open="proofDrawerOpen"
       :signal="selectedSignal"
       @close="proofDrawerOpen = false"
@@ -94,6 +94,10 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+
+definePageMeta({
+  layout: 'agency'
+})
 
 useHead({
   title: 'Roster Inbox - Agency Portal',

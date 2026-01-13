@@ -24,6 +24,6 @@ definePageMeta({
 
 <template>
   <InternalPasswordGate>
-    <ShareablesGallery />
+    <InternalShareablesGallery />
   </InternalPasswordGate>
 </template>

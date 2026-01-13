@@ -13,17 +13,15 @@
               <div class="flex items-center gap-3">
                 <div 
                   class="w-12 h-12 rounded-xl flex items-center justify-center"
-                  :class="city.isStack ? 'bg-violet-600/20' : 'bg-gray-800'"
+                  :class="heatBgClass"
                 >
-                  <svg class="w-6 h-6" :class="city.isStack ? 'text-violet-400' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <!-- V1.1: Show heat score -->
+                  <span class="text-lg font-bold" :class="heatTextClass">{{ city.heatScore || 0 }}</span>
                 </div>
                 <div>
                   <h2 class="text-white font-semibold text-lg">{{ city.name }}</h2>
                   <div class="flex items-center gap-2">
-                    <span class="text-gray-400 text-sm">{{ city.artistCount }} artists</span>
+                    <span class="text-gray-400 text-sm">{{ city.activeArtists || 0 }} artists</span>
                     <span 
                       v-if="city.isStack"
                       class="text-xs px-2 py-0.5 rounded-full bg-violet-600/20 text-violet-400 border border-violet-500/30"
@@ -43,6 +41,33 @@
 
           <!-- Content -->
           <div class="flex-1 overflow-y-auto p-4">
+            <!-- V1.1: City Heat Score -->
+            <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-sm">City Heat Score</span>
+                <span class="text-2xl font-bold" :class="heatTextClass">{{ city.heatScore || 0 }}</span>
+              </div>
+              <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  class="h-full rounded-full transition-all"
+                  :class="heatBarClass"
+                  :style="{ width: `${city.heatScore || 0}%` }"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-4 mt-3 text-center">
+                <div>
+                  <div class="text-lg font-bold text-white">{{ city.activeArtists || 0 }}</div>
+                  <div class="text-xs text-gray-500">Active Artists</div>
+                </div>
+                <div>
+                  <div class="text-lg font-bold" :class="(city.highMomentumArtists || 0) >= 2 ? 'text-emerald-400' : 'text-gray-400'">
+                    {{ city.highMomentumArtists || 0 }}
+                  </div>
+                  <div class="text-xs text-gray-500">High Momentum</div>
+                </div>
+              </div>
+            </div>
+
             <!-- Stack Alert -->
             <div 
               v-if="city.isStack"
@@ -55,76 +80,55 @@
                 <div>
                   <div class="text-violet-300 font-medium text-sm">City Stack Detected</div>
                   <p class="text-violet-400/70 text-xs mt-1">
-                    Multiple roster artists are performing well in {{ city.name }}. 
+                    {{ city.highMomentumArtists || 0 }} roster artists have high momentum in {{ city.name }}. 
                     Consider coordinated territorial strategy.
                   </p>
                 </div>
               </div>
             </div>
 
-            <!-- Artists List -->
+            <!-- V1.1: Top 3 Artists with momentum -->
             <div class="space-y-3">
-              <h3 class="text-gray-400 text-sm font-medium">Active Artists</h3>
+              <h3 class="text-gray-400 text-sm font-medium">Top Artists in {{ city.name }}</h3>
               
               <div 
-                v-for="artist in city.artists" 
-                :key="artist.bandId"
+                v-for="bandId in topArtistIds" 
+                :key="bandId"
                 class="bg-gray-800/50 border border-gray-700 rounded-xl p-3"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gray-700 flex items-center justify-center">
-                      <span class="text-gray-300 font-medium">{{ artist.name.charAt(0) }}</span>
+                      <span class="text-gray-300 font-medium">{{ getBandInitial(bandId) }}</span>
                     </div>
                     <div>
-                      <div class="text-white font-medium text-sm">{{ artist.name }}</div>
-                      <div class="text-gray-500 text-xs">{{ artist.genre }}</div>
+                      <div class="text-white font-medium text-sm">{{ getBandName(bandId) }}</div>
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <AgencySignalPill :state="getBandMomentumState(bandId)" size="sm" />
+                        <span 
+                          class="text-xs font-medium"
+                          :class="getBandVelocity(bandId) >= 0 ? 'text-emerald-400' : 'text-red-400'"
+                        >
+                          {{ getBandVelocity(bandId) >= 0 ? '+' : '' }}{{ getBandVelocity(bandId) }}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <button 
-                    @click="$emit('openArtist', artist.bandId)"
+                    @click="$emit('openArtist', bandId)"
                     class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-medium rounded-lg transition-colors"
                   >
                     Open
                   </button>
                 </div>
-
-                <!-- Artist's signals for this city -->
-                <div v-if="getArtistCitySignals(artist.bandId).length" class="mt-3 pt-3 border-t border-gray-700">
-                  <div 
-                    v-for="signal in getArtistCitySignals(artist.bandId).slice(0, 2)" 
-                    :key="signal.id"
-                    class="flex items-center justify-between py-1"
-                  >
-                    <div class="text-xs text-gray-400">{{ signal.headline }}</div>
-                    <div class="text-xs font-medium" :class="getAccentClass(signal.accent)">
-                      {{ signal.hero }}
-                    </div>
-                  </div>
-                </div>
               </div>
-            </div>
 
-            <!-- All City Signals -->
-            <div class="mt-6">
-              <h3 class="text-gray-400 text-sm font-medium mb-3">Recent Signals</h3>
-              <div class="space-y-2">
-                <div 
-                  v-for="signal in city.signals.slice(0, 10)" 
-                  :key="signal.id"
-                  class="flex items-center gap-3 p-2 bg-gray-800/30 rounded-lg"
-                >
-                  <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400">
-                    {{ signal.band?.name?.charAt(0) || '?' }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="text-xs text-white truncate">{{ signal.headline }}</div>
-                    <div class="text-xs text-gray-500">{{ signal.band?.name }}</div>
-                  </div>
-                  <div class="text-sm font-medium" :class="getAccentClass(signal.accent)">
-                    {{ signal.hero }}
-                  </div>
-                </div>
+              <!-- Show more if available -->
+              <div 
+                v-if="allArtistIds.length > 3"
+                class="text-center text-xs text-gray-500 py-2"
+              >
+                + {{ allArtistIds.length - 3 }} more artist{{ allArtistIds.length - 3 !== 1 ? 's' : '' }}
               </div>
             </div>
           </div>
@@ -135,6 +139,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useAgencyPortalStore } from '~/stores/agencyPortal'
+
 const props = defineProps({
   isOpen: Boolean,
   city: Object
@@ -142,20 +149,57 @@ const props = defineProps({
 
 defineEmits(['close', 'openArtist'])
 
-function getArtistCitySignals(bandId) {
-  if (!props.city?.signals) return []
-  return props.city.signals.filter(s => s.bandId === bandId)
+const store = useAgencyPortalStore()
+
+// V1.1: Heat-based styling
+const heatScore = computed(() => props.city?.heatScore || 0)
+
+const heatBgClass = computed(() => {
+  if (heatScore.value >= 80) return 'bg-rose-500/20'
+  if (heatScore.value >= 60) return 'bg-amber-500/20'
+  if (heatScore.value >= 40) return 'bg-blue-500/20'
+  return 'bg-gray-800'
+})
+
+const heatTextClass = computed(() => {
+  if (heatScore.value >= 80) return 'text-rose-400'
+  if (heatScore.value >= 60) return 'text-amber-400'
+  if (heatScore.value >= 40) return 'text-blue-400'
+  return 'text-gray-400'
+})
+
+const heatBarClass = computed(() => {
+  if (heatScore.value >= 80) return 'bg-gradient-to-r from-rose-600 to-rose-400'
+  if (heatScore.value >= 60) return 'bg-gradient-to-r from-amber-600 to-amber-400'
+  if (heatScore.value >= 40) return 'bg-gradient-to-r from-blue-600 to-blue-400'
+  return 'bg-gray-600'
+})
+
+// V1.1: Get artist IDs from new structure
+const allArtistIds = computed(() => {
+  return props.city?.activeBandIds || props.city?.highMomentumBandIds || []
+})
+
+const topArtistIds = computed(() => {
+  return allArtistIds.value.slice(0, 3)
+})
+
+function getBandName(bandId) {
+  const band = store.getBandById(bandId)
+  return band?.name || 'Unknown'
 }
 
-function getAccentClass(accent) {
-  const classes = {
-    violet: 'text-violet-400',
-    blue: 'text-blue-400',
-    emerald: 'text-emerald-400',
-    amber: 'text-amber-400',
-    rose: 'text-rose-400'
-  }
-  return classes[accent] || classes.violet
+function getBandInitial(bandId) {
+  const band = store.getBandById(bandId)
+  return band?.name?.charAt(0) || '?'
+}
+
+function getBandMomentumState(bandId) {
+  return store.getBandMomentumState(bandId)
+}
+
+function getBandVelocity(bandId) {
+  return store.getBandVelocity7d(bandId)
 }
 </script>
 

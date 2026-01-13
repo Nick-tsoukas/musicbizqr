@@ -151,6 +151,10 @@
 import { ref, computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 
+definePageMeta({
+  layout: 'agency'
+})
+
 useHead({
   title: 'Roster Admin - Agency Portal',
   meta: [

@@ -109,6 +109,10 @@
 <script setup>
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 
+definePageMeta({
+  layout: 'agency'
+})
+
 useHead({
   title: 'Team - Agency Portal',
   meta: [

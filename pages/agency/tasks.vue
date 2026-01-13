@@ -43,7 +43,7 @@
           Overdue ({{ tasksByStatus.overdue.length }})
         </h2>
         <div class="space-y-2">
-          <TaskRow 
+          <AgencyTaskRow 
             v-for="task in tasksByStatus.overdue" 
             :key="task.id" 
             :task="task"
@@ -58,7 +58,7 @@
       <div class="mb-6">
         <h2 class="text-white font-semibold mb-3">Open Tasks ({{ tasksByStatus.open.length }})</h2>
         <div class="space-y-2">
-          <TaskRow 
+          <AgencyTaskRow 
             v-for="task in tasksByStatus.open" 
             :key="task.id" 
             :task="task"
@@ -88,7 +88,7 @@
           Completed ({{ tasksByStatus.done.length }})
         </button>
         <div v-if="showCompleted" class="space-y-2">
-          <TaskRow 
+          <AgencyTaskRow 
             v-for="task in tasksByStatus.done" 
             :key="task.id" 
             :task="task"
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Task Drawer -->
-    <TaskDrawer
+    <AgencyTaskDrawer
       :is-open="taskDrawerOpen"
       :band-id="selectedBandId"
       :editing-task="editingTask"
@@ -150,6 +150,10 @@
 import { ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+
+definePageMeta({
+  layout: 'agency'
+})
 
 useHead({
   title: 'Tasks - Agency Portal',
