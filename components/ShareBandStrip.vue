@@ -274,51 +274,57 @@ function showToast(message, duration = 2000) {
 }
 
 // Image loader helper (for fan share image generator)
-// Handles CORS by testing if image can be drawn to canvas without tainting
-async function loadImageDirect(url, timeoutMs = 10000) {
+// Fetches image as blob to bypass CORS restrictions
+async function loadImageDirect(url, timeoutMs = 15000) {
   // Skip if no URL
   if (!url) {
     throw new Error('No URL provided')
   }
 
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
+  console.log('[loadImageDirect] Fetching image as blob:', url)
+
+  try {
+    // Fetch image as blob to bypass CORS
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
     
-    const timeout = setTimeout(() => {
-      console.warn('[loadImageDirect] Timeout loading:', url)
-      reject(new Error('Image load timeout'))
-    }, timeoutMs)
+    const response = await fetch(url, {
+      signal: controller.signal,
+      mode: 'cors',
+      credentials: 'omit',
+    })
     
-    img.onload = () => {
-      clearTimeout(timeout)
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    
+    const blob = await response.blob()
+    const objectUrl = URL.createObjectURL(blob)
+    
+    // Load image from object URL (no CORS issues)
+    return new Promise((resolve, reject) => {
+      const img = new Image()
       
-      // Test if we can actually use this image on canvas without CORS issues
-      try {
-        const testCanvas = document.createElement('canvas')
-        testCanvas.width = 10
-        testCanvas.height = 10
-        const testCtx = testCanvas.getContext('2d')
-        testCtx.drawImage(img, 0, 0, 10, 10)
-        
-        // This will throw if canvas is tainted
-        testCanvas.toDataURL()
-        
-        console.log('[loadImageDirect] Image loaded and CORS-safe:', url)
+      img.onload = () => {
+        console.log('[loadImageDirect] Image loaded from blob:', img.width, 'x', img.height)
+        // Don't revoke URL yet - we need it for canvas drawing
+        // It will be garbage collected when the image is no longer referenced
         resolve(img)
-      } catch (corsErr) {
-        console.warn('[loadImageDirect] Image loaded but CORS-tainted:', url)
-        reject(new Error('CORS tainted'))
       }
-    }
-    img.onerror = (err) => {
-      clearTimeout(timeout)
-      console.warn('[loadImageDirect] Image load error:', url, err)
-      reject(err || new Error('Image load error'))
-    }
-    
-    img.src = url
-  })
+      img.onerror = (err) => {
+        URL.revokeObjectURL(objectUrl)
+        console.warn('[loadImageDirect] Failed to load from blob URL')
+        reject(err || new Error('Image load error'))
+      }
+      
+      img.src = objectUrl
+    })
+  } catch (err) {
+    console.warn('[loadImageDirect] Fetch failed:', err.message)
+    throw err
+  }
 }
 
 // Image generation with caching - uses new poster-style fan share image
