@@ -68,7 +68,30 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
-                {{ copied ? 'Copied!' : 'Copy Summary' }}
+                {{ copied === 'summary' ? 'Copied!' : 'Copy Summary' }}
+              </button>
+            </div>
+
+            <!-- V1.2: Slack Copy Buttons -->
+            <div class="mt-6 space-y-3">
+              <label class="block text-sm text-gray-400 mb-2">Slack-Ready Outputs</label>
+              <button 
+                @click="copySlackUpdate"
+                class="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 border border-gray-700"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                {{ copied === 'slack' ? 'Copied!' : 'Copy Slack Update' }}
+              </button>
+              <button 
+                @click="copyThreadPack"
+                class="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 border border-gray-700"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
+                {{ copied === 'thread' ? 'Copied!' : 'Copy Thread Pack (4 msgs)' }}
               </button>
             </div>
 
@@ -93,6 +116,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+import { slackUpdate, slackThreadPack } from '~/utils/agencyPortal/briefGenerators'
+import { getPlaybookForSignalType } from '~/utils/agencyPortal/mockData'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -102,12 +127,22 @@ const props = defineProps({
 defineEmits(['close'])
 
 const store = useAgencyPortalStore()
-const copied = ref(false)
+const copied = ref('')
 const proofCard = ref(null)
 
 const band = computed(() => {
   if (!props.signal?.bandId) return null
   return store.getBandById(props.signal.bandId)
+})
+
+const owner = computed(() => {
+  if (!props.signal?.bandId) return null
+  return store.getOwnerForBand(props.signal.bandId)
+})
+
+const playbook = computed(() => {
+  if (!props.signal?.type) return null
+  return getPlaybookForSignalType(props.signal.type)
 })
 
 const cardClasses = computed(() => {
@@ -130,8 +165,51 @@ const summaryText = computed(() => {
 async function copySummary() {
   try {
     await navigator.clipboard.writeText(summaryText.value)
-    copied.value = true
-    setTimeout(() => { copied.value = false }, 2000)
+    copied.value = 'summary'
+    setTimeout(() => { copied.value = '' }, 2000)
+  } catch (e) {
+    console.error('Failed to copy:', e)
+  }
+}
+
+async function copySlackUpdate() {
+  if (!props.signal || !band.value) return
+  try {
+    const text = slackUpdate({
+      signal: props.signal,
+      band: band.value,
+      owner: owner.value,
+      playbook: playbook.value
+    })
+    await navigator.clipboard.writeText(text)
+    copied.value = 'slack'
+    setTimeout(() => { copied.value = '' }, 2000)
+  } catch (e) {
+    console.error('Failed to copy:', e)
+  }
+}
+
+async function copyThreadPack() {
+  if (!props.signal || !band.value) return
+  try {
+    const metrics = {
+      momentumState: store.getBandMomentumState(props.signal.bandId),
+      velocity7d: store.getBandVelocity7d(props.signal.bandId),
+      topCity: store.getBandTopCity(props.signal.bandId)
+    }
+    const cityData = store.cityHeatScores.find(c => c.name === metrics.topCity)
+    
+    const text = slackThreadPack({
+      signal: props.signal,
+      band: band.value,
+      owner: owner.value,
+      playbook: playbook.value,
+      metrics,
+      cityData
+    })
+    await navigator.clipboard.writeText(text)
+    copied.value = 'thread'
+    setTimeout(() => { copied.value = '' }, 2000)
   } catch (e) {
     console.error('Failed to copy:', e)
   }

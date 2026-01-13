@@ -2,9 +2,42 @@
   <AgencyLayout>
     <div class="max-w-4xl mx-auto">
       <!-- Page Header -->
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold text-white mb-2">Roster Inbox</h1>
-        <p class="text-gray-400">Triage your roster's signals and take action</p>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white mb-2">Roster Inbox</h1>
+          <p class="text-gray-400">Triage your roster's signals and take action</p>
+        </div>
+        <button
+          @click="briefsDrawerOpen = true"
+          class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Briefs
+        </button>
+      </div>
+
+      <!-- V1.2: Daily Brief Strip -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-3">
+          <div class="text-xs text-gray-500 mb-1">Top Mover</div>
+          <div class="text-white font-medium text-sm truncate">{{ topMover?.bandName || 'N/A' }}</div>
+          <div class="text-emerald-400 text-xs">{{ topMover ? formatVelocity(topMover.velocity) : '' }}</div>
+        </div>
+        <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-3">
+          <div class="text-xs text-gray-500 mb-1">Hottest City</div>
+          <div class="text-white font-medium text-sm truncate">{{ hottestCity?.name || 'N/A' }}</div>
+          <div class="text-amber-400 text-xs">Heat {{ hottestCity?.heatScore || 0 }}</div>
+        </div>
+        <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-3">
+          <div class="text-xs text-gray-500 mb-1">Overdue Tasks</div>
+          <div class="text-2xl font-bold" :class="overdueCount > 0 ? 'text-red-400' : 'text-emerald-400'">{{ overdueCount }}</div>
+        </div>
+        <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-3">
+          <div class="text-xs text-gray-500 mb-1">Needs Action</div>
+          <div class="text-2xl font-bold text-violet-400">{{ needsActionCount }}</div>
+        </div>
       </div>
 
       <!-- Search -->
@@ -87,6 +120,12 @@
       :signal="selectedSignal"
       @close="proofDrawerOpen = false"
     />
+
+    <!-- V1.2: Briefs Drawer -->
+    <AgencyBriefsDrawer
+      :is-open="briefsDrawerOpen"
+      @close="briefsDrawerOpen = false"
+    />
   </AgencyLayout>
 </template>
 
@@ -112,8 +151,19 @@ const store = useAgencyPortalStore()
 const searchQuery = ref('')
 const assignDrawerOpen = ref(false)
 const proofDrawerOpen = ref(false)
+const briefsDrawerOpen = ref(false)
 const selectedBandId = ref(null)
 const selectedSignal = ref(null)
+
+// V1.2: Daily Brief Strip data
+const topMover = computed(() => store.topMovers[0] || null)
+const hottestCity = computed(() => store.cityHeatScores[0] || null)
+const overdueCount = computed(() => store.overdueTasks.length)
+const needsActionCount = computed(() => store.triageBuckets.needsAction.length)
+
+function formatVelocity(v) {
+  return v >= 0 ? `+${v}` : `${v}`
+}
 
 const filteredBuckets = computed(() => {
   const buckets = store.triageBuckets

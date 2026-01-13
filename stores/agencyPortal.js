@@ -536,6 +536,32 @@ export const useAgencyPortalStore = defineStore('agencyPortal', {
       const { showHandled = false } = options
       const allSignals = Object.values(state.signalsByBandId).flat()
       return state.hygieneSignals(allSignals, { showHandled })
+    },
+
+    // V1.2: Get band's top city from daily metrics or signals
+    getBandTopCity: (state) => (bandId) => {
+      const metrics = state.getBandDailyMetrics(bandId)
+      if (metrics && metrics.length > 0) {
+        return metrics[metrics.length - 1]?.topCity || null
+      }
+      const signals = state.signalsByBandId[bandId] || []
+      const citySignal = signals.find(s => s.context?.city)
+      return citySignal?.context?.city || null
+    },
+
+    // V1.2: Get overdue tasks
+    overdueTasks: (state) => {
+      const now = new Date()
+      return state.tasks.filter(t => {
+        if (t.status === 'done') return false
+        if (!t.dueAt) return false
+        return new Date(t.dueAt) < now
+      })
+    },
+
+    // V1.2: Get open tasks
+    openTasks: (state) => {
+      return state.tasks.filter(t => t.status !== 'done')
     }
   },
 

@@ -48,6 +48,37 @@
             </button>
           </div>
         </div>
+
+        <!-- V1.2: Share / Brief Row -->
+        <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-800">
+          <button
+            @click="copySlackUpdate"
+            class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            {{ copyFeedback === 'slack' ? 'Copied!' : 'Slack Update' }}
+          </button>
+          <button
+            @click="copyThreadPack"
+            class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+            </svg>
+            {{ copyFeedback === 'thread' ? 'Copied!' : 'Thread Pack' }}
+          </button>
+          <button
+            @click="copyArtistPack"
+            class="px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {{ copyFeedback === 'pack' ? 'Copied!' : 'Artist Pack' }}
+          </button>
+        </div>
       </div>
 
       <!-- Top Signals Row -->
@@ -187,6 +218,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
 import { getPlaybookForSignalType, getMomentumState } from '~/utils/agencyPortal/mockData'
+import { slackUpdate, slackThreadPack, artistMomentumPack, generateNarrativeLines, generateProofLines } from '~/utils/agencyPortal/briefGenerators'
 
 definePageMeta({
   layout: 'agency'
@@ -234,6 +266,82 @@ const proofDrawerOpen = ref(false)
 const taskDrawerOpen = ref(false)
 const selectedSignal = ref(null)
 const editingTask = ref(null)
+const copyFeedback = ref('')
+
+// V1.2: Copy functions for briefs
+async function copySlackUpdate() {
+  const topSignal = topSignals.value[0]
+  if (!band.value || !topSignal) return
+  try {
+    const text = slackUpdate({
+      signal: topSignal,
+      band: band.value,
+      owner: owner.value,
+      playbook: suggestedPlaybook.value
+    })
+    await navigator.clipboard.writeText(text)
+    copyFeedback.value = 'slack'
+    setTimeout(() => { copyFeedback.value = '' }, 2000)
+  } catch (e) {
+    console.error('Failed to copy:', e)
+  }
+}
+
+async function copyThreadPack() {
+  const topSignal = topSignals.value[0]
+  if (!band.value || !topSignal) return
+  try {
+    const metrics = {
+      momentumState: store.getBandMomentumState(bandId.value),
+      velocity7d: store.getBandVelocity7d(bandId.value),
+      topCity: store.getBandTopCity(bandId.value)
+    }
+    const cityData = store.cityHeatScores.find(c => c.name === metrics.topCity)
+    const text = slackThreadPack({
+      signal: topSignal,
+      band: band.value,
+      owner: owner.value,
+      playbook: suggestedPlaybook.value,
+      metrics,
+      cityData
+    })
+    await navigator.clipboard.writeText(text)
+    copyFeedback.value = 'thread'
+    setTimeout(() => { copyFeedback.value = '' }, 2000)
+  } catch (e) {
+    console.error('Failed to copy:', e)
+  }
+}
+
+async function copyArtistPack() {
+  const topSignal = topSignals.value[0]
+  if (!band.value) return
+  try {
+    const metrics = {
+      momentumState: store.getBandMomentumState(bandId.value),
+      momentumIndex: store.getBandMomentumIndex(bandId.value),
+      velocity7d: store.getBandVelocity7d(bandId.value),
+      topCity: store.getBandTopCity(bandId.value),
+      window: '7d'
+    }
+    const narrativeLines = generateNarrativeLines(metrics, topSignal)
+    const proofLines = generateProofLines(signals.value, band.value)
+    const text = artistMomentumPack({
+      band: band.value,
+      signal: topSignal,
+      metrics,
+      playbook: suggestedPlaybook.value,
+      owner: owner.value,
+      narrativeLines,
+      proofLines
+    })
+    await navigator.clipboard.writeText(text)
+    copyFeedback.value = 'pack'
+    setTimeout(() => { copyFeedback.value = '' }, 2000)
+  } catch (e) {
+    console.error('Failed to copy:', e)
+  }
+}
 
 function signalTextClass(accent) {
   const classes = {

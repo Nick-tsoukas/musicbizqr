@@ -68,6 +68,17 @@
               </div>
             </div>
 
+            <!-- V1.2: Copy City Brief Button -->
+            <button
+              @click="copyCityBrief"
+              class="w-full mb-4 px-4 py-3 bg-violet-600 hover:bg-violet-500 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {{ copyFeedback ? 'Copied!' : 'Copy City Claim Brief' }}
+            </button>
+
             <!-- Stack Alert -->
             <div 
               v-if="city.isStack"
@@ -139,8 +150,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useAgencyPortalStore } from '~/stores/agencyPortal'
+import { cityClaimBrief } from '~/utils/agencyPortal/briefGenerators'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -150,6 +162,38 @@ const props = defineProps({
 defineEmits(['close', 'openArtist'])
 
 const store = useAgencyPortalStore()
+const copyFeedback = ref(false)
+
+// V1.2: Copy City Claim Brief
+async function copyCityBrief() {
+  if (!props.city) return
+  try {
+    const cityBands = props.city.activeBandIds || []
+    const topArtists = cityBands.slice(0, 5).map(bandId => {
+      const band = store.getBandById(bandId)
+      const signals = store.getSignalsForBand(bandId)
+      const topSignal = signals[0]
+      return {
+        bandId,
+        bandName: band?.name || 'Unknown',
+        momentumState: store.getBandMomentumState(bandId),
+        momentumIndex: store.getBandMomentumIndex(bandId),
+        topSignalProof: topSignal?.proof
+      }
+    })
+    
+    const text = cityClaimBrief({
+      city: props.city,
+      window: '7d',
+      topArtists
+    })
+    await navigator.clipboard.writeText(text)
+    copyFeedback.value = true
+    setTimeout(() => { copyFeedback.value = false }, 2000)
+  } catch (e) {
+    console.error('Failed to copy:', e)
+  }
+}
 
 // V1.1: Heat-based styling
 const heatScore = computed(() => props.city?.heatScore || 0)

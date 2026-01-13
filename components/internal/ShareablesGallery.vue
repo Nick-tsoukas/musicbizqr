@@ -266,7 +266,10 @@ async function regenerateBandCard(card) {
         microCaption: card.microCaption,
         selectedCaptionStyle: selectedTone.value,
       },
-      band: card.band,
+      bandName: card.band?.name || 'Artist',
+      bandImageUrl: card.band?.imageUrl || null,
+      isBandNameInLogo: card.band?.isBandNameInLogo || false,
+      captionStyle: selectedTone.value,
     })
     
     if (blob && tile.setImage) {
