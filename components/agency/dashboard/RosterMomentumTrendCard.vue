@@ -39,16 +39,23 @@
 
     <!-- Sparkline Chart -->
     <div class="h-16 relative">
-      <svg class="w-full h-full" preserveAspectRatio="none">
+      <!-- Empty state when no data -->
+      <div v-if="!hasValidData" class="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <p class="text-gray-500 text-xs">Not enough momentum data</p>
+        <p class="text-gray-600 text-[10px] mt-1">Add bandDailyMetrics for the last {{ days }} days</p>
+      </div>
+      
+      <!-- Chart when data exists -->
+      <svg v-else class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <!-- Grid lines -->
-        <line x1="0" y1="25%" x2="100%" y2="25%" stroke="#374151" stroke-width="1" stroke-dasharray="4" />
-        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#374151" stroke-width="1" stroke-dasharray="4" />
-        <line x1="0" y1="75%" x2="100%" y2="75%" stroke="#374151" stroke-width="1" stroke-dasharray="4" />
+        <line x1="0" y1="25" x2="100" y2="25" stroke="#374151" stroke-width="0.5" stroke-dasharray="2" />
+        <line x1="0" y1="50" x2="100" y2="50" stroke="#374151" stroke-width="0.5" stroke-dasharray="2" />
+        <line x1="0" y1="75" x2="100" y2="75" stroke="#374151" stroke-width="0.5" stroke-dasharray="2" />
         
         <!-- Area fill -->
         <path 
           :d="areaPath" 
-          fill="url(#gradient)" 
+          fill="url(#momentumGradient)" 
           opacity="0.3"
         />
         
@@ -60,11 +67,12 @@
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          vector-effect="non-scaling-stroke"
         />
         
         <!-- Gradient definition -->
         <defs>
-          <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="momentumGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stop-color="#8b5cf6" />
             <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0" />
           </linearGradient>
@@ -77,6 +85,21 @@
       <span>{{ days }}d ago</span>
       <span>Today</span>
     </div>
+
+    <!-- Dev-only Debug Panel -->
+    <div v-if="isDev && debugOpen" class="mt-3 p-2 bg-gray-800 rounded text-xs text-gray-400 font-mono">
+      <div>Window: {{ days }}d | Series: {{ trendData.length }} pts</div>
+      <div v-if="trendData.length">First: {{ trendData[0]?.date }} ({{ trendData[0]?.avgIndex }})</div>
+      <div v-if="trendData.length">Last: {{ trendData[trendData.length-1]?.date }} ({{ trendData[trendData.length-1]?.avgIndex }})</div>
+      <div>Min/Max: {{ debugMin }}/{{ debugMax }}</div>
+    </div>
+    <button 
+      v-if="isDev" 
+      @click.stop="debugOpen = !debugOpen"
+      class="absolute top-2 right-2 text-[10px] text-gray-600 hover:text-gray-400"
+    >
+      {{ debugOpen ? '✕' : '🐛' }}
+    </button>
   </div>
 </template>
 
@@ -87,6 +110,10 @@ import { safeInt, isValidNumber } from '~/utils/agencyPortal/validateMockData'
 
 defineEmits(['click'])
 
+// Dev mode detection
+const isDev = process.dev || import.meta.dev || process.env.NODE_ENV !== 'production'
+const debugOpen = ref(false)
+
 const store = useAgencyPortalStore()
 const days = ref(7)
 
@@ -94,6 +121,11 @@ const trendData = computed(() => {
   const data = store.rosterMomentumTrend(days.value)
   // Filter out invalid data points
   return (data || []).filter(d => isValidNumber(d?.avgIndex))
+})
+
+// Check if we have valid data to render
+const hasValidData = computed(() => {
+  return trendData.value.length >= 2
 })
 
 const currentAvg = computed(() => {
@@ -110,33 +142,54 @@ const trendDirection = computed(() => {
   return Math.round(last - first)
 })
 
+// Debug helpers
+const debugMin = computed(() => {
+  if (!trendData.value.length) return 0
+  return Math.min(...trendData.value.map(d => d.avgIndex))
+})
+
+const debugMax = computed(() => {
+  if (!trendData.value.length) return 0
+  return Math.max(...trendData.value.map(d => d.avgIndex))
+})
+
+// SVG line points (numeric coordinates for viewBox 0 0 100 100)
 const linePoints = computed(() => {
   if (!trendData.value.length) return ''
-  const max = Math.max(...trendData.value.map(d => d.avgIndex), 100)
-  const min = Math.min(...trendData.value.map(d => d.avgIndex), 0)
+  const values = trendData.value.map(d => d.avgIndex)
+  const max = Math.max(...values, 100)
+  const min = Math.min(...values, 0)
   const range = max - min || 1
   
   return trendData.value.map((d, i) => {
-    const x = (i / (trendData.value.length - 1)) * 100
+    const x = trendData.value.length === 1 ? 50 : (i / (trendData.value.length - 1)) * 100
     const y = 100 - ((d.avgIndex - min) / range) * 100
-    return `${x}%,${y}%`
+    // Clamp y to valid range
+    const safeY = Math.max(5, Math.min(95, y))
+    return `${x},${safeY}`
   }).join(' ')
 })
 
+// SVG area path (for gradient fill)
 const areaPath = computed(() => {
   if (!trendData.value.length) return ''
-  const max = Math.max(...trendData.value.map(d => d.avgIndex), 100)
-  const min = Math.min(...trendData.value.map(d => d.avgIndex), 0)
+  const values = trendData.value.map(d => d.avgIndex)
+  const max = Math.max(...values, 100)
+  const min = Math.min(...values, 0)
   const range = max - min || 1
   
   const points = trendData.value.map((d, i) => {
-    const x = (i / (trendData.value.length - 1)) * 100
+    const x = trendData.value.length === 1 ? 50 : (i / (trendData.value.length - 1)) * 100
     const y = 100 - ((d.avgIndex - min) / range) * 100
-    return `${x} ${y}`
+    const safeY = Math.max(5, Math.min(95, y))
+    return { x, y: safeY }
   })
   
-  return `M 0 100 L 0 ${100 - ((trendData.value[0].avgIndex - min) / range) * 100} ` +
-         points.map((p, i) => `L ${p}`).join(' ') +
-         ` L 100 100 Z`
+  const firstY = points[0]?.y || 50
+  const lastX = points[points.length - 1]?.x || 100
+  
+  return `M 0 100 L 0 ${firstY} ` +
+         points.map(p => `L ${p.x} ${p.y}`).join(' ') +
+         ` L ${lastX} 100 Z`
 })
 </script>

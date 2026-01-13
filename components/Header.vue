@@ -38,6 +38,7 @@
           Logout
         </p>
         <NuxtLink to="/article" class="nav-link">Articles</NuxtLink>
+        <NuxtLink to="/agency" class="nav-link">Agency</NuxtLink>
         <NuxtLink to="/saved" class="nav-link">
           Saved
           <client-only>
@@ -138,6 +139,9 @@
         >
         <NuxtLink to="/contact" @click="toggleMenu" class="mobile-nav-link"
           >Contact</NuxtLink
+        >
+        <NuxtLink to="/agency" @click="toggleMenu" class="mobile-nav-link"
+          >Agency</NuxtLink
         >
         <NuxtLink
           v-if="user"
