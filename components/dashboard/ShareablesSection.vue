@@ -262,7 +262,7 @@ async function fetchData() {
   
   try {
     const response = await fetch(
-      `${strapiUrl}/api/shareables/cards?bandId=${props.bandId}&range=24h`
+      `${strapiUrl}/api/pulse/shareables?bandId=${props.bandId}`
     )
     const data = await response.json()
     
