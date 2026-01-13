@@ -198,9 +198,9 @@ export async function generateFanShareImage({
 
     // Helper to draw placeholder with initials
     function drawPlaceholder() {
-      console.log('[fanShareImage] Drawing placeholder, bandName:', bandName)
+      console.log('[fanShareImage] Drawing placeholder, bandName:', bandName, 'at y:', imageY)
       
-      // Draw circle background
+      // Draw circle background - more visible
       ctx.beginPath()
       ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
       ctx.closePath()
@@ -208,16 +208,16 @@ export async function generateFanShareImage({
         width / 2 - imageSize / 2, imageY,
         width / 2 + imageSize / 2, imageY + imageSize
       )
-      placeholderGradient.addColorStop(0, accent.primary + '60')
-      placeholderGradient.addColorStop(1, accent.primary + '30')
+      placeholderGradient.addColorStop(0, accent.primary)
+      placeholderGradient.addColorStop(1, accent.primary + '80')
       ctx.fillStyle = placeholderGradient
       ctx.fill()
       
-      // Draw border
+      // Draw border - more visible
       ctx.beginPath()
       ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
-      ctx.strokeStyle = accent.primary + '50'
-      ctx.lineWidth = 3
+      ctx.strokeStyle = '#ffffff'
+      ctx.lineWidth = 4
       ctx.stroke()
 
       // Draw initials
@@ -232,9 +232,9 @@ export async function generateFanShareImage({
           .toUpperCase()
         
         if (initials) {
-          ctx.font = 'bold 100px system-ui, -apple-system, sans-serif'
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-          ctx.fillText(initials, width / 2, imageY + imageSize / 2 + 35)
+          ctx.font = 'bold 120px system-ui, -apple-system, sans-serif'
+          ctx.fillStyle = '#ffffff'
+          ctx.fillText(initials, width / 2, imageY + imageSize / 2 + 40)
         }
       }
     }
