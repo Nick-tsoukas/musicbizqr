@@ -52,17 +52,66 @@
 
         <!-- Content -->
         <div class="p-5 space-y-5">
-          <!-- Stats -->
-          <div class="space-y-2">
-            <div v-if="item.primaryStat" class="flex items-center gap-2 text-sm">
-              <span class="text-purple-400 font-semibold">{{ item.primaryStat }}</span>
-            </div>
-            <div v-if="item.secondaryStat" class="flex items-center gap-2 text-sm text-white/50">
-              <span>{{ item.secondaryStat }}</span>
-            </div>
-            <div v-if="item.context?.venueName" class="flex items-center gap-2 text-xs text-white/40">
-              <span>📍</span>
-              <span>{{ item.context.venueName }}</span>
+          <!-- Card Preview -->
+          <div class="card-preview-container relative rounded-xl overflow-hidden bg-black/40 border border-white/10">
+            <div class="aspect-square w-full max-w-[320px] mx-auto p-4">
+              <!-- Preview card that matches export -->
+              <div 
+                class="w-full h-full rounded-xl overflow-hidden relative"
+                :style="previewCardStyle"
+              >
+                <!-- Background gradient -->
+                <div class="absolute inset-0" :class="previewGradientClass"></div>
+                
+                <!-- Accent orb -->
+                <div 
+                  class="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl opacity-40"
+                  :style="{ backgroundColor: accentColor }"
+                ></div>
+
+                <!-- Content -->
+                <div class="relative z-10 h-full flex flex-col p-4 text-center">
+                  <!-- Window label -->
+                  <div class="mb-2">
+                    <span 
+                      class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+                      :style="previewBadgeStyle"
+                    >
+                      {{ item.windowLabel }}
+                    </span>
+                  </div>
+
+                  <!-- Headline -->
+                  <h4 class="text-white text-xs font-bold mb-2 line-clamp-2">
+                    {{ item.title }}
+                  </h4>
+
+                  <!-- Hero stat -->
+                  <div class="flex-1 flex items-center justify-center">
+                    <span 
+                      class="text-2xl font-black"
+                      :style="previewHeroStyle"
+                    >
+                      {{ item.primaryStat }}
+                    </span>
+                  </div>
+
+                  <!-- Proof -->
+                  <p class="text-white/60 text-[9px] uppercase tracking-wide mb-2">
+                    {{ item.secondaryStat }}
+                  </p>
+
+                  <!-- Caption preview -->
+                  <p class="text-white/70 text-[10px] italic mb-2 line-clamp-2">
+                    "{{ selectedCaption }}"
+                  </p>
+
+                  <!-- Band name -->
+                  <p v-if="!item.band?.isBandNameInLogo" class="text-white text-xs font-semibold">
+                    {{ item.band?.name }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -201,10 +250,12 @@ const emit = defineEmits(['update:modelValue'])
 
 const {
   generateShareImage,
+  generateShareCardImage,
   webShare,
   copyToClipboard,
   downloadBlob,
   openFacebookSharer,
+  ACCENT_COLORS,
 } = useShareKit()
 
 // State
@@ -223,6 +274,41 @@ const captionVariants = [
   { key: 'grateful', label: '🙏 Grateful' },
   { key: 'tease', label: '👀 Tease' },
 ]
+
+// Accent color helpers
+const accentColor = computed(() => {
+  const accent = props.item?.accent || 'violet'
+  return ACCENT_COLORS?.[accent]?.primary || '#8B5CF6'
+})
+
+const previewGradientClass = computed(() => {
+  const accent = props.item?.accent || 'violet'
+  const gradientMap = {
+    violet: 'bg-gradient-to-br from-violet-900/80 via-gray-900 to-gray-900',
+    blue: 'bg-gradient-to-br from-blue-900/80 via-gray-900 to-gray-900',
+    emerald: 'bg-gradient-to-br from-emerald-900/80 via-gray-900 to-gray-900',
+    amber: 'bg-gradient-to-br from-amber-900/80 via-gray-900 to-gray-900',
+    rose: 'bg-gradient-to-br from-rose-900/80 via-gray-900 to-gray-900',
+  }
+  return gradientMap[accent] || gradientMap.violet
+})
+
+const previewCardStyle = computed(() => ({
+  border: `1px solid ${accentColor.value}33`,
+}))
+
+const previewBadgeStyle = computed(() => ({
+  backgroundColor: `${accentColor.value}20`,
+  color: accentColor.value,
+  borderColor: `${accentColor.value}40`,
+}))
+
+const previewHeroStyle = computed(() => ({
+  background: `linear-gradient(135deg, #F472B6, ${accentColor.value}, #60A5FA, #34D399)`,
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+}))
 
 // Computed
 const badgeClass = computed(() => {
@@ -273,17 +359,28 @@ async function getOrGenerateImage() {
   const band = props.item?.band
   if (!band) return null
 
-  const blob = await generateShareImage({
+  // Build card object for new generator
+  const card = {
+    headline: props.item?.title,
+    hero: props.item?.primaryStat,
+    proof: props.item?.secondaryStat,
+    accent: props.item?.accent || 'violet',
+    microCaption: props.item?.share?.captions || null,
+  }
+
+  // Use new generateShareCardImage for V1 cards
+  const blob = await generateShareCardImage({
     canvasEl: canvasRef.value,
+    card,
     bandName: band.name,
     bandImageUrl: band.imageUrl,
-    momentTitle: props.item?.title,
-    subtitle: props.item?.secondaryStat || null,
     isBandNameInLogo: band.isBandNameInLogo,
+    captionStyle: captionStyle.value,
   })
 
   if (blob) {
     cachedImageBlob.value = blob
+    // Cache for 30 seconds
     setTimeout(() => { cachedImageBlob.value = null }, 30000)
   }
 
@@ -400,6 +497,11 @@ watch(() => props.item, () => {
   captionStyle.value = props.item?.share?.defaultCaptionStyle || 'hype'
 })
 
+// Clear cache when caption style changes (so image regenerates with new caption)
+watch(captionStyle, () => {
+  cachedImageBlob.value = null
+})
+
 // Track when drawer opens
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
@@ -463,5 +565,14 @@ onUnmounted(() => {
 .toast-leave-to {
   opacity: 0;
   transform: translate(-50%, 10px);
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

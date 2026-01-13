@@ -424,15 +424,340 @@ export function useShareKit() {
     return `${bandSlug}-${type}.png`
   }
 
+  // ============================================================
+  // NEW: ShareCard Image Generation (V1 Shareables)
+  // ============================================================
+
+  const ACCENT_COLORS = {
+    violet: { primary: '#8B5CF6', glow: 'rgba(139, 92, 246, 0.25)' },
+    blue: { primary: '#3B82F6', glow: 'rgba(59, 130, 246, 0.25)' },
+    emerald: { primary: '#10B981', glow: 'rgba(16, 185, 129, 0.25)' },
+    amber: { primary: '#F59E0B', glow: 'rgba(245, 158, 11, 0.25)' },
+    rose: { primary: '#F43F5E', glow: 'rgba(244, 63, 94, 0.25)' },
+  }
+
+  /**
+   * Strip leading emoji from text for canvas rendering
+   */
+  function stripLeadingEmoji(text) {
+    if (!text) return ''
+    // Remove leading emoji and whitespace
+    return text.replace(/^[\p{Emoji}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}\s]+/u, '').trim()
+  }
+
+  /**
+   * Wrap text to fit within maxWidth, shrinking font if needed
+   * Returns { lines: string[], fontSize: number }
+   */
+  function wrapText(ctx, text, maxWidth, maxLines = 2, baseFontSize = 40, minFontSize = 28) {
+    let fontSize = baseFontSize
+    let lines = []
+
+    while (fontSize >= minFontSize) {
+      ctx.font = `bold ${fontSize}px system-ui, -apple-system, sans-serif`
+      lines = []
+      const words = text.split(' ')
+      let currentLine = ''
+
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word
+        const metrics = ctx.measureText(testLine)
+        
+        if (metrics.width > maxWidth && currentLine) {
+          lines.push(currentLine)
+          currentLine = word
+        } else {
+          currentLine = testLine
+        }
+      }
+      if (currentLine) lines.push(currentLine)
+
+      if (lines.length <= maxLines) {
+        return { lines, fontSize }
+      }
+      fontSize -= 2
+    }
+
+    // If still too many lines, truncate
+    if (lines.length > maxLines) {
+      lines = lines.slice(0, maxLines)
+      lines[maxLines - 1] = lines[maxLines - 1].slice(0, -3) + '...'
+    }
+
+    return { lines, fontSize: minFontSize }
+  }
+
+  /**
+   * Fit hero text to width, shrinking if needed
+   * Returns { text: string, fontSize: number }
+   */
+  function fitHeroText(ctx, text, maxWidth, baseFontSize = 128, minFontSize = 72) {
+    let fontSize = baseFontSize
+
+    while (fontSize >= minFontSize) {
+      ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`
+      const metrics = ctx.measureText(text)
+      
+      if (metrics.width <= maxWidth) {
+        return { text, fontSize }
+      }
+      fontSize -= 4
+    }
+
+    return { text, fontSize: minFontSize }
+  }
+
+  /**
+   * Generate share card image for V1 Shareables
+   * @param {Object} options
+   * @param {HTMLCanvasElement} options.canvasEl - Canvas element (1080x1080)
+   * @param {Object} options.card - Card data { headline, hero, proof, accent, microCaption }
+   * @param {string} options.bandName - Band name
+   * @param {string|null} options.bandImageUrl - Optional band image URL
+   * @param {boolean} options.isBandNameInLogo - Skip band name if true
+   * @param {string} options.captionStyle - 'hype' | 'grateful' | 'tease'
+   * @returns {Promise<Blob|null>}
+   */
+  async function generateShareCardImage({
+    canvasEl,
+    card,
+    bandName,
+    bandImageUrl = null,
+    isBandNameInLogo = false,
+    captionStyle = 'hype',
+  }) {
+    if (!canvasEl || !card) return null
+
+    try {
+      const ctx = canvasEl.getContext('2d')
+      const width = 1080
+      const height = 1080
+
+      // Get accent colors
+      const accent = ACCENT_COLORS[card.accent] || ACCENT_COLORS.violet
+
+      // === BACKGROUND ===
+      // Clean cinematic gradient
+      const bgGradient = ctx.createLinearGradient(0, 0, width, height)
+      bgGradient.addColorStop(0, '#1a0a2e')      // Deep purple-black
+      bgGradient.addColorStop(0.4, '#0f0f0f')    // Near black
+      bgGradient.addColorStop(0.7, '#0a1220')    // Hint of blue
+      bgGradient.addColorStop(1, '#0a1a1a')      // Dark teal hint
+      ctx.fillStyle = bgGradient
+      ctx.fillRect(0, 0, width, height)
+
+      // === DECORATIVE ELEMENTS ===
+      // Top-right accent orb
+      ctx.beginPath()
+      ctx.arc(width * 0.85, height * 0.12, 200, 0, Math.PI * 2)
+      const orbGradient = ctx.createRadialGradient(
+        width * 0.85, height * 0.12, 0,
+        width * 0.85, height * 0.12, 200
+      )
+      orbGradient.addColorStop(0, accent.glow)
+      orbGradient.addColorStop(1, 'transparent')
+      ctx.fillStyle = orbGradient
+      ctx.fill()
+
+      // Bottom-left subtle orb
+      ctx.beginPath()
+      ctx.arc(width * 0.15, height * 0.88, 150, 0, Math.PI * 2)
+      const orb2Gradient = ctx.createRadialGradient(
+        width * 0.15, height * 0.88, 0,
+        width * 0.15, height * 0.88, 150
+      )
+      orb2Gradient.addColorStop(0, 'rgba(16, 185, 129, 0.12)')
+      orb2Gradient.addColorStop(1, 'transparent')
+      ctx.fillStyle = orb2Gradient
+      ctx.fill()
+
+      ctx.textAlign = 'center'
+
+      // === ARTIST PHOTO ===
+      const hasImage = !!bandImageUrl
+      const imageSize = 280
+      const imageY = 160
+
+      if (bandImageUrl) {
+        try {
+          const img = await loadImage(bandImageUrl)
+          
+          if (img && img.width > 0 && img.height > 0) {
+            // Draw circular clipped image
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+            ctx.closePath()
+            ctx.clip()
+            
+            // Draw image centered and cover the circle
+            const imgAspect = img.width / img.height
+            let drawWidth, drawHeight, drawX, drawY
+            
+            if (imgAspect > 1) {
+              drawHeight = imageSize
+              drawWidth = imageSize * imgAspect
+              drawX = width / 2 - drawWidth / 2
+              drawY = imageY
+            } else {
+              drawWidth = imageSize
+              drawHeight = imageSize / imgAspect
+              drawX = width / 2 - imageSize / 2
+              drawY = imageY - (drawHeight - imageSize) / 2
+            }
+            
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
+            ctx.restore()
+            
+            // Add subtle border around image
+            ctx.beginPath()
+            ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+            ctx.lineWidth = 3
+            ctx.stroke()
+          }
+        } catch (imgErr) {
+          console.warn('[useShareKit] Failed to load band image:', imgErr)
+        }
+      } else {
+        // Placeholder circle with initials
+        ctx.beginPath()
+        ctx.arc(width / 2, imageY + imageSize / 2, imageSize / 2, 0, Math.PI * 2)
+        const placeholderGradient = ctx.createLinearGradient(
+          width / 2 - imageSize / 2, imageY,
+          width / 2 + imageSize / 2, imageY + imageSize
+        )
+        placeholderGradient.addColorStop(0, accent.primary + '40')
+        placeholderGradient.addColorStop(1, accent.primary + '20')
+        ctx.fillStyle = placeholderGradient
+        ctx.fill()
+
+        // Draw initials
+        const initials = bandName
+          .split(' ')
+          .map(w => w[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase()
+        ctx.font = 'bold 80px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+        ctx.fillText(initials, width / 2, imageY + imageSize / 2 + 28)
+      }
+
+      // === HEADLINE ===
+      const headlineY = hasImage ? imageY + imageSize + 60 : 280
+      const headlineText = stripLeadingEmoji(card.headline) || card.headline
+      const { lines: headlineLines, fontSize: headlineFontSize } = wrapText(
+        ctx, headlineText, width - 120, 2, 42, 30
+      )
+      
+      ctx.font = `bold ${headlineFontSize}px system-ui, -apple-system, sans-serif`
+      ctx.fillStyle = '#ffffff'
+      headlineLines.forEach((line, i) => {
+        ctx.fillText(line, width / 2, headlineY + i * (headlineFontSize + 8))
+      })
+
+      // === HERO STAT ===
+      const heroY = headlineY + headlineLines.length * (headlineFontSize + 8) + 80
+      const { text: heroText, fontSize: heroFontSize } = fitHeroText(
+        ctx, card.hero, width - 100, 120, 72
+      )
+
+      // Hero glow effect
+      ctx.save()
+      ctx.shadowColor = accent.glow
+      ctx.shadowBlur = 40
+      ctx.font = `900 ${heroFontSize}px system-ui, -apple-system, sans-serif`
+      
+      // MBQ gradient fill for hero
+      const heroGradient = ctx.createLinearGradient(
+        width / 2 - 200, heroY,
+        width / 2 + 200, heroY
+      )
+      heroGradient.addColorStop(0, '#F472B6')    // Pink
+      heroGradient.addColorStop(0.3, accent.primary)  // Accent color
+      heroGradient.addColorStop(0.6, '#60A5FA')  // Blue
+      heroGradient.addColorStop(1, '#34D399')    // Green
+      ctx.fillStyle = heroGradient
+      ctx.fillText(heroText, width / 2, heroY)
+      ctx.restore()
+
+      // Thin accent underline
+      ctx.beginPath()
+      ctx.moveTo(width / 2 - 80, heroY + 20)
+      ctx.lineTo(width / 2 + 80, heroY + 20)
+      ctx.strokeStyle = accent.primary + '60'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // === PROOF LINE ===
+      const proofY = heroY + 60
+      ctx.font = '600 28px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
+      ctx.fillText(card.proof || '', width / 2, proofY)
+
+      // === CAPTION (optional) ===
+      const caption = card.microCaption?.[captionStyle] || card.microCaption?.hype
+      if (caption) {
+        const captionY = proofY + 55
+        ctx.font = 'italic 30px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+        
+        // Wrap caption to 2 lines max
+        const { lines: captionLines } = wrapText(ctx, `"${caption}"`, width - 140, 2, 30, 24)
+        ctx.font = `italic 28px system-ui, -apple-system, sans-serif`
+        captionLines.forEach((line, i) => {
+          ctx.fillText(line, width / 2, captionY + i * 36)
+        })
+      }
+
+      // === BAND NAME ===
+      if (!isBandNameInLogo) {
+        const bandNameY = height - 160
+        ctx.font = 'bold 40px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = '#ffffff'
+        
+        // Truncate if too long
+        let displayName = bandName
+        while (ctx.measureText(displayName).width > width - 100 && displayName.length > 10) {
+          displayName = displayName.slice(0, -4) + '...'
+        }
+        ctx.fillText(displayName, width / 2, bandNameY)
+      }
+
+      // === TAGLINE ===
+      ctx.font = '28px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+      ctx.fillText('Scan • Listen • Follow', width / 2, height - 100)
+
+      // === BRANDING ===
+      ctx.font = '22px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'
+      ctx.fillText('via MusicBizQR', width / 2, height - 55)
+
+      // Convert to blob
+      return new Promise((resolve) => {
+        canvasEl.toBlob((blob) => {
+          resolve(blob)
+        }, 'image/png')
+      })
+    } catch (err) {
+      console.error('[useShareKit] Failed to generate share card image:', err)
+      return null
+    }
+  }
+
   return {
     buildShareUrl,
     buildCaption,
     buildShareText,
     generateShareImage,
+    generateShareCardImage,
     webShare,
     copyToClipboard,
     downloadBlob,
     openFacebookSharer,
     getShareFilename,
+    ACCENT_COLORS,
   }
 }

@@ -105,7 +105,7 @@
           class="flex gap-4 overflow-x-auto pb-3 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide"
           @scroll="updateArrows"
         >
-          <ShareableMomentCard
+          <ShareableCard
             v-for="item in currentItems"
             :key="item.id"
             :item="item"
@@ -149,7 +149,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useShareablesFeed } from '~/composables/useShareablesFeed'
 import { useShareKit } from '~/composables/useShareKit'
-import ShareableMomentCard from './ShareableMomentCard.vue'
+import ShareableCard from './ShareableCard.vue'
 import ShareCustomizeDrawer from './ShareCustomizeDrawer.vue'
 
 const props = defineProps({
