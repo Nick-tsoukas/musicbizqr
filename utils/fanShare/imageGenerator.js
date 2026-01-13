@@ -228,9 +228,13 @@ export async function generateFanShareImage({
 
     let imageDrawn = false
 
+    console.log('[fanShareImage] bandImageUrl:', bandImageUrl, 'loadImage:', !!loadImage)
+
     if (bandImageUrl && loadImage) {
       try {
+        console.log('[fanShareImage] Attempting to load image...')
         const img = await loadImage(bandImageUrl)
+        console.log('[fanShareImage] Image loaded:', img?.width, 'x', img?.height)
         
         if (img && img.width > 0 && img.height > 0) {
           // Draw circular clipped image
