@@ -94,7 +94,8 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "nuxt-particles",
     "@unlok-co/nuxt-stripe",
-    '@nuxtjs/seo'
+    '@nuxtjs/seo',
+    '@pinia/nuxt'
   ],
 
    image: {
