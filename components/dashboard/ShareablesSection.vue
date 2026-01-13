@@ -69,7 +69,7 @@
             v-for="card in filteredCards"
             :key="card.id"
             :item="card"
-            :size="filteredCards.length > 2 ? 'compact' : 'normal'"
+            size="normal"
             @click="openCustomize"
             @share="openCustomize"
           />

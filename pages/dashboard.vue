@@ -80,12 +80,13 @@
             class="mt-4"
           />
           
-          <!-- System Status Card -->
+          <!-- System Status Card (commented out - not needed for now)
           <SystemStatusCard
             v-if="bandItems[0]?.id"
             :band-id="bandItems[0].id"
             @refresh="refreshPanels"
           />
+          -->
         </div>
       </section>
 
