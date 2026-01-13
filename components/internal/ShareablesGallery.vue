@@ -62,7 +62,7 @@
     </div>
 
     <!-- Content -->
-    <div class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+    <div class="max-w-7xl mx-auto px-6 py-8 space-y-12">
       <!-- Band Shareables Section -->
       <section v-if="activeView === 'band' || activeView === 'both'">
         <div class="flex items-center justify-between mb-4">
@@ -91,7 +91,7 @@
         </div>
 
         <!-- Band Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InternalShareablesTile
             v-for="card in filteredBandCards"
             :key="card.id"
@@ -132,7 +132,7 @@
         </div>
 
         <!-- Fan Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InternalShareablesTile
             v-for="item in filteredFanItems"
             :key="item.id"

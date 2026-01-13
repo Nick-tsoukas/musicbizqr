@@ -20,7 +20,7 @@
     </div>
 
     <!-- Preview Area -->
-    <div class="p-4 space-y-4">
+    <div class="p-5 space-y-5">
       <!-- Image Preview -->
       <div class="aspect-square bg-black/40 rounded-lg overflow-hidden relative">
         <img 
@@ -39,22 +39,22 @@
       </div>
 
       <!-- Headline -->
-      <div class="text-center">
-        <p class="text-white font-bold text-sm">{{ item.headline }}</p>
-        <p v-if="item.hero" class="text-lg font-black bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400 bg-clip-text text-transparent">
+      <div class="text-center py-2">
+        <p class="text-white font-bold text-base mb-1">{{ item.headline }}</p>
+        <p v-if="item.hero" class="text-xl font-black bg-gradient-to-r from-pink-500 via-violet-500 to-emerald-400 bg-clip-text text-transparent">
           {{ item.hero }}
         </p>
       </div>
 
       <!-- Caption -->
-      <div class="bg-black/30 rounded-lg p-3">
-        <p class="text-white/60 text-xs italic text-center">
+      <div class="bg-black/30 rounded-lg p-4">
+        <p class="text-white/60 text-sm italic text-center leading-relaxed">
           {{ selectedCaption }}
         </p>
       </div>
 
       <!-- Actions -->
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 gap-3">
         <button
           @click="handleCopyCaption"
           class="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-xs font-medium transition-colors flex items-center justify-center gap-1"
