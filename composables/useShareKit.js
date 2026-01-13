@@ -1,9 +1,20 @@
 /**
  * Share Kit composable - shared utilities for band and moment sharing
  * Provides helpers for Web Share API, clipboard, downloads, and social sharing
+ * 
+ * V2: Now includes fan share system with identity-driven copy and poster-style images
  */
 
 import { useRuntimeConfig } from '#imports'
+import {
+  FAN_MOMENT_TYPES,
+  getFanCaption,
+  getAllCaptions,
+  getFanHeadline,
+  detectFanMomentType,
+  buildFanShareText,
+} from '@/utils/fanShare/copy'
+import { generateFanShareImage, getAccentForMoment } from '@/utils/fanShare/imageGenerator'
 
 export function useShareKit() {
   /**
@@ -16,6 +27,7 @@ export function useShareKit() {
 
   /**
    * Build caption text (without URL) - for Instagram/social copy
+   * LEGACY: Use getFanCaption for new fan shares
    */
   function buildCaption({ bandName, momentType = null, momentTitle = null }) {
     if (momentType) {
@@ -38,6 +50,7 @@ export function useShareKit() {
 
   /**
    * Build share text (with URL) - for SMS/email/Web Share
+   * LEGACY: Use buildFanShareText for new fan shares
    */
   function buildShareText({ bandName, shareUrl, momentType = null, momentTitle = null }) {
     if (momentType) {
@@ -886,12 +899,15 @@ export function useShareKit() {
   }
 
   return {
+    // Legacy functions
     buildShareUrl,
     buildShareUrlWithAttribution,
     buildCaption,
     buildShareText,
     generateShareImage,
     generateShareCardImage,
+    
+    // Core share functions
     webShare,
     webShareWithTracking,
     copyToClipboard,
@@ -902,6 +918,18 @@ export function useShareKit() {
     openFacebookSharerWithTracking,
     getShareFilename,
     trackShareAction,
+    
+    // Fan share system (V2)
+    FAN_MOMENT_TYPES,
+    getFanCaption,
+    getAllCaptions,
+    getFanHeadline,
+    detectFanMomentType,
+    buildFanShareText,
+    generateFanShareImage,
+    getAccentForMoment,
+    
+    // Shared
     ACCENT_COLORS,
   }
 }

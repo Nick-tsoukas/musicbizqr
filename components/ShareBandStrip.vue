@@ -137,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRuntimeConfig } from '#imports'
 import { useVisitorSession } from '@/composables/useVisitorSession'
 import { useShareKit } from '@/composables/useShareKit'
@@ -176,6 +176,23 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Fan context for moment detection
+  fanCity: {
+    type: String,
+    default: null,
+  },
+  isFirstVisit: {
+    type: Boolean,
+    default: false,
+  },
+  isNearEvent: {
+    type: Boolean,
+    default: false,
+  },
+  momentumCity: {
+    type: String,
+    default: null,
+  },
 })
 
 const config = useRuntimeConfig()
@@ -190,6 +207,13 @@ const {
   downloadBlob,
   openFacebookSharer,
   getShareFilename,
+  // Fan share system (V2)
+  FAN_MOMENT_TYPES,
+  getFanCaption,
+  getFanHeadline,
+  detectFanMomentType,
+  buildFanShareText,
+  generateFanShareImage,
 } = useShareKit()
 
 // State
@@ -200,6 +224,19 @@ const canvasRef = ref(null)
 const toastMessage = ref('')
 const cachedImageBlob = ref(null)
 const cacheKey = ref('')
+const detectedMomentType = ref(FAN_MOMENT_TYPES.DEFAULT)
+
+// Detect fan moment type on mount
+onMounted(() => {
+  detectedMomentType.value = detectFanMomentType({
+    isFirstVisit: props.isFirstVisit,
+    isNearEvent: props.isNearEvent,
+    cityMatchesMomentum: props.fanCity && props.momentumCity && 
+      props.fanCity.toLowerCase() === props.momentumCity.toLowerCase(),
+    isReturningFan: !props.isFirstVisit,
+    isSuperFan: false, // Would need session duration tracking
+  })
+})
 
 // Computed values
 function getShareUrl() {
@@ -207,15 +244,27 @@ function getShareUrl() {
 }
 
 function getCaption() {
-  return buildCaption({ bandName: props.bandName })
+  // Use new fan share copy system
+  return getFanCaption(detectedMomentType.value, 'hype', {
+    bandName: props.bandName,
+    city: props.fanCity || props.momentumCity,
+  })
 }
 
 function getShareTextWithUrl() {
-  return buildShareText({ bandName: props.bandName, shareUrl: getShareUrl() })
+  const caption = getCaption()
+  return buildFanShareText(caption, getShareUrl())
 }
 
 function getFilename() {
   return getShareFilename(props.bandSlug, 'share')
+}
+
+function getHeadline() {
+  return getFanHeadline(detectedMomentType.value, {
+    bandName: props.bandName,
+    city: props.fanCity || props.momentumCity,
+  })
 }
 
 // Toast helper
@@ -224,18 +273,44 @@ function showToast(message, duration = 2000) {
   setTimeout(() => { toastMessage.value = '' }, duration)
 }
 
-// Image generation with caching
+// Image loader helper (for fan share image generator)
+function loadImageDirect(url, timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    
+    const timeout = setTimeout(() => {
+      reject(new Error('Image load timeout'))
+    }, timeoutMs)
+    
+    img.onload = () => {
+      clearTimeout(timeout)
+      resolve(img)
+    }
+    img.onerror = (err) => {
+      clearTimeout(timeout)
+      reject(err || new Error('Image load error'))
+    }
+    img.src = url
+  })
+}
+
+// Image generation with caching - uses new poster-style fan share image
 async function getOrGenerateImage() {
-  const key = `${props.bandSlug}-${props.bandName}`
+  const key = `${props.bandSlug}-${props.bandName}-${detectedMomentType.value}`
   if (cachedImageBlob.value && cacheKey.value === key) {
     return cachedImageBlob.value
   }
   
-  const blob = await generateShareImage({
+  // Use new fan share image generator (poster style)
+  const blob = await generateFanShareImage({
     canvasEl: canvasRef.value,
+    headline: getHeadline(),
     bandName: props.bandName,
     bandImageUrl: props.bandImageUrl,
     isBandNameInLogo: props.isBandNameInLogo,
+    momentType: detectedMomentType.value,
+    loadImage: loadImageDirect,
   })
   
   if (blob) {
