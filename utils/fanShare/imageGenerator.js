@@ -319,14 +319,14 @@ export async function generateFanShareImage({
     
     ctx.font = `900 ${headlineFontSize}px system-ui, -apple-system, sans-serif`
     
-    // Gradient fill for headline
+    // Gradient fill for headline (pink -> violet -> emerald)
     const headlineGradient = ctx.createLinearGradient(
-      width / 2 - 200, headlineY,
-      width / 2 + 200, headlineY
+      width / 2 - 300, headlineY,
+      width / 2 + 300, headlineY
     )
-    headlineGradient.addColorStop(0, '#ffffff')
-    headlineGradient.addColorStop(0.5, accent.primary)
-    headlineGradient.addColorStop(1, '#ffffff')
+    headlineGradient.addColorStop(0, '#ec4899')    // pink-500
+    headlineGradient.addColorStop(0.5, '#8b5cf6')  // violet-500
+    headlineGradient.addColorStop(1, '#34d399')   // emerald-400
     ctx.fillStyle = headlineGradient
     
     // Wrap if needed
