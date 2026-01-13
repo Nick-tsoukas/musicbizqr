@@ -274,15 +274,14 @@ function showToast(message, duration = 2000) {
 }
 
 // Image loader helper (for fan share image generator)
-// Uses a proxy approach to avoid CORS issues
-function loadImageDirect(url, timeoutMs = 10000) {
-  return new Promise((resolve, reject) => {
-    // Skip if no URL
-    if (!url) {
-      reject(new Error('No URL provided'))
-      return
-    }
+// Handles CORS by testing if image can be drawn to canvas without tainting
+async function loadImageDirect(url, timeoutMs = 10000) {
+  // Skip if no URL
+  if (!url) {
+    throw new Error('No URL provided')
+  }
 
+  return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     
@@ -293,8 +292,24 @@ function loadImageDirect(url, timeoutMs = 10000) {
     
     img.onload = () => {
       clearTimeout(timeout)
-      console.log('[loadImageDirect] Image loaded successfully:', url)
-      resolve(img)
+      
+      // Test if we can actually use this image on canvas without CORS issues
+      try {
+        const testCanvas = document.createElement('canvas')
+        testCanvas.width = 10
+        testCanvas.height = 10
+        const testCtx = testCanvas.getContext('2d')
+        testCtx.drawImage(img, 0, 0, 10, 10)
+        
+        // This will throw if canvas is tainted
+        testCanvas.toDataURL()
+        
+        console.log('[loadImageDirect] Image loaded and CORS-safe:', url)
+        resolve(img)
+      } catch (corsErr) {
+        console.warn('[loadImageDirect] Image loaded but CORS-tainted:', url)
+        reject(new Error('CORS tainted'))
+      }
     }
     img.onerror = (err) => {
       clearTimeout(timeout)
@@ -302,7 +317,6 @@ function loadImageDirect(url, timeoutMs = 10000) {
       reject(err || new Error('Image load error'))
     }
     
-    // Try loading the image
     img.src = url
   })
 }
