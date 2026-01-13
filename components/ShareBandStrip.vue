@@ -274,23 +274,35 @@ function showToast(message, duration = 2000) {
 }
 
 // Image loader helper (for fan share image generator)
+// Uses a proxy approach to avoid CORS issues
 function loadImageDirect(url, timeoutMs = 10000) {
   return new Promise((resolve, reject) => {
+    // Skip if no URL
+    if (!url) {
+      reject(new Error('No URL provided'))
+      return
+    }
+
     const img = new Image()
     img.crossOrigin = 'anonymous'
     
     const timeout = setTimeout(() => {
+      console.warn('[loadImageDirect] Timeout loading:', url)
       reject(new Error('Image load timeout'))
     }, timeoutMs)
     
     img.onload = () => {
       clearTimeout(timeout)
+      console.log('[loadImageDirect] Image loaded successfully:', url)
       resolve(img)
     }
     img.onerror = (err) => {
       clearTimeout(timeout)
+      console.warn('[loadImageDirect] Image load error:', url, err)
       reject(err || new Error('Image load error'))
     }
+    
+    // Try loading the image
     img.src = url
   })
 }
