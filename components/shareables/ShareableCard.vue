@@ -38,9 +38,9 @@
       </h3>
 
       <!-- Hero stat - BIG -->
-      <div class="flex-1 flex items-center justify-center my-2">
+      <div class="flex-1 flex items-center justify-center my-2 max-w-full overflow-hidden">
         <span 
-          class="text-4xl md:text-5xl font-black tracking-tight text-center"
+          class="text-4xl md:text-5xl font-black tracking-tight text-center leading-none max-w-full break-words"
           :style="heroStyle"
         >
           {{ item.primaryStat }}
@@ -101,8 +101,8 @@ const gradientClasses = computed(() => {
 
 const sizeClasses = computed(() => {
   return props.size === 'compact' 
-    ? 'w-[260px] min-h-[280px]' 
-    : 'w-[280px] md:w-[320px] min-h-[320px]'
+    ? 'w-full min-h-[280px]' 
+    : 'w-full md:w-[320px] min-h-[320px]'
 })
 
 const cardStyle = computed(() => ({

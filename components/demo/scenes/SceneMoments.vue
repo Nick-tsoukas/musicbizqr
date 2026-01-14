@@ -1,181 +1,78 @@
 <template>
-  <div class="space-y-6">
-    <!-- Scene Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Share Moments</h1>
-      <p class="text-white/60 text-lg">Sharing becomes distribution. Identity signal, not just a link.</p>
-    </div>
-
-    <!-- Three Panel Layout -->
-    <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Panel 1: Moment Maker -->
-      <div class="bg-gradient-to-b from-white/5 to-black/40 border border-white/10 rounded-2xl p-5">
-        <h3 class="text-white font-semibold text-lg mb-4">Create a Moment</h3>
-
-        <!-- Moment Type -->
-        <div class="mb-4">
-          <div class="text-white/60 text-sm mb-2">Moment Type</div>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              v-for="type in momentTypes"
-              :key="type.id"
-              type="button"
-              :class="[
-                'px-3 py-2 rounded-lg border text-left transition text-sm',
-                selectedType === type.id
-                  ? 'border-purple-400/50 bg-purple-500/20 text-purple-200'
-                  : 'border-white/10 text-white/70 hover:bg-white/5',
-              ]"
-              @click="selectedType = type.id"
-            >
-              <span class="mr-1">{{ type.icon }}</span>
-              {{ type.label }}
-            </button>
-          </div>
-        </div>
-
-        <!-- City -->
-        <div class="mb-4">
-          <div class="text-white/60 text-sm mb-2">City</div>
-          <select
-            v-model="selectedCity"
-            class="w-full px-3 py-2 rounded-lg border border-white/10 bg-black/60 text-white text-sm focus:border-purple-400/50 focus:outline-none"
-          >
-            <option v-for="city in demoCities" :key="city.name" :value="city.name">
-              {{ city.name }}, {{ city.state }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Vibe -->
-        <div class="mb-4">
-          <div class="text-white/60 text-sm mb-2">Vibe</div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="vibe in vibeOptions"
-              :key="vibe.id"
-              type="button"
-              :class="[
-                'px-3 py-1.5 rounded-full border text-xs transition',
-                selectedVibe === vibe.id
-                  ? 'border-purple-400/50 bg-purple-500/20 text-purple-200'
-                  : 'border-white/10 text-white/60 hover:bg-white/5',
-              ]"
-              @click="selectedVibe = vibe.id"
-            >
-              {{ vibe.emoji }} {{ vibe.label }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Generate Button -->
+  <div class="w-full">
+    <!-- Subtle Demo Overlay -->
+    <div class="flex items-center justify-between mb-4 px-2">
+      <span class="text-white/40 text-xs font-medium uppercase tracking-wide">Demo: Shareables</span>
+      <div class="flex items-center gap-2">
         <button
           type="button"
-          class="w-full py-3 rounded-xl border border-purple-400/50 bg-purple-500/20 text-purple-200 font-semibold hover:bg-purple-500/30 transition"
-          @click="handleCreateMoment"
+          class="px-3 py-1.5 text-xs text-white/60 hover:text-white border border-white/10 rounded-lg hover:bg-white/5 transition flex items-center gap-1.5"
+          @click="spawnCard"
         >
-          Generate Moment
+          <span class="text-[10px]">+1</span>
+          Spawn card
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 text-xs bg-purple-600/20 text-purple-300 border border-purple-400/30 rounded-lg hover:bg-purple-600/30 transition flex items-center gap-1.5"
+          @click="nextScene"
+        >
+          Next
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
+    </div>
 
-      <!-- Panel 2: Moment Card Preview -->
-      <div class="bg-gradient-to-b from-white/5 to-black/40 border border-white/10 rounded-2xl p-5">
-        <h3 class="text-white font-semibold text-lg mb-4">Moment Card</h3>
+    <!-- Shareables Gallery -->
+    <div class="max-w-5xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">Shareable Moments</h2>
+        <p class="text-white/60">Real-time analytics become share-ready content</p>
+      </div>
 
+      <!-- Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
         <div
-          v-if="latestMoment"
-          class="bg-gradient-to-br from-purple-900/40 via-violet-900/30 to-black border border-purple-500/30 rounded-xl p-5 space-y-3"
+          v-for="card in visibleCards"
+          :key="card._instanceId || card.id"
+          class="transform transition-all duration-300 hover:scale-[1.02] h-[420px] md:h-[440px] lg:h-[460px]"
         >
-          <!-- Band Name -->
-          <div class="text-purple-300 text-sm font-medium">{{ latestMoment.bandName }}</div>
-
-          <!-- Headline -->
-          <div class="text-2xl font-bold text-white">
-            {{ getMomentType(latestMoment.momentType)?.headline || 'I was there.' }}
-          </div>
-
-          <!-- Subline -->
-          <div class="text-white/70">
-            {{ getMomentType(latestMoment.momentType)?.subline || 'And it was everything.' }}
-          </div>
-
-          <!-- City & Date -->
-          <div class="flex items-center gap-3 text-sm text-white/60">
-            <span>📍 {{ latestMoment.city }}</span>
-            <span>📅 {{ formatDate(latestMoment.date) }}</span>
-          </div>
-
-          <!-- Vibe -->
-          <div v-if="latestMoment.vibe" class="inline-block px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">
-            {{ getVibe(latestMoment.vibe)?.emoji }} {{ getVibe(latestMoment.vibe)?.label }}
-          </div>
-
-          <!-- Share Button -->
-          <button
-            type="button"
-            :class="[
-              'w-full py-3 rounded-xl border font-semibold transition mt-4',
-              latestMoment.shared
-                ? 'border-green-400/50 bg-green-500/20 text-green-200'
-                : 'border-purple-400/50 bg-purple-500/20 text-purple-200 hover:bg-purple-500/30',
-            ]"
-            :disabled="latestMoment.shared"
-            @click="handleShareMoment(latestMoment.id)"
-          >
-            {{ latestMoment.shared ? '✓ Shared' : 'Share Moment' }}
-          </button>
-        </div>
-
-        <div v-else class="text-center py-12 text-white/40">
-          <div class="text-4xl mb-2">✨</div>
-          <div>Create a moment to see the preview</div>
+          <ShareableCard
+            :item="card"
+            size="compact"
+            class="h-full"
+            @select="() => {}"
+            @share="() => {}"
+          />
         </div>
       </div>
 
-      <!-- Panel 3: Moment Feed & Stats -->
-      <div class="bg-gradient-to-b from-white/5 to-black/40 border border-white/10 rounded-2xl p-5">
-        <h3 class="text-white font-semibold text-lg mb-4">Moment Feed</h3>
+      <!-- Empty State -->
+      <div v-if="visibleCards.length === 0" class="text-center py-16 text-white/40">
+        <div class="text-5xl mb-4">✨</div>
+        <div class="text-lg">Click "Spawn card" to generate shareable moments</div>
+      </div>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-3 gap-2 mb-4">
-          <div class="bg-black/30 border border-white/10 rounded-lg p-3 text-center">
-            <div class="text-xl font-bold text-white tabular-nums">{{ demoStats.momentsCreated }}</div>
-            <div class="text-white/50 text-xs">Created</div>
-          </div>
-          <div class="bg-black/30 border border-white/10 rounded-lg p-3 text-center">
-            <div class="text-xl font-bold text-white tabular-nums">{{ demoStats.momentsShared }}</div>
-            <div class="text-white/50 text-xs">Shared</div>
-          </div>
-          <div class="bg-black/30 border border-white/10 rounded-lg p-3 text-center">
-            <div class="text-xl font-bold text-white tabular-nums">{{ demoStats.profileVisits }}</div>
-            <div class="text-white/50 text-xs">Visits</div>
-          </div>
+      <!-- Stats Row -->
+      <div class="mt-8 grid grid-cols-4 gap-3">
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-white tabular-nums">{{ visibleCards.length }}</div>
+          <div class="text-white/50 text-xs">Cards Ready</div>
         </div>
-
-        <!-- Feed -->
-        <div class="space-y-2 max-h-80 overflow-y-auto">
-          <div
-            v-for="moment in moments.slice(0, 8)"
-            :key="moment.id"
-            :class="[
-              'px-3 py-2 rounded-lg border transition',
-              moment.id === latestMoment?.id
-                ? 'border-purple-400/40 bg-purple-500/10'
-                : 'border-white/10 bg-black/20',
-            ]"
-          >
-            <div class="flex items-start justify-between gap-2">
-              <div class="min-w-0">
-                <div class="text-white text-sm font-medium truncate">
-                  {{ getMomentType(moment.momentType)?.icon }} {{ getMomentType(moment.momentType)?.label }}
-                </div>
-                <div class="text-white/50 text-xs">
-                  {{ moment.city }} · {{ formatDate(moment.date) }}
-                </div>
-              </div>
-              <div v-if="moment.shared" class="shrink-0 text-green-400 text-xs">✓</div>
-            </div>
-          </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-white tabular-nums">{{ totalDeckSize }}</div>
+          <div class="text-white/50 text-xs">Card Types</div>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-purple-400 tabular-nums">∞</div>
+          <div class="text-white/50 text-xs">Auto-Generated</div>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-emerald-400 tabular-nums">1-tap</div>
+          <div class="text-white/50 text-xs">Share Ready</div>
         </div>
       </div>
     </div>
@@ -183,36 +80,73 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useDemoShow } from '@/composables/useDemoShow'
-import { momentTypes, vibeOptions, getMomentType, getVibe } from '@/data/demoMomentTemplates'
+import { getBandDemoCards } from '~/utils/shareables/demoDeck'
+import ShareableCard from '@/components/shareables/ShareableCard.vue'
 
-const {
-  selectedBand,
-  demoStats,
-  moments,
-  demoCities,
-  createMoment,
-  shareMoment,
-} = useDemoShow()
+const { goToScene } = useDemoShow()
 
-const selectedType = ref('i-was-there')
-const selectedCity = ref('Los Angeles')
-const selectedVibe = ref('front-row')
+// Demo deck
+const bandDeck = ref([])
+let deckIdx = 0
+let instanceCounter = 0
 
-const latestMoment = computed(() => moments.value[0] || null)
+// Visible cards (max 6 for grid)
+const visibleCards = ref([])
+const totalDeckSize = ref(0)
 
-function handleCreateMoment() {
-  createMoment(selectedType.value, selectedCity.value, selectedVibe.value)
+// Normalize card for ShareableCard component
+function normalizeCard(raw) {
+  return {
+    id: raw.id,
+    _instanceId: ++instanceCounter,
+    type: raw.type,
+    accent: raw.accent,
+    windowLabel: raw.windowLabel,
+    title: raw.headline,
+    primaryStat: raw.hero,
+    secondaryStat: raw.proof,
+    band: raw.band,
+  }
 }
 
-function handleShareMoment(momentId) {
-  shareMoment(momentId)
+// Initialize deck
+function initDeck() {
+  const rawCards = getBandDemoCards()
+  bandDeck.value = rawCards
+  totalDeckSize.value = rawCards.length
+  deckIdx = 0
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+// Get next card from deck
+function nextCard() {
+  if (bandDeck.value.length === 0) initDeck()
+  const raw = bandDeck.value[deckIdx % bandDeck.value.length]
+  deckIdx++
+  return normalizeCard(raw)
 }
+
+// Spawn a new card
+function spawnCard() {
+  const card = nextCard()
+  visibleCards.value.unshift(card)
+  // Keep max 6 visible
+  if (visibleCards.value.length > 6) {
+    visibleCards.value.pop()
+  }
+}
+
+// Go to next scene
+function nextScene() {
+  goToScene(2)
+}
+
+// Initialize with 3 cards
+onMounted(() => {
+  initDeck()
+  for (let i = 0; i < 3; i++) {
+    spawnCard()
+  }
+})
 </script>

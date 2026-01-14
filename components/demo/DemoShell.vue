@@ -21,6 +21,9 @@
 
       <!-- Right: Controls -->
       <div class="flex items-center gap-2">
+        <!-- Header Extra Slot (for Showtime button) -->
+        <slot name="header-extra" />
+
         <!-- Mode Toggle -->
         <div class="flex items-center bg-black/40 border border-white/10 rounded-full p-0.5">
           <button

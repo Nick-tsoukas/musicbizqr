@@ -6,11 +6,14 @@
 
 // Demo band data
 export const DEMO_BAND = {
-  id: 4,
-  name: 'The Danny Nova Band',
-  slug: 'thedannynovaband',
-  imageUrl: 'https://qrcode101.s3.us-east-1.amazonaws.com/dannylogo_2c227e4742.PNG',
-  isBandNameInLogo: true,
+  id: 1,
+  name: 'Neon Avenue',
+  slug: 'neon-avenue',
+  genre: 'Indie Pop',
+  city: 'Los Angeles',
+  state: 'CA',
+  imageUrl: '/neonposter.png',
+  isBandNameInLogo: false,
 }
 
 // All 10 card types with their accents
@@ -123,7 +126,7 @@ const DEMO_CARDS_DATA = {
   },
   ENGAGED_SESSIONS: {
     headline: '⏱️ FANS ARE LOCKED IN',
-    hero: '2:45',
+    hero: '2m 45s',
     proof: 'AVG SESSION TIME • LAST 24H',
     windowLabel: 'LAST 24H',
     window: '24h',
@@ -162,8 +165,8 @@ const DEMO_CARDS_DATA = {
   },
   MILESTONE_DROP: {
     headline: '🏆 MILESTONE UNLOCKED',
-    hero: '50 INTERACTIONS',
-    proof: 'LAST 7D • KEEP IT GOING',
+    hero: '50',
+    proof: 'INTERACTIONS • LAST 7D',
     windowLabel: 'LAST 7D',
     window: '7d',
     microCaption: {
