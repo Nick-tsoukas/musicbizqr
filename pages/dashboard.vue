@@ -90,6 +90,9 @@
         </div>
       </section>
 
+      <!-- Demo Controls (only for whitelisted users) -->
+      <DemoControlsCard />
+
       <!-- QR Codes Section -->
       <div v-if="loading" class="mb-8">
         <SkeletonLoader />
@@ -569,6 +572,7 @@ import {
 import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
 import ShareablesSection from '~/components/dashboard/ShareablesSection.vue';
+import DemoControlsCard from '~/components/dashboard/DemoControlsCard.vue';
 
 // rebuild
 

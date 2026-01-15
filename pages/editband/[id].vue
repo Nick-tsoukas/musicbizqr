@@ -160,6 +160,75 @@
               </div>
             </div>
           </div>
+
+          <!-- Button Style (only for default page style) -->
+          <div v-if="pageStyle === 'default'" class="mt-6 pt-6 border-t border-white/10">
+            <h3 class="text-white font-semibold mb-3">Button Style</h3>
+            <p class="text-white/50 text-sm mb-4">Choose how streaming and social buttons appear on your page.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Classic Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
+                :class="buttonStyle === 'classic' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="buttonStyle = 'classic'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="buttonStyle === 'classic' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="buttonStyle === 'classic'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold">Classic</div>
+                    <p class="text-white/50 text-sm mt-1">Bold white borders, larger buttons with hover lift effect.</p>
+                  </div>
+                </div>
+                <!-- Preview -->
+                <div class="mt-3 space-y-2">
+                  <div class="w-full border border-white bg-transparent text-white flex items-center gap-2 font-semibold px-3 py-2 rounded-md text-sm">
+                    <div class="w-5 h-5 rounded bg-green-500/20"></div>
+                    <span>Spotify</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modern Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
+                :class="buttonStyle === 'modern' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="buttonStyle = 'modern'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="buttonStyle === 'modern' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="buttonStyle === 'modern'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold">Modern</div>
+                    <p class="text-white/50 text-sm mt-1">Subtle glass effect, rounded corners, compact spacing.</p>
+                  </div>
+                </div>
+                <!-- Preview -->
+                <div class="mt-3 space-y-2">
+                  <div class="w-full flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm">
+                    <div class="w-4 h-4 rounded bg-green-500/20"></div>
+                    <span class="text-white font-medium">Spotify</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- Band Details Section -->
@@ -974,7 +1043,8 @@ const removeSong = ref(false);
 const removeVideo = ref(false);
 
 // Page style
-const pageStyle = ref('default'); // 'default' | 'compact'
+const pageStyle = ref('default'); // 'default' | 'compact' | 'bold'
+const buttonStyle = ref('classic'); // 'classic' | 'modern'
 const showStylePreview = ref(false);
 const previewingStyle = ref('default');
 
@@ -1400,6 +1470,7 @@ async function fetchBand() {
     websitelink.value = normalizeLink(attrs.websitelink) || "";
     websitelinktext.value = attrs.websitelinktext || "";
     pageStyle.value = attrs.pageStyle || "default";
+    buttonStyle.value = attrs.buttonStyle || "classic";
 
     // Existing image
     const img = attrs.bandImg?.data;
@@ -1632,6 +1703,7 @@ async function submitForm() {
     const payload = {
       name: bandName.value,
       pageStyle: pageStyle.value,
+      buttonStyle: buttonStyle.value,
       genre: genre.value,
       bio: bio.value,
       websitelink: websitelink.value || null,

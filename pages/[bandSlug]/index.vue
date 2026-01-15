@@ -520,8 +520,9 @@
 
         <!-- Streaming Links -->
         <section v-if="hasStreamingLinks && isSectionVisible('streaming')" class="mt-10">
-          <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Streaming</h3>
-          <div class="space-y-2">
+          <h3 v-if="buttonStyle === 'modern'" class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Streaming</h3>
+          <h2 v-else class="text-2xl md:text-3xl font-bold text-white mb-4">Streaming Links</h2>
+          <div :class="buttonStyle === 'modern' ? 'space-y-2' : ''">
             <template v-for="platform in orderedStreamingPlatforms" :key="platform.name">
               <a
                 v-if="band.data[platform.name] && !isLinkHidden(platform.name)"
@@ -533,14 +534,14 @@
                     band.data[platform.name]
                   )
                 "
-                class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
+                :class="streamingButtonClasses"
               >
                 <img
                   :src="platform.img"
-                  class="w-6 h-6 shrink-0"
+                  :class="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
                   :alt="platform.label"
                 />
-                <span class="text-white font-medium">{{ platform.label }}</span>
+                <span :class="buttonStyle === 'modern' ? 'text-white font-medium' : 'text-white font-semibold text-lg md:text-xl min-w-0 truncate'">{{ platform.label }}</span>
               </a>
             </template>
           </div>
@@ -548,8 +549,9 @@
 
         <!-- Social Media -->
         <section v-if="hasSocialLinks && isSectionVisible('social')" class="mt-10">
-          <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Social</h3>
-          <div class="space-y-2">
+          <h3 v-if="buttonStyle === 'modern'" class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Social</h3>
+          <h2 v-else class="text-2xl md:text-3xl font-bold text-white mb-4">Social Media</h2>
+          <div :class="buttonStyle === 'modern' ? 'space-y-2' : ''">
             <template v-for="platform in orderedSocialPlatforms" :key="platform.name">
               <a
                 v-if="band.data[platform.name] && !isLinkHidden(platform.name)"
@@ -561,14 +563,14 @@
                     band.data[platform.name]
                   )
                 "
-                class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
+                :class="streamingButtonClasses"
               >
                 <img
                   :src="platform.img"
-                  class="w-6 h-6 shrink-0"
+                  :class="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
                   :alt="platform.label"
                 />
-                <span class="text-white font-medium">{{ platform.label }}</span>
+                <span :class="buttonStyle === 'modern' ? 'text-white font-medium' : 'text-white font-semibold text-lg md:text-xl min-w-0 truncate'">{{ platform.label }}</span>
               </a>
             </template>
           </div>
@@ -1102,20 +1104,7 @@ import MomentBadges from "@/components/smartlink/MomentBadges.vue";
 import ShowDayHeader from "@/components/smartlink/ShowDayHeader.vue";
 import MomentShareCard from "@/components/smartlink/MomentShareCard.vue";
 import DevIndicator from "@/components/smartlink/DevIndicator.vue";
-import {
-  SMARTLINK_LIVE_SURFACE_ENABLED,
-  SMARTLINK_SHOW_NOW_BANNER,
-  SMARTLINK_SHOW_LIVE_FEED,
-  SMARTLINK_SHOW_PAGE_MODES,
-  SMARTLINK_SHOW_CONTINUE_CHIP,
-  SMARTLINK_SHOW_FAN_TOASTS,
-  SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR,
-  SMARTLINK_V2_ENABLED,
-  SMARTLINK_SHOW_MOMENT_BADGES,
-  SMARTLINK_SHOW_SHOW_DAY_HEADER,
-  SMARTLINK_SHOW_MOMENT_SHARE_CARD,
-  DEMO_FEED_ENABLED,
-} from '@/config/smartLinkFeatureFlags';
+import { getDemoFlag } from '@/composables/useDemoFlags';
 
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
@@ -1459,27 +1448,48 @@ const pageStyle = computed(() => {
 const isCompactStyle = computed(() => pageStyle.value === 'compact');
 const isBoldStyle = computed(() => pageStyle.value === 'bold');
 
+// Button style for streaming/social links: 'classic' (original) or 'modern' (updated)
+const buttonStyle = computed(() => {
+  return band.value?.data?.buttonStyle || 'classic';
+});
+
+// Streaming/Social button classes based on buttonStyle
+const streamingButtonClasses = computed(() => {
+  if (buttonStyle.value === 'modern') {
+    // Modern style: subtle background, rounded-xl, smaller
+    return 'w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition';
+  }
+  // Classic style: white border, transparent bg, larger, with hover effects
+  return 'w-full mb-4 border border-white bg-transparent text-white flex items-center gap-3 font-semibold px-4 py-4 rounded-md hover:bg-white/5 active:bg-white/10 transition duration-200 ease-out hover:-translate-y-[1px] active:translate-y-0';
+});
+
 // ============================================
 // SMART LINK LIVE SURFACE
 // ============================================
-// HOW TO DEMO: Set SMARTLINK_LIVE_SURFACE_ENABLED to true in config/smartLinkFeatureFlags.js
+// HOW TO DEMO: Use Dashboard > Demo Controls panel to toggle features
 // When disabled, page behaves exactly as before (no layout shifts)
 
-// Live Surface Feature Flags - direct from config
-const showNowBanner = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_NOW_BANNER);
-const showLiveFeed = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_LIVE_FEED);
-const showContinueChip = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_CONTINUE_CHIP);
-const showFanToasts = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_FAN_TOASTS);
-const showSupportModuleRefactor = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR);
-const showMomentBadges = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_V2_ENABLED && SMARTLINK_SHOW_MOMENT_BADGES);
-const shouldShowShowDayHeader = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_V2_ENABLED && SMARTLINK_SHOW_SHOW_DAY_HEADER);
-const showMomentShareCard = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_V2_ENABLED && SMARTLINK_SHOW_MOMENT_SHARE_CARD);
+// Live Surface Feature Flags - from useDemoFlags (localStorage > config defaults)
+const showNowBanner = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_SHOW_NOW_BANNER'));
+const showLiveFeed = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_SHOW_LIVE_FEED'));
+const showContinueChip = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_SHOW_CONTINUE_CHIP'));
+const showFanToasts = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_SHOW_FAN_TOASTS'));
+const showSupportModuleRefactor = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR'));
+const showMomentBadges = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_V2_ENABLED') && getDemoFlag('SMARTLINK_SHOW_MOMENT_BADGES'));
+const shouldShowShowDayHeader = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_V2_ENABLED') && getDemoFlag('SMARTLINK_SHOW_SHOW_DAY_HEADER'));
+const showMomentShareCard = computed(() => getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') && getDemoFlag('SMARTLINK_V2_ENABLED') && getDemoFlag('SMARTLINK_SHOW_MOMENT_SHARE_CARD'));
 
 // Live Surface Data - computed from band/events
 const nowBannerState = computed(() => {
-  if (!SMARTLINK_LIVE_SURFACE_ENABLED || !SMARTLINK_SHOW_NOW_BANNER) return 'QUIET_DEFAULT';
+  if (!getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') || !getDemoFlag('SMARTLINK_SHOW_NOW_BANNER')) return 'QUIET_DEFAULT';
   
-  // Check for manual override
+  // Check for demo force override (highest priority for demo users)
+  const forcedBanner = getDemoFlag('DEMO_FORCE_NOW_BANNER');
+  if (forcedBanner) {
+    return forcedBanner;
+  }
+  
+  // Check for manual override from band data
   if (band.value?.data?.nowBannerOverride) {
     return band.value.data.nowBannerOverride;
   }
@@ -1571,7 +1581,13 @@ const nowBannerContent = computed(() => {
 });
 
 const effectivePageMode = computed(() => {
-  if (!SMARTLINK_LIVE_SURFACE_ENABLED || !SMARTLINK_SHOW_PAGE_MODES) return 'QUIET';
+  if (!getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') || !getDemoFlag('SMARTLINK_SHOW_PAGE_MODES')) return 'QUIET';
+  
+  // Check for demo force override (highest priority for demo users)
+  const forcedMode = getDemoFlag('DEMO_FORCE_MODE');
+  if (forcedMode) {
+    return forcedMode;
+  }
   
   const now = new Date();
   const events = upcomingEvents.value || [];
@@ -1594,8 +1610,8 @@ const effectivePageMode = computed(() => {
 
 // Demo feed items
 const liveFeedItems = computed(() => {
-  if (!SMARTLINK_LIVE_SURFACE_ENABLED || !SMARTLINK_SHOW_LIVE_FEED) return [];
-  if (!DEMO_FEED_ENABLED) return [];
+  if (!getDemoFlag('SMARTLINK_LIVE_SURFACE_ENABLED') || !getDemoFlag('SMARTLINK_SHOW_LIVE_FEED')) return [];
+  if (!getDemoFlag('DEMO_FEED_ENABLED')) return [];
   
   const mode = effectivePageMode.value;
   const now = Date.now();
