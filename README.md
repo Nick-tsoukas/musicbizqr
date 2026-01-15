@@ -560,3 +560,221 @@ components/smartlink/
 - [ ] DEV indicator only shows in development
 - [ ] Fan toasts fire on save/follow actions
 - [ ] Continue chip remembers last clicked link
+
+---
+
+# Smart Link Live Surface (V1 + V2)
+
+A feature-flagged upgrade system that makes MBQ band pages feel **alive**, **present-tense**, and **momentum-driven** — without adding social feed complexity.
+
+---
+
+## Live Features (Built)
+
+### 1) Live Surface System (Foundation)
+A state-aware system that controls what the band page shows, emphasizes, or hides based on what's happening **right now**.
+
+- Converts the Smart Link page from static → reactive
+- Powers all present-tense + momentum features
+- Designed to stay calm when nothing is happening
+
+---
+
+### 2) NOW Banner (Present-Tense Context)
+A contextual status banner that answers:
+
+> "What's happening with this band today?"
+
+**States**
+- SHOW_TONIGHT — event within 24 hours
+- POST_SHOW_THANKS — event ended within 12 hours
+- NEW_RELEASE — new release in last 30 days
+- ON_TOUR — 2+ upcoming events
+- QUIET_DEFAULT — fallback/calm mode
+
+**Behavior**
+- Auto-detected from band/events
+- Can be manually overridden (future backend field)
+
+---
+
+### 3) Page Modes (Live State Machine)
+A live state machine that subtly changes CTA emphasis and page behavior based on touring context.
+
+**Modes**
+- SHOW_DAY 
+- POST_SHOW 
+- QUIET 
+
+**Effect**
+- SHOW_DAY → Tickets/Entry emphasized, events rise higher
+- POST_SHOW → Share/Support emphasized
+- QUIET → Listen/Follow emphasized
+
+---
+
+### 4) Live Feed (Micro Momentum Signals)
+A non-social micro-feed that displays **proof of momentum** without usernames, comments, or moderation.
+
+**Signal Types**
+- SUPPORT_RECEIVED — payment in last 2h/24h
+- CITY_TUNING_IN — top city today or new city
+- HEATING_UP — activity spike (2x baseline)
+- POST_SHOW_SPIKE — surge after show ends
+- MOST_CLICKED_LINK — top platform today
+
+**Rules**
+- Max **3** items shown
+- Items decay after **24h**
+- Calm by default (no spam/no noise)
+
+---
+
+### 5) Demo Feed Mode (Live Signal Simulator)
+A realistic live-signal simulator used when real analytics data is missing.
+
+**Behavior**
+- Auto-populates live feed with realistic activity
+- Varies signals based on page mode:
+  - SHOW_DAY → heating up + city tuning in
+  - POST_SHOW → post-show spike + support received
+  - QUIET → calmer signals (most clicked link, city tuning in)
+
+**Purpose**
+- Enables clean internal demos without hacking code or real traffic
+
+---
+
+### 6) Continue Chip (Returning Fan Memory)
+A returning-visitor feature that remembers where the fan last engaged.
+
+**Examples**
+- "Continue on YouTube"
+- "Continue listening"
+
+**Rules**
+- Uses `localStorage` 
+- Dismissible (dismiss state persists 24h)
+- Stored data expires after 7 days
+
+---
+
+### 7) Fan Recognition Toasts (Live Feedback Loop)
+Non-intrusive toasts that acknowledge fan actions.
+
+**Triggers**
+- Follow
+- Save
+- Share
+- Payment intent
+
+**Examples**
+- "Following! Stay in the loop."
+- "Saved. Welcome back anytime."
+- "Shared — thanks for spreading the word."
+- "You're supporting independent music."
+
+**Rules**
+- Rate-limited (min 5s between toasts)
+- Queue system for multiple actions
+- Auto-dismiss ~3 seconds
+- No popups/modals (calm UX)
+
+---
+
+### 8) Support Module Refactor (Context-Aware Payments)
+A consolidated "Support the Band" payment surface with quick tip options.
+
+**Includes**
+- Quick tip buttons: $5, $10, $20 (with optional "Popular" badge)
+- Expandable advanced payment options
+- Preserves all existing Stripe Connect payment functionality
+
+**Live Behavior**
+- Auto-expands on SHOW_DAY 
+- Stays calmer/collapsed on QUIET 
+
+---
+
+## V2 Live Features (Optional / Feature-Flagged)
+
+### 9) Moment Badges (Small Chips)
+Small "moment chips" under the NOW banner to summarize current activity.
+
+**Examples**
+- New tonight
+- Tour week
+- Fresh release
+- Fresh video
+- Merch drop
+
+**Rules**
+- Max **3** badges displayed
+- Auto-derived from band state
+
+---
+
+### 10) Show Day Header (Compact Strip)
+A compact sticky-like strip that appears only on SHOW_DAY.
+
+Example:
+- `[ live] Tonight in Austin — The Fillmore    [Tickets]` 
+
+Purpose:
+- High-conversion show-day CTA
+- Perfect for QR scans at shows
+
+---
+
+### 11) Moment Share Card (Shareable Preview)
+A shareable preview card that appears inside the Share section.
+
+**Types**
+- you_were_here 
+- support_received 
+- heating_up 
+- post_show 
+- default 
+
+Purpose:
+- Turns momentum into something fans can share instantly
+
+---
+
+## Demo & Internal Controls (Quality-of-Life)
+
+### 12) Feature Flags System
+All Live Surface functionality is controlled via:
+- Master enable/disable
+- Per-module toggles
+- V2 gated toggles
+- Demo feed mode
+
+Ensures:
+- Safe rollout
+- Zero layout shifts when disabled
+- Easy demos + iteration
+
+---
+
+### 13) Demo Control Panel (Dashboard UI Toggles)
+An internal Demo Controls UI (whitelisted users only) that allows:
+
+- Turning Live Surface ON/OFF
+- Toggling modules without editing code
+- Enabling demo feed mode
+- Enabling V2
+- (Optional) forcing states for demos (e.g., SHOW_DAY, SHOW_TONIGHT)
+
+---
+
+## Why This Matters
+MBQ Smart Links are no longer static "link-in-bio pages."
+
+They are **Live Artist Surfaces** that:
+- show present-tense context
+- reflect momentum
+- adapt to show/tour states
+- acknowledge fans
+- improve repeat engagement
+- support monetization at the right moment

@@ -706,7 +706,7 @@
         <!-- CTA repeat -->
         <div
           ref="parallaxRef"
-          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] kenburns-bg z-50"
+          class="relative w-screen min-h-screen bg-scroll md:bg-fixed bg-center bg-cover bg-[url('/assets/aisix.webp')] z-50"
         >
           <div
             class="absolute inset-0 bg-black/50 flex items-center justify-center z-50"
