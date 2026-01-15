@@ -157,7 +157,7 @@
                     <div class="text-white/50 text-xs">demo QR</div>
                   </div>
 
-                  <div class="mt-4 rounded-2xl border border-white/10 bg-black/40 p-3 sm:p-4 flex items-center justify-center"  data-aos="fade-left" data-aos-once="true">
+                  <div class="mt-4 rounded-2xl border border-white/10 bg-black/40 p-3 sm:p-4 flex items-center justify-center"  >
                     <img
                       src="@/assets/mbqqrcodefinaljan.png"
                       alt="Example MusicBizQR dynamic QR code linking to an artist smart link page"
