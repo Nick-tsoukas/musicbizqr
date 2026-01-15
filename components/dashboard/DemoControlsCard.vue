@@ -30,14 +30,29 @@
       <div class="mb-6">
         <h3 class="text-white/70 text-xs font-semibold uppercase tracking-wider mb-3">Master Controls</h3>
         <div class="space-y-3">
-          <ToggleRow
+          <label
             v-for="flag in masterFlags"
             :key="flag.key"
-            :label="flag.label"
-            :description="flag.description"
-            :model-value="demoFlags[flag.key]"
-            @update:model-value="setFlag(flag.key, $event)"
-          />
+            class="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/[0.07] transition-colors"
+          >
+            <div class="min-w-0">
+              <div class="text-white font-medium text-sm">{{ flag.label }}</div>
+              <div class="text-white/50 text-xs truncate">{{ flag.description }}</div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="demoFlags[flag.key]"
+              @click.prevent="setFlag(flag.key, !demoFlags[flag.key])"
+              class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
+              :class="demoFlags[flag.key] ? 'bg-amber-500' : 'bg-white/20'"
+            >
+              <span
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                :class="demoFlags[flag.key] ? 'translate-x-5' : 'translate-x-0'"
+              />
+            </button>
+          </label>
         </div>
       </div>
 
@@ -45,15 +60,31 @@
       <div class="mb-6">
         <h3 class="text-white/70 text-xs font-semibold uppercase tracking-wider mb-3">V1 Modules</h3>
         <div class="space-y-3" :class="{ 'opacity-50 pointer-events-none': !isMasterEnabled }">
-          <ToggleRow
+          <label
             v-for="flag in v1Flags"
             :key="flag.key"
-            :label="flag.label"
-            :description="flag.description"
-            :model-value="demoFlags[flag.key]"
-            :disabled="!isMasterEnabled"
-            @update:model-value="setFlag(flag.key, $event)"
-          />
+            class="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/[0.07] transition-colors"
+            :class="{ 'cursor-not-allowed': !isMasterEnabled }"
+          >
+            <div class="min-w-0">
+              <div class="text-white font-medium text-sm">{{ flag.label }}</div>
+              <div class="text-white/50 text-xs truncate">{{ flag.description }}</div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="demoFlags[flag.key]"
+              :disabled="!isMasterEnabled"
+              @click.prevent="setFlag(flag.key, !demoFlags[flag.key])"
+              class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
+              :class="demoFlags[flag.key] ? 'bg-amber-500' : 'bg-white/20'"
+            >
+              <span
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                :class="demoFlags[flag.key] ? 'translate-x-5' : 'translate-x-0'"
+              />
+            </button>
+          </label>
         </div>
         <p v-if="!isMasterEnabled" class="text-amber-400/70 text-xs mt-2">
           Enable "Live Surface Enabled" to toggle V1 modules
@@ -64,25 +95,53 @@
       <div>
         <h3 class="text-white/70 text-xs font-semibold uppercase tracking-wider mb-3">V2 Modules (Experimental)</h3>
         <div class="space-y-3 mb-3">
-          <ToggleRow
-            :label="v2EnabledFlag.label"
-            :description="v2EnabledFlag.description"
-            :model-value="demoFlags[v2EnabledFlag.key]"
-            :disabled="!isMasterEnabled"
-            :class="{ 'opacity-50 pointer-events-none': !isMasterEnabled }"
-            @update:model-value="setFlag(v2EnabledFlag.key, $event)"
-          />
+          <label class="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/[0.07] transition-colors" :class="{ 'cursor-not-allowed': !isMasterEnabled }">
+            <div class="min-w-0">
+              <div class="text-white font-medium text-sm">{{ v2EnabledFlag.label }}</div>
+              <div class="text-white/50 text-xs truncate">{{ v2EnabledFlag.description }}</div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="demoFlags[v2EnabledFlag.key]"
+              :disabled="!isMasterEnabled"
+              @click.prevent="setFlag(v2EnabledFlag.key, !demoFlags[v2EnabledFlag.key])"
+              class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
+              :class="demoFlags[v2EnabledFlag.key] ? 'bg-amber-500' : 'bg-white/20'"
+            >
+              <span
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                :class="demoFlags[v2EnabledFlag.key] ? 'translate-x-5' : 'translate-x-0'"
+              />
+            </button>
+          </label>
         </div>
         <div class="space-y-3" :class="{ 'opacity-50 pointer-events-none': !isMasterEnabled || !isV2Enabled }">
-          <ToggleRow
+          <label
             v-for="flag in v2Flags"
             :key="flag.key"
-            :label="flag.label"
-            :description="flag.description"
-            :model-value="demoFlags[flag.key]"
-            :disabled="!isMasterEnabled || !isV2Enabled"
-            @update:model-value="setFlag(flag.key, $event)"
-          />
+            class="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/[0.07] transition-colors"
+            :class="{ 'cursor-not-allowed': !isMasterEnabled || !isV2Enabled }"
+          >
+            <div class="min-w-0">
+              <div class="text-white font-medium text-sm">{{ flag.label }}</div>
+              <div class="text-white/50 text-xs truncate">{{ flag.description }}</div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              :aria-checked="demoFlags[flag.key]"
+              :disabled="!isMasterEnabled || !isV2Enabled"
+              @click.prevent="setFlag(flag.key, !demoFlags[flag.key])"
+              class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
+              :class="demoFlags[flag.key] ? 'bg-amber-500' : 'bg-white/20'"
+            >
+              <span
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                :class="demoFlags[flag.key] ? 'translate-x-5' : 'translate-x-0'"
+              />
+            </button>
+          </label>
         </div>
         <p v-if="isMasterEnabled && !isV2Enabled" class="text-amber-400/70 text-xs mt-2">
           Enable "V2 Features Enabled" to toggle V2 modules
@@ -97,24 +156,62 @@
         </p>
         <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': !isMasterEnabled }">
           <!-- Force Page Mode -->
-          <SelectRow
-            :label="forceModeFlag.label"
-            :description="forceModeFlag.description"
-            :options="forceModeFlag.options"
-            :model-value="demoFlags[forceModeFlag.key]"
-            :disabled="!isMasterEnabled"
-            @update:model-value="setFlag(forceModeFlag.key, $event)"
-          />
+          <div class="p-3 rounded-lg bg-white/5 border border-white/10">
+            <div class="flex items-center justify-between gap-4">
+              <div class="min-w-0">
+                <div class="text-white font-medium text-sm">{{ forceModeFlag.label }}</div>
+                <div class="text-white/50 text-xs truncate">{{ forceModeFlag.description }}</div>
+              </div>
+              <select
+                :value="demoFlags[forceModeFlag.key]"
+                :disabled="!isMasterEnabled"
+                @change="setFlag(forceModeFlag.key, $event.target.value === '' ? null : $event.target.value)"
+                class="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent min-w-[140px]"
+                :class="{ 'opacity-50 cursor-not-allowed': !isMasterEnabled }"
+              >
+                <option 
+                  v-for="opt in forceModeFlag.options" 
+                  :key="opt.value ?? 'null'" 
+                  :value="opt.value ?? ''"
+                  class="bg-gray-900 text-white"
+                >
+                  {{ opt.label }}
+                </option>
+              </select>
+            </div>
+            <div v-if="demoFlags[forceModeFlag.key]" class="mt-2 text-xs text-amber-400/80">
+              ⚠️ Forced override active — ignoring detection logic
+            </div>
+          </div>
           
           <!-- Force NOW Banner -->
-          <SelectRow
-            :label="forceNowBannerFlag.label"
-            :description="forceNowBannerFlag.description"
-            :options="forceNowBannerFlag.options"
-            :model-value="demoFlags[forceNowBannerFlag.key]"
-            :disabled="!isMasterEnabled"
-            @update:model-value="setFlag(forceNowBannerFlag.key, $event)"
-          />
+          <div class="p-3 rounded-lg bg-white/5 border border-white/10">
+            <div class="flex items-center justify-between gap-4">
+              <div class="min-w-0">
+                <div class="text-white font-medium text-sm">{{ forceNowBannerFlag.label }}</div>
+                <div class="text-white/50 text-xs truncate">{{ forceNowBannerFlag.description }}</div>
+              </div>
+              <select
+                :value="demoFlags[forceNowBannerFlag.key]"
+                :disabled="!isMasterEnabled"
+                @change="setFlag(forceNowBannerFlag.key, $event.target.value === '' ? null : $event.target.value)"
+                class="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent min-w-[140px]"
+                :class="{ 'opacity-50 cursor-not-allowed': !isMasterEnabled }"
+              >
+                <option 
+                  v-for="opt in forceNowBannerFlag.options" 
+                  :key="opt.value ?? 'null'" 
+                  :value="opt.value ?? ''"
+                  class="bg-gray-900 text-white"
+                >
+                  {{ opt.label }}
+                </option>
+              </select>
+            </div>
+            <div v-if="demoFlags[forceNowBannerFlag.key]" class="mt-2 text-xs text-amber-400/80">
+              ⚠️ Forced override active — ignoring detection logic
+            </div>
+          </div>
         </div>
         <p v-if="!isMasterEnabled" class="text-amber-400/70 text-xs mt-2">
           Enable "Live Surface Enabled" to use demo overrides
@@ -164,77 +261,4 @@ function handleReset() {
   }
 }
 
-// Toggle Row Component (inline)
-const ToggleRow = {
-  props: {
-    label: String,
-    description: String,
-    modelValue: Boolean,
-    disabled: Boolean,
-  },
-  emits: ['update:modelValue'],
-  template: `
-    <label class="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/[0.07] transition-colors" :class="{ 'cursor-not-allowed': disabled }">
-      <div class="min-w-0">
-        <div class="text-white font-medium text-sm">{{ label }}</div>
-        <div class="text-white/50 text-xs truncate">{{ description }}</div>
-      </div>
-      <button
-        type="button"
-        role="switch"
-        :aria-checked="modelValue"
-        :disabled="disabled"
-        @click.prevent="$emit('update:modelValue', !modelValue)"
-        class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
-        :class="modelValue ? 'bg-amber-500' : 'bg-white/20'"
-      >
-        <span
-          class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-          :class="modelValue ? 'translate-x-5' : 'translate-x-0'"
-        />
-      </button>
-    </label>
-  `,
-}
-
-// Select Row Component (inline) for dropdown overrides
-const SelectRow = {
-  props: {
-    label: String,
-    description: String,
-    options: Array,
-    modelValue: [String, null],
-    disabled: Boolean,
-  },
-  emits: ['update:modelValue'],
-  template: `
-    <div class="p-3 rounded-lg bg-white/5 border border-white/10">
-      <div class="flex items-center justify-between gap-4">
-        <div class="min-w-0">
-          <div class="text-white font-medium text-sm">{{ label }}</div>
-          <div class="text-white/50 text-xs truncate">{{ description }}</div>
-        </div>
-        <select
-          :value="modelValue"
-          :disabled="disabled"
-          @change="$emit('update:modelValue', $event.target.value === '' ? null : $event.target.value)"
-          class="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent min-w-[140px]"
-          :class="{ 'opacity-50 cursor-not-allowed': disabled }"
-        >
-          <option 
-            v-for="opt in options" 
-            :key="opt.value ?? 'null'" 
-            :value="opt.value ?? ''"
-            class="bg-gray-900 text-white"
-          >
-            {{ opt.label }}
-          </option>
-        </select>
-      </div>
-      <div v-if="modelValue" class="mt-2 text-xs text-amber-400/80">
-        ⚠️ Forced override active — ignoring detection logic
-      </div>
-    </div>
-  `,
-}
 </script>
