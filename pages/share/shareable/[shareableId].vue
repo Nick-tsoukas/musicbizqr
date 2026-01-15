@@ -16,7 +16,7 @@ const headline = computed(() => decodeURIComponent(query.headline as string || '
 const proof = computed(() => decodeURIComponent(query.proof as string || ''))
 const accent = computed(() => query.accent as string || 'violet')
 
-// Fetch band data on server for OG tags
+// Fetch band data on server for OG tags (optional - page works without it)
 const { data: bandData } = await useAsyncData(
   `share-shareable-${shareableId.value}`,
   async () => {
@@ -26,16 +26,27 @@ const { data: bandData } = await useAsyncData(
       const res = await fetch(
         `${strapiUrl}/api/bands/${bandId.value}?populate=bandImg`
       )
+      if (!res.ok) return null
       const json = await res.json()
       return json.data || null
     } catch (err) {
       console.error('[share/shareable] Failed to fetch band:', err)
       return null
     }
-  }
+  },
+  { default: () => null }
 )
 
-const bandName = computed(() => bandData.value?.name || bandData.value?.attributes?.name || 'Artist')
+// Use band name from query param (bandSlug) as fallback if DB lookup fails
+const bandName = computed(() => {
+  if (bandData.value?.name) return bandData.value.name
+  if (bandData.value?.attributes?.name) return bandData.value.attributes.name
+  // Fallback: convert slug to title case
+  if (bandSlug.value) {
+    return bandSlug.value.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }
+  return 'Artist'
+})
 
 // Build OG image URL with all params
 const siteUrl = 'https://musicbizqr.com'

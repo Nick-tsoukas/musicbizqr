@@ -358,6 +358,10 @@ function getShareUrl() {
 }
 
 function getOgUrl() {
+  // Prefer explicit ogUrl if provided (e.g., demo cards)
+  if (props.item?.share?.ogUrl) {
+    return props.item.share.ogUrl
+  }
   // Build shareable share URL with OG image params for Facebook
   if (props.item?.id && props.item?.band?.id) {
     const params = new URLSearchParams({
@@ -371,7 +375,7 @@ function getOgUrl() {
     })
     return `https://musicbizqr.com/share/shareable/${props.item.id}?${params.toString()}`
   }
-  return props.item?.share?.ogUrl || ''
+  return ''
 }
 
 /**

@@ -44,8 +44,8 @@
             :item="card"
             size="compact"
             class="h-full"
-            @select="() => {}"
-            @share="() => {}"
+            @select="openShareDrawer(card)"
+            @share="openShareDrawer(card)"
           />
         </div>
       </div>
@@ -63,27 +63,67 @@
           <div class="text-white/50 text-xs">Cards Ready</div>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-white tabular-nums">{{ totalDeckSize }}</div>
-          <div class="text-white/50 text-xs">Card Types</div>
+          <div class="text-2xl font-bold text-white tabular-nums">{{ demoStats.shares }}</div>
+          <div class="text-white/50 text-xs">Shares</div>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-purple-400 tabular-nums">∞</div>
-          <div class="text-white/50 text-xs">Auto-Generated</div>
+          <div class="text-2xl font-bold text-purple-400 tabular-nums">{{ demoStats.visits }}</div>
+          <div class="text-white/50 text-xs">Visits</div>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
           <div class="text-2xl font-bold text-emerald-400 tabular-nums">1-tap</div>
           <div class="text-white/50 text-xs">Share Ready</div>
         </div>
       </div>
+
+      <!-- Recent Shares Strip -->
+      <div v-if="recentShares.length > 0" class="mt-6">
+        <div class="text-white/40 text-xs uppercase tracking-wider mb-3">Recent Shares</div>
+        <div class="flex gap-3 overflow-x-auto pb-2">
+          <div
+            v-for="(share, idx) in recentShares.slice(0, 3)"
+            :key="idx"
+            class="flex-shrink-0 bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3"
+          >
+            <span class="text-lg">{{ share.platformIcon }}</span>
+            <div class="min-w-0">
+              <div class="text-white text-sm font-medium truncate max-w-[180px]">{{ share.caption }}</div>
+              <div class="text-white/50 text-xs">{{ share.timeAgo }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Share Drawer (real component) -->
+    <ShareCustomizeDrawer
+      v-model="isShareDrawerOpen"
+      :item="selectedShareable"
+    />
+
+    <!-- Demo Toast -->
+    <Teleport to="body">
+      <Transition name="toast">
+        <div
+          v-if="toastMessage"
+          class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[10000] px-4 py-2.5 rounded-xl bg-emerald-600/90 border border-emerald-400/30 text-white text-sm font-medium shadow-xl backdrop-blur-sm flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          {{ toastMessage }}
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useDemoShow } from '@/composables/useDemoShow'
-import { getBandDemoCards } from '~/utils/shareables/demoDeck'
+import { getBandDemoCards, DEMO_BAND } from '~/utils/shareables/demoDeck'
 import ShareableCard from '@/components/shareables/ShareableCard.vue'
+import ShareCustomizeDrawer from '@/components/shareables/ShareCustomizeDrawer.vue'
 
 const { goToScene } = useDemoShow()
 
@@ -96,18 +136,67 @@ let instanceCounter = 0
 const visibleCards = ref([])
 const totalDeckSize = ref(0)
 
-// Normalize card for ShareableCard component
+// Share drawer state
+const isShareDrawerOpen = ref(false)
+const selectedShareable = ref(null)
+
+// Demo stats
+const demoStats = reactive({
+  shares: 0,
+  visits: 0,
+})
+
+// Recent shares
+const recentShares = ref([])
+
+// Toast
+const toastMessage = ref('')
+
+// Normalize card for ShareableCard component + ShareCustomizeDrawer
 function normalizeCard(raw) {
+  // Build OG URL with all params so Facebook can render the card image
+  const ogParams = new URLSearchParams({
+    bandId: String(DEMO_BAND.id),
+    bandSlug: DEMO_BAND.slug,
+    type: raw.type,
+    hero: raw.hero,
+    headline: raw.headline,
+    proof: raw.proof,
+    accent: raw.accent,
+  })
+  const ogUrl = `https://musicbizqr.com/share/shareable/demo-${raw.type.toLowerCase()}?${ogParams.toString()}`
+
   return {
     id: raw.id,
     _instanceId: ++instanceCounter,
     type: raw.type,
+    kind: raw.type,
     accent: raw.accent,
     windowLabel: raw.windowLabel,
+    // ShareableCard uses these
     title: raw.headline,
     primaryStat: raw.hero,
     secondaryStat: raw.proof,
-    band: raw.band,
+    // ShareCustomizeDrawer getOgUrl() uses these
+    headline: raw.headline,
+    hero: raw.hero,
+    proof: raw.proof,
+    band: {
+      id: DEMO_BAND.id,
+      name: DEMO_BAND.name,
+      slug: DEMO_BAND.slug,
+      imageUrl: DEMO_BAND.imageUrl,
+      isBandNameInLogo: DEMO_BAND.isBandNameInLogo,
+    },
+    share: {
+      captions: raw.microCaption || {
+        hype: `${raw.headline} 🔥`,
+        grateful: `${raw.headline} 🙏`,
+        tease: `${raw.headline} 👀`,
+      },
+      shareUrl: `https://musicbizqr.com/${DEMO_BAND.slug}`,
+      ogUrl: ogUrl,
+    },
   }
 }
 
@@ -137,6 +226,73 @@ function spawnCard() {
   }
 }
 
+// Open share drawer
+function openShareDrawer(card) {
+  selectedShareable.value = card
+  isShareDrawerOpen.value = true
+}
+
+// Show toast
+function showToast(message, duration = 2500) {
+  toastMessage.value = message
+  setTimeout(() => { toastMessage.value = '' }, duration)
+}
+
+// Simulate post (called when drawer closes after share action)
+function simulatePost(platform = 'Instagram') {
+  // Bump stats
+  demoStats.shares += 1
+  demoStats.visits += Math.floor(Math.random() * 13) + 8 // 8-20
+
+  // Add to recent shares
+  const caption = selectedShareable.value?.share?.captions?.hype || 'Shared a moment'
+  const platformIcons = {
+    Instagram: '📸',
+    Facebook: '👍',
+    Twitter: '🐦',
+    Copy: '📋',
+  }
+  recentShares.value.unshift({
+    platform,
+    platformIcon: platformIcons[platform] || '📤',
+    caption: caption.slice(0, 40) + (caption.length > 40 ? '...' : ''),
+    timeAgo: 'just now',
+  })
+
+  // Keep max 5 recent shares
+  if (recentShares.value.length > 5) {
+    recentShares.value.pop()
+  }
+
+  // Show toast
+  showToast('Posted ✅')
+
+  // Optionally spawn a SHARE_CHAIN card to show momentum
+  if (Math.random() > 0.5) {
+    setTimeout(() => {
+      // Find SHARE_CHAIN card type
+      const shareChainRaw = bandDeck.value.find(c => c.type === 'SHARE_CHAIN')
+      if (shareChainRaw) {
+        const card = normalizeCard(shareChainRaw)
+        visibleCards.value.unshift(card)
+        if (visibleCards.value.length > 6) {
+          visibleCards.value.pop()
+        }
+      }
+    }, 1000)
+  }
+}
+
+// Watch drawer close to simulate post
+let wasOpen = false
+watch(isShareDrawerOpen, (isOpen) => {
+  if (wasOpen && !isOpen && selectedShareable.value) {
+    // Drawer just closed - simulate a post
+    simulatePost()
+  }
+  wasOpen = isOpen
+})
+
 // Go to next scene
 function nextScene() {
   goToScene(2)
@@ -150,3 +306,15 @@ onMounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 10px);
+}
+</style>
