@@ -200,11 +200,11 @@ sitemap: {
     throttleDelay: 99, // Delay on throttle used while scrolling the page
 
     // Settings that can be overridden on per-element basis:
-    offset: 120, // Offset (in px) from the original trigger point
+    offset: 50, // Offset (in px) from the original trigger point - reduced for mobile
     delay: 0, // Delay value from 0 to 3000 (in ms)
     duration: 400, // Duration value from 0 to 3000 (in ms)
     easing: 'ease', // Default easing for AOS animations
-    once: false, // Whether animation should happen only once
+    once: true, // Whether animation should happen only once - set true so elements stay visible
     mirror: false, // Whether elements should animate out while scrolling past them
     anchorPlacement: 'top-bottom', // Defines which position of the element regarding to window should trigger the animation
   },

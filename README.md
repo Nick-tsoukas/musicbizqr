@@ -246,3 +246,317 @@ Signals should be generated server-side based on:
  - fixed code on article page 
  - upgraded article again
 - upgrading f fff f
+
+---
+
+## Smart Link Live Surface (V1 + V2)
+
+A feature-flagged upgrade system that makes band pages feel alive, present-tense, and momentum-driven without adding social feed complexity.
+
+### Quick Start (How to Demo)
+
+1. Open `config/smartLinkFeatureFlags.js`
+2. Set `SMARTLINK_LIVE_SURFACE_ENABLED = true`
+3. Refresh any band page to see the new features
+4. Toggle individual module flags to show/hide specific upgrades
+
+**When `SMARTLINK_LIVE_SURFACE_ENABLED = false` (default), the page behaves exactly as before with zero layout shifts.**
+
+### Feature Flags
+
+```js
+// config/smartLinkFeatureFlags.js
+
+// Master switch - controls ALL live surface features
+SMARTLINK_LIVE_SURFACE_ENABLED = false  // Set to true for demos
+
+// V1 Module Toggles (only active when master switch is true)
+SMARTLINK_SHOW_NOW_BANNER = true        // Contextual status banner
+SMARTLINK_SHOW_LIVE_FEED = true         // Micro-signals display
+SMARTLINK_SHOW_PAGE_MODES = true        // State machine (SHOW_DAY, POST_SHOW, QUIET)
+SMARTLINK_SHOW_CONTINUE_CHIP = true     // "Continue on YouTube" for returning visitors
+SMARTLINK_SHOW_FAN_TOASTS = true        // Recognition toasts after actions
+SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR = true  // Consolidated payment section
+
+// Demo Data Mode
+DEMO_FEED_ENABLED = true                // Shows realistic demo data when real data is missing
+
+// V2 Optional Features (requires V2_ENABLED = true)
+SMARTLINK_V2_ENABLED = false
+SMARTLINK_SHOW_MOMENT_BADGES = true     // Small chips ("New tonight", "Tour week")
+SMARTLINK_SHOW_SHOW_DAY_HEADER = true   // Compact show day strip
+SMARTLINK_SHOW_MOMENT_SHARE_CARD = true // Shareable moment preview
+```
+
+### V1 Components
+
+#### NOW Banner (`NowBanner.vue`)
+Contextual status banner below identity, above primary CTAs.
+
+**States:**
+| State | Trigger | Display |
+|-------|---------|---------|
+| `SHOW_TONIGHT` | Event within 24h | "Live Tonight" + venue/city + tickets CTA |
+| `POST_SHOW_THANKS` | Event ended within 12h | "Thanks for coming out" + share CTA |
+| `NEW_RELEASE` | `newReleaseDate` within 30d | "New Music" + listen CTA |
+| `ON_TOUR` | 2+ upcoming events | "On Tour" + see dates CTA |
+| `QUIET_DEFAULT` | Fallback | Band name + bio snippet |
+
+**Auto-detection logic:**
+```
+if (event within 24h) → SHOW_TONIGHT
+else if (event ended within 12h) → POST_SHOW_THANKS
+else if (newReleaseDate within 30d) → NEW_RELEASE
+else if (2+ upcoming events) → ON_TOUR
+else → QUIET_DEFAULT
+```
+
+#### Live Feed (`LiveFeed.vue`)
+Micro-signals showing recent activity. NOT a social feed—no usernames, no comments.
+
+**Feed Item Types:**
+| Type | Description | Icon |
+|------|-------------|------|
+| `SUPPORT_RECEIVED` | Payment in last 2h/24h | 💜 |
+| `CITY_TUNING_IN` | Top city today or new city | 📍 |
+| `HEATING_UP` | Activity spike (2x baseline) | 🔥 |
+| `POST_SHOW_SPIKE` | Surge after show ends | 📈 |
+| `MOST_CLICKED_LINK` | Top platform today | 🎵 |
+
+**Rules:**
+- Max 3 items displayed
+- Items decay after 24h
+- Demo data auto-populates when real data is missing
+
+#### Page Modes (State Machine)
+Affects CTA emphasis and subtle section reordering.
+
+| Mode | Trigger | Effect |
+|------|---------|--------|
+| `SHOW_DAY` | Event within 24h | Tickets/Entry emphasized, events higher |
+| `POST_SHOW` | Event ended within 12h | Share/Support emphasized |
+| `QUIET` | Default | Listen/Follow emphasized |
+
+#### Continue Chip (`ContinueChip.vue`)
+For returning visitors—shows last clicked platform/media.
+
+- Uses localStorage to track: last clicked platform, last played media
+- Shows subtle chip: "Continue on YouTube" / "Continue listening"
+- Dismissible (stays dismissed for 24h)
+- 7-day expiry on stored data
+
+#### Fan Toasts (`FanToast.vue`)
+Recognition toasts after key actions.
+
+**Triggers:**
+| Action | Example Toast |
+|--------|---------------|
+| `follow` | "Following! Stay in the loop." |
+| `save` | "Saved. Welcome back anytime." |
+| `share` | "Shared — thanks for spreading the word." |
+| `payment` | "You're supporting independent music." |
+
+**Rules:**
+- Rate-limited: 5s minimum between toasts
+- Queue system for multiple actions
+- 3s display duration
+
+#### Support Module (`SupportModule.vue`)
+Consolidated payment section with quick tip amounts.
+
+- Quick tip buttons: $5, $10, $20 (with "Popular" badge)
+- Expandable detailed payment options
+- Auto-expands on `SHOW_DAY` mode
+- Preserves all existing Stripe functionality
+
+### V2 Components (Optional)
+
+#### Moment Badges (`MomentBadges.vue`)
+Small chips under NOW banner.
+
+| Badge | Trigger |
+|-------|---------|
+| 🎤 New tonight | `hasShowTonight` |
+| 🚐 Tour week | `isOnTour` |
+| 🔥 Fresh release | `hasNewRelease` |
+| 🎬 Fresh video | `hasNewVideo` |
+| 👕 Merch drop | `hasMerchDrop` |
+
+Max 3 badges displayed.
+
+#### Show Day Header (`ShowDayHeader.vue`)
+Compact strip only on `SHOW_DAY` mode.
+
+```
+[🔴 live] Tonight in Austin — The Fillmore    [Tickets]
+```
+
+#### Moment Share Card (`MomentShareCard.vue`)
+Shareable preview card in share section.
+
+**Types:** `you_were_here`, `support_received`, `heating_up`, `post_show`, `default`
+
+### File Structure
+
+```
+config/
+└── smartLinkFeatureFlags.js    # All feature flags
+
+composables/
+├── useSmartLinkPageMode.js     # Page mode state machine
+├── useSmartLinkLiveFeed.js     # Live feed data + demo fallback
+└── useSmartLinkLiveSurface.js  # Main integration composable
+
+components/smartlink/
+├── NowBanner.vue               # Contextual status banner
+├── LiveFeed.vue                # Micro-signals display
+├── ContinueChip.vue            # Return visitor chip
+├── FanToast.vue                # Recognition toasts
+├── SupportModule.vue           # Consolidated payments
+├── MomentBadges.vue            # V2: Small chips
+├── ShowDayHeader.vue           # V2: Show day strip
+└── MomentShareCard.vue         # V2: Shareable card
+```
+
+### Backend TODOs
+
+When implementing real data, add these fields/endpoints:
+
+**Band Fields:**
+```js
+band.newReleaseDate      // Date - for NEW_RELEASE detection
+band.nowBannerOverride   // String - manual banner state override
+```
+
+**Event Fields:**
+```js
+event.doorsTime          // String - "7:00 PM" for show day header
+```
+
+**Analytics Endpoint:**
+```
+GET /api/bands/:id/live-signals
+
+Response:
+{
+  recentSupport: { amount: 20, timestamp: 1705000000000 },
+  topCity: { name: "Austin", isNew: false, count: 45 },
+  activitySpike: { multiplier: 2.5, timestamp: 1705000000000 },
+  topLink: { platform: "Spotify", clicks: 120 }
+}
+```
+
+### Integration Points
+
+The Live Surface integrates with existing band page at:
+- `pages/[bandSlug]/index.vue` - Main integration
+- `onToggleSaveBand()` - Triggers save toast
+- `handleFollowConfirm()` - Triggers follow toast
+- Streaming link clicks - Records for Continue Chip
+
+### Demo Data
+
+When `DEMO_FEED_ENABLED = true` and real data is missing:
+- Live feed shows realistic mock signals
+- Signals vary based on page mode (SHOW_DAY gets "heating up", POST_SHOW gets "spike")
+- Demo data is obvious in code but invisible to users
+
+### Implementation Details
+
+#### How It Works (Technical)
+
+The Live Surface is implemented directly in `pages/[bandSlug]/index.vue` with feature flags imported from `config/smartLinkFeatureFlags.js`.
+
+**Key Design Decisions:**
+1. **No composable wrapper** - Feature flags and computed values are defined directly in the page component for simplicity and to avoid reactivity issues with composables inside computed properties.
+2. **Direct flag imports** - All `SMARTLINK_*` flags are imported at the top of the script and used in computed properties.
+3. **Demo data inline** - The `liveFeedItems` computed generates demo data directly when `DEMO_FEED_ENABLED` is true.
+
+**State Detection Logic (in page component):**
+```js
+// NOW Banner State Detection
+const nowBannerState = computed(() => {
+  // 1. Check manual override from band data
+  if (band.value?.data?.nowBannerOverride) return band.value.data.nowBannerOverride;
+  
+  // 2. Auto-detect from events
+  if (event within 24h) return 'SHOW_TONIGHT';
+  if (newReleaseDate within 30d) return 'NEW_RELEASE';
+  if (2+ upcoming events) return 'ON_TOUR';
+  return 'QUIET_DEFAULT';
+});
+
+// Page Mode Detection
+const effectivePageMode = computed(() => {
+  if (event within 24h) return 'SHOW_DAY';
+  // TODO: POST_SHOW detection needs past events
+  return 'QUIET';
+});
+
+// Demo Feed Items (varies by mode)
+const liveFeedItems = computed(() => {
+  // QUIET: city + trending link
+  // SHOW_DAY: city + heating up
+  // POST_SHOW: city + post-show spike
+});
+```
+
+**Component Placement in Template:**
+```
+Bio/Tagline
+  ↓
+[ShowDayHeader] ← V2, only on SHOW_DAY mode
+  ↓
+[NowBanner] ← Always shows when enabled
+  ↓
+[MomentBadges] ← V2, chips under banner
+  ↓
+[ContinueChip] ← For returning visitors
+  ↓
+[LiveFeed] ← Micro-signals
+  ↓
+Main Content (Featured Song, etc.)
+```
+
+**DEV Indicator:**
+- `DevIndicator.vue` shows "🔴 Live Surface: ON" badge in bottom-left
+- Only visible when `SMARTLINK_LIVE_SURFACE_ENABLED = true` AND `NODE_ENV !== 'production'`
+- Prevents accidentally leaving features enabled in production
+
+#### File Locations
+
+```
+config/
+└── smartLinkFeatureFlags.js    # All feature flags (master switch here)
+
+pages/[bandSlug]/
+└── index.vue                   # Main integration (flags, computed, template)
+
+components/smartlink/
+├── NowBanner.vue               # Contextual status banner
+├── LiveFeed.vue                # Micro-signals display
+├── ContinueChip.vue            # Return visitor chip
+├── FanToast.vue                # Recognition toasts
+├── SupportModule.vue           # Consolidated payments
+├── DevIndicator.vue            # DEV-only badge
+├── MomentBadges.vue            # V2: Small chips
+├── ShowDayHeader.vue           # V2: Show day strip
+└── MomentShareCard.vue         # V2: Shareable card
+```
+
+#### Adding New Features
+
+1. Add flag to `config/smartLinkFeatureFlags.js`
+2. Import flag in `pages/[bandSlug]/index.vue`
+3. Create computed for visibility: `const showMyFeature = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && MY_FLAG)`
+4. Add component to template with `v-if="showMyFeature"`
+
+#### Testing Checklist
+
+- [ ] `SMARTLINK_LIVE_SURFACE_ENABLED = false` → Page looks exactly like before
+- [ ] `SMARTLINK_LIVE_SURFACE_ENABLED = true` → All enabled features appear
+- [ ] Individual flags toggle features on/off
+- [ ] Demo feed shows when `DEMO_FEED_ENABLED = true` and no real data
+- [ ] DEV indicator only shows in development
+- [ ] Fan toasts fire on save/follow actions
+- [ ] Continue chip remembers last clicked link

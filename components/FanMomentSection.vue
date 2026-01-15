@@ -72,85 +72,35 @@
           </div>
         </div>
         
-        <!-- Share Buttons -->
-        <div class="mt-4 space-y-3">
+        <!-- Share Button -->
+        <div class="mt-4">
           <button
-            @click="handleShare"
-            :disabled="sharing"
-            class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-emerald-600 text-white font-semibold text-sm hover:from-purple-500 hover:to-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            @click="shareDrawerOpen = true"
+            class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-emerald-600 text-white font-semibold text-sm hover:from-purple-500 hover:to-emerald-500 transition-all flex items-center justify-center gap-2"
           >
-            <svg v-if="!sharing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
-            <span v-if="sharing">Sharing...</span>
-            <span v-else>Share this moment</span>
+            <span>Share this moment</span>
           </button>
-          
-          <!-- Social Share Kit row -->
-          <div class="flex items-center justify-center gap-2 flex-wrap">
-            <!-- Copy Link -->
-            <button
-              @click="handleCopyLink"
-              class="px-3 py-1.5 rounded-lg border border-white/15 text-white/70 text-xs hover:bg-white/5 transition-colors flex items-center gap-1.5"
-              title="Copy link"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
-              <span>Link</span>
-            </button>
-            
-            <!-- Copy Caption -->
-            <button
-              @click="handleCopyCaption"
-              class="px-3 py-1.5 rounded-lg border border-white/15 text-white/70 text-xs hover:bg-white/5 transition-colors flex items-center gap-1.5"
-              title="Copy caption"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <span>Caption</span>
-            </button>
-            
-            <!-- Download Image -->
-            <button
-              @click="handleDownloadImage"
-              :disabled="downloadingImage"
-              class="px-3 py-1.5 rounded-lg border border-white/15 text-white/70 text-xs hover:bg-white/5 transition-colors flex items-center gap-1.5 disabled:opacity-50"
-              title="Download image"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span>Image</span>
-            </button>
-            
-            <!-- Instagram helper -->
-            <button
-              @click="handleInstagramKit"
-              :disabled="preparingIG"
-              class="px-3 py-1.5 rounded-lg border border-pink-500/30 text-pink-400/80 text-xs hover:bg-pink-500/10 transition-colors flex items-center gap-1.5 disabled:opacity-50"
-              title="Prepare for Instagram"
-            >
-              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-              <span>{{ preparingIG ? '...' : 'IG' }}</span>
-            </button>
-            
-            <!-- Facebook helper -->
-            <button
-              @click="handleFacebookShare"
-              class="px-3 py-1.5 rounded-lg border border-blue-500/30 text-blue-400/80 text-xs hover:bg-blue-500/10 transition-colors flex items-center gap-1.5"
-              title="Share on Facebook"
-            >
-              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-              <span>FB</span>
-            </button>
-          </div>
         </div>
+
+        <!-- Moment Share Drawer -->
+        <MomentShareDrawer
+          :is-open="shareDrawerOpen"
+          :band-id="bandId"
+          :band-slug="bandSlug"
+          :band-name="bandName"
+          :band-image-url="bandImageUrl"
+          :is-band-name-in-logo="isBandNameInLogo"
+          :headline="momentHeadline"
+          :subtext="momentSubtext"
+          :fan-position="fanPositionText"
+          :captions="momentCaptions"
+          :moment-type="moment?.actionType || 'DEFAULT'"
+          @close="shareDrawerOpen = false"
+          @shared="onMomentShared"
+        />
         
         <!-- Decorative elements -->
         <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -168,6 +118,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRuntimeConfig } from '#imports'
 import { useVisitorSession } from '@/composables/useVisitorSession'
 import { useShareKit } from '@/composables/useShareKit'
+import MomentShareDrawer from '@/components/band/MomentShareDrawer.vue'
 
 const props = defineProps({
   bandId: {
@@ -219,6 +170,7 @@ const hasEarnedThisSession = ref(false)
 const toastMessage = ref('')
 const cachedImageBlob = ref(null)
 const captionStyle = ref('hype')
+const shareDrawerOpen = ref(false)
 
 // Caption variants
 const captionVariants = [
@@ -305,10 +257,31 @@ const locationText = computed(() => {
   // cityName is used for CITY_HEAT moments
   if (cityName) return cityName
   if (city && state) return `${city}, ${state}`
-  if (city) return city
-  if (state) return state
-  return ''
 })
+
+// Captions object for the drawer
+const momentCaptions = computed(() => {
+  const bandName = props.bandName || 'the band'
+  const actionType = moment.value?.actionType || ''
+  
+  return {
+    hype: actionType === 'qr_scan' ? `I was there for ${bandName} 🔥 Live show energy!`
+        : actionType === 'link_click' ? `Just discovered ${bandName} 🔥 You need to check them out!`
+        : actionType === 'follow' ? `Just followed ${bandName} 🔥 Join the fanbase!`
+        : actionType === 'payment' ? `I backed ${bandName} 🔥 Real fans support real music!`
+        : `I was part of the moment for ${bandName} 🔥`,
+    chill: actionType === 'qr_scan' ? `Thanks for the show ${bandName} 🙏 Incredible night.`
+        : actionType === 'payment' ? `Proud to support ${bandName} 🙏 Every bit helps.`
+        : `Grateful to be part of ${bandName}'s journey 🙏`,
+    flex: actionType === 'qr_scan' ? `${bandName}… that was just the beginning 👀`
+        : `Something's happening with ${bandName}… stay close 👀`,
+  }
+})
+
+// Handler for when moment is shared via drawer
+function onMomentShared({ channel, captionStyle }) {
+  showToast('Moment shared!')
+}
 
 // Check local cooldown (24h per band)
 function checkLocalCooldown() {

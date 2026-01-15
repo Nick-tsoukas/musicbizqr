@@ -2,6 +2,7 @@ import { ref, computed, watch } from 'vue'
 import { demoBands, defaultDemoBand } from '@/data/demoBands'
 import { demoCities, getRandomCity } from '@/data/demoCities'
 import { seededMoments, generateMomentId, getMomentType, getVibe } from '@/data/demoMomentTemplates'
+import { useDemoState } from '@/composables/useDemoState'
 
 const SCENES = [
   { key: 'smartlinks', label: 'Smart Links', caption: 'One link. Every platform. Full analytics.' },
@@ -25,70 +26,34 @@ const autoplay = ref(false)
 const autoplayInterval = ref(null)
 const selectedBandId = ref(defaultDemoBand.id)
 
-// Demo stats
-const demoStats = ref({
-  scans: 127,
-  profileVisits: 342,
-  spotifyClicks: 89,
-  appleMusicClicks: 45,
-  youtubePlays: 67,
-  follows: 23,
-  ticketClicks: 34,
-  merchClicks: 12,
-  momentsCreated: seededMoments.length,
-  momentsShared: seededMoments.filter(m => m.shared).length,
-})
-
 // Moments feed
 const moments = ref([...seededMoments])
-
-// Top cities with counts
-const topCities = ref([
-  { name: 'Los Angeles', count: 45 },
-  { name: 'New York', count: 38 },
-  { name: 'Chicago', count: 29 },
-  { name: 'Austin', count: 24 },
-  { name: 'Nashville', count: 18 },
-])
 
 // Toast notifications
 const toasts = ref([])
 
 export function useDemoShow() {
+  // Get shared demo state
+  const {
+    demoStats,
+    topCities,
+    momentumState,
+    momentumLabel,
+    momentumColor,
+    recentShares,
+    recentShareables,
+    simulateFans,
+    simulateShares: sharedSimulateShares,
+    recordShare,
+    spawnShareable,
+  } = useDemoState()
+
   // Computed
   const currentScene = computed(() => SCENES[sceneIndex.value])
   const currentSceneKey = computed(() => currentScene.value?.key)
   const selectedBand = computed(() => demoBands.find(b => b.id === selectedBandId.value) || defaultDemoBand)
   const isFirstScene = computed(() => sceneIndex.value === 0)
   const isLastScene = computed(() => sceneIndex.value === SCENES.length - 1)
-  
-  const momentumState = computed(() => {
-    const activity = demoStats.value.momentsShared + Math.floor(demoStats.value.profileVisits / 10)
-    if (activity >= MOMENTUM_THRESHOLDS.breakout.min) return 'breakout'
-    if (activity >= MOMENTUM_THRESHOLDS.heating.min) return 'heating'
-    if (activity >= MOMENTUM_THRESHOLDS.watching.min) return 'watching'
-    return 'cooling'
-  })
-
-  const momentumLabel = computed(() => {
-    const labels = {
-      cooling: 'Cooling — activity is low',
-      watching: 'Watching — building momentum',
-      heating: 'Heating — engagement rising',
-      breakout: 'Breakout — viral potential',
-    }
-    return labels[momentumState.value]
-  })
-
-  const momentumColor = computed(() => {
-    const colors = {
-      cooling: 'text-blue-400',
-      watching: 'text-yellow-400',
-      heating: 'text-orange-400',
-      breakout: 'text-red-400',
-    }
-    return colors[momentumState.value]
-  })
 
   // Actions
   function nextScene() {
@@ -112,27 +77,9 @@ export function useDemoShow() {
 
   function restart() {
     sceneIndex.value = 0
-    // Reset stats to baseline
-    demoStats.value = {
-      scans: 127,
-      profileVisits: 342,
-      spotifyClicks: 89,
-      appleMusicClicks: 45,
-      youtubePlays: 67,
-      follows: 23,
-      ticketClicks: 34,
-      merchClicks: 12,
-      momentsCreated: seededMoments.length,
-      momentsShared: seededMoments.filter(m => m.shared).length,
-    }
     moments.value = [...seededMoments]
-    topCities.value = [
-      { name: 'Los Angeles', count: 45 },
-      { name: 'New York', count: 38 },
-      { name: 'Chicago', count: 29 },
-      { name: 'Austin', count: 24 },
-      { name: 'Nashville', count: 18 },
-    ]
+    // Note: demoStats and topCities are now managed by useDemoState
+    // Call resetDemoState() from useDemoState if full reset is needed
   }
 
   function setMode(newMode) {
@@ -238,33 +185,15 @@ export function useDemoShow() {
   }
 
   function simulateFanBurst(count = 50) {
-    demoStats.value.scans += count
-    demoStats.value.profileVisits += count * 2
-    demoStats.value.spotifyClicks += Math.floor(count * 0.4)
-    demoStats.value.youtubePlays += Math.floor(count * 0.2)
-    demoStats.value.follows += Math.floor(count * 0.1)
-    
-    // Distribute across cities
-    for (let i = 0; i < Math.min(count / 10, 5); i++) {
-      const cityIdx = Math.floor(Math.random() * topCities.value.length)
-      topCities.value[cityIdx].count += Math.floor(count / 5)
-    }
-    
+    // Delegate to shared state
+    simulateFans(count)
     showToast(`${count} fans hit the link!`)
   }
 
   function simulateShares(count = 10) {
-    for (let i = 0; i < count; i++) {
-      const unshared = moments.value.find(m => !m.shared)
-      if (unshared) {
-        shareMoment(unshared.id)
-      } else {
-        // Create and share new moments
-        const types = ['i-was-there', 'support-the-band', 'new-fan', 'favorite-song']
-        const newMoment = createMoment(types[i % types.length], getRandomCity().name, 'chills')
-        shareMoment(newMoment.id)
-      }
-    }
+    // Delegate to shared state
+    sharedSimulateShares(count)
+    showToast(`${count} shares simulated!`)
   }
 
   // Autoplay

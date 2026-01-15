@@ -16,6 +16,282 @@
       </div>
     </div>
 
+    <!-- Compact Style -->
+    <div
+      v-else-if="isCompactStyle"
+      class="bg-black w-screen mx-auto pt-[var(--header-height)] fade-in"
+    >
+      <BandPageCompact
+        :band="band.data"
+        :upcoming-events="upcomingEvents"
+        :hidden-links="hiddenLinks"
+        :enabled-payment-buttons="enabledPaymentButtons"
+        :followable-platforms="followablePlatforms"
+        @play-song="onSongPlay"
+        @link-click="(link) => handleClick(band.data.id, link.name, link.url)"
+        @view-event="(event) => router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+        @quick-tip="(amount) => handleQuickTip(amount)"
+        @follow="openFollowModal"
+        @share="openShareModal"
+      >
+        <template #audio-player>
+          <!-- Embedded Track -->
+          <div
+            v-if="band.data.singlesong?.isEmbed && safeEmbedHtml"
+            class="w-full"
+          >
+            <div
+              class="relative w-full h-64 rounded-xl overflow-hidden"
+              :class="{ 'embed-shake': embedShake }"
+            >
+              <div
+                ref="embedPlayerWrapperEl"
+                class="absolute inset-0 w-full h-full"
+                v-html="safeEmbedHtml"
+              ></div>
+
+              <div
+                v-if="!hasTrackedEmbedClick"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-black/35 text-white text-sm font-semibold"
+                @click.prevent.stop="onEmbedOverlayTap"
+              >
+                Tap to play
+              </div>
+
+              <div
+                v-if="showEmbedTapAgainHint"
+                class="absolute inset-x-0 bottom-2 z-20 flex justify-center pointer-events-none"
+              >
+                <div class="px-3 py-1 rounded-md bg-black/70 text-white text-xs">
+                  Tap again to play
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Raw Audio -->
+          <div v-else class="w-full">
+            <AudioPlayer
+              :album="formatSingleSong(band.data.singlesong)"
+              :placeholderImage="'/placeholder-image.svg'"
+              @play="onSongPlay"
+              class="rounded-xl"
+            />
+          </div>
+        </template>
+
+        <template #video-player>
+          <div
+            v-if="!isVideoPlaying"
+            @click="playVideo"
+            class="relative w-full overflow-hidden bg-black cursor-pointer rounded-xl embed-container"
+          >
+            <img
+              :src="singleVideoThumbnail"
+              :alt="`${band.data.name} video thumbnail`"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-black/30"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div
+                class="h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/15"
+              >
+                <svg viewBox="0 0 24 24" class="h-6 w-6 text-white" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="embed-container rounded-xl overflow-hidden">
+            <iframe
+              :src="singleVideoEmbedUrl + '?autoplay=1'"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </template>
+      </BandPageCompact>
+      
+      <!-- Fan Moment Section for compact -->
+      <client-only>
+        <FanMomentSection
+          v-if="band?.data?.id"
+          ref="fanMomentRef"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
+          :pulse-data="pulseData"
+        />
+      </client-only>
+
+      <footer class="h-40 flex justify-center items-center">
+        <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
+      </footer>
+
+      <!-- Follow Band Modal -->
+      <client-only>
+        <FollowBandModal
+          :is-open="followModalOpen"
+          :band-name="band?.data?.name || ''"
+          :band-id="band?.data?.id"
+          :band-slug="currentBandSlug"
+          :platforms="followablePlatforms"
+          @close="followModalOpen = false"
+          @confirm="handleFollowConfirm"
+          @track="handleFollowTrack"
+        />
+      </client-only>
+    </div>
+
+    <!-- Bold Style -->
+    <div
+      v-else-if="isBoldStyle"
+      class="bg-black w-screen mx-auto pt-[var(--header-height)] fade-in"
+    >
+      <BandPageBold
+        :band="band.data"
+        :upcoming-events="upcomingEvents"
+        :hidden-links="hiddenLinks"
+        :enabled-payment-buttons="enabledPaymentButtons"
+        :followable-platforms="followablePlatforms"
+        @play-song="onSongPlay"
+        @link-click="(link) => handleClick(band.data.id, link.name, link.url)"
+        @view-event="(event) => router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+        @quick-tip="(amount) => handleQuickTip(amount)"
+        @follow="openFollowModal"
+        @save="onToggleSaveBand"
+        @share="shareDrawerOpen = true"
+      >
+        <template #audio-player>
+          <!-- Embedded Track -->
+          <div
+            v-if="band.data.singlesong?.isEmbed && safeEmbedHtml"
+            class="w-full"
+          >
+            <div
+              class="relative w-full h-64 rounded-xl overflow-hidden"
+              :class="{ 'embed-shake': embedShake }"
+            >
+              <div
+                ref="embedPlayerWrapperEl"
+                class="absolute inset-0 w-full h-full"
+                v-html="safeEmbedHtml"
+              ></div>
+
+              <div
+                v-if="!hasTrackedEmbedClick"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-black/35 text-white text-sm font-semibold"
+                @click.prevent.stop="onEmbedOverlayTap"
+              >
+                Tap to play
+              </div>
+
+              <div
+                v-if="showEmbedTapAgainHint"
+                class="absolute inset-x-0 bottom-2 z-20 flex justify-center pointer-events-none"
+              >
+                <div class="px-3 py-1 rounded-md bg-black/70 text-white text-xs">
+                  Tap again to play
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Raw Audio -->
+          <div v-else class="w-full">
+            <AudioPlayer
+              :album="formatSingleSong(band.data.singlesong)"
+              :placeholderImage="'/placeholder-image.svg'"
+              @play="onSongPlay"
+              class="rounded-xl"
+            />
+          </div>
+        </template>
+
+        <template #video-player>
+          <div
+            v-if="!isVideoPlaying"
+            @click="playVideo"
+            class="relative w-full overflow-hidden bg-black cursor-pointer rounded-xl embed-container"
+          >
+            <img
+              :src="singleVideoThumbnail"
+              :alt="`${band.data.name} video thumbnail`"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-black/30"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div
+                class="h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/15"
+              >
+                <svg viewBox="0 0 24 24" class="h-6 w-6 text-white" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="embed-container rounded-xl overflow-hidden">
+            <iframe
+              :src="singleVideoEmbedUrl + '?autoplay=1'"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </template>
+      </BandPageBold>
+      
+      <!-- Fan Moment Section for bold -->
+      <client-only>
+        <FanMomentSection
+          v-if="band?.data?.id"
+          ref="fanMomentRef"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
+          :pulse-data="pulseData"
+        />
+      </client-only>
+
+      <footer class="h-40 flex justify-center items-center bg-black">
+        <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
+      </footer>
+
+      <!-- Follow Band Modal -->
+      <client-only>
+        <FollowBandModal
+          :is-open="followModalOpen"
+          :band-name="band?.data?.name || ''"
+          :band-id="band?.data?.id"
+          :band-slug="currentBandSlug"
+          :platforms="followablePlatforms"
+          @close="followModalOpen = false"
+          @confirm="handleFollowConfirm"
+          @track="handleFollowTrack"
+        />
+      </client-only>
+
+      <!-- Share Drawer -->
+      <client-only>
+        <ShareDrawer
+          v-if="band?.data?.id"
+          :is-open="shareDrawerOpen"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
+          @close="shareDrawerOpen = false"
+        />
+      </client-only>
+    </div>
+
+    <!-- Default Style -->
     <div
       v-else
       class="bg-black w-screen h-[35vh] md:h-[60vh] mx-auto pt-[var(--header-height)] fade-in"
@@ -82,6 +358,59 @@
         </div>
       </div>
 
+      <!-- ============================================ -->
+      <!-- SMART LINK LIVE SURFACE COMPONENTS -->
+      <!-- Only shown when SMARTLINK_LIVE_SURFACE_ENABLED is true -->
+      <!-- ============================================ -->
+
+      <!-- V2: Show Day Header (only on SHOW_DAY mode) -->
+      <ShowDayHeader
+        v-if="shouldShowShowDayHeader && upcomingEvents.length > 0"
+        :event="upcomingEvents[0]"
+        :has-pay-entry="enabledPaymentButtons.length > 0"
+        class="mt-4"
+        @tickets="(e) => handleClick(band.data.id, 'tickets', e.ticketLink)"
+        @pay-entry="scrollToSupport"
+      />
+
+      <!-- NOW Banner -->
+      <div v-if="showNowBanner && nowBannerContent" class="w-full px-6 mt-6 md:max-w-[80vw] md:mx-auto">
+        <NowBanner
+          :state="nowBannerState"
+          :content="nowBannerContent"
+          @cta-click="handleNowBannerCta"
+          @scroll-to="handleScrollTo"
+          @share="shareDrawerOpen = true"
+        />
+      </div>
+
+      <!-- V2: Moment Badges -->
+      <div v-if="showMomentBadges" class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <MomentBadges
+          :has-show-tonight="nowBannerState === 'SHOW_TONIGHT'"
+          :is-on-tour="nowBannerState === 'ON_TOUR'"
+          :has-new-release="nowBannerState === 'NEW_RELEASE'"
+        />
+      </div>
+
+      <!-- Continue Chip (for returning visitors) -->
+      <div v-if="showContinueChip" class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <ContinueChip
+          ref="continueChipRef"
+          :band-slug="currentBandSlug"
+          @continue="handleContinueAction"
+        />
+      </div>
+
+      <!-- Live Feed Micro-signals -->
+      <div v-if="showLiveFeed && hasLiveFeedItems" class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <LiveFeed
+          :feed-items="liveFeedItems"
+          :primary-feed-item="primaryFeedItem"
+          :has-feed-items="hasLiveFeedItems"
+          display-mode="single"
+        />
+      </div>
 
       <!-- Main Content -->
       <div class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
@@ -191,12 +520,11 @@
 
         <!-- Streaming Links -->
         <section v-if="hasStreamingLinks && isSectionVisible('streaming')" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Streaming Links
-          </h2>
-          <template v-for="platform in orderedStreamingPlatforms" :key="platform.name">
-            <span v-if="band.data[platform.name] && !isLinkHidden(platform.name)">
+          <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Streaming</h3>
+          <div class="space-y-2">
+            <template v-for="platform in orderedStreamingPlatforms" :key="platform.name">
               <a
+                v-if="band.data[platform.name] && !isLinkHidden(platform.name)"
                 :href="band.data[platform.name]"
                 @click.prevent="
                   handleClick(
@@ -205,30 +533,26 @@
                     band.data[platform.name]
                   )
                 "
+                class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
               >
-                <button
-                  class="w-full mb-6 custom-border text-white text-lg flex items-center gap-3 font-semibold px-4 py-4 shadow-lg rounded-md md:text-xl min-w-0"
-                >
-                  <img
-                    :src="platform.img"
-                    class="h-8 w-8 shrink-0"
-                    :alt="platform.label"
-                  />
-                  <span class="min-w-0 truncate">{{ platform.label }}</span>
-                </button>
+                <img
+                  :src="platform.img"
+                  class="w-6 h-6 shrink-0"
+                  :alt="platform.label"
+                />
+                <span class="text-white font-medium">{{ platform.label }}</span>
               </a>
-            </span>
-          </template>
+            </template>
+          </div>
         </section>
 
         <!-- Social Media -->
         <section v-if="hasSocialLinks && isSectionVisible('social')" class="mt-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-            Social Media
-          </h2>
-          <template v-for="platform in orderedSocialPlatforms" :key="platform.name">
-            <span v-if="band.data[platform.name] && !isLinkHidden(platform.name)">
+          <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Social</h3>
+          <div class="space-y-2">
+            <template v-for="platform in orderedSocialPlatforms" :key="platform.name">
               <a
+                v-if="band.data[platform.name] && !isLinkHidden(platform.name)"
                 :href="band.data[platform.name]"
                 @click.prevent="
                   handleClick(
@@ -237,20 +561,17 @@
                     band.data[platform.name]
                   )
                 "
+                class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
               >
-                <button
-                  class="w-full custom-border mb-6 text-white text-lg flex items-center gap-3 font-semibold px-4 py-4 shadow-lg rounded-md md:text-xl min-w-0"
-                >
-                  <img
-                    :src="platform.img"
-                    class="h-8 w-8 shrink-0"
-                    :alt="platform.label"
-                  />
-                  <span class="min-w-0 truncate">{{ platform.label }}</span>
-                </button>
+                <img
+                  :src="platform.img"
+                  class="w-6 h-6 shrink-0"
+                  :alt="platform.label"
+                />
+                <span class="text-white font-medium">{{ platform.label }}</span>
               </a>
-            </span>
-          </template>
+            </template>
+          </div>
         </section>
 
         <!-- Upcoming Events -->
@@ -622,46 +943,63 @@
         </section>
       </div>
 
-      <!-- Follow & Save Band Section -->
+      <!-- Action Buttons Row -->
       <div class="w-full px-6 mt-16 mb-8 md:max-w-[80vw] md:mx-auto">
-        <!-- Follow Band Button -->
-        <button
-          v-if="followablePlatforms.length > 0 && isSectionVisible('follow')"
-          type="button"
-          class="w-full mb-4 flex items-center justify-center gap-3 rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-900/50 to-violet-900/50 px-4 py-4 text-white text-lg md:text-xl font-semibold shadow-lg transition hover:from-purple-900/70 hover:to-violet-900/70 hover:border-purple-400/60 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-          @click="openFollowModal"
-        >
-          <svg class="h-6 w-6 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-          </svg>
-          <span>Follow {{ band.data.name }}</span>
-        </button>
+        <div class="grid grid-cols-3 gap-3">
+          <!-- Follow Button -->
+          <button
+            v-if="followablePlatforms.length > 0 && isSectionVisible('follow')"
+            type="button"
+            class="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-purple-500/40 bg-gradient-to-b from-purple-900/50 to-violet-900/50 text-white font-semibold shadow-lg transition hover:from-purple-900/70 hover:to-violet-900/70 hover:border-purple-400/60 hover:-translate-y-0.5 focus:outline-none"
+            @click="openFollowModal"
+          >
+            <svg class="h-6 w-6 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+            </svg>
+            <span class="text-sm">Follow</span>
+          </button>
 
-        <!-- Save Band Button -->
-        <client-only>
+          <!-- Save Button -->
+          <client-only>
+            <button
+              v-if="band?.data"
+              type="button"
+              class="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl font-semibold shadow-lg transition hover:-translate-y-0.5 focus:outline-none"
+              :class="isCurrentBandSaved 
+                ? 'border border-amber-500/50 bg-gradient-to-b from-amber-900/40 to-yellow-900/40 text-amber-300 hover:from-amber-900/60 hover:to-yellow-900/60' 
+                : 'border border-white/20 bg-gradient-to-b from-slate-800/60 to-slate-700/60 text-white hover:from-slate-800/80 hover:to-slate-700/80'"
+              @click="onToggleSaveBand"
+            >
+              <svg v-if="isCurrentBandSaved" class="h-6 w-6 shrink-0 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
+              </svg>
+              <svg v-else class="h-6 w-6 shrink-0 text-white/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+              </svg>
+              <span class="text-sm">{{ isCurrentBandSaved ? "Saved" : "Save" }}</span>
+            </button>
+          </client-only>
+
+          <!-- Share Button -->
           <button
             v-if="band?.data"
             type="button"
-            class="w-full mb-4 flex items-center justify-center gap-3 rounded-2xl px-4 py-4 text-white text-lg md:text-xl font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-            :class="isCurrentBandSaved 
-              ? 'border border-amber-500/50 bg-gradient-to-r from-amber-900/40 to-yellow-900/40 hover:from-amber-900/60 hover:to-yellow-900/60 hover:border-amber-400/70' 
-              : 'border border-white/20 bg-gradient-to-r from-slate-800/60 to-slate-700/60 hover:from-slate-800/80 hover:to-slate-700/80 hover:border-white/30'"
-            @click="onToggleSaveBand"
+            class="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-white/20 bg-gradient-to-b from-slate-800/60 to-slate-700/60 text-white font-semibold shadow-lg transition hover:from-slate-800/80 hover:to-slate-700/80 hover:border-white/30 hover:-translate-y-0.5 focus:outline-none"
+            @click="shareDrawerOpen = true"
           >
-            <svg v-if="isCurrentBandSaved" class="h-6 w-6 shrink-0 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-              <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
+            <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
-            <svg v-else class="h-6 w-6 shrink-0 text-white/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-            </svg>
-            <span>{{ isCurrentBandSaved ? "Saved to My Bands" : "Save to My Bands" }}</span>
+            <span class="text-sm">Share</span>
           </button>
-          
-          <!-- Saved Confirmation -->
+        </div>
+
+        <!-- Saved Confirmation -->
+        <client-only>
           <Transition name="fade">
             <div 
               v-if="showSavedConfirmation" 
-              class="flex items-center justify-center gap-2 text-amber-300/90 text-sm py-2"
+              class="flex items-center justify-center gap-2 text-amber-300/90 text-sm py-3 mt-3"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
@@ -670,19 +1008,21 @@
             </div>
           </Transition>
         </client-only>
+      </div>
 
-        <!-- Share Band Button (styled to match Follow/Save) -->
-        <ShareBandStrip
+      <!-- Share Drawer -->
+      <client-only>
+        <ShareDrawer
           v-if="band?.data?.id"
+          :is-open="shareDrawerOpen"
           :band-id="band.data.id"
           :band-slug="currentBandSlug"
           :band-name="band.data.name || 'This Artist'"
           :band-image-url="band.data.bandImg?.url || null"
           :is-band-name-in-logo="band.data.isBandNameInLogo || false"
-          placement="FOOTER"
-          full-width
+          @close="shareDrawerOpen = false"
         />
-      </div>
+      </client-only>
 
       <!-- Fan Moment Section (shows only when moment is earned) -->
       <client-only>
@@ -716,6 +1056,19 @@
         @track="handleFollowTrack"
       />
     </client-only>
+
+    <!-- Smart Link Live Surface: Fan Toast (recognition after actions) -->
+    <client-only>
+      <FanToast
+        v-if="showFanToasts"
+        ref="fanToastRef"
+      />
+    </client-only>
+
+    <!-- DEV-only indicator when Live Surface is enabled -->
+    <client-only>
+      <DevIndicator />
+    </client-only>
   </div>
 </template>
 
@@ -730,10 +1083,39 @@ import AudioPlayer from "@/components/AudioPlayer.vue";
 import FollowBandModal from "@/components/band/FollowBandModal.vue";
 import FanMomentSection from "@/components/FanMomentSection.vue";
 import ShareBandStrip from "@/components/ShareBandStrip.vue";
+import ShareDrawer from "@/components/band/ShareDrawer.vue";
+import BandPageCompact from "@/components/band/BandPageCompact.vue";
+import BandPageBold from "@/components/band/BandPageBold.vue";
 import {
   normalizeLayoutConfig,
   isSectionEnabled,
 } from "@/utils/bandLayout";
+
+// Smart Link Live Surface Components
+import NowBanner from "@/components/smartlink/NowBanner.vue";
+import LiveFeed from "@/components/smartlink/LiveFeed.vue";
+import ContinueChip from "@/components/smartlink/ContinueChip.vue";
+import FanToast from "@/components/smartlink/FanToast.vue";
+import SupportModule from "@/components/smartlink/SupportModule.vue";
+// V2 Components
+import MomentBadges from "@/components/smartlink/MomentBadges.vue";
+import ShowDayHeader from "@/components/smartlink/ShowDayHeader.vue";
+import MomentShareCard from "@/components/smartlink/MomentShareCard.vue";
+import DevIndicator from "@/components/smartlink/DevIndicator.vue";
+import {
+  SMARTLINK_LIVE_SURFACE_ENABLED,
+  SMARTLINK_SHOW_NOW_BANNER,
+  SMARTLINK_SHOW_LIVE_FEED,
+  SMARTLINK_SHOW_PAGE_MODES,
+  SMARTLINK_SHOW_CONTINUE_CHIP,
+  SMARTLINK_SHOW_FAN_TOASTS,
+  SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR,
+  SMARTLINK_V2_ENABLED,
+  SMARTLINK_SHOW_MOMENT_BADGES,
+  SMARTLINK_SHOW_SHOW_DAY_HEADER,
+  SMARTLINK_SHOW_MOMENT_SHARE_CARD,
+  DEMO_FEED_ENABLED,
+} from '@/config/smartLinkFeatureFlags';
 
 import facebookIcon from "@/assets/facebookfree.png";
 import instagramIcon from "@/assets/instagramfree.png";
@@ -1070,6 +1452,216 @@ const layoutConfig = computed(() => {
   return normalizeLayoutConfig(band.value?.data?.layoutConfig);
 });
 
+const pageStyle = computed(() => {
+  return band.value?.data?.pageStyle || 'default';
+});
+
+const isCompactStyle = computed(() => pageStyle.value === 'compact');
+const isBoldStyle = computed(() => pageStyle.value === 'bold');
+
+// ============================================
+// SMART LINK LIVE SURFACE
+// ============================================
+// HOW TO DEMO: Set SMARTLINK_LIVE_SURFACE_ENABLED to true in config/smartLinkFeatureFlags.js
+// When disabled, page behaves exactly as before (no layout shifts)
+
+// Live Surface Feature Flags - direct from config
+const showNowBanner = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_NOW_BANNER);
+const showLiveFeed = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_LIVE_FEED);
+const showContinueChip = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_CONTINUE_CHIP);
+const showFanToasts = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_FAN_TOASTS);
+const showSupportModuleRefactor = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR);
+const showMomentBadges = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_V2_ENABLED && SMARTLINK_SHOW_MOMENT_BADGES);
+const shouldShowShowDayHeader = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_V2_ENABLED && SMARTLINK_SHOW_SHOW_DAY_HEADER);
+const showMomentShareCard = computed(() => SMARTLINK_LIVE_SURFACE_ENABLED && SMARTLINK_V2_ENABLED && SMARTLINK_SHOW_MOMENT_SHARE_CARD);
+
+// Live Surface Data - computed from band/events
+const nowBannerState = computed(() => {
+  if (!SMARTLINK_LIVE_SURFACE_ENABLED || !SMARTLINK_SHOW_NOW_BANNER) return 'QUIET_DEFAULT';
+  
+  // Check for manual override
+  if (band.value?.data?.nowBannerOverride) {
+    return band.value.data.nowBannerOverride;
+  }
+  
+  const now = new Date();
+  const events = upcomingEvents.value || [];
+  
+  // Check for show tonight (event within 24h)
+  if (events.length > 0) {
+    const nextEvent = events[0];
+    const eventDate = new Date(nextEvent.date + 'T20:00:00');
+    const hoursUntil = (eventDate - now) / (1000 * 60 * 60);
+    if (hoursUntil >= 0 && hoursUntil <= 24) {
+      return 'SHOW_TONIGHT';
+    }
+  }
+  
+  // Check for post-show (event ended within 12h)
+  // TODO: Need past events data
+  
+  // Check for new release
+  const releaseDate = band.value?.data?.newReleaseDate;
+  if (releaseDate) {
+    const daysSince = (now - new Date(releaseDate)) / (1000 * 60 * 60 * 24);
+    if (daysSince >= 0 && daysSince <= 30) {
+      return 'NEW_RELEASE';
+    }
+  }
+  
+  // Check for on tour (2+ upcoming events)
+  if (events.length >= 2) {
+    return 'ON_TOUR';
+  }
+  
+  return 'QUIET_DEFAULT';
+});
+
+const nowBannerContent = computed(() => {
+  const state = nowBannerState.value;
+  const events = upcomingEvents.value || [];
+  const nextEvent = events[0] || null;
+  
+  switch (state) {
+    case 'SHOW_TONIGHT':
+      return {
+        icon: '🎤',
+        headline: 'Live Tonight',
+        subtext: nextEvent ? `${nextEvent.venue || 'Show'} in ${nextEvent.city || 'your city'}` : 'Catch the show',
+        cta: nextEvent?.link ? 'Get Tickets' : null,
+        ctaLink: nextEvent?.link || null,
+        accent: 'orange',
+      };
+    case 'POST_SHOW_THANKS':
+      return {
+        icon: '🙏',
+        headline: 'Thanks for coming out',
+        subtext: 'Hope you had a great time',
+        cta: 'Share the moment',
+        ctaAction: 'share',
+        accent: 'purple',
+      };
+    case 'NEW_RELEASE':
+      return {
+        icon: '🔥',
+        headline: 'New Music',
+        subtext: 'Fresh release — check it out',
+        cta: 'Listen Now',
+        ctaAction: 'scroll-to-featured',
+        accent: 'pink',
+      };
+    case 'ON_TOUR':
+      return {
+        icon: '🚐',
+        headline: 'On Tour',
+        subtext: `${events.length} shows coming up`,
+        cta: 'See Dates',
+        ctaAction: 'scroll-to-events',
+        accent: 'blue',
+      };
+    default:
+      return {
+        icon: '🎵',
+        headline: band.value?.data?.name || 'Welcome',
+        subtext: 'Thanks for stopping by',
+        cta: null,
+        accent: 'neutral',
+      };
+  }
+});
+
+const effectivePageMode = computed(() => {
+  if (!SMARTLINK_LIVE_SURFACE_ENABLED || !SMARTLINK_SHOW_PAGE_MODES) return 'QUIET';
+  
+  const now = new Date();
+  const events = upcomingEvents.value || [];
+  
+  // SHOW_DAY: event within 24h
+  if (events.length > 0) {
+    const nextEvent = events[0];
+    const eventDate = new Date(nextEvent.date + 'T20:00:00');
+    const hoursUntil = (eventDate - now) / (1000 * 60 * 60);
+    if (hoursUntil >= 0 && hoursUntil <= 24) {
+      return 'SHOW_DAY';
+    }
+  }
+  
+  // POST_SHOW: event ended within 12h
+  // TODO: Need past events data
+  
+  return 'QUIET';
+});
+
+// Demo feed items
+const liveFeedItems = computed(() => {
+  if (!SMARTLINK_LIVE_SURFACE_ENABLED || !SMARTLINK_SHOW_LIVE_FEED) return [];
+  if (!DEMO_FEED_ENABLED) return [];
+  
+  const mode = effectivePageMode.value;
+  const now = Date.now();
+  const cities = ['Los Angeles', 'New York', 'Chicago', 'Austin', 'Nashville'];
+  const randomCity = cities[Math.floor(Math.random() * cities.length)];
+  
+  const items = [];
+  
+  // City tuning in (always show)
+  items.push({
+    id: 'demo-city',
+    icon: '📍',
+    copy: `${randomCity} is tuning in`,
+    timestamp: now - (30 * 60 * 1000),
+  });
+  
+  if (mode === 'SHOW_DAY') {
+    items.push({
+      id: 'demo-heating',
+      icon: '🔥',
+      copy: 'Activity heating up',
+      timestamp: now - (15 * 60 * 1000),
+    });
+  } else if (mode === 'POST_SHOW') {
+    items.push({
+      id: 'demo-spike',
+      icon: '📈',
+      copy: 'Post-show surge happening',
+      timestamp: now - (20 * 60 * 1000),
+    });
+  } else {
+    items.push({
+      id: 'demo-link',
+      icon: '🎵',
+      copy: 'Spotify trending today',
+      timestamp: now - (2 * 60 * 60 * 1000),
+    });
+  }
+  
+  return items.slice(0, 3);
+});
+
+const primaryFeedItem = computed(() => liveFeedItems.value[0] || null);
+const hasLiveFeedItems = computed(() => liveFeedItems.value.length > 0);
+const momentShareType = computed(() => {
+  if (effectivePageMode.value === 'SHOW_DAY') return 'you_were_here';
+  if (effectivePageMode.value === 'POST_SHOW') return 'post_show';
+  return 'default';
+});
+
+// Component refs
+const fanToastRef = ref(null);
+const continueChipRef = ref(null);
+
+// Fan Toast helper - call after key actions
+function showFanToast(actionType, options = {}) {
+  if (!showFanToasts.value) return;
+  fanToastRef.value?.showToast(actionType, options);
+}
+
+// Continue Chip helper - record user actions
+function recordContinueAction(type, url = null) {
+  if (!showContinueChip.value) return;
+  continueChipRef.value?.recordAction(type, url);
+}
+
 const isSectionVisible = (sectionId) => {
   return isSectionEnabled(layoutConfig.value, sectionId);
 };
@@ -1131,6 +1723,7 @@ function onToggleSaveBand() {
   const didSave = toggleSaveBand(payload);
   if (didSave) {
     showSavedConfirmation.value = true;
+    showFanToast('save'); // Smart Link Live Surface toast
     if (savedConfirmationTimeout) clearTimeout(savedConfirmationTimeout);
     savedConfirmationTimeout = setTimeout(() => {
       showSavedConfirmation.value = false;
@@ -1492,8 +2085,39 @@ const hiddenLinkKeys = computed(() => {
   return [];
 });
 
+// Alias for compact component
+const hiddenLinks = hiddenLinkKeys;
+
 function isLinkHidden(key) {
   return hiddenLinkKeys.value.includes(key);
+}
+
+/* ---------- compact style helpers ---------- */
+function handleQuickTip(amount) {
+  // Find the first enabled tip button and use it
+  const tipBtn = enabledPaymentButtons.value.find(b => b.key === 'tip_band') || enabledPaymentButtons.value[0];
+  if (tipBtn) {
+    paymentAmountByKey.value[tipBtn.key] = amount;
+    startCheckout(tipBtn);
+  }
+}
+
+function openShareModal() {
+  // Use native share if available, otherwise copy link
+  const shareUrl = `${window.location.origin}/${currentBandSlug.value}`;
+  const shareData = {
+    title: band.value?.data?.name || 'Check out this artist',
+    text: `Check out ${band.value?.data?.name || 'this artist'} on MusicBizQR`,
+    url: shareUrl
+  };
+  
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(() => {});
+  }
 }
 
 const hasStreamingLinks = computed(() =>
@@ -1593,7 +2217,7 @@ async function fetchBandData() {
     `&fields[7]=youtube&fields[8]=youtubeMusic&fields[9]=spotify&fields[10]=appleMusic` + // streaming
     `&fields[11]=reverbnation&fields[12]=soundcloud&fields[13]=bandcamp&fields[14]=twitch&fields[15]=deezer` +
     `&fields[16]=facebook&fields[17]=instagram&fields[18]=twitter&fields[19]=tiktok` + // social
-    `&fields[20]=paymentsEnabled&fields[21]=stripeOnboardingComplete&fields[22]=paymentButtons&fields[23]=hiddenLinks&fields[24]=merchConcierge` +
+    `&fields[20]=paymentsEnabled&fields[21]=stripeOnboardingComplete&fields[22]=paymentButtons&fields[23]=hiddenLinks&fields[24]=merchConcierge&fields[25]=pageStyle` +
     `&populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
     `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +
@@ -1792,6 +2416,7 @@ function triggerFanMomentForPayment() {
 
 /* ---------- Follow the Band ---------- */
 const followModalOpen = ref(false);
+const shareDrawerOpen = ref(false);
 
 const followablePlatforms = computed(() => {
   const platforms = [];
@@ -1846,6 +2471,9 @@ function handleFollowConfirm(platformIds) {
 
   // Trigger fan moment for follow action
   triggerFanMomentForFollow();
+  
+  // Smart Link Live Surface toast
+  showFanToast('follow');
 
   // Track redirect events before navigating
   for (const p of selectedPlatforms) {
@@ -1874,6 +2502,42 @@ function handleFollowConfirm(platformIds) {
 
 function handleFollowTrack(trackData) {
   sendFollowTrackEvent(trackData);
+}
+
+// ============================================
+// SMART LINK LIVE SURFACE HANDLERS
+// ============================================
+
+function handleNowBannerCta(data) {
+  if (data.type === 'link' && data.url) {
+    handleClick(band.value?.data?.id, 'now_banner_cta', data.url);
+  }
+}
+
+function handleScrollTo(section) {
+  const sectionMap = {
+    featured: '.featured-song-section, [class*="Featured Song"]',
+    events: '.events-section, [class*="Upcoming Shows"]',
+    support: '.support-section, [class*="Support"]',
+  };
+  
+  const selector = sectionMap[section];
+  if (!selector) return;
+  
+  const el = document.querySelector(selector);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function scrollToSupport() {
+  handleScrollTo('support');
+}
+
+function handleContinueAction(data) {
+  if (data.url) {
+    handleClick(band.value?.data?.id, data.type, data.url);
+  }
 }
 
 function trackFollowRedirect(platformId, url) {

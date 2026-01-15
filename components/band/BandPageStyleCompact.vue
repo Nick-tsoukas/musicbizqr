@@ -1,5 +1,5 @@
 <template>
-  <div class="smart-link-panel w-full max-w-md mx-auto">
+  <div class="band-style-compact w-full">
     <!-- Hero Image with Real Poster -->
     <div class="relative aspect-[16/10] rounded-t-2xl overflow-hidden">
       <img 
@@ -139,7 +139,7 @@ import twitterIcon from '@/assets/twitter.png'
 </script>
 
 <style scoped>
-.smart-link-panel {
+.band-style-compact {
   box-shadow: 
     0 0 80px rgba(139, 92, 246, 0.15),
     0 25px 60px -12px rgba(0, 0, 0, 0.6),

@@ -1,0 +1,315 @@
+<template>
+  <div class="band-page-compact bg-black min-h-screen">
+    <!-- Hero Section - Compact -->
+    <div class="relative w-full aspect-[16/10] max-h-[50vh]">
+      <img
+        v-if="band.bandImg?.url"
+        :src="band.bandImg.url"
+        :alt="`${band.name} image`"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+      
+      <!-- Live Badge (if has upcoming events) -->
+      <div v-if="hasUpcomingEvents" class="absolute top-4 left-4">
+        <div class="flex items-center gap-2 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+          </span>
+          Live Shows
+        </div>
+      </div>
+
+      <!-- Artist Info Overlay -->
+      <div class="absolute bottom-0 left-0 right-0 p-5">
+        <h1 v-if="!band.isBandNameInLogo" class="text-3xl md:text-4xl font-bold text-white tracking-tight">
+          {{ band.name }}
+        </h1>
+        <p v-if="band.bio" class="text-white/80 text-sm md:text-base mt-2 line-clamp-2">
+          {{ band.bio }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="px-4 md:px-6 py-6 max-w-2xl mx-auto space-y-6">
+      <!-- Featured Song - slot for parent to render AudioPlayer -->
+      <section v-if="hasFeaturedSong" class="space-y-2">
+        <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider">Featured Song</h3>
+        <slot name="audio-player"></slot>
+      </section>
+
+      <!-- Featured Video - slot for parent to render video player -->
+      <section v-if="hasFeaturedVideo" class="space-y-2">
+        <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider">Featured Video</h3>
+        <slot name="video-player"></slot>
+      </section>
+
+      <!-- Streaming Links - Grid -->
+      <div v-if="visibleStreamingLinks.length">
+        <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Listen Now</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <a
+            v-for="link in visibleStreamingLinks.slice(0, 4)"
+            :key="link.name"
+            :href="link.url"
+            target="_blank"
+            rel="noopener"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border transition group"
+            :class="link.colorClass"
+            @click.prevent="$emit('link-click', link)"
+          >
+            <img :src="link.icon" :alt="link.label" class="w-6 h-6" />
+            <span class="text-white text-sm font-medium">{{ link.label }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Social Links - Horizontal -->
+      <div v-if="visibleSocialLinks.length">
+        <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Follow</h3>
+        <div class="flex gap-2">
+          <a
+            v-for="link in visibleSocialLinks.slice(0, 4)"
+            :key="link.name"
+            :href="link.url"
+            target="_blank"
+            rel="noopener"
+            class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
+            @click.prevent="$emit('link-click', link)"
+          >
+            <img :src="link.icon" :alt="link.label" class="w-5 h-5" />
+            <span class="text-white text-sm">{{ link.label }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Next Show - Compact Card -->
+      <div v-if="nextEvent" class="bg-gradient-to-br from-purple-500/10 to-violet-500/5 border border-purple-400/20 rounded-xl p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="text-purple-300 text-xs font-semibold uppercase tracking-wider">Next Show</div>
+            <div class="text-white font-bold text-lg mt-1">
+              {{ nextEvent.city || 'TBA' }}<span v-if="nextEvent.state">, {{ nextEvent.state }}</span>
+            </div>
+            <div class="text-white/70 text-sm">{{ nextEvent.venue || 'Venue TBA' }} • {{ formatDate(nextEvent.date) }}</div>
+          </div>
+          <button 
+            class="px-4 py-2 bg-purple-500/20 border border-purple-400/40 rounded-lg text-purple-200 text-sm font-semibold hover:bg-purple-500/30 transition"
+            @click="$emit('view-event', nextEvent)"
+          >
+            {{ nextEvent.ticketLink ? 'Tickets' : 'Details' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment Buttons - Compact -->
+      <div v-if="enabledPaymentButtons.length" class="bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-violet-900/30 border border-purple-400/20 rounded-2xl p-5 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/10 to-violet-500/5 pointer-events-none" />
+        
+        <div class="relative">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div class="text-white font-bold text-lg flex items-center gap-2">
+                <span class="text-xl">💜</span>
+                Support {{ band.name }}
+              </div>
+              <div class="text-white/50 text-sm mt-0.5">One-tap secure checkout</div>
+            </div>
+          </div>
+          
+          <!-- Quick Tip Buttons -->
+          <div class="grid grid-cols-3 gap-3">
+            <button 
+              v-for="amount in [5, 10, 20]"
+              :key="amount"
+              class="group relative px-4 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:-translate-y-0.5"
+              :class="amount === 20 
+                ? 'bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-400 hover:to-violet-400 border border-pink-400/30 shadow-lg shadow-pink-500/20 hover:shadow-pink-500/30 font-bold' 
+                : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 hover:shadow-lg hover:shadow-purple-500/10'"
+              @click="$emit('quick-tip', amount)"
+            >
+              <span class="text-lg">${{ amount }}</span>
+              <span v-if="amount === 20" class="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-yellow-400 text-yellow-900 text-[10px] font-bold rounded-full uppercase tracking-wide">Popular</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="flex gap-3">
+        <button 
+          v-if="hasFollowablePlatforms"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-purple-500/40 bg-gradient-to-r from-purple-900/50 to-violet-900/50 text-white font-semibold hover:from-purple-900/70 hover:to-violet-900/70 transition"
+          @click="$emit('follow')"
+        >
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+          </svg>
+          Follow
+        </button>
+        <button 
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/20 bg-white/5 text-white font-semibold hover:bg-white/10 transition"
+          @click="$emit('share')"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          Share
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, ref } from 'vue'
+import AudioPlayer from "@/components/AudioPlayer.vue"
+
+import facebookIcon from "@/assets/facebookfree.png"
+import instagramIcon from "@/assets/instagramfree.png"
+import twitchIcon from "@/assets/twitchfree.png"
+import appleMusicIcon from "@/assets/apple.svg"
+import soundcloudIcon from "@/assets/soundcloudlast.png"
+import deezerIcon from "@/assets/dezzer.svg"
+import youtubeIcon from "@/assets/youtube-icon.svg"
+import bandcampIcon from "@/assets/bandcamp.svg"
+import spotifyIcon from "@/assets/spotify.svg"
+import tiktokIcon from "@/assets/tiktok.png"
+import twitterIcon from "@/assets/twitter.png"
+
+const props = defineProps({
+  band: {
+    type: Object,
+    required: true
+  },
+  upcomingEvents: {
+    type: Array,
+    default: () => []
+  },
+  hiddenLinks: {
+    type: Array,
+    default: () => []
+  },
+  enabledPaymentButtons: {
+    type: Array,
+    default: () => []
+  },
+  followablePlatforms: {
+    type: Array,
+    default: () => []
+  }
+})
+
+defineEmits(['play-song', 'link-click', 'view-event', 'quick-tip', 'follow', 'share'])
+
+const streamingPlatforms = [
+  { name: 'spotify', label: 'Spotify', icon: spotifyIcon, colorClass: 'bg-[#1DB954]/10 border-[#1DB954]/30 hover:bg-[#1DB954]/20' },
+  { name: 'appleMusic', label: 'Apple', icon: appleMusicIcon, colorClass: 'bg-white/5 border-white/10 hover:bg-white/10' },
+  { name: 'youtube', label: 'YouTube', icon: youtubeIcon, colorClass: 'bg-red-500/10 border-red-500/20 hover:bg-red-500/20' },
+  { name: 'soundcloud', label: 'SoundCloud', icon: soundcloudIcon, colorClass: 'bg-orange-500/10 border-orange-500/20 hover:bg-orange-500/20' },
+  { name: 'deezer', label: 'Deezer', icon: deezerIcon, colorClass: 'bg-white/5 border-white/10 hover:bg-white/10' },
+  { name: 'bandcamp', label: 'Bandcamp', icon: bandcampIcon, colorClass: 'bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20' },
+]
+
+const socialPlatforms = [
+  { name: 'instagram', label: 'Instagram', icon: instagramIcon },
+  { name: 'tiktok', label: 'TikTok', icon: tiktokIcon },
+  { name: 'twitter', label: 'X', icon: twitterIcon },
+  { name: 'facebook', label: 'Facebook', icon: facebookIcon },
+  { name: 'twitch', label: 'Twitch', icon: twitchIcon },
+]
+
+const isLinkHidden = (name) => props.hiddenLinks.includes(name)
+
+const visibleStreamingLinks = computed(() => {
+  return streamingPlatforms
+    .filter(p => props.band[p.name] && !isLinkHidden(p.name))
+    .map(p => ({ ...p, url: props.band[p.name] }))
+})
+
+const visibleSocialLinks = computed(() => {
+  return socialPlatforms
+    .filter(p => props.band[p.name] && !isLinkHidden(p.name))
+    .map(p => ({ ...p, url: props.band[p.name] }))
+})
+
+const hasFeaturedSong = computed(() => {
+  const ss = props.band.singlesong
+  if (!ss) return false
+  return ss.isEmbed || ss.song?.url
+})
+
+const isEmbedSong = computed(() => {
+  return props.band.singlesong?.isEmbed === true
+})
+
+const safeEmbedHtml = computed(() => {
+  const html = props.band.singlesong?.embedHtml || ''
+  if (!html) return ''
+  // Basic sanitization - only allow iframe tags
+  const iframeMatch = html.match(/<iframe[\s\S]*?<\/iframe>/i)
+  return iframeMatch ? iframeMatch[0] : ''
+})
+
+const formattedSong = computed(() => {
+  const single = props.band.singlesong
+  if (!single) return null
+  
+  const nestedUrl = single?.song?.data?.attributes?.url
+  const directUrl = single?.song?.url
+  const fileUrl = nestedUrl || directUrl || null
+  
+  if (!fileUrl) return null
+  
+  return {
+    id: single?.id,
+    attributes: {
+      title: single?.title || 'Featured Track',
+      songs: {
+        data: [
+          {
+            id: 1,
+            attributes: {
+              title: single?.title || 'Featured Track',
+              audioFile: { data: { attributes: { url: fileUrl } } },
+            },
+          },
+        ],
+      },
+      coverImage: {
+        data: props.band.bandImg ? { attributes: { url: props.band.bandImg.url } } : null,
+      },
+    },
+  }
+})
+
+const songTitle = computed(() => {
+  return props.band.singlesong?.title || 'Featured Track'
+})
+
+const hasFeaturedVideo = computed(() => {
+  return !!props.band.singlevideo?.youtubeid
+})
+
+const hasUpcomingEvents = computed(() => props.upcomingEvents.length > 0)
+const nextEvent = computed(() => props.upcomingEvents[0] || null)
+
+const hasFollowablePlatforms = computed(() => props.followablePlatforms.length > 0)
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+</script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

@@ -63,11 +63,11 @@
           <div class="text-white/50 text-xs">Cards Ready</div>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-white tabular-nums">{{ demoStats.shares }}</div>
+          <div class="text-2xl font-bold text-white tabular-nums">{{ displayStats.shares }}</div>
           <div class="text-white/50 text-xs">Shares</div>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-purple-400 tabular-nums">{{ demoStats.visits }}</div>
+          <div class="text-2xl font-bold text-purple-400 tabular-nums">{{ displayStats.visits }}</div>
           <div class="text-white/50 text-xs">Visits</div>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
@@ -119,106 +119,40 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useDemoShow } from '@/composables/useDemoShow'
-import { getBandDemoCards, DEMO_BAND } from '~/utils/shareables/demoDeck'
+import { useDemoState } from '@/composables/useDemoState'
 import ShareableCard from '@/components/shareables/ShareableCard.vue'
 import ShareCustomizeDrawer from '@/components/shareables/ShareCustomizeDrawer.vue'
 
 const { goToScene } = useDemoShow()
-
-// Demo deck
-const bandDeck = ref([])
-let deckIdx = 0
-let instanceCounter = 0
+const {
+  demoStats,
+  recentShares,
+  recentShareables,
+  recordShare,
+  getNextCard,
+} = useDemoState()
 
 // Visible cards (max 6 for grid)
 const visibleCards = ref([])
-const totalDeckSize = ref(0)
 
 // Share drawer state
 const isShareDrawerOpen = ref(false)
 const selectedShareable = ref(null)
 
-// Demo stats
-const demoStats = reactive({
-  shares: 0,
-  visits: 0,
-})
-
-// Recent shares
-const recentShares = ref([])
-
 // Toast
 const toastMessage = ref('')
 
-// Normalize card for ShareableCard component + ShareCustomizeDrawer
-function normalizeCard(raw) {
-  // Build OG URL with all params so Facebook can render the card image
-  const ogParams = new URLSearchParams({
-    bandId: String(DEMO_BAND.id),
-    bandSlug: DEMO_BAND.slug,
-    type: raw.type,
-    hero: raw.hero,
-    headline: raw.headline,
-    proof: raw.proof,
-    accent: raw.accent,
-  })
-  const ogUrl = `https://musicbizqr.com/share/shareable/demo-${raw.type.toLowerCase()}?${ogParams.toString()}`
-
-  return {
-    id: raw.id,
-    _instanceId: ++instanceCounter,
-    type: raw.type,
-    kind: raw.type,
-    accent: raw.accent,
-    windowLabel: raw.windowLabel,
-    // ShareableCard uses these
-    title: raw.headline,
-    primaryStat: raw.hero,
-    secondaryStat: raw.proof,
-    // ShareCustomizeDrawer getOgUrl() uses these
-    headline: raw.headline,
-    hero: raw.hero,
-    proof: raw.proof,
-    band: {
-      id: DEMO_BAND.id,
-      name: DEMO_BAND.name,
-      slug: DEMO_BAND.slug,
-      imageUrl: DEMO_BAND.imageUrl,
-      isBandNameInLogo: DEMO_BAND.isBandNameInLogo,
-    },
-    share: {
-      captions: raw.microCaption || {
-        hype: `${raw.headline} 🔥`,
-        grateful: `${raw.headline} 🙏`,
-        tease: `${raw.headline} 👀`,
-      },
-      shareUrl: `https://musicbizqr.com/${DEMO_BAND.slug}`,
-      ogUrl: ogUrl,
-    },
-  }
-}
-
-// Initialize deck
-function initDeck() {
-  const rawCards = getBandDemoCards()
-  bandDeck.value = rawCards
-  totalDeckSize.value = rawCards.length
-  deckIdx = 0
-}
-
-// Get next card from deck
-function nextCard() {
-  if (bandDeck.value.length === 0) initDeck()
-  const raw = bandDeck.value[deckIdx % bandDeck.value.length]
-  deckIdx++
-  return normalizeCard(raw)
-}
+// Computed stats for display
+const displayStats = computed(() => ({
+  shares: demoStats.value.shares,
+  visits: demoStats.value.profileVisits,
+}))
 
 // Spawn a new card
 function spawnCard() {
-  const card = nextCard()
+  const card = getNextCard()
   visibleCards.value.unshift(card)
   // Keep max 6 visible
   if (visibleCards.value.length > 6) {
@@ -240,29 +174,14 @@ function showToast(message, duration = 2500) {
 
 // Simulate post (called when drawer closes after share action)
 function simulatePost(platform = 'Instagram') {
-  // Bump stats
-  demoStats.shares += 1
-  demoStats.visits += Math.floor(Math.random() * 13) + 8 // 8-20
-
-  // Add to recent shares
   const caption = selectedShareable.value?.share?.captions?.hype || 'Shared a moment'
-  const platformIcons = {
-    Instagram: '📸',
-    Facebook: '👍',
-    Twitter: '🐦',
-    Copy: '📋',
-  }
-  recentShares.value.unshift({
+  
+  // Use shared state to record the share
+  recordShare({
     platform,
-    platformIcon: platformIcons[platform] || '📤',
-    caption: caption.slice(0, 40) + (caption.length > 40 ? '...' : ''),
-    timeAgo: 'just now',
+    caption,
+    shareable: selectedShareable.value,
   })
-
-  // Keep max 5 recent shares
-  if (recentShares.value.length > 5) {
-    recentShares.value.pop()
-  }
 
   // Show toast
   showToast('Posted ✅')
@@ -270,14 +189,10 @@ function simulatePost(platform = 'Instagram') {
   // Optionally spawn a SHARE_CHAIN card to show momentum
   if (Math.random() > 0.5) {
     setTimeout(() => {
-      // Find SHARE_CHAIN card type
-      const shareChainRaw = bandDeck.value.find(c => c.type === 'SHARE_CHAIN')
-      if (shareChainRaw) {
-        const card = normalizeCard(shareChainRaw)
-        visibleCards.value.unshift(card)
-        if (visibleCards.value.length > 6) {
-          visibleCards.value.pop()
-        }
+      const card = getNextCard()
+      visibleCards.value.unshift(card)
+      if (visibleCards.value.length > 6) {
+        visibleCards.value.pop()
       }
     }, 1000)
   }
@@ -300,7 +215,6 @@ function nextScene() {
 
 // Initialize with 3 cards
 onMounted(() => {
-  initDeck()
   for (let i = 0; i < 3; i++) {
     spawnCard()
   }

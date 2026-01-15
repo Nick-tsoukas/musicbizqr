@@ -118,138 +118,7 @@
 
           <div class="px-4 pb-4">
             <div class="relative w-full h-[300px] sm:h-[320px]">
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-b from-white/5 to-transparent opacity-60"></div>
-
-              <div class="absolute inset-0 pb-6">
-                <svg
-                  v-if="chartType === 'bar'"
-                  class="absolute inset-0 w-full h-full"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  @mouseleave="hoverIndex = null"
-                >
-                  <defs>
-                    <linearGradient id="barFill" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0" stop-color="#34D399" stop-opacity="1" />
-                      <stop offset="1" stop-color="#059669" stop-opacity="0.95" />
-                    </linearGradient>
-                    <linearGradient id="barFillHot" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0" stop-color="#A7F3D0" stop-opacity="1" />
-                      <stop offset="1" stop-color="#10B981" stop-opacity="1" />
-                    </linearGradient>
-                  </defs>
-
-                  <g opacity="1">
-                    <line v-for="y in [10,30,50,70,90]" :key="y" x1="0" :y1="y" x2="100" :y2="y" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" />
-                  </g>
-
-                  <g>
-                    <rect
-                      v-for="(b, i) in barSvgBars"
-                      :key="b.key"
-                      :x="b.x"
-                      :y="b.y"
-                      :width="b.w"
-                      :height="b.h"
-                      :rx="b.rx"
-                      :fill="hoverIndex === i ? 'url(#barFillHot)' : 'url(#barFill)'"
-                      :opacity="hoverIndex === i ? 1 : 0.9"
-                      stroke="rgba(255,255,255,0.14)"
-                      stroke-width="0.6"
-                      @mouseenter="hoverIndex = i"
-                      @click="hoverIndex = i"
-                      @focus="hoverIndex = i"
-                      @blur="hoverIndex = null"
-                      tabindex="0"
-                      role="button"
-                      :aria-label="`${b.label}: ${b.value}`"
-                    />
-                  </g>
-                </svg>
-
-                <svg
-                  v-else
-                  class="absolute inset-0 w-full h-full"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  @mouseleave="hoverIndex = null"
-                >
-                  <defs>
-                    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-                      <feGaussianBlur stdDeviation="2.2" result="coloredBlur" />
-                      <feMerge>
-                        <feMergeNode in="coloredBlur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
-                    </filter>
-                    <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0" stop-color="#10B981" stop-opacity="0.42" />
-                      <stop offset="1" stop-color="#10B981" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-
-                  <g opacity="1">
-                    <line v-for="y in [10,30,50,70,90]" :key="y" x1="0" :y1="y" x2="100" :y2="y" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" />
-                  </g>
-
-                  <path :d="smoothAreaPath" fill="url(#fill)" />
-                  <path
-                    :d="smoothLinePath"
-                    fill="none"
-                    stroke="#10B981"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    opacity="0.22"
-                    filter="url(#glow)"
-                  />
-                  <path
-                    :d="smoothLinePath"
-                    fill="none"
-                    stroke="#34D399"
-                    stroke-width="2.4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-
-                  <g>
-                    <g
-                      v-for="(p, i) in linePoints"
-                      :key="p.key"
-                    >
-                      <circle
-                        v-if="hoverIndex === i"
-                        :cx="p.x"
-                        :cy="p.y"
-                        r="4.5"
-                        fill="rgba(16,185,129,0.16)"
-                      />
-                      <circle
-                        :cx="p.x"
-                        :cy="p.y"
-                        :r="hoverIndex === i ? 2.8 : 2.3"
-                        :fill="hoverIndex === i ? '#D1FAE5' : '#34D399'"
-                        :opacity="hoverIndex === i ? 1 : 0.9"
-                        stroke="rgba(255,255,255,0.20)"
-                        stroke-width="0.4"
-                        @mouseenter="hoverIndex = i"
-                        @click="hoverIndex = i"
-                        @focus="hoverIndex = i"
-                        @blur="hoverIndex = null"
-                        tabindex="0"
-                      />
-                    </g>
-                  </g>
-                </svg>
-              </div>
-
-              <div class="absolute left-0 right-0 bottom-0 px-1.5">
-                <div class="flex justify-between gap-2 text-[11px] text-white/60 border-t border-white/10 pt-1.5">
-                  <span v-for="(l, i) in axisLabels" :key="i" class="truncate">
-                    {{ l }}
-                  </span>
-                </div>
-              </div>
+              <canvas ref="chartCanvas" class="w-full h-full"></canvas>
             </div>
           </div>
         </div>
@@ -576,7 +445,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { Chart } from 'chart.js/auto'
 
 type Tab = 'Page Views' | 'Link Clicks' | 'Songs' | 'Videos' | 'QR Scans'
 
@@ -594,6 +464,8 @@ const selectedRange = ref<(typeof rangeOptions)[number]['days']>(30)
 const chartType = ref<'bar' | 'line'>('bar')
 
 const hoverIndex = ref<number | null>(null)
+const chartCanvas = ref<HTMLCanvasElement | null>(null)
+let chartInstance: Chart | null = null
 
 function hashSeed(s: string) {
   let h = 2166136261
@@ -1000,7 +872,7 @@ const paymentsDemo = computed(() => {
 
   const payoutCount = Math.max(2, Math.round(2 + rand() * (selectedRange.value === 365 ? 28 : 10)))
   const insights = [
-    'Fans tip more when the CTA is above the fold — try “Support the band” near the top link block.',
+    'Fans tip more when the CTA is above the fold — try "Support the band" near the top link block.',
     'Your best conversion happens after shows. Enable QR codes at merch table and stage corners.',
     'Merch bundles lift average order value. Pair a tee + sticker pack and highlight it first.',
   ].slice(0, 3)
@@ -1035,6 +907,144 @@ const paymentsDemo = computed(() => {
     sources,
     insights,
     recent,
+  }
+})
+
+// Chart.js rendering
+function createChart() {
+  if (!chartCanvas.value) return
+  
+  // Destroy existing chart
+  if (chartInstance) {
+    chartInstance.destroy()
+    chartInstance = null
+  }
+
+  const ctx = chartCanvas.value.getContext('2d')
+  if (!ctx) return
+
+  const { labels, data } = chartConfig.value
+  const isBar = chartType.value === 'bar'
+
+  // Create gradient for line chart fill
+  const gradient = ctx.createLinearGradient(0, 0, 0, 300)
+  gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)')
+  gradient.addColorStop(1, 'rgba(16, 185, 129, 0)')
+
+  chartInstance = new Chart(ctx, {
+    type: isBar ? 'bar' : 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: selectedTab.value,
+        data,
+        backgroundColor: isBar 
+          ? 'rgba(52, 211, 153, 0.85)' 
+          : gradient,
+        borderColor: isBar 
+          ? 'rgba(52, 211, 153, 1)' 
+          : 'rgba(52, 211, 153, 1)',
+        borderWidth: isBar ? 0 : 3,
+        borderRadius: isBar ? 6 : 0,
+        fill: !isBar,
+        tension: 0.4,
+        pointBackgroundColor: 'rgba(52, 211, 153, 1)',
+        pointBorderColor: 'rgba(255, 255, 255, 0.8)',
+        pointBorderWidth: 2,
+        pointRadius: isBar ? 0 : 4,
+        pointHoverRadius: isBar ? 0 : 6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 400,
+        easing: 'easeOutQuart',
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'rgba(255, 255, 255, 0.9)',
+          bodyColor: 'rgba(52, 211, 153, 1)',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8,
+          displayColors: false,
+          titleFont: {
+            size: 12,
+            weight: '500',
+          },
+          bodyFont: {
+            size: 16,
+            weight: '600',
+          },
+          callbacks: {
+            label: (context) => context.parsed.y.toLocaleString(),
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            color: 'rgba(255, 255, 255, 0.06)',
+            drawBorder: false,
+          },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.5)',
+            font: {
+              size: 11,
+            },
+            maxRotation: 0,
+          },
+          border: {
+            display: false,
+          },
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(255, 255, 255, 0.06)',
+            drawBorder: false,
+          },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.5)',
+            font: {
+              size: 11,
+            },
+            padding: 8,
+          },
+          border: {
+            display: false,
+          },
+        },
+      },
+    },
+  })
+}
+
+// Watch for changes and update chart
+watch([chartConfig, chartType], () => {
+  createChart()
+}, { deep: true })
+
+onMounted(() => {
+  // Small delay to ensure canvas is ready
+  setTimeout(createChart, 50)
+})
+
+onUnmounted(() => {
+  if (chartInstance) {
+    chartInstance.destroy()
+    chartInstance = null
   }
 })
 </script>

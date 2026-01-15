@@ -35,6 +35,133 @@
       </div>
 
       <form class="space-y-8" @submit.prevent="submitForm">
+        <!-- Page Style Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-indigo-500 to-purple-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Page Style</h2>
+              <p class="form-section-subtitle">Choose how your band page looks to fans</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Classic Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
+                :class="pageStyle === 'default' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="pageStyle = 'default'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="pageStyle === 'default' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="pageStyle === 'default'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold">Classic</div>
+                    <p class="text-white/50 text-sm mt-1">Full-width sections with detailed layouts for streaming, social, and events.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  @click.stop="openStylePreview('default')"
+                  class="mt-3 w-full py-2 px-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:text-white transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Preview
+                </button>
+              </div>
+
+              <!-- Compact Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
+                :class="pageStyle === 'compact' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="pageStyle = 'compact'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="pageStyle === 'compact' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="pageStyle === 'compact'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold">Compact</div>
+                    <p class="text-white/50 text-sm mt-1">Modern grid layout with brand-colored buttons and a sleek, condensed design.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  @click.stop="openStylePreview('compact')"
+                  class="mt-3 w-full py-2 px-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:text-white transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Preview
+                </button>
+              </div>
+
+              <!-- Bold Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all md:col-span-2"
+                :class="pageStyle === 'bold' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="pageStyle = 'bold'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="pageStyle === 'bold' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="pageStyle === 'bold'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold flex items-center gap-2">
+                      Bold
+                      <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-[10px] font-bold uppercase">New</span>
+                    </div>
+                    <p class="text-white/50 text-sm mt-1">Immersive hero with sticky nav, bento-grid streaming links, and timeline-style events.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  @click.stop="openStylePreview('bold')"
+                  class="mt-3 w-full py-2 px-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:text-white transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Preview
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Band Details Section -->
         <section class="form-section">
           <div class="form-section-header">
@@ -812,11 +939,19 @@
         </div>
       </form>
     </div>
+
+    <!-- Style Preview Modal -->
+    <BandPageStylePreview 
+      :is-open="showStylePreview" 
+      :preview-style="previewingStyle" 
+      @close="closeStylePreview" 
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import BandPageStylePreview from '@/components/band/BandPageStylePreview.vue';
 
 const singlevideoTitle = ref("");
 const singlesongEmbedHtml = ref("");
@@ -837,6 +972,20 @@ const paymentsEnabled = ref(false);
 // flags for “delete on save”
 const removeSong = ref(false);
 const removeVideo = ref(false);
+
+// Page style
+const pageStyle = ref('default'); // 'default' | 'compact'
+const showStylePreview = ref(false);
+const previewingStyle = ref('default');
+
+function openStylePreview(style) {
+  previewingStyle.value = style;
+  showStylePreview.value = true;
+}
+
+function closeStylePreview() {
+  showStylePreview.value = false;
+}
 
 // Band basics
 const bandName = ref("");
@@ -1250,6 +1399,7 @@ async function fetchBand() {
     bio.value = attrs.bio || "";
     websitelink.value = normalizeLink(attrs.websitelink) || "";
     websitelinktext.value = attrs.websitelinktext || "";
+    pageStyle.value = attrs.pageStyle || "default";
 
     // Existing image
     const img = attrs.bandImg?.data;
@@ -1481,6 +1631,7 @@ async function submitForm() {
     // Full band payload
     const payload = {
       name: bandName.value,
+      pageStyle: pageStyle.value,
       genre: genre.value,
       bio: bio.value,
       websitelink: websitelink.value || null,

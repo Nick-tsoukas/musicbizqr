@@ -58,7 +58,7 @@
 
       <!-- Beat indicator -->
       <div class="text-white/40 text-xs font-mono ml-2">
-        {{ state }}
+        {{ beatLabel }}
       </div>
     </div>
 
@@ -74,10 +74,10 @@
         :style="{ 
           opacity: smartLinkOpacity,
           filter: `blur(${smartLinkBlur}px)`,
-          transform: smartLinkOpacity < 1 ? 'scale(0.95)' : 'scale(1)'
+          transform: smartLinkOpacity < 1 ? 'scale(0.92)' : 'scale(1)'
         }"
       >
-        <DemoShowtimeSmartLinkPanelPlaceholder />
+        <SmartLinkPanelPlaceholder />
       </div>
 
       <!-- Layer 2: Shareables Conveyor -->
@@ -211,9 +211,10 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, computed } from 'vue'
 import { useDemoShowtime } from '@/composables/useDemoShowtime'
 import ShareableCard from '@/components/shareables/ShareableCard.vue'
+import SmartLinkPanelPlaceholder from '@/components/demo/showtime/SmartLinkPanelPlaceholder.vue'
 
 const props = defineProps({
   autoplay: { type: Boolean, default: false }
@@ -240,14 +241,25 @@ const {
   setSpeed,
 } = useDemoShowtime()
 
+const beatLabels = {
+  idle: 'Ready',
+  beat1: '1/4 · Smart Link',
+  beat2: '2/4 · Shareables',
+  beat3: '3/4 · Featured',
+  beat4: '4/4 · Analytics',
+  done: 'Complete',
+}
+
+const beatLabel = computed(() => beatLabels[state.value] || state.value)
+
 function getCardStyle(card) {
   const baseRight = 80 // px from right edge for newest
-  const offsetPerPosition = 200 // px shift left per position
-  const opacityPerPosition = 0.3 // opacity reduction per position
+  const offsetPerPosition = 220 // px shift left per position
+  const opacityPerPosition = 0.25 // opacity reduction per position
 
   const translateX = baseRight + (card.position * offsetPerPosition)
-  const opacity = Math.max(0, 1 - (card.position * opacityPerPosition))
-  const scale = 1 - (card.position * 0.05)
+  const opacity = Math.max(0.1, 1 - (card.position * opacityPerPosition))
+  const scale = 1 - (card.position * 0.08)
   const zIndex = 10 - card.position
 
   return {
