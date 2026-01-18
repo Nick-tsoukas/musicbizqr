@@ -3,11 +3,15 @@
     <span
       v-for="badge in visibleBadges"
       :key="badge.key"
-      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
+      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium relative overflow-hidden"
       :class="badge.classes"
     >
-      <span>{{ badge.icon }}</span>
-      <span>{{ badge.label }}</span>
+      <!-- Animated border effect -->
+      <div class="absolute inset-0 rounded-full border-2 animate-pulse"></div>
+      <div class="absolute inset-0 rounded-full border-2 animate-ping"></div>
+      <!-- Content -->
+      <span class="relative z-10">{{ badge.icon }}</span>
+      <span class="relative z-10">{{ badge.label }}</span>
     </span>
   </div>
 </template>
@@ -35,7 +39,7 @@ const visibleBadges = computed(() => {
       key: 'show-tonight',
       icon: '🎤',
       label: 'New tonight',
-      classes: 'bg-orange-500/20 text-orange-300 border border-orange-400/30',
+      classes: 'text-orange-300 border-orange-400/50 shadow-lg shadow-orange-400/50',
     })
   }
 
@@ -44,7 +48,7 @@ const visibleBadges = computed(() => {
       key: 'tour-week',
       icon: '🚐',
       label: 'Tour week',
-      classes: 'bg-blue-500/20 text-blue-300 border border-blue-400/30',
+      classes: 'text-purple-300 border-purple-400/50 shadow-lg shadow-purple-400/50',
     })
   }
 
@@ -53,7 +57,7 @@ const visibleBadges = computed(() => {
       key: 'new-release',
       icon: '🔥',
       label: 'Fresh release',
-      classes: 'bg-pink-500/20 text-pink-300 border border-pink-400/30',
+      classes: 'text-green-300 border-green-400/50 shadow-lg shadow-green-400/50',
     })
   }
 
@@ -62,7 +66,7 @@ const visibleBadges = computed(() => {
       key: 'new-video',
       icon: '🎬',
       label: 'Fresh video',
-      classes: 'bg-purple-500/20 text-purple-300 border border-purple-400/30',
+      classes: 'text-purple-300 border-purple-400/50 shadow-lg shadow-purple-400/50',
     })
   }
 
@@ -71,7 +75,7 @@ const visibleBadges = computed(() => {
       key: 'merch-drop',
       icon: '👕',
       label: 'Merch drop',
-      classes: 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30',
+      classes: 'text-pink-300 border-pink-400/50 shadow-lg shadow-pink-400/50',
     })
   }
 
@@ -81,7 +85,7 @@ const visibleBadges = computed(() => {
       key: badge.key || `custom-${badges.length}`,
       icon: badge.icon || '✨',
       label: badge.label,
-      classes: badge.classes || 'bg-white/10 text-white/80 border border-white/20',
+      classes: badge.classes || 'text-white/80 border-white/20 shadow-lg shadow-white/20',
     })
   })
 
@@ -89,3 +93,25 @@ const visibleBadges = computed(() => {
   return badges.slice(0, 3)
 })
 </script>
+
+<style scoped>
+@keyframes neon-flicker {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+}
+
+.animate-pulse {
+  animation: neon-flicker 2s ease-in-out infinite;
+}
+
+.animate-ping {
+  animation: neon-flicker 2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+</style>

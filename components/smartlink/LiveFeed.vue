@@ -3,7 +3,7 @@
     <!-- Single item display (default) -->
     <div 
       v-if="displayMode === 'single' && primaryFeedItem"
-      class="feed-item flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 backdrop-blur-sm"
+      class="feed-item flex items-center gap-3 px-4 py-3"
     >
       <div :class="getIconClasses(primaryFeedItem.icon)" class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
         <component :is="getIconComponent(primaryFeedItem.icon)" class="w-4 h-4" />
@@ -17,7 +17,7 @@
       <div 
         v-for="item in feedItems.slice(0, maxItems)"
         :key="item.id"
-        class="feed-item flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10"
+        class="feed-item flex items-center gap-3 px-4 py-2.5"
       >
         <div :class="getIconClasses(item.icon)" class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0">
           <component :is="getIconComponent(item.icon)" class="w-3.5 h-3.5" />

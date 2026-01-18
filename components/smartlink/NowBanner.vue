@@ -7,7 +7,7 @@
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-3 min-w-0">
         <!-- Icon -->
-        <span class="text-xl shrink-0">{{ content.icon }}</span>
+        <span v-if="content.icon" class="text-xl shrink-0">{{ content.icon }}</span>
         
         <!-- Text -->
         <div class="min-w-0">
@@ -50,11 +50,11 @@ const bannerClasses = computed(() => {
   const accent = props.content?.accent || 'neutral'
   
   const accentMap = {
-    orange: 'bg-gradient-to-r from-orange-500/20 to-amber-500/10 border border-orange-400/30',
-    purple: 'bg-gradient-to-r from-purple-500/20 to-violet-500/10 border border-purple-400/30',
-    pink: 'bg-gradient-to-r from-pink-500/20 to-rose-500/10 border border-pink-400/30',
-    blue: 'bg-gradient-to-r from-blue-500/20 to-cyan-500/10 border border-blue-400/30',
-    neutral: 'bg-white/5 border border-white/10',
+    orange: '',
+    purple: '',
+    pink: '',
+    blue: '',
+    neutral: '',
   }
   
   return accentMap[accent] || accentMap.neutral

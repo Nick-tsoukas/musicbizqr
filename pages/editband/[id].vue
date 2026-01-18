@@ -86,6 +86,44 @@
                 </button>
               </div>
 
+              <!-- Smart Link Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
+                :class="pageStyle === 'smartlink' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="pageStyle = 'smartlink'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="pageStyle === 'smartlink' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="pageStyle === 'smartlink'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold flex items-center gap-2">
+                      Smart Link
+                      <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-[10px] font-bold uppercase">Live</span>
+                    </div>
+                    <p class="text-white/50 text-sm mt-1">Smart Link style with Live Surface features, responsive hero, and integrated band content.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  @click.stop="openStylePreview('smartlink')"
+                  class="mt-3 w-full py-2 px-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:text-white transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Preview
+                </button>
+              </div>
+
               <!-- Compact Style -->
               <div 
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
@@ -149,6 +187,44 @@
                 <button 
                   type="button"
                   @click.stop="openStylePreview('bold')"
+                  class="mt-3 w-full py-2 px-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:text-white transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Preview
+                </button>
+              </div>
+
+              <!-- Smart Link Style -->
+              <div 
+                class="relative p-4 rounded-xl border-2 cursor-pointer transition-all md:col-span-2"
+                :class="pageStyle === 'smartlink' 
+                  ? 'border-purple-500 bg-purple-500/10' 
+                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'"
+                @click="pageStyle = 'smartlink'"
+              >
+                <div class="flex items-start gap-3">
+                  <div 
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
+                    :class="pageStyle === 'smartlink' ? 'border-purple-500 bg-purple-500' : 'border-white/30'"
+                  >
+                    <svg v-if="pageStyle === 'smartlink'" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-semibold flex items-center gap-2">
+                      Smart Link
+                      <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-[10px] font-bold uppercase">Live</span>
+                    </div>
+                    <p class="text-white/50 text-sm mt-1">Smart Link style with Live Surface features, responsive hero, and integrated band content.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  @click.stop="openStylePreview('smartlink')"
                   class="mt-3 w-full py-2 px-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:text-white transition flex items-center justify-center gap-2"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -50,7 +50,7 @@ export const DEMO_FEED_ENABLED = true;
 // ============================================
 // V2 OPTIONAL FEATURES (future)
 // ============================================
-export const SMARTLINK_V2_ENABLED = false;
+export const SMARTLINK_V2_ENABLED = true;  // Force V2 features on
 
 // V2 Module Toggles (only active when V2_ENABLED is true)
 export const SMARTLINK_SHOW_MOMENT_BADGES = true;

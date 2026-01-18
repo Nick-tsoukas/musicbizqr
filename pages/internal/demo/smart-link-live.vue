@@ -100,14 +100,22 @@
   <!-- Smart Link Demo Content (exact copy from SmartLinkDemo) -->
   <div class="bg-black min-h-screen text-white">
     <div class="w-full mx-auto">
-      <!-- Hero Section -->
+      <!-- Hero Section with Overlay MomentBadges -->
       <div class="relative w-full overflow-hidden h-[35vh] md:h-[60vh]">
         <img
           :src="neonPoster"
           alt="Neon Avenue image"
           class="absolute inset-0 h-full w-full object-cover"
         />
-        <div class="absolute inset-0 bg-black/0"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        
+        <!-- MomentBadges Overlay - Positioned under MBQ header -->
+        <div class="absolute top-8 left-6 z-30">
+          <MomentBadges
+            :is-on-tour="true"
+            :has-new-release="true"
+          />
+        </div>
       </div>
 
       <!-- Band Name -->
@@ -131,45 +139,24 @@
       <!-- SMART LINK LIVE SURFACE COMPONENTS -->
       <!-- ============================================ -->
 
-      <!-- Debug Info -->
-      <div class="w-full px-6 mt-4 text-center">
-        <div class="text-xs text-white/50 mb-2">
-          DEBUG: showNowBanner={{ showNowBanner }}, showMomentBadges={{ showMomentBadges }}, showV2Features={{ showV2Features }}
-        </div>
-        <div class="text-xs text-white/50 mb-2">
-          DEBUG: nowBannerState={{ nowBannerState }}, forceTourMode={{ forceTourMode }}
-        </div>
-      </div>
-
       <!-- V2: Show Day Header (only on SHOW_DAY mode) -->
-      <ShowDayHeader
-        v-if="showV2Features && showShowDayHeader && nextEvent"
-        :event="nextEvent"
-        :has-pay-entry="true"
-        class="mt-4"
-        @tickets="handleTicketClick"
-        @pay-entry="scrollToSupport"
-      />
+      <div v-if="showV2Features && showShowDayHeader && nextEvent" class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <ShowDayHeader
+          :event="nextEvent"
+          :has-pay-entry="true"
+          @tickets="handleTicketClick"
+          @pay-entry="scrollToSupport"
+        />
+      </div>
 
       <!-- NOW Banner -->
       <div v-if="showNowBanner && nowBannerContent" class="w-full px-6 mt-6 md:max-w-[80vw] md:mx-auto">
-        <div class="text-xs text-purple-400 mb-2">NOW BANNER RENDERING:</div>
         <NowBanner
           :state="nowBannerState"
           :content="nowBannerContent"
           @cta-click="handleBannerCta"
           @scroll-to="handleScrollTo"
           @share="shareDrawerOpen = true"
-        />
-      </div>
-
-      <!-- V2: Moment Badges -->
-      <div v-if="showV2Features && showMomentBadges" class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
-        <div class="text-xs text-purple-400 mb-2">MOMENT BADGES RENDERING:</div>
-        <MomentBadges
-          :has-show-tonight="nowBannerState === 'SHOW_TONIGHT'"
-          :is-on-tour="nowBannerState === 'ON_TOUR'"
-          :has-new-release="nowBannerState === 'NEW_RELEASE'"
         />
       </div>
 
@@ -482,18 +469,18 @@ import twitterIcon from '@/assets/twitter.png'
 
 import demoSongUrl from '@/assets/Turns Me On.mp3'
 
-// Feature Toggles
+// Feature Toggles - Force everything ON for demo
 const showNowBanner = ref(true)
 const showLiveFeed = ref(true)
 const showFanToasts = ref(true)
 const showContinueChip = ref(true)
 const showMomentBadges = ref(true)  // Enable to show tour week badge
-const showShowDayHeader = ref(false)
+const showShowDayHeader = ref(true)  // Enable show day header
 const demoFeedEnabled = ref(true)
 const autoRun = ref(false)
 const forceTourMode = ref(true)  // Enable tour mode by default to show ON_TOUR banner
 
-// V2 Features
+// V2 Features - Force ON
 const showV2Features = ref(true)
 
 // UI State
@@ -588,10 +575,10 @@ const nowBannerContent = computed(() => {
   
   if (nowBannerState.value === 'ON_TOUR') {
     return {
-      icon: '🚐',
+      icon: '',
       headline: 'On Tour',
       subtext: '3 upcoming shows across the west coast',
-      accent: 'blue',
+      accent: 'purple',
       cta: 'See Dates',
       ctaAction: 'scroll-to-events'
     }

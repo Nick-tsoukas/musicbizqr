@@ -52,6 +52,58 @@
       </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- SMART LINK LIVE SURFACE COMPONENTS -->
+    <!-- ============================================ -->
+
+    <!-- MomentBadges Overlay -->
+    <div class="absolute top-8 left-6 z-30">
+      <MomentBadges
+        :has-show-tonight="hasUpcomingEvents"
+        :is-on-tour="hasUpcomingEvents"
+        :has-new-release="false"
+      />
+    </div>
+
+    <!-- Show Day Header -->
+    <div v-if="hasUpcomingEvents" class="max-w-4xl mx-auto px-4 mt-6">
+      <ShowDayHeader
+        :event="nextEvent"
+        :has-pay-entry="enabledPaymentButtons.length > 0"
+        @tickets="$emit('view-event', nextEvent)"
+        @pay-entry="$emit('scroll-to-support')"
+      />
+    </div>
+
+    <!-- NOW Banner -->
+    <div class="max-w-4xl mx-auto px-4 mt-6">
+      <NowBanner
+        state="ON_TOUR"
+        :content="nowBannerContent"
+        @cta-click="handleBannerCta"
+        @scroll-to="handleScrollTo"
+        @share="$emit('share')"
+      />
+    </div>
+
+    <!-- Continue Chip -->
+    <div class="max-w-4xl mx-auto px-4 mt-6">
+      <ContinueChip
+        :band-slug="band.slug"
+        @continue="handleContinueAction"
+      />
+    </div>
+
+    <!-- Live Feed -->
+    <div class="max-w-4xl mx-auto px-4 mt-6">
+      <LiveFeed
+        :feed-items="liveFeedItems"
+        :primary-feed-item="primaryFeedItem"
+        :has-feed-items="hasLiveFeedItems"
+        display-mode="single"
+      />
+    </div>
+
     <!-- Quick Actions Bar -->
     <div class="sticky top-0 z-40 bg-black/80 backdrop-blur-lg border-b border-white/10">
       <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -306,7 +358,14 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+
+// Live Surface Components
+import MomentBadges from '~/components/smartlink/MomentBadges.vue'
+import ShowDayHeader from '~/components/smartlink/ShowDayHeader.vue'
+import NowBanner from '~/components/smartlink/NowBanner.vue'
+import ContinueChip from '~/components/smartlink/ContinueChip.vue'
+import LiveFeed from '~/components/smartlink/LiveFeed.vue'
 
 import facebookIcon from "@/assets/facebookfree.png"
 import instagramIcon from "@/assets/instagramfree.png"
@@ -319,6 +378,49 @@ import bandcampIcon from "@/assets/bandcamp.svg"
 import spotifyIcon from "@/assets/spotify.svg"
 import tiktokIcon from "@/assets/tiktok.png"
 import twitterIcon from "@/assets/twitter.png"
+
+// Live Surface Data
+const liveFeedItems = ref([])
+const hasLiveFeedItems = computed(() => liveFeedItems.value.length > 0)
+const primaryFeedItem = computed(() => liveFeedItems.value[0] || null)
+
+const nowBannerContent = {
+  icon: '',
+  headline: 'On Tour',
+  subtext: 'Live shows and new music',
+  accent: 'purple',
+  cta: 'See Dates',
+  ctaAction: 'scroll-to-events'
+}
+
+// Generate initial feed items
+onMounted(() => {
+  const feedItems = [
+    { id: 1, icon: '📍', copy: 'Fans tuning in', type: 'city', timestamp: Date.now() - 5000 },
+    { id: 2, icon: '🎵', copy: 'Music playing', type: 'song_play', timestamp: Date.now() - 15000 },
+    { id: 3, icon: '👤', copy: 'New follower', type: 'new_follower', timestamp: Date.now() - 30000 },
+  ]
+  liveFeedItems.value = feedItems
+})
+
+// Event Handlers
+function handleBannerCta(action) {
+  if (action.action === 'scroll-to-events') {
+    // Emit event to parent to scroll to events section
+    console.log('Scroll to events')
+  }
+}
+
+function handleScrollTo(section) {
+  if (section === 'events') {
+    // Emit event to parent to scroll to events section
+    console.log('Scroll to events')
+  }
+}
+
+function handleContinueAction(action) {
+  console.log('Continue action:', action)
+}
 
 const props = defineProps({
   band: {
