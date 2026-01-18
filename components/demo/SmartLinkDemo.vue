@@ -194,9 +194,54 @@
             </template>
           </section>
 
+          <!-- ============================================ -->
+          <!-- SMART LINK LIVE SURFACE COMPONENTS -->
+          <!-- ============================================ -->
+
+          <!-- MomentBadges -->
+          <div :class="[moduleClass(8), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(8)">
+            <MomentBadges
+              :is-on-tour="true"
+              :has-new-release="true"
+            />
+          </div>
+
+          <!-- Show Day Header -->
+          <div :class="[moduleClass(9), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(9)">
+            <ShowDayHeader
+              :event="nextEvent"
+              :has-pay-entry="true"
+            />
+          </div>
+
+          <!-- NOW Banner -->
+          <div :class="[moduleClass(10), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(10)">
+            <NowBanner
+              state="ON_TOUR"
+              :content="nowBannerContent"
+            />
+          </div>
+
+          <!-- Continue Chip -->
+          <div :class="[moduleClass(11), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(11)">
+            <ContinueChip
+              band-slug="neon-avenue"
+            />
+          </div>
+
+          <!-- Live Feed -->
+          <div :class="[moduleClass(12), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(12)">
+            <LiveFeed
+              :feed-items="liveFeedItems"
+              :primary-feed-item="primaryFeedItem"
+              :has-feed-items="hasLiveFeedItems"
+              display-mode="single"
+            />
+          </div>
+
           <section
-            :class="[moduleClass(8), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']"
-            :style="moduleStyle(8)"
+            :class="[moduleClass(13), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']"
+            :style="moduleStyle(13)"
           >
             <h2 :class="h2Class">
               Upcoming Events
@@ -520,6 +565,13 @@
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 
+// Live Surface Components
+import LiveFeed from '~/components/smartlink/LiveFeed.vue'
+import MomentBadges from '~/components/smartlink/MomentBadges.vue'
+import ShowDayHeader from '~/components/smartlink/ShowDayHeader.vue'
+import NowBanner from '~/components/smartlink/NowBanner.vue'
+import ContinueChip from '~/components/smartlink/ContinueChip.vue'
+
 import neonPoster from '@/assets/neonposter.png'
 import eventPoster from '@/assets/eventposter1.png'
 import aisixPoster from '@/assets/aisix.webp'
@@ -537,6 +589,30 @@ import tiktokIcon from '@/assets/tiktok.png'
 import twitterIcon from '@/assets/twitter.png'
 
 import demoSongUrl from '@/assets/Turns Me On.mp3'
+
+// Live Surface Data
+const liveFeedItems = ref([])
+const hasLiveFeedItems = computed(() => liveFeedItems.value.length > 0)
+const primaryFeedItem = computed(() => liveFeedItems.value[0] || null)
+
+const nowBannerContent = {
+  icon: '',
+  headline: 'On Tour',
+  subtext: '3 upcoming shows across the west coast',
+  accent: 'purple',
+  cta: 'See Dates',
+  ctaAction: 'scroll-to-events'
+}
+
+// Generate initial feed items
+onMounted(() => {
+  const feedItems = [
+    { id: 1, icon: '📍', copy: 'Los Angeles tuning in', type: 'city', timestamp: Date.now() - 5000 },
+    { id: 2, icon: '🎵', copy: 'Turns Me On played', type: 'song_play', timestamp: Date.now() - 15000 },
+    { id: 3, icon: '👤', copy: 'New follower', type: 'new_follower', timestamp: Date.now() - 30000 },
+  ]
+  liveFeedItems.value = feedItems
+})
 
 const props = defineProps({
   variant: {

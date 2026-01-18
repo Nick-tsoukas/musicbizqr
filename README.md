@@ -778,3 +778,184 @@ They are **Live Artist Surfaces** that:
 - acknowledge fans
 - improve repeat engagement
 - support monetization at the right moment
+
+---
+
+## Live Surface Documentation
+
+### Overview
+Live Surface transforms static band pages into dynamic, real-time experiences that adapt to tour states, fan activity, and momentum signals.
+
+### Demo Pages
+- **Smart Link Live Demo**: `/internal/demo/smart-link-live` - Complete Live Surface showcase
+- **Demo Controls**: Available in dashboard for whitelisted users
+- **Feature Flags**: Full control over Live Surface modules and states
+
+### Style Guide
+
+#### Band Page Styles
+All band page templates now include Live Surface features:
+
+| Style | Description | Live Surface Integration |
+|-------|-------------|---------------------------|
+| **Classic** | Full-width sections with detailed layouts | Complete integration |
+| **Smart Link** | Live Surface features, responsive hero | Native Live Surface style |
+| **Compact** | Modern grid layout, mobile-friendly | Overlay MomentBadges |
+| **Bold** | Immersive hero, bento-grid streaming | Premium Live Surface experience |
+
+#### Component Hierarchy
+1. **MomentBadges** - Animated neon badges overlay on hero image
+2. **ShowDayHeader** - "Tonight in Los Angeles • The Echo" style
+3. **NOW Banner** - Contextual status banners (ON_TOUR, SHOW_TONIGHT, etc.)
+4. **ContinueChip** - For returning visitors
+5. **LiveFeed** - Real-time micro-signals
+6. **SupportModule** - Enhanced support sections
+
+#### Visual Design
+- **Color Scheme**: Elite purple/red gradient theme
+- **Typography**: Clean, modern sans-serif hierarchy
+- **Animations**: Neon cyberpunk borders, smooth transitions
+- **Responsive**: Mobile-first design with adaptive layouts
+- **Accessibility**: High contrast, semantic HTML, ARIA labels
+
+### Technical Implementation
+
+#### Live Surface Components
+```vue
+<!-- Core Components -->
+<MomentBadges :is-on-tour="true" :has-new-release="true" />
+<ShowDayHeader :event="nextEvent" :has-pay-entry="true" />
+<NowBanner state="ON_TOUR" :content="nowBannerContent" />
+<ContinueChip :band-slug="band.slug" />
+<LiveFeed :feed-items="liveFeedItems" display-mode="single" />
+<SupportModule :band-name="band.name" :show-quick-tips="true" />
+```
+
+#### Data Structure
+```javascript
+// Live Feed Items
+const liveFeedItems = [
+  { id: 1, icon: '', copy: 'Los Angeles tuning in', type: 'city' },
+  { id: 2, icon: '', copy: 'Turns Me On played', type: 'song_play' },
+  { id: 3, icon: '', copy: 'New follower', type: 'new_follower' }
+]
+
+// NOW Banner Content
+const nowBannerContent = {
+  icon: '',
+  headline: 'On Tour',
+  subtext: '3 upcoming shows across the west coast',
+  accent: 'purple',
+  cta: 'See Dates',
+  ctaAction: 'scroll-to-events'
+}
+```
+
+#### Banner States
+- **ON_TOUR** - Touring with upcoming shows
+- **SHOW_TONIGHT** - Show happening today
+- **NEW_RELEASE** - New music available
+- **HEATING_UP** - Momentum spike detected
+- **DEFAULT** - Standard state
+
+### Interactive Features
+
+#### MomentBadges
+- **Animated Borders**: Purple neon cyberpunk infinite animation
+- **Dynamic States**: Tour week, new release, heating up
+- **Overlay Position**: Top-left of hero image
+- **Responsive**: Adapts to all screen sizes
+
+#### Live Feed
+- **Real-time Updates**: Micro-signals from fan activity
+- **Multiple Display Modes**: Single, multi, compact
+- **Smart Filtering**: Relevant signals based on context
+- **Engagement Metrics**: Track fan interactions
+
+#### NOW Banner
+- **Contextual Content**: Adapts to tour/release states
+- **Interactive CTAs**: Scroll-to-events, share functionality
+- **Color Themes**: Purple/red elite color scheme
+- **Smooth Transitions**: State changes with animations
+
+### Analytics & Tracking
+
+#### Event Emissions
+```javascript
+// Component Events
+@tickets="handleTicketClick"
+@pay-entry="scrollToSupport"
+@cta-click="handleBannerCta"
+@scroll-to="handleScrollTo"
+@share="handleShare"
+@continue="handleContinueAction"
+@quick-tip="handleSupport"
+```
+
+#### Fan Recognition
+- **Toast Notifications**: Real-time fan acknowledgments
+- **Activity Tracking**: Monitor engagement patterns
+- **Return Visitor Detection**: Personalized experiences
+- **Geographic Signals**: Location-based fan activity
+
+### Configuration Options
+
+#### Feature Flags
+- `SMARTLINK_LIVE_SURFACE_ENABLED` - Master toggle
+- `SMARTLINK_V2_ENABLED` - V2 components access
+- `SMARTLINK_SHOW_MOMENT_BADGES` - Badge visibility
+- `SMARTLINK_SHOW_SHOW_DAY_HEADER` - Header visibility
+- `SMARTLINK_SHOW_LIVE_FEED` - Feed visibility
+- `SMARTLINK_SHOW_SUPPORT_MODULE` - Support section
+
+#### Demo Controls
+- **Live Feed Mode**: Simulated activity for demos
+- **State Override**: Force specific banner states
+- **Module Toggles**: Enable/disable individual components
+- **Style Variants**: Switch between band page styles
+
+### Getting Started
+
+#### For Developers
+1. **Clone Repository**: `git clone [repo-url]`
+2. **Install Dependencies**: `npm install`
+3. **Run Development**: `npm run dev`
+4. **Visit Demo**: `/internal/demo/smart-link-live`
+5. **Enable Features**: Use demo controls in dashboard
+
+#### For Bands
+1. **Create Profile**: Choose Smart Link style during setup
+2. **Upload Content**: Add music, images, tour dates
+3. **Enable Live Surface**: Features activate automatically
+4. **Customize**: Adjust colors, layout, content
+5. **Share**: Distribute Smart Link to fans
+
+### Best Practices
+
+#### Design Guidelines
+- **Consistent Branding**: Match band aesthetic
+- **Clear Hierarchy**: Important information first
+- **Mobile Priority**: Optimize for mobile viewing
+- **Fast Loading**: Optimize images and assets
+- **Accessibility**: Semantic HTML, ARIA labels
+
+#### Content Strategy
+- **Real-time Updates**: Keep tour dates current
+- **Fan Engagement**: Respond to activity signals
+- **Momentum Building**: Leverage heating up states
+- **Cross-platform**: Link to streaming/social
+- **Call-to-action**: Clear next steps for fans
+
+### Related Resources
+
+#### Documentation
+- **Component API**: Detailed props and events
+- **Styling Guide**: CSS classes and theming
+- **Integration Guide**: Adding to existing pages
+- **Migration Guide**: Upgrading from static pages
+
+#### Support
+- **Demo Pages**: Interactive examples
+- **Code Repository**: Source code and examples
+- **Community**: Developer discussions
+- **Issues**: Bug reports and feature requests
