@@ -1,8 +1,8 @@
 <template>
-  <div class="chart-card mb-6">
+  <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5 mb-4">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
-        <h3 class="text-white text-lg font-semibold">MBQ Pulse</h3>
+        <h3 class="text-white font-semibold">MBQ Pulse</h3>
         <span
           :class="[
             'px-2 py-0.5 text-xs font-medium rounded-full',
@@ -328,8 +328,3 @@ const growthText = computed(() => {
 })
 </script>
 
-<style scoped>
-.chart-card {
-  @apply bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-lg;
-}
-</style>

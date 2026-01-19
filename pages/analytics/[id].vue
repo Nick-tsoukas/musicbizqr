@@ -1,12 +1,48 @@
 <template>
   <div
-    class="px-4 sm:px-6 py-10 bg-gradient-to-b from-black via-slate-950 to-black min-h-screen pt-[var(--header-height)] max-w-6xl mx-auto"
+    class="px-4 sm:px-6 py-10 bg-gradient-to-b from-black via-slate-950 to-black min-h-screen pt-[var(--header-height)] max-w-5xl mx-auto"
   >
-    <div class="flex items-start justify-between gap-4 mb-6">
-      <div class="min-w-0">
-        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Analytics Dashboard</h2>
-        <div class="text-gray-400 text-sm mt-1">
-          Understand what fans do after they scan.
+    <!-- Header -->
+    <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-black/40 shadow-[0_25px_60px_rgba(0,0,0,0.55)] mb-6">
+      <div class="px-6 py-5">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div class="min-w-0">
+            <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Analytics Dashboard</h2>
+            <p class="text-white/70 mt-1 text-sm sm:text-base">
+              Understand what fans do after they scan.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0 bg-black/20 border border-white/10 rounded-full p-1">
+            <button
+              type="button"
+              :aria-pressed="chartDisplayType === 'bar'"
+              @click="setChartDisplayType('bar')"
+              :class="[
+                'px-3 py-1 text-xs rounded-full transition',
+                chartDisplayType === 'bar'
+                  ? 'bg-emerald-500/20 text-emerald-200'
+                  : 'text-white/70 hover:bg-white/5',
+                'motion-reduce:transition-none',
+              ]"
+            >
+              Bar
+            </button>
+            <button
+              type="button"
+              :aria-pressed="chartDisplayType === 'line'"
+              @click="setChartDisplayType('line')"
+              :class="[
+                'px-3 py-1 text-xs rounded-full transition',
+                chartDisplayType === 'line'
+                  ? 'bg-emerald-500/20 text-emerald-200'
+                  : 'text-white/70 hover:bg-white/5',
+                'motion-reduce:transition-none',
+              ]"
+            >
+              Line
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -32,7 +68,7 @@
     <InsightsPanel 
       v-if="bandId"
       :band-id="bandId"
-      class="mb-6"
+      class="mb-4"
       @action="handleInsightAction"
     />
 
@@ -288,43 +324,14 @@
 
         <div class="flex items-center justify-between mb-2">
           <div class="min-w-0">
-            <h3 class="text-white text-lg font-semibold">{{ chartTitle }}</h3>
-            <div class="text-gray-400 text-xs">
+            <h3 class="text-white font-semibold">{{ chartTitle }}</h3>
+            <div class="text-white/60 text-xs mt-0.5">
               {{
                 selectedRange === 1
                   ? humanDayLabel(selectedDate)
                   : `Last ${selectedRange} days`
               }}
             </div>
-          </div>
-
-          <div class="flex items-center gap-1.5 shrink-0 bg-black/20 border border-white/10 rounded-full p-1">
-            <button
-              type="button"
-              :aria-pressed="chartDisplayType === 'bar'"
-              @click="setChartDisplayType('bar')"
-              :class="[
-                'px-3 py-1 text-xs rounded-full transition-colors',
-                chartDisplayType === 'bar'
-                  ? 'bg-emerald-500/20 text-emerald-200'
-                  : 'text-gray-300 hover:bg-white/5',
-              ]"
-            >
-              Bar
-            </button>
-            <button
-              type="button"
-              :aria-pressed="chartDisplayType === 'line'"
-              @click="setChartDisplayType('line')"
-              :class="[
-                'px-3 py-1 text-xs rounded-full transition-colors',
-                chartDisplayType === 'line'
-                  ? 'bg-emerald-500/20 text-emerald-200'
-                  : 'text-gray-300 hover:bg-white/5',
-              ]"
-            >
-              Line
-            </button>
           </div>
         </div>
         <div class="chart-wrap ratio-16x9">
@@ -336,28 +343,21 @@
 
       <!-- Link Clicks: Top Platforms (from server rollups) -->
       <div v-if="selectedTab === 'Link Clicks'" class="chart-card">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">Top Platforms</h3>
-          <span class="text-gray-400 text-xs"
-            >{{ totalClicksInRange }} in range</span
-          >
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-white font-semibold">Top Platforms</h3>
+          <span class="text-white/50 text-xs">{{ totalClicksInRange }} in range</span>
         </div>
 
-        <ul
-          v-if="topClickPlatforms.length"
-          class="text-gray-200 text-sm space-y-2"
-        >
-          <li
+        <div v-if="topClickPlatforms.length" class="space-y-2">
+          <div
             v-for="[name, count] in topClickPlatforms"
             :key="name"
-            class="flex items-center gap-2"
+            class="flex items-center gap-3"
           >
-            <span class="inline-block w-28 truncate text-white capitalize">{{
-              name
-            }}</span>
-            <div class="h-2 bg-gray-800 rounded w-full">
+            <div class="w-28 truncate text-white/85 text-sm capitalize">{{ name }}</div>
+            <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
               <div
-                class="h-2 bg-purple-500 rounded"
+                class="h-2 rounded-full bg-purple-400/80"
                 :style="{
                   width:
                     Math.min(
@@ -369,13 +369,11 @@
                 }"
               />
             </div>
-            <span class="text-gray-400 w-10 text-right tabular-nums">{{
-              count
-            }}</span>
-          </li>
-        </ul>
+            <div class="w-10 text-right tabular-nums text-white/60 text-sm">{{ count }}</div>
+          </div>
+        </div>
 
-        <p v-else class="text-gray-400 text-sm">No clicks in this range.</p>
+        <p v-else class="text-white/50 text-sm">No clicks in this range.</p>
       </div>
 
       <!-- USA Heat Map -->
@@ -387,42 +385,36 @@
 
       <!-- Top Cities (from /analytics/geo) -->
       <div class="chart-card">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">🌎 Top Cities</h3>
-          <span v-if="topCities.length" class="text-gray-400 text-xs">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-white font-semibold">Top Cities</h3>
+          <span v-if="topCities.length" class="text-white/50 text-xs">
             {{ topCities.length }} total
           </span>
         </div>
 
-        <ul v-if="paginatedCities.length" class="text-gray-200 text-sm space-y-2">
-          <li
+        <div v-if="paginatedCities.length" class="space-y-2">
+          <div
             v-for="[city, count] in paginatedCities"
             :key="city"
-            class="flex items-center gap-2"
+            class="flex items-center gap-3"
           >
-            <div class="flex-1 flex items-center gap-2">
-              <span class="inline-block w-28 truncate text-white">{{
-                city
-              }}</span>
-              <div class="h-2 bg-gray-800 rounded w-full">
-                <div
-                  class="h-2 bg-emerald-500 rounded"
-                  :style="{
-                    width:
-                      Math.min(
-                        100,
-                        Math.round((count / (topCities[0]?.[1] || 1)) * 100)
-                      ) + '%',
-                  }"
-                />
-              </div>
+            <div class="w-28 truncate text-white/85 text-sm">{{ city }}</div>
+            <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+              <div
+                class="h-2 rounded-full bg-emerald-400/80"
+                :style="{
+                  width:
+                    Math.min(
+                      100,
+                      Math.round((count / (topCities[0]?.[1] || 1)) * 100)
+                    ) + '%',
+                }"
+              />
             </div>
-            <span class="text-gray-400 w-10 text-right tabular-nums">{{
-              count
-            }}</span>
-          </li>
-        </ul>
-        <p v-else class="text-gray-400 text-sm">No city data yet.</p>
+            <div class="w-10 text-right tabular-nums text-white/60 text-sm">{{ count }}</div>
+          </div>
+        </div>
+        <p v-else class="text-white/50 text-sm">No city data yet.</p>
         
         <!-- Pagination -->
         <div v-if="totalCityPages > 1" class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
@@ -450,46 +442,29 @@
 
       <!-- Sources / Mediums / Referrers (from server rollups) -->
       <div class="chart-card">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">Sources</h3>
-          <span class="text-gray-400 text-xs"
-            >{{ totalViewsInRange }} in range</span
-          >
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-white font-semibold">Sources</h3>
+          <span class="text-white/50 text-xs">{{ totalViewsInRange }} in range</span>
         </div>
 
-        <p class="text-gray-400 text-sm mb-4 leading-relaxed">
-          <span class="text-emerald-400 font-semibold"
-            >Where your fans are coming from.</span
-          >
-          This shows how listeners found your band page — whether from social
-          media, search, QR codes, or other sites. “Source” means the platform
-          or website; “Medium” means the type of traffic (social, search,
-          direct, or referral).
+        <p class="text-white/60 text-sm mb-4">
+          Where your fans are coming from — social media, search, QR codes, or other sites.
         </p>
 
         <div class="grid md:grid-cols-3 gap-4">
           <!-- By Source -->
-          <div>
-            <h4 class="text-white font-medium mb-2 flex items-center gap-1">
-              By Source
-              <span class="text-gray-500 text-xs">(platform or website)</span>
-            </h4>
-            <ul
-              v-if="sourceCounts.length"
-              class="text-gray-200 text-sm space-y-2"
-            >
-              <li
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <h4 class="text-white font-semibold mb-3">By Source</h4>
+            <div v-if="sourceCounts.length" class="space-y-2">
+              <div
                 v-for="[src, count] in sourceCounts"
                 :key="src"
-                class="flex items-center gap-2"
+                class="flex items-center gap-3"
               >
-                <span
-                  class="inline-block w-28 truncate text-white capitalize"
-                  >{{ src }}</span
-                >
-                <div class="h-2 bg-gray-800 rounded w-full">
+                <div class="w-28 truncate text-white/85 text-sm capitalize">{{ src }}</div>
+                <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    class="h-2 bg-purple-500 rounded"
+                    class="h-2 rounded-full bg-purple-400/80"
                     :style="{
                       width:
                         Math.min(
@@ -501,36 +476,25 @@
                     }"
                   ></div>
                 </div>
-                <span class="text-gray-400 w-10 text-right tabular-nums">{{
-                  count
-                }}</span>
-              </li>
-            </ul>
-            <p v-else class="text-gray-400 text-sm">No source data yet.</p>
+                <div class="w-10 text-right tabular-nums text-white/60 text-sm">{{ count }}</div>
+              </div>
+            </div>
+            <p v-else class="text-white/50 text-sm">No source data yet.</p>
           </div>
 
           <!-- By Medium -->
-          <div>
-            <h4 class="text-white font-medium mb-2 flex items-center gap-1">
-              By Medium
-              <span class="text-gray-500 text-xs">(traffic type)</span>
-            </h4>
-            <ul
-              v-if="mediumCounts.length"
-              class="text-gray-200 text-sm space-y-2"
-            >
-              <li
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <h4 class="text-white font-semibold mb-3">By Medium</h4>
+            <div v-if="mediumCounts.length" class="space-y-2">
+              <div
                 v-for="[m, count] in mediumCounts"
                 :key="m"
-                class="flex items-center gap-2"
+                class="flex items-center gap-3"
               >
-                <span
-                  class="inline-block w-28 truncate text-white capitalize"
-                  >{{ m }}</span
-                >
-                <div class="h-2 bg-gray-800 rounded w-full">
+                <div class="w-28 truncate text-white/85 text-sm capitalize">{{ m }}</div>
+                <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    class="h-2 bg-emerald-500 rounded"
+                    class="h-2 rounded-full bg-emerald-400/80"
                     :style="{
                       width:
                         Math.min(
@@ -542,47 +506,35 @@
                     }"
                   ></div>
                 </div>
-                <span class="text-gray-400 w-10 text-right tabular-nums">{{
-                  count
-                }}</span>
-              </li>
-            </ul>
-            <p v-else class="text-gray-400 text-sm">No medium data yet.</p>
+                <div class="w-10 text-right tabular-nums text-white/60 text-sm">{{ count }}</div>
+              </div>
+            </div>
+            <p v-else class="text-white/50 text-sm">No medium data yet.</p>
           </div>
 
           <!-- Top Referrers -->
-          <div>
-            <h4 class="text-white font-medium mb-2 flex items-center gap-1">
-              Top Referrers
-              <span class="text-gray-500 text-xs"
-                >(websites linking to you)</span
-              >
-            </h4>
-            <ul
-              v-if="topRefDomains.length"
-              class="text-gray-200 text-sm space-y-2"
-            >
-              <li
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <h4 class="text-white font-semibold mb-3">Top Referrers</h4>
+            <div v-if="topRefDomains.length" class="space-y-2">
+              <div
                 v-for="[d, count] in topRefDomains"
                 :key="d"
                 class="flex items-center justify-between"
               >
-                <span class="truncate w-40 text-white">{{ d }}</span>
-                <span class="text-gray-400 tabular-nums">{{ count }}</span>
-              </li>
-            </ul>
-            <p v-else class="text-gray-400 text-sm">No referrer domains yet.</p>
+                <span class="truncate text-white/85 text-sm">{{ d }}</span>
+                <span class="text-white/60 tabular-nums text-sm">{{ count }}</span>
+              </div>
+            </div>
+            <p v-else class="text-white/50 text-sm">No referrer domains yet.</p>
           </div>
         </div>
       </div>
 
       <!-- Devices (from server rollups) -->
       <div class="chart-card">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-white text-lg font-semibold">Top Devices</h3>
-          <span class="text-gray-400 text-xs"
-            >{{ totalDeviceViews }} total</span
-          >
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-white font-semibold">Top Devices</h3>
+          <span class="text-white/50 text-xs">{{ totalDeviceViews }} total</span>
         </div>
 
         <div v-if="totalDeviceViews > 0" class="mt-3 space-y-2">
@@ -2647,17 +2599,11 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .chart-card {
-  background:
-    radial-gradient(1200px 400px at 20% -10%, rgba(168, 85, 247, 0.18), transparent 55%),
-    radial-gradient(900px 350px at 85% 0%, rgba(16, 185, 129, 0.14), transparent 55%),
-    rgba(17, 24, 39, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
-  padding: 1.05rem;
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
+  padding: 1rem;
+  overflow: hidden;
 }
 
 .chart-wrap {

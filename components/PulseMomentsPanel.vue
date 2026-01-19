@@ -1,5 +1,5 @@
 <template>
-  <div class="chart-card mb-6">
+  <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5 mb-4">
     <!-- Toast notification -->
     <Transition name="fade">
       <div
@@ -12,11 +12,11 @@
 
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-white text-lg font-semibold flex items-center gap-2">
-          <span class="text-xl">⚡</span>
+        <h3 class="text-white font-semibold flex items-center gap-2">
+          <span class="text-lg">⚡</span>
           Pulse Moments
         </h3>
-        <p class="text-gray-400 text-xs mt-0.5">Auto-generated shareable moments from fan energy spikes</p>
+        <p class="text-white/50 text-xs mt-0.5">Auto-generated shareable moments from fan energy spikes</p>
       </div>
       
       <!-- Dev-only: Run Evaluator button -->
