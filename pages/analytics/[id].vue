@@ -28,8 +28,16 @@
       :range-label="museRangeLabel"
     />
 
-    <!-- Insights (MUSE) -->
-    <div class="chart-card mb-6">
+    <!-- Insights (MUSE) - V2 Panel -->
+    <InsightsPanel 
+      v-if="bandId"
+      :band-id="bandId"
+      class="mb-6"
+      @action="handleInsightAction"
+    />
+
+    <!-- Legacy Insights (fallback) -->
+    <div v-if="false" class="chart-card mb-6">
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-white text-lg font-semibold">Insights (Muse)</h3>
         <span class="text-gray-400 text-xs">
@@ -1388,6 +1396,11 @@ let viewsChart: any = null;
 function humanDayLabel(yyyy_mm_dd: string) {
   const d = parseISO(`${yyyy_mm_dd}T00:00:00`);
   return isValid(d) ? fmt(d, "EEE, MMM d") : "";
+}
+
+/* ---------- Insights Panel action handler ---------- */
+function handleInsightAction({ action, insight }: { action: any; insight: any }) {
+  console.log('[Analytics] Insight action:', action, insight);
 }
 
 /* ---------- YouTube re-sync helpers ---------- */
