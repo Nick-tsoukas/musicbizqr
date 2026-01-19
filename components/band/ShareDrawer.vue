@@ -352,14 +352,7 @@ async function getOrGenerateImage() {
     return cachedImageBlob.value
   }
   
-  console.log('[ShareDrawer] Starting image generation for:', key)
-  console.log('[ShareDrawer] Canvas element:', canvasRef.value)
-  console.log('[ShareDrawer] Band image URL:', props.bandImageUrl)
-  
-  if (!canvasRef.value) {
-    console.error('[ShareDrawer] Canvas element not found')
-    return null
-  }
+  if (!canvasRef.value) return null
   
   const blob = await generateFanShareImage({
     canvasEl: canvasRef.value,
@@ -370,37 +363,6 @@ async function getOrGenerateImage() {
     momentType: FAN_MOMENT_TYPES.DEFAULT,
     loadImage: loadImageDirect,
   })
-  
-  console.log('[ShareDrawer] Generated blob:', blob)
-  
-  // If image generation failed due to CORS, try without the image
-  if (!blob && props.bandImageUrl) {
-    console.warn('[ShareDrawer] Image generation failed, trying without band image due to CORS issue')
-    const blobWithoutImage = await generateFanShareImage({
-      canvasEl: canvasRef.value,
-      headline: getHeadline(),
-      bandName: props.bandName,
-      bandImageUrl: null, // Don't try to load the image
-      isBandNameInLogo: props.isBandNameInLogo,
-      momentType: FAN_MOMENT_TYPES.DEFAULT,
-      loadImage: loadImageDirect,
-    })
-    
-    console.log('[ShareDrawer] Generated blob without image:', blobWithoutImage)
-    
-    if (blobWithoutImage) {
-      cachedImageBlob.value = blobWithoutImage
-      cacheKey.value = key
-      setTimeout(() => {
-        if (cacheKey.value === key) {
-          cachedImageBlob.value = null
-          cacheKey.value = ''
-        }
-      }, 30000)
-    }
-    
-    return blobWithoutImage
-  }
   
   if (blob) {
     cachedImageBlob.value = blob

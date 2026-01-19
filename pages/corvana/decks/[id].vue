@@ -335,43 +335,22 @@ async function convertImageToDataUrl(url) {
 function getFullImageUrl(url) {
   if (!url) return null
   if (url.startsWith('http')) return url
-  const fullUrl = `https://musicbizqr.com${url}`
-  console.log('getFullImageUrl:', url, '->', fullUrl)
-  return fullUrl
+  return `https://musicbizqr.com${url}`
 }
 
 // Preload band image as data URL
 onMounted(async () => {
-  console.log('[onMounted] Starting image preload')
   const imageUrl = getFullImageUrl('/neonposter.png')
   if (imageUrl) {
     const dataUrl = await convertImageToDataUrl(imageUrl)
     if (dataUrl) {
       bandImageDataUrl.value = dataUrl
-      console.log('[onMounted] Band image preloaded successfully')
-    } else {
-      console.warn('[onMounted] Failed to preload band image, using fallback')
-      // Use a simple colored square as fallback for testing
-      const canvas = document.createElement('canvas')
-      canvas.width = 200
-      canvas.height = 200
-      const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#8B5CF6'
-      ctx.fillRect(0, 0, 200, 200)
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 80px sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText('NA', 100, 130)
-      bandImageDataUrl.value = canvas.toDataURL('image/png')
-      console.log('[onMounted] Created fallback test image')
     }
   }
 })
 
 // Native share handler for band page share button
 function handleNativeShare() {
-  console.log('Opening share drawer')
-  console.log('bandImageDataUrl.value:', bandImageDataUrl.value ? `data URL (${bandImageDataUrl.value.substring(0, 50)}...)` : 'null')
   shareDrawerOpen.value = true
 }
 
