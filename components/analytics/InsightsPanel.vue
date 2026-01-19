@@ -8,18 +8,20 @@
         </div>
         <div>
           <h3 class="text-white font-semibold">Muse Insights</h3>
-          <p class="text-white/50 text-xs">AI-powered analysis</p>
+          <p class="text-white/50 text-xs">
+            {{ computedAt ? `Updated ${formatTime(computedAt)}` : 'Intelligence panel' }}
+          </p>
         </div>
       </div>
       <button 
-        v-if="!loading && insights.length"
+        v-if="!loading"
         @click="refresh"
         class="text-white/50 hover:text-white text-xs flex items-center gap-1 transition"
+        :class="{ 'animate-spin': loading }"
       >
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-        Refresh
       </button>
     </div>
 
@@ -56,17 +58,29 @@
             <div class="flex items-center gap-2 min-w-0">
               <span class="text-lg shrink-0">{{ severityIcon(insight.severity) }}</span>
               <div class="min-w-0">
-                <h4 class="text-white font-medium text-sm truncate">{{ insight.title }}</h4>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-white font-medium text-sm truncate">{{ insight.title }}</h4>
+                  <span 
+                    v-if="insight.category" 
+                    class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/40 uppercase tracking-wide"
+                  >
+                    {{ insight.category }}
+                  </span>
+                </div>
                 <p class="text-white/70 text-xs mt-0.5">{{ insight.summary }}</p>
               </div>
             </div>
             
-            <!-- Confidence Badge -->
-            <div 
-              class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium"
-              :class="confidenceClass(insight.confidence)"
-            >
-              {{ insight.confidence }}% sure
+            <!-- Confidence Bar -->
+            <div class="shrink-0 flex flex-col items-end gap-1">
+              <div class="text-[10px] text-white/50">{{ insight.confidence }}%</div>
+              <div class="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  class="h-full rounded-full transition-all"
+                  :class="confidenceBarClass(insight.confidence)"
+                  :style="{ width: `${insight.confidence}%` }"
+                ></div>
+              </div>
             </div>
           </div>
 
@@ -115,7 +129,7 @@
 
           <!-- Data Window -->
           <div class="mt-2 text-white/30 text-[10px]">
-            Based on {{ insight.dataWindow }} of data
+            Based on {{ insight.window || '7d' }} of data
           </div>
         </div>
       </TransitionGroup>
@@ -151,6 +165,7 @@ const loading = ref(false)
 const error = ref(null)
 const insights = ref([])
 const generatedAt = ref(null)
+const computedAt = ref(null)
 const expandedWhy = ref({})
 
 const config = useRuntimeConfig()
@@ -188,6 +203,12 @@ function confidenceClass(confidence) {
   if (confidence >= 80) return 'bg-green-500/20 text-green-400'
   if (confidence >= 60) return 'bg-yellow-500/20 text-yellow-400'
   return 'bg-white/10 text-white/50'
+}
+
+function confidenceBarClass(confidence) {
+  if (confidence >= 80) return 'bg-green-500'
+  if (confidence >= 60) return 'bg-yellow-500'
+  return 'bg-white/40'
 }
 
 function actionClass(type) {
@@ -238,7 +259,8 @@ async function fetchInsights() {
     if (res.ok) {
       insights.value = res.insights || []
       generatedAt.value = res.generatedAt
-      emit('loaded', { insights: insights.value, generatedAt: generatedAt.value })
+      computedAt.value = res.computedAt || res.generatedAt
+      emit('loaded', { insights: insights.value, computedAt: computedAt.value })
     } else {
       throw new Error(res.error || 'Failed to load insights')
     }
