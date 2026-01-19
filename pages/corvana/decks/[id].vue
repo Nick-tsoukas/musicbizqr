@@ -7,15 +7,49 @@
 
     <!-- Narrative Slide -->
     <div v-if="currentSlide?.type === 'narrative'" style="width: 100%; max-width: 800px; padding: 2rem; text-align: center;">
-      <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; color: #fff; margin-bottom: 1.5rem;">{{ currentSlide.content.headline }}</h1>
+      <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; margin-bottom: 1.5rem; background: linear-gradient(to right, #ec4899, #8b5cf6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ currentSlide.content.headline }}</h1>
       <h2 style="font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 500; color: #a0a0a0; margin-bottom: 2rem;">{{ currentSlide.content.subhead }}</h2>
       <p style="font-size: clamp(1rem, 2vw, 1.2rem); color: #808080; line-height: 1.6;">{{ currentSlide.content.body }}</p>
     </div>
 
     <!-- Mobile View Slide -->
-    <div v-else-if="currentSlide?.type === 'mobile_view'" style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 100vh; padding: 2rem;">
+    <div v-else-if="currentSlide?.type === 'mobile_view'" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 100vh; padding: 2rem; padding-top: 6rem; gap: 1.5rem;">
+      
+      <!-- Template Switcher (only on Slide 2 - SmartLinkSurface) -->
+      <div v-if="currentSlide?.content?.componentKey === 'SmartLinkSurface'" style="position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; background: rgba(0,0,0,0.9); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.2); z-index: 10000; backdrop-filter: blur(10px);">
+        <button
+          v-for="opt in templateOptions"
+          :key="opt.key"
+          @click="selectedTemplate = opt.key"
+          :style="{
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+            background: selectedTemplate === opt.key ? 'linear-gradient(to right, #8b5cf6, #10b981)' : 'rgba(255,255,255,0.1)',
+            color: selectedTemplate === opt.key ? '#fff' : 'rgba(255,255,255,0.7)'
+          }"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
+
       <MobileViewport>
+        <!-- Use template component for SmartLinkSurface slide -->
         <component 
+          v-if="currentSlide?.content?.componentKey === 'SmartLinkSurface'"
+          :is="templateComponent"
+          @share="handleNativeShare"
+          @follow="handleFollow"
+          @quick-tip="handleQuickTip"
+          @link-click="handleLinkClick"
+        />
+        <!-- Use registry component for other slides -->
+        <component 
+          v-else
           :is="resolvedComponent"
           v-bind="componentProps"
           @share="handleNativeShare"
@@ -173,6 +207,9 @@ import { resolveComponent as getRegistryComponent } from '~/corvana/decks/compon
 import MobileViewport from '~/corvana/decks/MobileViewport.vue'
 import SharePreviewOverlay from '~/corvana/decks/SharePreviewOverlay.vue'
 import ShareDrawer from '~/components/band/ShareDrawer.vue'
+import BandPageStyleDefault from '~/components/band/BandPageStyleDefault.vue'
+import BandPageStyleCompact from '~/components/band/BandPageStyleCompact.vue'
+import BandPageStyleBold from '~/components/band/BandPageStyleBold.vue'
 
 const route = useRoute()
 
@@ -185,6 +222,24 @@ const selectedShareable = ref(null)
 const shareCaptionSuggestions = ref([])
 const shareDrawerOpen = ref(false)
 const bandImageDataUrl = ref(null)
+const selectedTemplate = ref('compact') // 'default', 'compact', 'bold'
+
+// Template options
+const templateOptions = [
+  { key: 'default', label: 'Default' },
+  { key: 'compact', label: 'Compact' },
+  { key: 'bold', label: 'Bold' }
+]
+
+// Get the selected template component
+const templateComponent = computed(() => {
+  switch (selectedTemplate.value) {
+    case 'default': return BandPageStyleDefault
+    case 'bold': return BandPageStyleBold
+    case 'compact':
+    default: return BandPageStyleCompact
+  }
+})
 
 // Get deck data
 const deck = computed(() => {
@@ -488,7 +543,7 @@ onUnmounted(() => {
 
 .top-controls {
   position: fixed;
-  top: 2rem;
+  top: 3.5rem;
   right: 2rem;
   display: flex;
   gap: 1rem;

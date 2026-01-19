@@ -7,6 +7,19 @@ const SmartLinkSurface = defineAsyncComponent(() =>
   import('~/components/band/BandPageCompact.vue')
 )
 
+// Band page style variants
+const BandPageStyleDefault = defineAsyncComponent(() => 
+  import('~/components/band/BandPageStyleDefault.vue')
+)
+
+const BandPageStyleCompact = defineAsyncComponent(() => 
+  import('~/components/band/BandPageStyleCompact.vue')
+)
+
+const BandPageStyleBold = defineAsyncComponent(() => 
+  import('~/components/band/BandPageStyleBold.vue')
+)
+
 const ShareablesGrid = defineAsyncComponent(() => 
   import('~/components/shareables/ShareablesFeed.vue')
 )

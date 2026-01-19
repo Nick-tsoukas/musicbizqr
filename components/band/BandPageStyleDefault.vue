@@ -1,29 +1,9 @@
 <template>
   <div class="band-style-default w-full">
-    <!-- Hero Section with Style Toggle -->
+    <!-- Hero Section -->
     <div class="relative">
-      <!-- Style Toggle Button -->
-      <div class="absolute top-4 right-4 z-30">
-        <div class="flex gap-2">
-          <button
-            @click="imageStyle = 'compact'"
-            :class="imageStyle === 'compact' ? 'bg-purple-500 text-white' : 'bg-white/20 text-white/70'"
-            class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all border border-white/20"
-          >
-            Compact
-          </button>
-          <button
-            @click="imageStyle = 'bold'"
-            :class="imageStyle === 'bold' ? 'bg-purple-500 text-white' : 'bg-white/20 text-white/70'"
-            class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all border border-white/20"
-          >
-            Bold
-          </button>
-        </div>
-      </div>
-
-      <!-- Compact Style Hero -->
-      <div v-if="imageStyle === 'compact'" class="relative w-full aspect-[16/10] max-h-[50vh] rounded-t-xl overflow-hidden">
+      <!-- Hero -->
+      <div class="relative w-full aspect-[16/10] max-h-[50vh] rounded-t-xl overflow-hidden">
         <img 
           :src="neonPoster" 
           alt="Neon Avenue" 
@@ -31,105 +11,41 @@
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         
-        <!-- Live Badge -->
-        <div class="absolute top-4 left-4">
-          <div class="flex items-center gap-2 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
+        <!-- All Badges Row - Live Badge + MomentBadges together -->
+        <div class="absolute top-4 left-4 right-4 flex items-center gap-2 flex-nowrap overflow-x-auto z-30">
+          <!-- Live Badge -->
+          <div class="flex items-center gap-2 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white shrink-0">
             <span class="relative flex h-2 w-2">
               <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
             </span>
             Live Shows
           </div>
-        </div>
-        
-        <!-- Artist Info Overlay -->
-        <div class="absolute bottom-0 left-0 right-0 p-5">
-          <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">
-            Neon Avenue
-          </h1>
-          <p class="text-white/80 text-sm md:text-base mt-2 line-clamp-2">
-            Indie pop for night drives and neon signs. New single out now — tap play below.
-          </p>
-        </div>
-        
-        <!-- MomentBadges Overlay -->
-        <div class="absolute top-8 left-6 z-30">
-          <MomentBadges
-            :is-on-tour="true"
-            :has-new-release="true"
-          />
-        </div>
-      </div>
-
-      <!-- Bold Style Hero -->
-      <div v-else-if="imageStyle === 'bold'" class="relative w-full h-screen max-h-[70vh] rounded-t-xl overflow-hidden">
-        <!-- Background Image with Blur Layer -->
-        <div class="absolute inset-0">
-          <img
-            :src="neonPoster"
-            alt="Neon Avenue image"
-            class="absolute inset-0 w-full h-full object-cover scale-110 blur-sm opacity-40"
-          />
-        </div>
-        
-        <!-- Main Image -->
-        <img
-          :src="neonPoster"
-          alt="Neon Avenue image"
-          class="absolute inset-0 w-full h-full object-contain"
-        />
-        
-        <!-- Gradient Overlays -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30" />
-        <div class="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-pink-900/20" />
-        
-        <!-- Floating Genre Badge -->
-        <div class="absolute top-6 left-6">
-          <div class="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium">
-            Indie Pop
+          
+          <!-- On Tour Badge -->
+          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-purple-300 shrink-0">
+            <span>🚐</span>
+            <span>On tour</span>
           </div>
-        </div>
-        
-        <!-- Artist Info -->
-        <div class="absolute bottom-0 left-0 right-0 p-8">
-          <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-            Neon Avenue
-          </h1>
-          <p class="text-white/90 text-lg md:text-xl max-w-2xl">
-            Indie pop for night drives and neon signs. New single out now — tap play below.
-          </p>
-        </div>
-        
-        <!-- MomentBadges Overlay -->
-        <div class="absolute top-8 left-6 z-30">
-          <MomentBadges
-            :is-on-tour="true"
-            :has-new-release="true"
-          />
-        </div>
-      </div>
-
-      <!-- Default Style Hero (Original) -->
-      <div v-else class="relative aspect-[16/9] rounded-t-xl overflow-hidden">
-        <img 
-          :src="neonPoster" 
-          alt="Neon Avenue" 
-          class="absolute inset-0 w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-        
-        <!-- MomentBadges Overlay -->
-        <div class="absolute top-8 left-6 z-30">
-          <MomentBadges
-            :is-on-tour="true"
-            :has-new-release="true"
-          />
+          
+          <!-- New Release Badge -->
+          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-emerald-300 shrink-0">
+            <span>🔥</span>
+            <span>New release</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Content -->
     <div class="bg-black border-x border-b border-white/10 rounded-b-xl">
+      <!-- Band Name & Bio - Right below hero -->
+      <div class="text-center p-5 pb-2">
+        <h1 class="text-3xl font-bold text-white">Neon Avenue</h1>
+        <p class="text-white/60 text-sm mt-2">Indie pop for night drives and neon signs.</p>
+        <p class="text-purple-400 text-sm mt-1">New single out now — tap play below.</p>
+      </div>
+
       <!-- ============================================ -->
       <!-- SMART LINK LIVE SURFACE COMPONENTS -->
       <!-- ============================================ -->
@@ -175,13 +91,6 @@
 
       <!-- Main Content -->
       <div class="p-5 space-y-6">
-        <!-- Band Name & Bio -->
-        <div class="text-center">
-          <h2 class="text-2xl font-bold text-white">Neon Avenue</h2>
-          <p class="text-white/60 text-sm mt-2">Indie pop for night drives and neon signs.</p>
-          <p class="text-purple-400 text-sm mt-1">New single out now — tap play below.</p>
-        </div>
-
         <!-- Featured Song -->
         <div>
           <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Featured Song</h3>
@@ -330,9 +239,6 @@ import ContinueChip from '~/components/smartlink/ContinueChip.vue'
 import LiveFeed from '~/components/smartlink/LiveFeed.vue'
 import SupportModule from '~/components/smartlink/SupportModule.vue'
 import FanToast from '~/components/smartlink/FanToast.vue'
-
-// Image Style State
-const imageStyle = ref('default')
 
 // Data
 const eventsSection = ref(null)
