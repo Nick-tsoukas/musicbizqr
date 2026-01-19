@@ -12,7 +12,7 @@
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         
         <!-- All Badges Row -->
-        <div class="absolute top-4 left-4 flex items-center gap-1.5 z-30">
+        <div class="absolute top-4 left-4 right-4 flex items-center gap-2 flex-wrap z-30">
           <!-- Live Badge -->
           <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">
             <span class="relative flex h-2 w-2">
@@ -23,15 +23,15 @@
           </div>
           
           <!-- On Tour Badge -->
-          <div class="flex items-center gap-1 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2 py-1 text-xs font-medium text-purple-300">
+          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-purple-300">
             <span>🚐</span>
-            <span>Tour</span>
+            <span>On tour</span>
           </div>
           
           <!-- New Release Badge -->
-          <div class="flex items-center gap-1 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2 py-1 text-xs font-medium text-emerald-300">
+          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-emerald-300">
             <span>🔥</span>
-            <span>New</span>
+            <span>New release</span>
           </div>
         </div>
       </div>
@@ -93,8 +93,29 @@
       <div class="p-5 space-y-6">
         <!-- Featured Song -->
         <div>
-          <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Featured Song</h3>
-          <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider">Featured Song</h3>
+            <!-- Player Style Toggle -->
+            <div class="flex gap-1 bg-white/5 rounded-lg p-0.5">
+              <button 
+                @click="playerStyle = 'default'"
+                :class="playerStyle === 'default' ? 'bg-purple-500/30 text-white' : 'text-white/50 hover:text-white/70'"
+                class="px-2 py-0.5 rounded text-[10px] font-medium transition"
+              >
+                Default
+              </button>
+              <button 
+                @click="playerStyle = 'compact'"
+                :class="playerStyle === 'compact' ? 'bg-purple-500/30 text-white' : 'text-white/50 hover:text-white/70'"
+                class="px-2 py-0.5 rounded text-[10px] font-medium transition"
+              >
+                Compact
+              </button>
+            </div>
+          </div>
+          
+          <!-- Default Style Player -->
+          <div v-if="playerStyle === 'default'" class="bg-white/5 border border-white/10 rounded-xl p-4">
             <div class="flex items-center gap-4">
               <div class="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
                 <img :src="neonPoster" alt="Album art" class="w-full h-full object-cover" />
@@ -108,6 +129,30 @@
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </button>
+            </div>
+          </div>
+          
+          <!-- Compact Style Player (from deck demo) -->
+          <div v-else class="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div class="flex items-center gap-4">
+              <div class="relative w-14 h-14 rounded-lg overflow-hidden shrink-0">
+                <img :src="neonPoster" alt="Album art" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                  <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-white font-semibold truncate">Turns Me On</div>
+                <div class="text-white/60 text-sm">New Single • 3:24</div>
+                <!-- Progress bar -->
+                <div class="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+                  <div class="h-full w-1/3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -245,6 +290,7 @@ const eventsSection = ref(null)
 const supportSection = ref(null)
 const activeToasts = ref([])
 const liveFeedItems = ref([])
+const playerStyle = ref('default') // 'default' or 'compact'
 
 const events = [
   { id: 1, date: 'Fri · Feb 21', venue: 'The Echo', city: 'Los Angeles', state: 'CA' },
