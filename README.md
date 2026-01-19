@@ -937,6 +937,185 @@ const nowBannerContent = {
 - **Clear Hierarchy**: Important information first
 - **Mobile Priority**: Optimize for mobile viewing
 - **Fast Loading**: Optimize images and assets
+
+---
+
+## Audio Player Style Guide
+
+A design system for the featured song/audio player component used in band page templates.
+
+### Component Structure
+
+```html
+<!-- Featured Song Card -->
+<div class="bg-white/5 border border-white/10 rounded-xl p-4">
+  <div class="flex items-center gap-4">
+    <!-- Album Art with Play Button Overlay -->
+    <div class="relative w-14 h-14 rounded-lg overflow-hidden shrink-0">
+      <img src="[album-art]" alt="Album art" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+        <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+          <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Track Info + Progress -->
+    <div class="min-w-0 flex-1">
+      <div class="text-white font-semibold truncate">Track Title</div>
+      <div class="text-white/60 text-sm">New Single • 3:24</div>
+      <!-- Progress Bar -->
+      <div class="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+        <div class="h-full w-1/3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Design Tokens
+
+#### Container
+| Property | Value | Description |
+|----------|-------|-------------|
+| Background | `bg-white/5` | 5% white opacity |
+| Border | `border border-white/10` | 10% white border |
+| Radius | `rounded-xl` | 12px border radius |
+| Padding | `p-4` | 16px padding |
+
+#### Album Art
+| Property | Value | Description |
+|----------|-------|-------------|
+| Size | `w-14 h-14` | 56x56px |
+| Radius | `rounded-lg` | 8px border radius |
+| Overlay | `bg-black/40` | 40% black overlay |
+
+#### Play Button
+| Property | Value | Description |
+|----------|-------|-------------|
+| Size | `w-8 h-8` | 32x32px |
+| Background | `bg-white/20 backdrop-blur` | Frosted glass effect |
+| Shape | `rounded-full` | Circle |
+| Icon | `w-4 h-4 text-white ml-0.5` | Centered play triangle |
+
+#### Typography
+| Element | Classes | Description |
+|---------|---------|-------------|
+| Track Title | `text-white font-semibold truncate` | Bold, truncates on overflow |
+| Subtitle | `text-white/60 text-sm` | 60% opacity, small |
+
+#### Progress Bar
+| Property | Value | Description |
+|----------|-------|-------------|
+| Track | `h-1 bg-white/10 rounded-full` | 4px height, subtle background |
+| Fill | `bg-gradient-to-r from-purple-500 to-pink-500` | Purple→Pink gradient |
+
+### Variants
+
+#### Compact (Default)
+- Album art: 56x56px (`w-14 h-14`)
+- Play button: 32x32px (`w-8 h-8`)
+- Single row layout
+
+#### Large
+- Album art: 64x64px (`w-16 h-16`)
+- Play button: 48x48px (`w-12 h-12`)
+- Larger text sizes
+
+```html
+<!-- Large Variant -->
+<div class="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
+  <!-- ... -->
+  <div class="w-12 h-12 rounded-full bg-purple-500/20 border border-purple-400/30 flex items-center justify-center">
+    <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  </div>
+</div>
+```
+
+### Interactive States
+
+#### Hover
+```css
+/* Container hover */
+hover:bg-white/10
+
+/* Play button hover */
+hover:bg-white/30
+hover:scale-105
+```
+
+#### Playing State
+```html
+<!-- Replace play icon with pause -->
+<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+</svg>
+
+<!-- Animate progress bar -->
+<div class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"></div>
+```
+
+### Color Palette
+
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Purple 500 | `#8b5cf6` | Progress bar start, accents |
+| Pink 500 | `#ec4899` | Progress bar end |
+| White/5 | `rgba(255,255,255,0.05)` | Card background |
+| White/10 | `rgba(255,255,255,0.1)` | Borders, progress track |
+| White/20 | `rgba(255,255,255,0.2)` | Play button background |
+| White/40 | `rgba(255,255,255,0.4)` | Album art overlay |
+| White/60 | `rgba(255,255,255,0.6)` | Subtitle text |
+
+### Accessibility
+
+- Play button has sufficient contrast (white on dark)
+- `truncate` prevents text overflow issues
+- Semantic HTML structure
+- Add `aria-label="Play track"` to play button
+- Add `role="progressbar"` to progress element
+
+### Usage Example
+
+```vue
+<template>
+  <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+    <div class="flex items-center gap-4">
+      <div class="relative w-14 h-14 rounded-lg overflow-hidden shrink-0">
+        <img :src="albumArt" :alt="`${trackTitle} album art`" class="w-full h-full object-cover" />
+        <button 
+          @click="togglePlay"
+          class="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/50 transition"
+          :aria-label="isPlaying ? 'Pause' : 'Play'"
+        >
+          <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition">
+            <svg v-if="!isPlaying" class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <svg v-else class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+            </svg>
+          </div>
+        </button>
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="text-white font-semibold truncate">{{ trackTitle }}</div>
+        <div class="text-white/60 text-sm">{{ subtitle }}</div>
+        <div class="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div 
+            class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"
+            :style="{ width: `${progress}%` }"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+```
 - **Accessibility**: Semantic HTML, ARIA labels
 
 #### Content Strategy
