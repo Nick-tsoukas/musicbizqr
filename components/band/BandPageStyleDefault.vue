@@ -11,27 +11,27 @@
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         
-        <!-- All Badges Row - Live Badge + MomentBadges together -->
-        <div class="absolute top-4 left-4 right-4 flex items-center gap-2 flex-nowrap overflow-x-auto z-30">
+        <!-- All Badges Row -->
+        <div class="absolute top-4 left-4 flex items-center gap-1.5 z-30">
           <!-- Live Badge -->
-          <div class="flex items-center gap-2 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white shrink-0">
+          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">
             <span class="relative flex h-2 w-2">
               <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
             </span>
-            Live Shows
+            Live
           </div>
           
           <!-- On Tour Badge -->
-          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-purple-300 shrink-0">
+          <div class="flex items-center gap-1 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2 py-1 text-xs font-medium text-purple-300">
             <span>🚐</span>
-            <span>On tour</span>
+            <span>Tour</span>
           </div>
           
           <!-- New Release Badge -->
-          <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-emerald-300 shrink-0">
+          <div class="flex items-center gap-1 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2 py-1 text-xs font-medium text-emerald-300">
             <span>🔥</span>
-            <span>New release</span>
+            <span>New</span>
           </div>
         </div>
       </div>
