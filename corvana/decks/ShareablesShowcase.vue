@@ -36,7 +36,7 @@
         <div 
           class="shareable-card group cursor-pointer"
           :class="{ 'ring-2 ring-pink-500': selectedCard === 1 }"
-          @click="selectCard(1); isDrawerOpen = true"
+          @click="selectCard(1)"
         >
           <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
             <img :src="neonPoster" alt="Share preview" class="w-full h-full object-cover" />
@@ -66,7 +66,7 @@
         <div 
           class="shareable-card group cursor-pointer"
           :class="{ 'ring-2 ring-pink-500': selectedCard === 2 }"
-          @click="selectCard(2); isDrawerOpen = true"
+          @click="selectCard(2)"
         >
           <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
             <img :src="neonPoster" alt="Share preview" class="w-full h-full object-cover" />
@@ -206,36 +206,64 @@
     </div>
   </div>
 
-  <!-- Real Share Drawer -->
-  <ShareDrawer
-    :is-open="isDrawerOpen"
+  <!-- MomentShareDrawer for fan moments -->
+  <MomentShareDrawer
+    :is-open="isMomentDrawerOpen"
     :band-id="1"
     band-slug="neon-avenue"
     band-name="Neon Avenue"
     band-image-url="/neonposter.png"
     :is-band-name-in-logo="false"
-    @close="isDrawerOpen = false"
+    :headline="currentMoment.headline"
+    :subtext="currentMoment.subtext"
+    :fan-position="currentMoment.fanPosition"
+    :captions="currentMoment.captions"
+    :moment-type="currentMoment.type"
+    @close="isMomentDrawerOpen = false"
+    @shared="handleShared"
   />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import ShareDrawer from '~/components/band/ShareDrawer.vue'
+import MomentShareDrawer from '~/components/band/MomentShareDrawer.vue'
 
 // Use public path instead of import to avoid potential build issues
 const neonPoster = '/neonposter.png'
-const isDrawerOpen = ref(false)
+const isMomentDrawerOpen = ref(false)
 
 const selectedCard = ref(1)
 const toastMessage = ref('')
 const shareUrl = 'https://mbq.link/neon-avenue'
 
-const captions = {
-  1: "Chicago is on fire tonight 🔥 Neon Avenue is LIVE and the city is tuning in. Join the moment →",
-  2: "Just showed some love to @NeonAvenue 💜 Supporting independent artists hits different. Check them out →"
+// Moment configurations for each card type
+const moments = {
+  1: {
+    type: 'heating_up',
+    headline: 'Chicago is feeling it',
+    subtext: 'The city is tuning in right now',
+    fanPosition: null,
+    captions: {
+      hype: "Chicago is on fire tonight 🔥 Neon Avenue is LIVE and the city is tuning in. Join the moment →",
+      chill: "Something's happening in Chicago... Neon Avenue vibes are spreading 🌃",
+      flex: "Caught the wave early 🌊 Chicago knows what's up with @NeonAvenue"
+    }
+  },
+  2: {
+    type: 'support_received',
+    headline: 'I backed the band',
+    subtext: 'Supporting independent music',
+    fanPosition: 'Early Supporter #47',
+    captions: {
+      hype: "Just showed some love to @NeonAvenue 💜 Supporting independent artists hits different!",
+      chill: "Dropped a tip for @NeonAvenue 🎵 Good music deserves support",
+      flex: "Early supporter status unlocked 💜 Been on @NeonAvenue before the wave"
+    }
+  }
 }
 
-const currentCaption = computed(() => captions[selectedCard.value])
+const currentMoment = computed(() => moments[selectedCard.value])
+const currentCaption = computed(() => currentMoment.value.captions.hype)
 
 const stats = ref({
   shares: 47,
@@ -246,6 +274,11 @@ const stats = ref({
 
 function selectCard(id) {
   selectedCard.value = id
+  isMomentDrawerOpen.value = true
+}
+
+function handleShared(data) {
+  showToast(`Shared via ${data.channel}!`)
 }
 
 function showToast(message) {
@@ -254,7 +287,7 @@ function showToast(message) {
 }
 
 function handleShare() {
-  isDrawerOpen.value = true
+  isMomentDrawerOpen.value = true
 }
 
 async function handleCopyLink() {
@@ -276,15 +309,15 @@ async function handleCopyCaption() {
 }
 
 function handleDownload() {
-  isDrawerOpen.value = true
+  isMomentDrawerOpen.value = true
 }
 
 function handleInstagram() {
-  isDrawerOpen.value = true
+  isMomentDrawerOpen.value = true
 }
 
 function handleFacebook() {
-  isDrawerOpen.value = true
+  isMomentDrawerOpen.value = true
 }
 </script>
 
