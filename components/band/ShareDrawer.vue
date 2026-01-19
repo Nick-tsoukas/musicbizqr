@@ -155,10 +155,10 @@
         {{ toastMessage }}
       </div>
     </Transition>
-
-    <!-- Hidden canvas for image generation -->
-    <canvas ref="canvasRef" class="hidden" width="1080" height="1080"></canvas>
   </Teleport>
+
+  <!-- Hidden canvas for image generation - outside Teleport so always available -->
+  <canvas ref="canvasRef" class="hidden" width="1080" height="1080"></canvas>
 </template>
 
 <script setup>
@@ -262,8 +262,63 @@ function showToast(message, duration = 2000) {
 async function loadImageDirect(url, timeoutMs = 15000) {
   if (!url) throw new Error('No URL provided')
 
+  // Handle data URLs directly - no CORS issues
+  if (url.startsWith('data:')) {
+    console.log('[ShareDrawer] Loading data URL image')
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        console.log('[ShareDrawer] Data URL image loaded:', img.width, 'x', img.height)
+        resolve(img)
+      }
+      img.onerror = (err) => {
+        console.error('[ShareDrawer] Data URL image load failed')
+        reject(err || new Error('Image load error'))
+      }
+      img.src = url
+    })
+  }
+
+  // Try direct loading first for same-origin images
+  if (url.includes('musicbizqr.com')) {
+    try {
+      console.log('[ShareDrawer] Trying direct load for same-origin image:', url)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+      
+      const response = await fetch(url, { 
+        signal: controller.signal,
+        mode: 'cors',
+        credentials: 'omit'
+      })
+      clearTimeout(timeoutId)
+      
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      
+      const blob = await response.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => {
+          console.log('[ShareDrawer] Direct load succeeded')
+          resolve(img)
+        }
+        img.onerror = (err) => {
+          URL.revokeObjectURL(objectUrl)
+          reject(err || new Error('Image load error'))
+        }
+        img.src = objectUrl
+      })
+    } catch (err) {
+      console.warn('[ShareDrawer] Direct load failed, trying proxy:', err)
+    }
+  }
+
+  // Try proxy for external images (S3, Cloudinary, etc.)
   try {
     const proxyUrl = `${config.public.strapiUrl}/api/image-proxy?url=${encodeURIComponent(url)}`
+    console.log('[ShareDrawer] Trying proxy URL:', proxyUrl)
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
     
@@ -285,6 +340,7 @@ async function loadImageDirect(url, timeoutMs = 15000) {
       img.src = objectUrl
     })
   } catch (err) {
+    console.error('[ShareDrawer] Proxy load failed:', err)
     throw err
   }
 }
@@ -296,6 +352,15 @@ async function getOrGenerateImage() {
     return cachedImageBlob.value
   }
   
+  console.log('[ShareDrawer] Starting image generation for:', key)
+  console.log('[ShareDrawer] Canvas element:', canvasRef.value)
+  console.log('[ShareDrawer] Band image URL:', props.bandImageUrl)
+  
+  if (!canvasRef.value) {
+    console.error('[ShareDrawer] Canvas element not found')
+    return null
+  }
+  
   const blob = await generateFanShareImage({
     canvasEl: canvasRef.value,
     headline: getHeadline(),
@@ -305,6 +370,37 @@ async function getOrGenerateImage() {
     momentType: FAN_MOMENT_TYPES.DEFAULT,
     loadImage: loadImageDirect,
   })
+  
+  console.log('[ShareDrawer] Generated blob:', blob)
+  
+  // If image generation failed due to CORS, try without the image
+  if (!blob && props.bandImageUrl) {
+    console.warn('[ShareDrawer] Image generation failed, trying without band image due to CORS issue')
+    const blobWithoutImage = await generateFanShareImage({
+      canvasEl: canvasRef.value,
+      headline: getHeadline(),
+      bandName: props.bandName,
+      bandImageUrl: null, // Don't try to load the image
+      isBandNameInLogo: props.isBandNameInLogo,
+      momentType: FAN_MOMENT_TYPES.DEFAULT,
+      loadImage: loadImageDirect,
+    })
+    
+    console.log('[ShareDrawer] Generated blob without image:', blobWithoutImage)
+    
+    if (blobWithoutImage) {
+      cachedImageBlob.value = blobWithoutImage
+      cacheKey.value = key
+      setTimeout(() => {
+        if (cacheKey.value === key) {
+          cachedImageBlob.value = null
+          cacheKey.value = ''
+        }
+      }, 30000)
+    }
+    
+    return blobWithoutImage
+  }
   
   if (blob) {
     cachedImageBlob.value = blob

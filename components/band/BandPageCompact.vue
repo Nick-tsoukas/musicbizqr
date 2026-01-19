@@ -10,15 +10,24 @@
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
       
-      <!-- Live Badge (if has upcoming events) -->
-      <div v-if="hasUpcomingEvents" class="absolute top-4 left-4">
-        <div class="flex items-center gap-2 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white">
-          <span class="relative flex h-2 w-2">
+      <!-- Top Badges Row - Live Shows + Moment Badges on same line -->
+      <div class="absolute top-4 left-4 right-4 flex items-center gap-2 z-30 flex-nowrap overflow-x-auto">
+        <!-- Live Badge (if has upcoming events) - compact style -->
+        <div v-if="hasUpcomingEvents" class="flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-white shrink-0">
+          <span class="relative flex h-1.5 w-1.5">
             <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
           </span>
-          Live Shows
+          Live
         </div>
+        
+        <!-- MomentBadges -->
+        <MomentBadges
+          :has-show-tonight="hasUpcomingEvents"
+          :is-on-tour="hasUpcomingEvents"
+          :has-new-release="false"
+          class="flex-nowrap"
+        />
       </div>
 
       <!-- Artist Info Overlay -->
@@ -29,15 +38,6 @@
         <p v-if="band.bio" class="text-white/80 text-sm md:text-base mt-2 line-clamp-2">
           {{ band.bio }}
         </p>
-      </div>
-
-      <!-- MomentBadges Overlay -->
-      <div class="absolute top-8 left-4 z-30">
-        <MomentBadges
-          :has-show-tonight="hasUpcomingEvents"
-          :is-on-tour="hasUpcomingEvents"
-          :has-new-release="false"
-        />
       </div>
     </div>
 
@@ -86,16 +86,49 @@
 
     <!-- Content -->
     <div class="px-4 md:px-6 py-6 max-w-2xl mx-auto space-y-6">
-      <!-- Featured Song - slot for parent to render AudioPlayer -->
+      <!-- Featured Song -->
       <section v-if="hasFeaturedSong" class="space-y-2">
         <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider">Featured Song</h3>
-        <slot name="audio-player"></slot>
+        <slot name="audio-player">
+          <!-- Default: Simple audio player if no slot content provided -->
+          <div v-if="!isEmbedSong && band.singlesong?.song?.url" class="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-white font-medium truncate">{{ songTitle }}</div>
+                <div class="text-white/50 text-sm">{{ band.name }}</div>
+              </div>
+              <button class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center hover:bg-purple-400 transition">
+                <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Embed song -->
+          <div v-else-if="isEmbedSong && safeEmbedHtml" class="rounded-xl overflow-hidden" v-html="safeEmbedHtml"></div>
+        </slot>
       </section>
 
-      <!-- Featured Video - slot for parent to render video player -->
+      <!-- Featured Video -->
       <section v-if="hasFeaturedVideo" class="space-y-2">
         <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider">Featured Video</h3>
-        <slot name="video-player"></slot>
+        <slot name="video-player">
+          <!-- Default: YouTube embed if no slot content provided -->
+          <div class="aspect-video rounded-xl overflow-hidden bg-black/50">
+            <iframe
+              :src="`https://www.youtube.com/embed/${band.singlevideo.youtubeid}`"
+              class="w-full h-full"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </slot>
       </section>
 
       <!-- Streaming Links - Grid -->

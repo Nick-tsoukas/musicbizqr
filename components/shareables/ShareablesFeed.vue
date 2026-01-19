@@ -175,6 +175,8 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['select', 'share'])
+
 // Create band data object for composable
 const bandData = computed(() => ({
   id: props.bandId,
@@ -247,6 +249,9 @@ function getBandUrl() {
 function openDrawer(item) {
   activeItem.value = item
   drawerOpen.value = true
+  // Emit events for Corvana integration
+  emit('select', item)
+  emit('share', item)
 }
 
 // Quick share band

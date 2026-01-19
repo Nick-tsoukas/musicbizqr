@@ -1,9 +1,9 @@
 <template>
-  <div v-if="visibleBadges.length > 0" class="moment-badges flex flex-wrap gap-2">
+  <div v-if="visibleBadges.length > 0" class="moment-badges flex flex-nowrap gap-2">
     <span
       v-for="badge in visibleBadges"
       :key="badge.key"
-      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium relative overflow-hidden"
+      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium relative overflow-hidden shrink-0"
       :class="badge.classes"
     >
       <!-- Animated border effect -->
