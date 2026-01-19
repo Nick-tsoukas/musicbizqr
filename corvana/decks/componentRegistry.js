@@ -41,6 +41,18 @@ const AgencyRosterSignals = defineAsyncComponent(() =>
   import('~/corvana/decks/AgencyDeckPanel.vue')
 )
 
+const PulseMuse = defineAsyncComponent(() => 
+  import('~/corvana/decks/PulseMuse.vue')
+)
+
+const LiveFeedEnhanced = defineAsyncComponent(() => 
+  import('~/corvana/decks/LiveFeedEnhanced.vue')
+)
+
+const ShareablesShowcase = defineAsyncComponent(() => 
+  import('~/corvana/decks/ShareablesShowcase.vue')
+)
+
 // Component registry
 export const componentRegistry = {
   'SmartLinkSurface': {
@@ -175,6 +187,44 @@ export const componentRegistry = {
       return {
         agencyData: data
       }
+    }
+  },
+
+  'PulseMuse': {
+    component: PulseMuse,
+    buildProps: (demoDataKey) => {
+      const data = getDemoData(demoDataKey)
+      
+      return {
+        pulseData: data.pulse || {
+          recentSupport: [],
+          stats: { todayTotal: 0, supporters: 0, streak: 0, weekChange: 0 },
+          chartBars: [30, 45, 35, 60, 50, 75, 90]
+        },
+        museData: data.muse || {
+          insights: [],
+          prediction: { headline: '', confidence: 0, detail: '' }
+        }
+      }
+    }
+  },
+
+  'LiveFeedEnhanced': {
+    component: LiveFeedEnhanced,
+    buildProps: (demoDataKey) => {
+      const data = getDemoData(demoDataKey)
+      const rawFeed = data.liveSurface?.recentActivityFeed || []
+      
+      return {
+        feedItems: rawFeed
+      }
+    }
+  },
+
+  'ShareablesShowcase': {
+    component: ShareablesShowcase,
+    buildProps: () => {
+      return {}
     }
   }
 }

@@ -52,66 +52,53 @@
 
         <!-- Content -->
         <div class="p-5 space-y-5">
-          <!-- Card Preview -->
+          <!-- Share Image Preview -->
           <div class="card-preview-container relative rounded-xl overflow-hidden bg-black/40 border border-white/10">
-            <div class="aspect-square w-full max-w-[320px] mx-auto p-4">
-              <!-- Preview card that matches export -->
-              <div 
-                class="w-full h-full rounded-xl overflow-hidden relative"
-                :style="previewCardStyle"
-              >
-                <!-- Background gradient -->
-                <div class="absolute inset-0" :class="previewGradientClass"></div>
-                
-                <!-- Accent orb -->
+            <div class="aspect-square w-full max-w-[320px] mx-auto flex items-center justify-center">
+              <!-- Loading state -->
+              <div v-if="generatingPreview" class="flex flex-col items-center gap-2 py-8">
+                <div class="animate-spin w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full"></div>
+                <span class="text-white/50 text-xs">Generating share image...</span>
+              </div>
+              <!-- Generated preview image -->
+              <img 
+                v-else-if="previewImageUrl"
+                :src="previewImageUrl" 
+                :alt="item.title"
+                class="w-full h-full object-contain"
+              />
+              <!-- Fallback to styled card preview -->
+              <div v-else class="w-full h-full p-4">
                 <div 
-                  class="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl opacity-40"
-                  :style="{ backgroundColor: accentColor }"
-                ></div>
-
-                <!-- Content -->
-                <div class="relative z-10 h-full flex flex-col p-4 text-center">
-                  <!-- Window label -->
-                  <div class="mb-2">
-                    <span 
-                      class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
-                      :style="previewBadgeStyle"
-                    >
-                      {{ item.windowLabel }}
-                    </span>
+                  class="w-full h-full rounded-xl overflow-hidden relative"
+                  :style="previewCardStyle"
+                >
+                  <div class="absolute inset-0" :class="previewGradientClass"></div>
+                  <div 
+                    class="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl opacity-40"
+                    :style="{ backgroundColor: accentColor }"
+                  ></div>
+                  <div class="relative z-10 h-full flex flex-col p-4 text-center">
+                    <div class="mb-2">
+                      <span 
+                        class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+                        :style="previewBadgeStyle"
+                      >
+                        {{ item.windowLabel }}
+                      </span>
+                    </div>
+                    <h4 class="text-white text-xs font-bold mb-2 line-clamp-2">{{ item.title }}</h4>
+                    <div class="flex-1 flex items-center justify-center">
+                      <span class="text-2xl font-black" :style="previewHeroStyle">{{ item.primaryStat }}</span>
+                    </div>
+                    <p class="text-white/60 text-[9px] uppercase tracking-wide mb-2">{{ item.secondaryStat }}</p>
+                    <p v-if="!item.band?.isBandNameInLogo" class="text-white text-xs font-semibold">{{ item.band?.name }}</p>
                   </div>
-
-                  <!-- Headline -->
-                  <h4 class="text-white text-xs font-bold mb-2 line-clamp-2">
-                    {{ item.title }}
-                  </h4>
-
-                  <!-- Hero stat -->
-                  <div class="flex-1 flex items-center justify-center">
-                    <span 
-                      class="text-2xl font-black"
-                      :style="previewHeroStyle"
-                    >
-                      {{ item.primaryStat }}
-                    </span>
-                  </div>
-
-                  <!-- Proof -->
-                  <p class="text-white/60 text-[9px] uppercase tracking-wide mb-2">
-                    {{ item.secondaryStat }}
-                  </p>
-
-                  <!-- Caption preview -->
-                  <p class="text-white/70 text-[10px] italic mb-2 line-clamp-2">
-                    "{{ selectedCaption }}"
-                  </p>
-
-                  <!-- Band name -->
-                  <p v-if="!item.band?.isBandNameInLogo" class="text-white text-xs font-semibold">
-                    {{ item.band?.name }}
-                  </p>
                 </div>
               </div>
+            </div>
+            <div class="absolute top-2 right-2 px-2 py-1 bg-purple-500/80 backdrop-blur rounded-full text-[10px] text-white font-medium">
+              {{ previewImageUrl ? 'Share Image' : 'Generating...' }}
             </div>
           </div>
 
@@ -273,6 +260,8 @@ const preparingIG = ref(false)
 const toastMessage = ref('')
 const canvasRef = ref(null)
 const cachedImageBlob = ref(null)
+const previewImageUrl = ref(null)
+const generatingPreview = ref(false)
 
 // Caption variants
 const captionVariants = [
@@ -334,6 +323,29 @@ const badgeClass = computed(() => {
 const selectedCaption = computed(() => {
   if (!props.item?.share?.captions) return ''
   return props.item.share.captions[captionStyle.value] || props.item.share.captions.hype || ''
+})
+
+// Generate preview image when drawer opens
+watch(() => props.modelValue, async (isOpen) => {
+  if (isOpen && !previewImageUrl.value && props.item) {
+    generatingPreview.value = true
+    try {
+      const blob = await getOrGenerateImage()
+      if (blob) {
+        previewImageUrl.value = URL.createObjectURL(blob)
+      }
+    } catch (e) {
+      console.error('[ShareCustomizeDrawer] Failed to generate preview:', e)
+    } finally {
+      generatingPreview.value = false
+    }
+  }
+}, { immediate: true })
+
+// Clear preview when item changes
+watch(() => props.item?.id, () => {
+  previewImageUrl.value = null
+  cachedImageBlob.value = null
 })
 
 // Methods

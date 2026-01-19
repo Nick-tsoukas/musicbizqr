@@ -1138,3 +1138,389 @@ hover:scale-105
 - **Code Repository**: Source code and examples
 - **Community**: Developer discussions
 - **Issues**: Bug reports and feature requests
+
+---
+
+## Corvana Deck System
+
+A multi-deck presentation system for conference-ready demos and investor pitches. Built with Nuxt 3, Vue 3, and TailwindCSS.
+
+### Overview
+
+Corvana is a slide deck renderer that dynamically loads components and demo data to create interactive presentations. Each deck is defined as a JavaScript object with slides that can be narrative text, mobile device previews, or full dashboard views.
+
+### Quick Start
+
+```bash
+# Navigate to a deck
+http://localhost:3000/corvana/decks/mbq-flagship-elite
+```
+
+### Deck Structure
+
+```javascript
+// corvana/decks/flagshipDeck_elite.js
+export const flagshipDeck_elite = {
+  slug: 'mbq-flagship-elite',
+  title: 'MBQ Flagship ELITE',
+  subtitle: 'Live Artist Surfaces + Momentum Intelligence',
+  slides: [
+    {
+      id: 1,
+      type: 'narrative',
+      chapter: 'Opening',
+      content: {
+        headline: 'MusicBizQR',
+        subhead: 'Live Artist Surfaces',
+        body: 'Static pages don\'t build careers.',
+        speakerNotes: 'Opening hook...'
+      }
+    },
+    {
+      id: 2,
+      type: 'mobile_view',
+      chapter: 'Demo: Surface',
+      content: {
+        componentKey: 'SmartLinkSurface',
+        demoDataKey: 'demo_band_neon_avenue',
+        speakerNotes: 'Show the live surface...'
+      }
+    },
+    {
+      id: 3,
+      type: 'dashboard_view',
+      chapter: 'Demo: Analytics',
+      content: {
+        componentKey: 'BandAnalyticsOverview',
+        speakerNotes: 'Flash the analytics...'
+      }
+    }
+  ]
+}
+```
+
+### Slide Types
+
+| Type | Description | Content Fields |
+|------|-------------|----------------|
+| `narrative` | Text-only slide | `headline`, `subhead`, `body`, `speakerNotes` |
+| `mobile_view` | Component in mobile device frame | `componentKey`, `demoDataKey`, `speakerNotes` |
+| `dashboard_view` | Full-width component | `componentKey`, `demoDataKey`, `speakerNotes` |
+
+### Component Registry
+
+Components are registered in `corvana/decks/componentRegistry.js`:
+
+```javascript
+import { defineAsyncComponent } from 'vue'
+
+const ShareablesShowcase = defineAsyncComponent(() => 
+  import('~/corvana/decks/ShareablesShowcase.vue')
+)
+
+export const componentRegistry = {
+  'ShareablesShowcase': {
+    component: ShareablesShowcase,
+    buildProps: (demoDataKey) => {
+      // Return props for the component
+      return {}
+    }
+  }
+}
+```
+
+### Adding a New Slide Component
+
+1. **Create the component** in `corvana/decks/`:
+```vue
+<!-- corvana/decks/MyComponent.vue -->
+<template>
+  <div class="my-component">
+    <!-- Component content -->
+  </div>
+</template>
+
+<script setup>
+// Component logic
+</script>
+```
+
+2. **Register in componentRegistry.js**:
+```javascript
+const MyComponent = defineAsyncComponent(() => 
+  import('~/corvana/decks/MyComponent.vue')
+)
+
+// Add to componentRegistry object:
+'MyComponent': {
+  component: MyComponent,
+  buildProps: (demoDataKey) => {
+    const data = getDemoData(demoDataKey)
+    return { /* props */ }
+  }
+}
+```
+
+3. **Add to deck slides**:
+```javascript
+{
+  id: 8,
+  type: 'dashboard_view',
+  chapter: 'Demo: My Feature',
+  content: {
+    componentKey: 'MyComponent',
+    demoDataKey: 'demo_band_neon_avenue',
+    speakerNotes: 'Explain the feature...'
+  }
+}
+```
+
+### Demo Data
+
+Demo data is stored in `corvana/demo/demoData.js`:
+
+```javascript
+export const demoData = {
+  'demo_band_neon_avenue': {
+    band: { name: 'Neon Avenue', genre: 'Indie Rock', ... },
+    events: [...],
+    analytics: {...}
+  }
+}
+
+export function getDemoData(key) {
+  return demoData[key] || demoData['demo_band_neon_avenue']
+}
+```
+
+### Deck Viewer Features
+
+- **Keyboard Navigation**: Arrow keys, spacebar, N/P keys
+- **Speaker Notes Panel**: Toggle with 'S' key or button
+- **Progress Bar**: Shows current position in deck
+- **Chapter Labels**: Display current section
+- **Fullscreen Mode**: F11 or fullscreen button
+
+### Key Files
+
+```
+corvana/
+├── decks/
+│   ├── deckIndex.js           # Deck registry
+│   ├── componentRegistry.js   # Component registry
+│   ├── flagshipDeck_elite.js  # Main demo deck
+│   ├── ShareablesShowcase.vue # Shareables demo component
+│   ├── LiveFeedEnhanced.vue   # Live feed demo
+│   ├── PulseMuse.vue          # Pulse/Muse demo
+│   └── MobileViewport.vue     # Mobile device frame
+├── demo/
+│   └── demoData.js            # Demo data store
+└── pages/corvana/decks/
+    └── [id].vue               # Deck viewer page
+```
+
+---
+
+## Share Drawer System
+
+A unified share experience across all MBQ surfaces with real-time image generation and preview.
+
+### Overview
+
+Share drawers provide a consistent sharing experience for bands and fans. When opened, they generate the actual share image and display it as a preview before sharing.
+
+### Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `ShareDrawer` | `components/band/ShareDrawer.vue` | Band page sharing |
+| `MomentShareDrawer` | `components/band/MomentShareDrawer.vue` | Fan moment sharing |
+| `ShareCustomizeDrawer` | `components/shareables/ShareCustomizeDrawer.vue` | Shareable card customization |
+
+### Share Image Generation
+
+All drawers use `useShareKit` composable for image generation:
+
+```javascript
+import { useShareKit } from '~/composables/useShareKit'
+
+const {
+  generateFanShareImage,    // Fan moment images
+  generateShareCardImage,   // Shareable card images
+  webShare,                 // Native Web Share API
+  copyToClipboard,          // Clipboard operations
+  downloadBlob,             // Image download
+  openFacebookSharer,       // Facebook sharing
+} = useShareKit()
+```
+
+### Image Preview Flow
+
+1. **Drawer opens** → `watch(isOpen)` triggers
+2. **Generate image** → `getOrGenerateImage()` creates 1080x1080 canvas
+3. **Create preview URL** → `URL.createObjectURL(blob)`
+4. **Display preview** → Shows actual share image in drawer
+5. **User shares** → Same image used for share action
+
+```javascript
+// Generate preview when drawer opens
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen && !previewImageUrl.value) {
+    generatingPreview.value = true
+    try {
+      const blob = await getOrGenerateImage()
+      if (blob) {
+        previewImageUrl.value = URL.createObjectURL(blob)
+      }
+    } finally {
+      generatingPreview.value = false
+    }
+  }
+}, { immediate: true })
+```
+
+### Share Actions
+
+| Action | Method | Description |
+|--------|--------|-------------|
+| Share Now | `webShare()` | Native share sheet (mobile) or copy+download fallback |
+| Copy Link | `copyToClipboard()` | Copy band URL to clipboard |
+| Copy Caption | `copyToClipboard()` | Copy generated caption |
+| Download Image | `downloadBlob()` | Download share image as PNG |
+| Instagram Kit | Download + copy caption | Ready for Instagram Stories |
+| Facebook | `openFacebookSharer()` | Open Facebook share dialog |
+
+### Caption Styles
+
+Drawers support multiple caption styles:
+
+```javascript
+const captionVariants = [
+  { key: 'hype', label: '🔥 Hype' },
+  { key: 'chill', label: '😎 Chill' },
+  { key: 'flex', label: '💪 Flex' },
+]
+```
+
+### Props Reference
+
+#### ShareDrawer
+```javascript
+props: {
+  isOpen: Boolean,
+  bandId: Number,
+  bandSlug: String,
+  bandName: String,
+  bandImageUrl: String,
+  isBandNameInLogo: Boolean,
+}
+```
+
+#### MomentShareDrawer
+```javascript
+props: {
+  isOpen: Boolean,
+  bandId: Number,
+  bandSlug: String,
+  bandName: String,
+  bandImageUrl: String,
+  headline: String,      // Moment headline
+  subtext: String,       // Moment subtext
+  fanPosition: String,   // Fan position (e.g., "Early Supporter #12")
+  captions: Object,      // { hype, chill, flex }
+  momentType: String,    // DEFAULT, SUPPORT, CITY, etc.
+}
+```
+
+### Styling
+
+Share drawers use consistent styling:
+
+```css
+/* Drawer container */
+.fixed.bottom-0.left-0.right-0.z-[101]
+.bg-gray-950.border-t.border-white/10.rounded-t-3xl
+
+/* Share image preview */
+.aspect-square.max-h-56.mx-auto
+.rounded-xl.overflow-hidden.bg-black/40.border.border-white/10
+
+/* Share button */
+.bg-gradient-to-r.from-purple-600.to-violet-600
+.hover:from-purple-500.hover:to-violet-500
+```
+
+### Z-Index Layers
+
+| Element | Z-Index |
+|---------|---------|
+| Backdrop | 100 |
+| Drawer | 101 |
+| Toast | 102 |
+| Speaker Notes | 10001 |
+
+---
+
+## Shareables System
+
+Auto-generated shareable content cards for bands and fans.
+
+### Shareable Types
+
+| Type | Description | Trigger |
+|------|-------------|---------|
+| `MILESTONE_DROP` | Achievement unlocked | Follower/stream milestones |
+| `CITY_CLAIM` | City domination | High activity in city |
+| `HEATING_UP` | Momentum spike | 2x baseline activity |
+| `SUPPORT_MOMENT` | Fan support receipt | After payment |
+| `YOU_WERE_HERE` | Show attendance | Post-show |
+
+### Components
+
+```
+components/shareables/
+├── ShareablesFeed.vue         # Feed of shareable cards
+├── ShareableCard.vue          # Individual card display
+├── ShareableMomentCard.vue    # Moment-specific card
+├── ShareCustomizeDrawer.vue   # Customization drawer
+└── ShareableHeroCard.vue      # Featured card display
+```
+
+### Feed Integration
+
+```vue
+<ShareablesFeed
+  :band-id="band.id"
+  :band-name="band.name"
+  :band-slug="band.slug"
+  :band-image-url="band.imageUrl"
+/>
+```
+
+### Card Data Structure
+
+```javascript
+{
+  id: 'share_001',
+  type: 'MILESTONE_DROP',
+  title: 'First 1,000 Streams',
+  primaryStat: '1,000',
+  secondaryStat: 'streams this week',
+  windowLabel: 'This Week',
+  accent: 'violet',  // violet, blue, emerald, amber, rose
+  share: {
+    captions: {
+      hype: '🔥 Just hit 1,000 streams!',
+      grateful: '🙏 Thank you for 1,000 streams',
+      tease: '👀 Something\'s happening...'
+    },
+    shareUrl: 'https://mbq.link/band-slug'
+  },
+  band: {
+    id: 1,
+    name: 'Neon Avenue',
+    slug: 'neon-avenue',
+    imageUrl: '/path/to/image.jpg'
+  }
+}
+```

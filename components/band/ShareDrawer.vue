@@ -40,6 +40,34 @@
 
         <!-- Content -->
         <div class="p-5 space-y-4">
+          <!-- Share Image Preview -->
+          <div class="relative rounded-xl overflow-hidden bg-black/40 border border-white/10">
+            <div class="aspect-square max-h-56 mx-auto flex items-center justify-center">
+              <!-- Loading state -->
+              <div v-if="generatingPreview" class="flex flex-col items-center gap-2 py-8">
+                <div class="animate-spin w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full"></div>
+                <span class="text-white/50 text-xs">Generating share image...</span>
+              </div>
+              <!-- Generated preview image -->
+              <img 
+                v-else-if="previewImageUrl"
+                :src="previewImageUrl" 
+                :alt="bandName"
+                class="w-full h-full object-contain"
+              />
+              <!-- Fallback to band image -->
+              <img 
+                v-else-if="bandImageUrl"
+                :src="bandImageUrl" 
+                :alt="bandName"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="absolute top-2 right-2 px-2 py-1 bg-purple-500/80 backdrop-blur rounded-full text-[10px] text-white font-medium">
+              {{ previewImageUrl ? 'Share Image' : 'Generating...' }}
+            </div>
+          </div>
+
           <!-- Quick Share Button -->
           <button
             @click="handleShare"
@@ -221,10 +249,29 @@ const canvasRef = ref(null)
 const toastMessage = ref('')
 const cachedImageBlob = ref(null)
 const cacheKey = ref('')
+const previewImageUrl = ref(null)
+const generatingPreview = ref(false)
 
 function close() {
   emit('close')
 }
+
+// Generate preview image when drawer opens
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen && !previewImageUrl.value) {
+    generatingPreview.value = true
+    try {
+      const blob = await getOrGenerateImage()
+      if (blob) {
+        previewImageUrl.value = URL.createObjectURL(blob)
+      }
+    } catch (e) {
+      console.error('[ShareDrawer] Failed to generate preview:', e)
+    } finally {
+      generatingPreview.value = false
+    }
+  }
+}, { immediate: true })
 
 // Computed values
 function getShareUrl() {

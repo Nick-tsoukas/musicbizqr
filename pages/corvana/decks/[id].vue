@@ -1,82 +1,93 @@
 <template>
-  <div class="corvana-deck-viewer" style="background: linear-gradient(135deg, #000 0%, #1a1a2e 50%, #0f0f1e 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-    <!-- Debug: Show current slide info -->
-    <div style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 8px 12px; z-index: 9999; font-size: 12px; border-radius: 6px;">
-      Slide {{ currentSlideIndex + 1 }} / {{ totalSlides }}
-    </div>
+  <div 
+    class="corvana-deck-viewer" 
+    @mousemove="handleMouseMove"
+    :class="{ 'reduce-motion': settings.reduceMotion }"
+  >
+    <!-- Slide Content with Transitions -->
+    <Transition :name="settings.reduceMotion ? '' : 'slide-fade'" mode="out-in">
+      <div :key="currentSlideIndex" class="slide-container">
+        
+        <!-- Chapter Label (shown on all slides) -->
+        <div v-if="currentSlide?.chapter" class="chapter-label">
+          {{ currentSlide.chapter }}
+        </div>
 
-    <!-- Narrative Slide -->
-    <div v-if="currentSlide?.type === 'narrative'" style="width: 100%; max-width: 800px; padding: 2rem; text-align: center;">
-      <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; margin-bottom: 1.5rem; background: linear-gradient(to right, #ec4899, #8b5cf6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ currentSlide.content.headline }}</h1>
-      <h2 style="font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 500; color: #a0a0a0; margin-bottom: 2rem;">{{ currentSlide.content.subhead }}</h2>
-      <p style="font-size: clamp(1rem, 2vw, 1.2rem); color: #808080; line-height: 1.6;">{{ currentSlide.content.body }}</p>
-    </div>
+        <!-- Narrative Slide -->
+        <div v-if="currentSlide?.type === 'narrative'" class="narrative-slide">
+          <h1 class="narrative-headline">{{ currentSlide.content.headline }}</h1>
+          <h2 v-if="currentSlide.content.subhead" class="narrative-subhead">{{ currentSlide.content.subhead }}</h2>
+          <p class="narrative-body">{{ currentSlide.content.body }}</p>
+          <p v-if="currentSlide.content.cta" class="narrative-cta">{{ currentSlide.content.cta }}</p>
+        </div>
 
-    <!-- Mobile View Slide -->
-    <div v-else-if="currentSlide?.type === 'mobile_view'" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 100vh; padding: 2rem; padding-top: 6rem; gap: 1.5rem;">
-      
-      <!-- Template Switcher (only on Slide 2 - SmartLinkSurface) -->
-      <div v-if="currentSlide?.content?.componentKey === 'SmartLinkSurface'" style="position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; background: rgba(0,0,0,0.9); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.2); z-index: 10000; backdrop-filter: blur(10px);">
-        <button
-          v-for="opt in templateOptions"
-          :key="opt.key"
-          @click="selectedTemplate = opt.key"
-          :style="{
-            padding: '0.5rem 1rem',
-            borderRadius: '0.5rem',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            transition: 'all 0.2s',
-            background: selectedTemplate === opt.key ? 'linear-gradient(to right, #8b5cf6, #10b981)' : 'rgba(255,255,255,0.1)',
-            color: selectedTemplate === opt.key ? '#fff' : 'rgba(255,255,255,0.7)'
-          }"
-        >
-          {{ opt.label }}
-        </button>
+        <!-- Mobile View Slide -->
+        <div v-else-if="currentSlide?.type === 'mobile_view'" class="mobile-view-slide">
+          
+          <!-- Template Switcher (only for SmartLinkSurface) -->
+          <div v-if="currentSlide?.content?.componentKey === 'SmartLinkSurface'" class="template-switcher">
+            <button
+              v-for="opt in templateOptions"
+              :key="opt.key"
+              @click="selectedTemplate = opt.key"
+              :class="['template-btn', { active: selectedTemplate === opt.key }]"
+            >
+              {{ opt.label }}
+            </button>
+          </div>
+
+          <MobileViewport>
+            <component 
+              v-if="currentSlide?.content?.componentKey === 'SmartLinkSurface'"
+              :is="templateComponent"
+              @share="handleNativeShare"
+              @follow="handleFollow"
+              @quick-tip="handleQuickTip"
+              @link-click="handleLinkClick"
+            />
+            <component 
+              v-else
+              :is="resolvedComponent"
+              v-bind="componentProps"
+              @share="handleNativeShare"
+              @follow="handleFollow"
+              @quick-tip="handleQuickTip"
+              @link-click="handleLinkClick"
+            />
+          </MobileViewport>
+        </div>
+
+        <!-- Dashboard View Slide -->
+        <div v-else-if="currentSlide?.type === 'dashboard_view'" class="dashboard-view-slide">
+          <div class="dashboard-container">
+            <component 
+              v-if="resolvedComponent"
+              :is="resolvedComponent"
+              v-bind="componentProps"
+            />
+            <div v-else class="text-white/50 text-center py-8">
+              Component not found: {{ currentSlide?.content?.componentKey }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Fallback -->
+        <div v-else class="fallback-slide">
+          No slide data or unknown type
+        </div>
       </div>
+    </Transition>
 
-      <MobileViewport>
-        <!-- Use template component for SmartLinkSurface slide -->
-        <component 
-          v-if="currentSlide?.content?.componentKey === 'SmartLinkSurface'"
-          :is="templateComponent"
-          @share="handleNativeShare"
-          @follow="handleFollow"
-          @quick-tip="handleQuickTip"
-          @link-click="handleLinkClick"
-        />
-        <!-- Use registry component for other slides -->
-        <component 
-          v-else
-          :is="resolvedComponent"
-          v-bind="componentProps"
-          @share="handleNativeShare"
-          @follow="handleFollow"
-          @quick-tip="handleQuickTip"
-          @link-click="handleLinkClick"
-        />
-      </MobileViewport>
-    </div>
-
-    <!-- Dashboard View Slide -->
-    <div v-else-if="currentSlide?.type === 'dashboard_view'" style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 100vh; padding: 2rem;">
-      <div style="width: 100%; max-width: 1200px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; padding: 2rem;">
-        <component 
-          :is="resolvedComponent"
-          v-bind="componentProps"
-        />
+    <!-- Key Hint (present mode, slide 1 only) -->
+    <Transition name="fade">
+      <div v-if="isPresentMode && currentSlideIndex === 0 && showKeyHint" class="key-hint">
+        Press <kbd>→</kbd> / <kbd>←</kbd> to navigate
       </div>
-    </div>
-
-    <!-- Fallback -->
-    <div v-else style="color: white; padding: 50px; font-size: 24px;">
-      No slide data or unknown type
-    </div>
+    </Transition>
 
     <!-- Navigation Controls -->
-    <div class="deck-controls">
+    <Transition name="fade">
+      <div v-show="!isPresentMode || showChrome" class="deck-controls">
       <!-- Previous Button -->
       <button 
         @click="previousSlide"
@@ -113,10 +124,12 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </button>
-    </div>
+      </div>
+    </Transition>
 
     <!-- Top Controls -->
-    <div class="top-controls">
+    <Transition name="fade">
+      <div v-show="!isPresentMode || showChrome" class="top-controls">
       <!-- Present Button -->
       <button 
         @click="togglePresentMode"
@@ -150,18 +163,37 @@
         </svg>
         Exit
       </button>
-    </div>
+      </div>
+    </Transition>
 
     <!-- Speaker Notes Panel -->
     <Transition name="slide-panel">
       <div v-if="showSpeakerNotes" class="speaker-notes-panel">
         <div class="notes-header">
           <h3 class="notes-title">Speaker Notes</h3>
-          <button @click="toggleSpeakerNotes" class="notes-close">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div class="notes-actions">
+            <button @click="copyCurrentNotes" class="notes-action-btn" title="Copy this slide's notes">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy
+            </button>
+            <button @click="copyFullScript" class="notes-action-btn" title="Copy all notes as script">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Full Script
+            </button>
+            <button @click="toggleSpeakerNotes" class="notes-close">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="notes-slide-info">
+          Slide {{ currentSlideIndex + 1 }} of {{ totalSlides }}
+          <span v-if="currentSlide?.chapter" class="notes-chapter">• {{ currentSlide.chapter }}</span>
         </div>
         <div class="notes-content">
           <p v-if="currentSlideContent?.speakerNotes" class="notes-text">
@@ -169,6 +201,12 @@
           </p>
           <p v-else class="notes-empty">No notes for this slide</p>
         </div>
+        <!-- Copy feedback -->
+        <Transition name="fade">
+          <div v-if="copyFeedback" class="copy-feedback">
+            {{ copyFeedback }}
+          </div>
+        </Transition>
       </div>
     </Transition>
 
@@ -201,8 +239,8 @@ definePageMeta({
   layout: false
 })
 
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { flagshipDeck_v1 } from '~/corvana/decks/flagshipDeck_v1.js'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { getDeckBySlug } from '~/corvana/decks/deckIndex.js'
 import { resolveComponent as getRegistryComponent } from '~/corvana/decks/componentRegistry.js'
 import MobileViewport from '~/corvana/decks/MobileViewport.vue'
 import SharePreviewOverlay from '~/corvana/decks/SharePreviewOverlay.vue'
@@ -223,6 +261,7 @@ const shareCaptionSuggestions = ref([])
 const shareDrawerOpen = ref(false)
 const bandImageDataUrl = ref(null)
 const selectedTemplate = ref('compact') // 'default', 'compact', 'bold'
+const copyFeedback = ref('')
 
 // Template options
 const templateOptions = [
@@ -241,13 +280,47 @@ const templateComponent = computed(() => {
   }
 })
 
-// Get deck data
+// Settings from localStorage
+const settings = ref({
+  reduceMotion: false,
+  useProgressDots: true
+})
+
+// Load settings
+onMounted(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem('corvana_settings') || '{}')
+    settings.value = { ...settings.value, ...saved }
+  } catch (e) {
+    // Use defaults
+  }
+})
+
+// Presenter UI state
+const showChrome = ref(true)
+const chromeTimeout = ref(null)
+const showKeyHint = ref(true)
+
+// Hide chrome on mouse idle in present mode
+function handleMouseMove() {
+  if (isPresentMode.value) {
+    showChrome.value = true
+    clearTimeout(chromeTimeout.value)
+    chromeTimeout.value = setTimeout(() => {
+      showChrome.value = false
+    }, 3000)
+  }
+}
+
+// Hide key hint after first navigation
+watch(currentSlideIndex, () => {
+  showKeyHint.value = false
+})
+
+// Get deck data using deckIndex
 const deck = computed(() => {
   const deckId = route.params.id
-  if (deckId === 'mbq-flagship-v1') {
-    return flagshipDeck_v1
-  }
-  throw new Error(`Deck "${deckId}" not found`)
+  return getDeckBySlug(deckId)
 })
 
 // Current slide
@@ -258,11 +331,14 @@ const currentSlide = computed(() => {
 // Resolve component for mobile_view and dashboard_view slides
 const resolvedComponent = computed(() => {
   if (currentSlide.value?.type === 'mobile_view' || currentSlide.value?.type === 'dashboard_view') {
+    const componentKey = currentSlide.value.content.componentKey
+    console.log('[DeckViewer] Resolving component:', componentKey)
     try {
-      const registry = getRegistryComponent(currentSlide.value.content.componentKey)
+      const registry = getRegistryComponent(componentKey)
+      console.log('[DeckViewer] Registry found:', !!registry, !!registry?.component)
       return registry.component
     } catch (e) {
-      console.error('Error resolving component:', e)
+      console.error('[DeckViewer] Error resolving component:', componentKey, e)
       return null
     }
   }
@@ -321,9 +397,49 @@ function toggleSpeakerNotes() {
   showSpeakerNotes.value = !showSpeakerNotes.value
 }
 
+// Copy current slide notes to clipboard
+async function copyCurrentNotes() {
+  const notes = currentSlideContent.value?.speakerNotes
+  if (!notes) {
+    copyFeedback.value = 'No notes to copy'
+    setTimeout(() => copyFeedback.value = '', 2000)
+    return
+  }
+  try {
+    await navigator.clipboard.writeText(notes)
+    copyFeedback.value = 'Notes copied!'
+    setTimeout(() => copyFeedback.value = '', 2000)
+  } catch (e) {
+    copyFeedback.value = 'Failed to copy'
+    setTimeout(() => copyFeedback.value = '', 2000)
+  }
+}
+
+// Copy full script (all notes) to clipboard
+async function copyFullScript() {
+  const slides = deck.value.slides
+  const script = slides.map((slide, i) => {
+    const chapter = slide.chapter ? ` [${slide.chapter}]` : ''
+    const headline = slide.content?.headline || `Slide ${i + 1}`
+    const notes = slide.content?.speakerNotes || '(No notes)'
+    return `--- SLIDE ${i + 1}${chapter}: ${headline} ---\n${notes}`
+  }).join('\n\n')
+  
+  try {
+    await navigator.clipboard.writeText(script)
+    copyFeedback.value = 'Full script copied!'
+    setTimeout(() => copyFeedback.value = '', 2000)
+  } catch (e) {
+    copyFeedback.value = 'Failed to copy'
+    setTimeout(() => copyFeedback.value = '', 2000)
+  }
+}
+
+const router = useRouter()
+
 function exitDeck() {
-  console.log('exitDeck called')
-  window.location.href = '/corvana/decks'
+  // Use router.push for faster client-side navigation instead of full page reload
+  router.push('/corvana/decks')
 }
 
 // Fullscreen
@@ -464,6 +580,192 @@ onUnmounted(() => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  background: linear-gradient(135deg, #000 0%, #1a1a2e 50%, #0f0f1e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Slide Container */
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 7rem; /* Space for bottom controls */
+}
+
+/* Chapter Label */
+.chapter-label {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(139, 92, 246, 0.8);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  z-index: 10;
+}
+
+/* Narrative Slide */
+.narrative-slide {
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.narrative-headline {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+
+.narrative-subhead {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2rem;
+}
+
+.narrative-body {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.narrative-cta {
+  margin-top: 3rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #10b981;
+  padding: 1rem 2rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 0.75rem;
+  display: inline-block;
+}
+
+/* Mobile View Slide */
+.mobile-view-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+  padding-top: 5rem;
+  padding-bottom: 8rem; /* Space for bottom controls */
+  gap: 1.5rem;
+}
+
+/* Template Switcher */
+.template-switcher {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+}
+
+.template-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.template-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.template-btn.active {
+  background: linear-gradient(to right, #8b5cf6, #10b981);
+  color: #fff;
+}
+
+/* Dashboard View Slide */
+.dashboard-view-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+  padding-top: 5rem;
+  padding-bottom: 8rem; /* Space for bottom controls */
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1200px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  max-height: calc(100vh - 10rem);
+  overflow-y: auto;
+}
+
+/* Fallback */
+.fallback-slide {
+  color: white;
+  padding: 50px;
+  font-size: 24px;
+}
+
+/* Key Hint */
+.key-hint {
+  position: fixed;
+  bottom: 8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  z-index: 50;
+}
+
+.key-hint kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem;
+  font-family: inherit;
 }
 
 .deck-controls {
@@ -592,7 +894,7 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(10px);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 200;
+  z-index: 10001;
   display: flex;
   flex-direction: column;
 }
@@ -601,7 +903,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -611,6 +913,33 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
+.notes-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notes-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notes-action-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #fff;
+}
+
 .notes-close {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -618,6 +947,22 @@ onUnmounted(() => {
   padding: 0.5rem;
   color: #fff;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notes-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.notes-slide-info {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notes-chapter {
+  color: rgba(139, 92, 246, 0.8);
 }
 
 .notes-content {
@@ -628,8 +973,9 @@ onUnmounted(() => {
 
 .notes-text {
   color: #e0e0e0;
-  line-height: 1.6;
+  line-height: 1.7;
   white-space: pre-wrap;
+  font-size: 0.95rem;
 }
 
 .notes-empty {
@@ -637,12 +983,65 @@ onUnmounted(() => {
   font-style: italic;
 }
 
+.copy-feedback {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(16, 185, 129, 0.9);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
 .present-mode-active {
   /* This is just a marker class, doesn't block content */
   display: none;
 }
 
-/* Transitions */
+/* Slide Transitions */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* Fade Transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Reduce Motion */
+.reduce-motion .slide-fade-enter-active,
+.reduce-motion .slide-fade-leave-active,
+.reduce-motion .fade-enter-active,
+.reduce-motion .fade-leave-active {
+  transition: none;
+}
+
+.reduce-motion .slide-fade-enter-from,
+.reduce-motion .slide-fade-leave-to {
+  transform: none;
+}
+
+/* Panel Transitions */
 .slide-panel-enter-active,
 .slide-panel-leave-active {
   transition: transform 0.3s ease;

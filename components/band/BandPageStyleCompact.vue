@@ -9,14 +9,25 @@
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
       
-      <!-- Live Badge -->
-      <div class="absolute top-3 left-3">
-        <div class="flex items-center gap-2 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-white">
+      <!-- Live Badges Row -->
+      <div class="absolute top-3 left-3 right-3 flex items-center gap-2 flex-wrap">
+        <!-- Live Badge -->
+        <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">
           <span class="relative flex h-2 w-2">
             <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
             <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
           </span>
           Live
+        </div>
+        <!-- On Tour Badge -->
+        <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-purple-300">
+          <span>🚐</span>
+          <span>On tour</span>
+        </div>
+        <!-- New Release Badge -->
+        <div class="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-medium text-emerald-300">
+          <span>🔥</span>
+          <span>New release</span>
         </div>
       </div>
 
@@ -50,6 +61,22 @@
               <div class="h-full w-1/3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Featured Video -->
+      <div class="relative aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10">
+        <img :src="neonPoster" alt="Video thumbnail" class="absolute inset-0 w-full h-full object-cover opacity-60" />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/20">
+            <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+        <div class="absolute bottom-2 left-2 right-2">
+          <div class="text-white font-semibold text-sm">Live at The Echo</div>
+          <div class="text-white/60 text-xs">2:14 highlight</div>
         </div>
       </div>
 
