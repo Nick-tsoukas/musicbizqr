@@ -866,7 +866,9 @@ watch(
 );
 
 const fetchData = async () => {
+  console.log('[Dashboard] fetchData called, user:', user.value?.id, user.value?.email);
   if (!user.value?.id) {
+    console.log('[Dashboard] No user ID, skipping fetch');
     loading.value = false;
     return;
   }
@@ -879,6 +881,9 @@ const fetchData = async () => {
       fetchBandsLite(),
       fetchEventsLite(),
     ]);
+
+    console.log('[Dashboard] Fetched data:', { qrs: qrsArr.length, bands: bandsArr.length, events: eventsArr.length });
+    console.log('[Dashboard] Raw bands:', JSON.stringify(bandsArr.slice(0, 2), null, 2));
 
     const mergedQrs = [...qrsArr];
 
@@ -915,6 +920,7 @@ const fetchData = async () => {
     // const scansArr = await fetchScansForQrIds(qrIds);
     // scans.value = scansArr;
   } catch (e) {
+    console.error('[Dashboard] fetchData error:', e);
   } finally {
     loading.value = false;
   }
@@ -974,39 +980,63 @@ async function fetchQrOptionsById(id) {
 
 // Return-only helpers (no state mutation)
 async function fetchQrsLite() {
-  const resp = await find("qrs", {
-    filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name", "id", ],
-    populate: { q_image: { fields: ["url"] } },
-    sort: ["updatedAt:desc"],
-    pagination: { pageSize: 50 },
-  });
-  return Array.isArray(resp.data) ? resp.data : [];
+  console.log('[Dashboard] fetchQrsLite starting... user.id:', user.value?.id);
+  console.log('[Dashboard] token present:', !!token.value);
+  try {
+    const resp = await find("qrs", {
+      filters: { users_permissions_user: { id: { $eq: user.value.id } } },
+      fields: ["name", "id", ],
+      populate: { q_image: { fields: ["url"] } },
+      sort: ["updatedAt:desc"],
+      pagination: { pageSize: 50 },
+    });
+    console.log('[Dashboard] fetchQrsLite response:', resp);
+    console.log('[Dashboard] fetchQrsLite success:', resp?.data?.length);
+    return Array.isArray(resp.data) ? resp.data : [];
+  } catch (e) {
+    console.error('[Dashboard] fetchQrsLite ERROR:', e);
+    console.error('[Dashboard] fetchQrsLite ERROR details:', e?.response?.status, e?.response?.data);
+    return [];
+  }
 }
 
 async function fetchBandsLite() {
-  const resp = await find("bands", {
-    filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["name", "slug", "stripeAccountId", "paymentsEnabled", "stripeOnboardingComplete", "isBandNameInLogo"],
-    populate: { bandImg: { fields: ["url", "formats"] } },
-    sort: ["updatedAt:desc"],
-    pagination: { pageSize: 50 },
-  });
-  return Array.isArray(resp.data) ? resp.data : [];
+  console.log('[Dashboard] fetchBandsLite starting...');
+  try {
+    const resp = await find("bands", {
+      filters: { users_permissions_user: { id: { $eq: user.value.id } } },
+      fields: ["name", "slug", "stripeAccountId", "paymentsEnabled", "stripeOnboardingComplete", "isBandNameInLogo"],
+      populate: { bandImg: { fields: ["url", "formats"] } },
+      sort: ["updatedAt:desc"],
+      pagination: { pageSize: 50 },
+    });
+    console.log('[Dashboard] fetchBandsLite success:', resp?.data?.length);
+    return Array.isArray(resp.data) ? resp.data : [];
+  } catch (e) {
+    console.error('[Dashboard] fetchBandsLite ERROR:', e);
+    return [];
+  }
 }
 
 async function fetchEventsLite() {
-  const resp = await find("events", {
-    filters: { users_permissions_user: { id: { $eq: user.value.id } } },
-    fields: ["title", "slug"],
-    populate: {
-      image: { fields: ["url", "formats"] },
-      band: { fields: ["slug"] },
-    },
-    sort: ["updatedAt:desc"],
-    pagination: { pageSize: 50 },
-  });
-  return Array.isArray(resp.data) ? resp.data : [];
+  console.log('[Dashboard] fetchEventsLite starting...');
+  try {
+    const resp = await find("events", {
+      filters: { users_permissions_user: { id: { $eq: user.value.id } } },
+      fields: ["title", "slug"],
+      populate: {
+        image: { fields: ["url", "formats"] },
+        band: { fields: ["slug"] },
+      },
+      sort: ["updatedAt:desc"],
+      pagination: { pageSize: 50 },
+    });
+    console.log('[Dashboard] fetchEventsLite success:', resp?.data?.length);
+    return Array.isArray(resp.data) ? resp.data : [];
+  } catch (e) {
+    console.error('[Dashboard] fetchEventsLite ERROR:', e);
+    return [];
+  }
 }
 
 // Keep your existing scans fetch (ideally replace with a /scans/count route)
@@ -1075,30 +1105,39 @@ const confirmDelete = async ({ id, type }) => {
 };
 
 const qrItems = computed(() =>
-  qrs.value.map((qr) => ({
-    id: qr.id,
-    title: qr.attributes.name,
-    imageUrl: qr.attributes.q_image?.data?.attributes?.url || "",
-    // scans: qr.attributes.scans,
-    raw: qr, // ← keep the full Strapi row so we can build QR options later
-    isShared: !!qr.__shared,
-  }))
+  qrs.value.map((qr) => {
+    // Handle both Strapi v4 (nested attributes) and v5 (flat) response formats
+    const attrs = qr.attributes || qr;
+    const qImage = attrs.q_image?.data?.attributes || attrs.q_image || null;
+    return {
+      id: qr.id,
+      title: attrs.name,
+      imageUrl: qImage?.url || "",
+      raw: qr,
+      isShared: !!qr.__shared,
+    };
+  })
 );
 
 const bandItems = computed(() =>
   Array.isArray(bands.value)
-    ? bands.value.map((b) => ({
-        id: b.id,
-        title: b.name,
-        name: b.name,
-        slug: b.slug,
-        imageUrl: b.bandImg?.formats?.medium?.url || b.bandImg?.url || "",
-        bandImg: b.bandImg ? { url: b.bandImg.url } : null,
-        isBandNameInLogo: b.isBandNameInLogo ?? false,
-        stripeAccountId: b.stripeAccountId ?? b.attributes?.stripeAccountId ?? null,
-        paymentsEnabled: b.paymentsEnabled ?? b.attributes?.paymentsEnabled ?? null,
-        stripeOnboardingComplete: b.stripeOnboardingComplete ?? b.attributes?.stripeOnboardingComplete ?? null,
-      }))
+    ? bands.value.map((b) => {
+        // Handle both Strapi v4 (nested attributes) and v5 (flat) response formats
+        const attrs = b.attributes || b;
+        const bandImg = attrs.bandImg?.data?.attributes || attrs.bandImg || null;
+        return {
+          id: b.id,
+          title: attrs.name,
+          name: attrs.name,
+          slug: attrs.slug,
+          imageUrl: bandImg?.formats?.medium?.url || bandImg?.url || "",
+          bandImg: bandImg ? { url: bandImg.url } : null,
+          isBandNameInLogo: attrs.isBandNameInLogo ?? false,
+          stripeAccountId: attrs.stripeAccountId ?? null,
+          paymentsEnabled: attrs.paymentsEnabled ?? null,
+          stripeOnboardingComplete: attrs.stripeOnboardingComplete ?? null,
+        };
+      })
     : []
 );
 
@@ -1129,13 +1168,19 @@ async function startPayoutOnboarding(bandId) {
 }
 
 const eventItems = computed(() =>
-  events.value.map((ev) => ({
-    id: ev.id,
-    title: ev.attributes.title,
-    slug: ev.attributes.slug, // ← event slug
-    bandSlug: ev.attributes.band?.data?.attributes?.slug || null, // ← band slug
-    imageUrl: ev.attributes.image?.data?.attributes?.url || "",
-  }))
+  events.value.map((ev) => {
+    // Handle both Strapi v4 (nested attributes) and v5 (flat) response formats
+    const attrs = ev.attributes || ev;
+    const image = attrs.image?.data?.attributes || attrs.image || null;
+    const band = attrs.band?.data?.attributes || attrs.band || null;
+    return {
+      id: ev.id,
+      title: attrs.title,
+      slug: attrs.slug,
+      bandSlug: band?.slug || null,
+      imageUrl: image?.url || "",
+    };
+  })
 );
 
 const viewQr = (img) => {
@@ -1156,6 +1201,8 @@ const imageURL = ref("");
 const qrView = ref(false);
 
 onMounted(async () => {
+  console.log('[Dashboard] onMounted - user:', user.value?.id, user.value?.email);
+  
   const tok = route.query.token;
   if (typeof tok === "string") {
     setToken(tok);
@@ -1163,7 +1210,9 @@ onMounted(async () => {
     router.replace({ path: route.path, query: {} });
   }
 
+  console.log('[Dashboard] About to call fetchData');
   await fetchData(); // show lists first
+  console.log('[Dashboard] fetchData complete, bands:', bands.value?.length, 'qrs:', qrs.value?.length);
   fetchPulse(); // fetch pulse after bands are loaded
 
   const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
