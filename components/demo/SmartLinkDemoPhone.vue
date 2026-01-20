@@ -37,13 +37,11 @@
           @touchstart.passive="markUserInteraction"
           @touchmove.passive="markUserInteraction"
         >
-          <div class="min-h-full">
-            <SmartLinkDemo
-              variant="phone"
-              container-class=""
-              @play-audio="markUserInteraction"
-            />
-          </div>
+          <SmartLinkDemo
+            variant="phone"
+            container-class=""
+            @play-audio="markUserInteraction"
+          />
         </div>
       </div>
       <div
@@ -74,11 +72,11 @@ import SmartLinkDemo from '@/components/demo/SmartLinkDemo.vue'
 const props = defineProps({
   width: {
     type: Number,
-    default: 272,
+    default: 310,
   },
   height: {
     type: Number,
-    default: 560,
+    default: 540,
   },
   wrapperClass: {
     type: String,

@@ -9,7 +9,8 @@
   :style="phoneScaleStyle"
 >
     <template v-if="variant === 'inline' || variant === 'phone'">
-      <div class="w-full mx-auto">
+      <div class="w-full mx-auto overflow-hidden">
+        <!-- Hero Section with Overlay MomentBadges -->
         <div
           :class="[
             moduleClass(0),
@@ -23,7 +24,15 @@
             alt="Neon Avenue image"
             class="absolute inset-0 h-full w-full object-cover"
           />
-          <div class="absolute inset-0 bg-black/0"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+          
+          <!-- MomentBadges -->
+          <div :class="[moduleClass(8), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(8)">
+            <MomentBadges
+              :is-on-tour="true"
+              :has-new-release="true"
+            />
+          </div>
         </div>
 
         <div
@@ -196,168 +205,176 @@
 
           <!-- ============================================ -->
           <!-- SMART LINK LIVE SURFACE COMPONENTS -->
+          <!-- Only show on inline variant, not phone (keep phone clean) -->
           <!-- ============================================ -->
 
-          <!-- MomentBadges -->
-          <div :class="[moduleClass(8), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(8)">
-            <MomentBadges
-              :is-on-tour="true"
-              :has-new-release="true"
-            />
-          </div>
+          <template v-if="!isPhone">
+            <!-- Show Day Header -->
+            <div :class="[moduleClass(9), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(9)">
+              <ShowDayHeader
+                :event="nextEvent"
+                :has-pay-entry="true"
+              />
+            </div>
 
-          <!-- Show Day Header -->
-          <div :class="[moduleClass(9), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(9)">
-            <ShowDayHeader
-              :event="nextEvent"
-              :has-pay-entry="true"
-            />
-          </div>
+            <!-- NOW Banner -->
+            <div :class="[moduleClass(10), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(10)">
+              <NowBanner
+                state="ON_TOUR"
+                :content="nowBannerContent"
+              />
+            </div>
 
-          <!-- NOW Banner -->
-          <div :class="[moduleClass(10), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(10)">
-            <NowBanner
-              state="ON_TOUR"
-              :content="nowBannerContent"
-            />
-          </div>
+            <!-- Continue Chip -->
+            <div :class="[moduleClass(11), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(11)">
+              <ContinueChip
+                band-slug="neon-avenue"
+              />
+            </div>
 
-          <!-- Continue Chip -->
-          <div :class="[moduleClass(11), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(11)">
-            <ContinueChip
-              band-slug="neon-avenue"
-            />
-          </div>
+            <!-- Live Feed -->
+            <div :class="[moduleClass(12), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(12)">
+              <LiveFeed
+                :feed-items="liveFeedItems"
+                :primary-feed-item="primaryFeedItem"
+                :has-feed-items="hasLiveFeedItems"
+                display-mode="single"
+              />
+            </div>
+          </template>
 
-          <!-- Live Feed -->
-          <div :class="[moduleClass(12), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(12)">
-            <LiveFeed
-              :feed-items="liveFeedItems"
-              :primary-feed-item="primaryFeedItem"
-              :has-feed-items="hasLiveFeedItems"
-              display-mode="single"
-            />
-          </div>
-
-          <section
-            :class="[moduleClass(13), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']"
-            :style="moduleStyle(13)"
-          >
-            <h2 :class="h2Class">
-              Upcoming Events
-            </h2>
-
-            <div
-              v-if="nextEvent"
-              :class="eventsCardClass"
+          <!-- Events and Tip sections - only show on inline, not phone -->
+          <template v-if="!isPhone">
+            <section
+              :class="[moduleClass(13), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']"
+              :style="moduleStyle(13)"
             >
-              <div :class="nextShowHeaderClass">
-                <div class="min-w-0">
-                  <div class="text-white/70 text-sm font-semibold">Next Show</div>
-                  <div :class="nextShowTitleClass">
-                    {{ nextEvent.city }}, {{ nextEvent.state }}
+              <h2 :class="h2Class">
+                Upcoming Events
+              </h2>
+
+              <div
+                v-if="nextEvent"
+                :class="eventsCardClass"
+              >
+                <div :class="nextShowHeaderClass">
+                  <div class="min-w-0">
+                    <div class="text-white/70 text-sm font-semibold">Next Show</div>
+                    <div :class="nextShowTitleClass">
+                      {{ nextEvent.city }}, {{ nextEvent.state }}
+                    </div>
+                    <div class="text-white/85 mt-1 font-semibold">
+                      {{ nextEvent.venue }}
+                    </div>
+                    <div class="text-purple-300 mt-2 font-semibold">
+                      {{ nextEvent.date }}
+                    </div>
                   </div>
-                  <div class="text-white/85 mt-1 font-semibold">
-                    {{ nextEvent.venue }}
+
+                  <button
+                    type="button"
+                    :class="ticketsButtonClass"
+                  >
+                    Tickets
+                  </button>
+                </div>
+
+                <div class="mt-4 border-t border-white/15 pt-4">
+                  <div v-if="isMobileViewport" class="space-y-3">
+                    <div
+                      v-for="event in otherEvents"
+                      :key="event.id"
+                      class="rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                    >
+                      <div class="text-purple-300 font-semibold">{{ event.date }}</div>
+                      <div class="text-white font-semibold mt-1">
+                        {{ event.city }}, {{ event.state }}
+                      </div>
+                      <div class="text-white/80">{{ event.venue }}</div>
+                      <button type="button" class="mt-3 w-full demo-cta">
+                        View Event
+                      </button>
+                    </div>
                   </div>
-                  <div class="text-purple-300 mt-2 font-semibold">
-                    {{ nextEvent.date }}
+
+                  <div v-else class="relative no-scrollbar overflow-x-auto">
+                    <table class="w-full table-fixed bg-transparent text-white rounded-md">
+                      <thead>
+                        <tr class="border-b border-purple-500 border-opacity-30">
+                          <th class="px-2 py-2 text-left w-[7.5rem]">Date</th>
+                          <th class="px-2 py-2 text-left">City</th>
+                          <th class="px-2 py-2 text-left">Venue</th>
+                          <th class="px-2 py-2 text-left w-[6rem]">Tickets</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="event in otherEvents"
+                          :key="event.id"
+                          class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
+                          @click.prevent
+                        >
+                          <td class="px-2 py-1 text-purple-400">
+                            {{ event.date }}
+                          </td>
+                          <td class="px-2 py-1 text-purple-400 break-words">
+                            {{ event.city }}, {{ event.state }}
+                          </td>
+                          <td class="px-2 py-1 text-purple-400 break-words">
+                            {{ event.venue }}
+                          </td>
+                          <td class="px-2 py-1 text-purple-400">
+                            <button type="button" class="text-purple-400">
+                              View Event
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              :class="[moduleClass(9), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']"
+              :style="moduleStyle(9)"
+            >
+              <div :class="tipCardClass">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <div :class="tipTitleClass">
+                      Tip Neon Avenue
+                    </div>
+                    <div class="text-white/80 mt-1">
+                      One-tap payout • secure checkout
+                    </div>
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  :class="ticketsButtonClass"
-                >
-                  Tickets
+                <div class="mt-4 grid grid-cols-3 gap-3">
+                  <button type="button" class="demo-chip">$5</button>
+                  <button type="button" class="demo-chip">$10</button>
+                  <button type="button" class="demo-chip">$20</button>
+                </div>
+
+                <button type="button" class="mt-4 w-full demo-cta demo-cta--accent">
+                  Send Tip
                 </button>
               </div>
+            </section>
+          </template>
 
-              <div class="mt-4 border-t border-white/15 pt-4">
-                <div v-if="isPhone || isMobileViewport" class="space-y-3">
-                  <div
-                    v-for="event in otherEvents"
-                    :key="event.id"
-                    class="rounded-xl border border-white/10 bg-black/20 px-4 py-3"
-                  >
-                    <div class="text-purple-300 font-semibold">{{ event.date }}</div>
-                    <div class="text-white font-semibold mt-1">
-                      {{ event.city }}, {{ event.state }}
-                    </div>
-                    <div class="text-white/80">{{ event.venue }}</div>
-                    <button type="button" class="mt-3 w-full demo-cta">
-                      View Event
-                    </button>
-                  </div>
-                </div>
-
-                <div v-else class="relative no-scrollbar overflow-x-auto">
-                  <table class="w-full table-fixed bg-transparent text-white rounded-md">
-                    <thead>
-                      <tr class="border-b border-purple-500 border-opacity-30">
-                        <th class="px-2 py-2 text-left w-[7.5rem]">Date</th>
-                        <th class="px-2 py-2 text-left">City</th>
-                        <th class="px-2 py-2 text-left">Venue</th>
-                        <th class="px-2 py-2 text-left w-[6rem]">Tickets</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="event in otherEvents"
-                        :key="event.id"
-                        class="border-b border-purple-500 border-opacity-20 hover:bg-purple-900 cursor-pointer"
-                        @click.prevent
-                      >
-                        <td class="px-2 py-1 text-purple-400">
-                          {{ event.date }}
-                        </td>
-                        <td class="px-2 py-1 text-purple-400 break-words">
-                          {{ event.city }}, {{ event.state }}
-                        </td>
-                        <td class="px-2 py-1 text-purple-400 break-words">
-                          {{ event.venue }}
-                        </td>
-                        <td class="px-2 py-1 text-purple-400">
-                          <button type="button" class="text-purple-400">
-                            View Event
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section
-            :class="[moduleClass(9), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']"
-            :style="moduleStyle(9)"
-          >
-            <div :class="tipCardClass">
-              <div class="flex items-start justify-between gap-4">
-                <div>
-                  <div :class="tipTitleClass">
-                    Tip Neon Avenue
-                  </div>
-                  <div class="text-white/80 mt-1">
-                    One-tap payout • secure checkout
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-4 grid grid-cols-3 gap-3">
-                <button type="button" class="demo-chip">$5</button>
-                <button type="button" class="demo-chip">$10</button>
-                <button type="button" class="demo-chip">$20</button>
-              </div>
-
-              <button type="button" class="mt-4 w-full demo-cta demo-cta--accent">
-                Send Tip
-              </button>
-            </div>
-          </section>
         </div>
+      </div>
+      
+      <!-- MBQ Logo Footer - Only show on phone variant -->
+      <div v-if="isPhone" class="flex justify-center">
+        <img 
+          src="/musicbizlogo.png" 
+          alt="MusicBizQR" 
+          class="h-8 w-auto opacity-60"
+        />
       </div>
     </template>
 
@@ -694,8 +711,8 @@ const platformIconClass = computed(() => {
 
 const platformButtonClass = computed(() => {
   return [
-    'w-full mb-6 border border-white bg-transparent text-white flex items-center gap-3 font-semibold px-4 py-4 rounded-md min-w-0',
-    isPhone.value ? 'text-base' : 'text-lg md:text-xl',
+    'w-full border border-white bg-transparent text-white flex items-center gap-3 font-semibold px-4 py-4 rounded-md min-w-0',
+    isPhone.value ? 'text-base mb-4' : 'text-lg md:text-xl mb-6',
     'hover:bg-white/5 active:bg-white/10 transition duration-200 ease-out hover:-translate-y-[1px] active:translate-y-0',
     'motion-reduce:transition-none motion-reduce:transform-none',
   ].join(' ')

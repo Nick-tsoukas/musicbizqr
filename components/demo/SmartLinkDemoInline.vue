@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full">
+  <div class="w-full max-w-full overflow-hidden">
     <SmartLinkDemo
       variant="inline"
-      container-class=""
+      container-class="max-w-full"
     />
   </div>
 </template>
