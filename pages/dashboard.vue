@@ -1078,7 +1078,14 @@ const confirmDelete = async ({ id, type }) => {
       method: "DELETE",
       headers: { Authorization: `Bearer ${useStrapiToken().value}` },
     });
+    
+    // Reset modal state and close it
+    if (deleteModalRef.value) {
+      deleteModalRef.value.resetDeleting();
+    }
     showDeleteModal.value = false;
+    
+    // Refresh the data
     await fetchData();
     
     // Show success toast

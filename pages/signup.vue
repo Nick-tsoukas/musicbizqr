@@ -49,7 +49,7 @@
                   v-model="formData.email"
                   type="email"
                   required
-                  class="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition text-base"
+                  class="w-full pl-12 pr-4 py-3.5 bg-neutral-900 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition text-base autofill-fix"
                   placeholder="you@example.com"
                 />
               </div>
@@ -70,7 +70,7 @@
                   type="password"
                   required
                   minlength="6"
-                  class="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition text-base"
+                  class="w-full pl-12 pr-4 py-3.5 bg-neutral-900 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition text-base autofill-fix"
                   placeholder="Create a password (min 6 characters)"
                 />
               </div>
@@ -226,13 +226,12 @@ const handleSignup = async () => {
       formData.value.password
     );
 
-    // 4️⃣ Notify & navigate
+    // 4️⃣ Notify & navigate - keep loading true until navigation completes
     alert(`✅ Welcome ${user.email}! Your 30-day trial is now active.`);
-    router.push("/signupSuccess");
+    await router.push("/signupSuccess");
   } catch (err) {
     console.error("Signup failed", err);
     errorMessage.value = err.message || "Signup failed. Please try again.";
-  } finally {
     loading.value = false;
   }
 };
@@ -244,5 +243,16 @@ const handleSignup = async () => {
   .min-h-screen {
     min-height: 100dvh;
   }
+}
+
+/* Fix browser autofill styling */
+.autofill-fix:-webkit-autofill,
+.autofill-fix:-webkit-autofill:hover,
+.autofill-fix:-webkit-autofill:focus,
+.autofill-fix:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #171717 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 </style>
