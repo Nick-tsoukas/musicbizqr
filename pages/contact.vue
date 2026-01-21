@@ -9,6 +9,18 @@
       </div>
       <form class="space-y-6" @submit.prevent="submitForm">
         <div class="space-y-4">
+          <!-- Honeypot field - hidden from humans, bots will fill it -->
+          <div class="absolute -left-[9999px]" aria-hidden="true">
+            <label for="company">Company</label>
+            <input
+              id="company"
+              v-model="form.company"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
+
           <div>
             <label for="name" class="block text-sm font-medium mb-1">Name</label>
             <input
@@ -68,17 +80,28 @@ const form = ref({
   name: '',
   email: '',
   message: '',
+  company: '', // Honeypot field - if filled, it's a bot
 });
 
 const submitForm = async () => {
+  // Check honeypot - if filled, silently reject (it's a bot)
+  if (form.value.company) {
+    console.log('[Contact] Bot detected via honeypot');
+    // Fake success to not alert the bot
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    alert('✅ Your message has been sent!');
+    form.value = { name: '', email: '', message: '', company: '' };
+    return;
+  }
+
   try {
     const res = await $fetch('/api/contact', {
       method: 'POST',
-      body: form.value
+      body: { name: form.value.name, email: form.value.email, message: form.value.message }
     })
     if (res.success) {
       alert('✅ Your message has been sent!')
-      form.value = { name: '', email: '', message: '' }
+      form.value = { name: '', email: '', message: '', company: '' }
     }
   } catch (err) {
     console.error('Contact error:', err)

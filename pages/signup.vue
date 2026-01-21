@@ -55,6 +55,18 @@
               </div>
             </div>
 
+            <!-- Honeypot field - hidden from humans, bots will fill it -->
+            <div class="absolute -left-[9999px]" aria-hidden="true">
+              <label for="website">Website</label>
+              <input
+                id="website"
+                v-model="formData.website"
+                type="text"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
             <!-- Password Field -->
             <div class="mb-6">
               <label for="password" class="block text-sm font-medium text-white/70 mb-2">Password</label>
@@ -148,6 +160,7 @@ const { trackWithStoredEventId } = useMetaTracking()
 const formData = ref({
   email: "",
   password: "",
+  website: "", // Honeypot field - if filled, it's a bot
 });
 
 // prevent double tracking
@@ -208,6 +221,16 @@ const handleGoogleLogin = async () => {
 };
 
 const handleSignup = async () => {
+  // Check honeypot - if filled, silently reject (it's a bot)
+  if (formData.value.website) {
+    console.log("[handleSignup] Bot detected via honeypot");
+    // Fake success to not alert the bot
+    loading.value = true;
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    await router.push("/signupSuccess");
+    return;
+  }
+
   loading.value = true;
   errorMessage.value = "";
   console.log("[handleSignup] payload →", JSON.stringify(formData.value));

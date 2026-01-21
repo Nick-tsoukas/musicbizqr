@@ -1663,13 +1663,30 @@ When creating a Stripe customer, we store:
 }
 ```
 
+### Stripe Webhook Handler
+
+The webhook is handled by the **Strapi backend** at `https://qrserver-production.up.railway.app/api/stripe/webhook`.
+
+**Location:** `qrdb/src/api/subscription/controllers/subscription.js`
+
+**Handled Events:**
+| Event | Action |
+|-------|--------|
+| `checkout.session.completed` | Sets status to `trialing` or `active` |
+| `invoice.payment_succeeded` | Sets status to `active` |
+| `invoice.payment_failed` | Sets status to `pastDue`, starts grace period |
+| `customer.subscription.updated` | Syncs status, plan, trial end date |
+| `customer.subscription.deleted` | Sets status to `canceled` |
+
+**Environment Variables (Strapi):**
+- `STRIPE_WEBHOOK_SECRET` - Webhook signing secret from Stripe Dashboard
+
 ### Potential Improvements
 
-1. **Webhook Handler**: Add `/api/stripe/webhook` to handle Stripe events (payment succeeded, failed, subscription canceled)
-2. **Grace Period**: Allow brief grace period after trial ends before restricting access
-3. **Email Notifications**: Send trial ending reminders at 7 days, 3 days, 1 day
-4. **Proration**: Handle plan upgrades/downgrades with proration
-5. **Multiple Plans**: Support different pricing tiers
+1. **Grace Period**: Allow brief grace period after trial ends before restricting access
+2. **Email Notifications**: Send trial ending reminders at 7 days, 3 days, 1 day
+3. **Proration**: Handle plan upgrades/downgrades with proration
+4. **Multiple Plans**: Support different pricing tiers
 
 ### Debugging
 
@@ -1688,3 +1705,57 @@ console.log(status)
 - View customers: https://dashboard.stripe.com/customers
 - View subscriptions: https://dashboard.stripe.com/subscriptions
 - Test webhooks: https://dashboard.stripe.com/webhooks
+
+---
+
+## Bot & Spam Protection
+
+### Honeypot Fields
+
+Forms use invisible honeypot fields to detect bots. Bots auto-fill all fields including hidden ones, while real users never see them.
+
+| Form | Honeypot Field | Location |
+|------|----------------|----------|
+| Signup | `website` | `pages/signup.vue` |
+| Contact | `company` | `pages/contact.vue` |
+
+### How It Works
+
+1. Hidden field positioned off-screen (`-left-[9999px]`)
+2. Real users never see or fill it
+3. Bots auto-fill all form fields
+4. If honeypot is filled → bot detected → fake success response
+
+### Implementation
+
+```vue
+<!-- Hidden honeypot field -->
+<div class="absolute -left-[9999px]" aria-hidden="true">
+  <label for="website">Website</label>
+  <input
+    id="website"
+    v-model="formData.website"
+    type="text"
+    tabindex="-1"
+    autocomplete="off"
+  />
+</div>
+```
+
+```js
+// Check honeypot before processing
+if (formData.value.website) {
+  console.log('Bot detected via honeypot');
+  // Fake success to not alert the bot
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  await router.push('/signupSuccess');
+  return;
+}
+```
+
+### Why Honeypot vs reCAPTCHA
+
+- **Zero friction** for real users
+- **No external dependencies** (no API keys)
+- **Bots don't know they failed** (fake success)
+- **Simple to implement** and maintain
