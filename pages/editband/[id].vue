@@ -1,10 +1,13 @@
 <template>
   <div class="min-h-screen bg-black pt-[var(--header-height)]">
     <!-- Loading Overlay -->
-    <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div class="flex flex-col items-center gap-4">
-        <div class="w-12 h-12 border-3 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-        <span class="text-white/70 text-sm">Saving changes...</span>
+    <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+      <div class="flex flex-col items-center gap-4 text-center px-6">
+        <div class="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+        <div>
+          <p class="text-white font-semibold text-lg">{{ loadingMessage }}</p>
+          <p class="text-white/50 text-sm mt-1">Please wait while we save your changes...</p>
+        </div>
       </div>
     </div>
 
@@ -1108,6 +1111,7 @@ const user = useStrapiUser();
 const token = useStrapiToken();
 
 const loading = ref(false);
+const loadingMessage = ref('Saving changes...');
 const payoutLoading = ref(false);
 
 const stripeAccountId = ref(null);
@@ -1648,6 +1652,7 @@ function handleSingleSongUpload(e) {
 
 async function submitForm() {
   loading.value = true;
+  loadingMessage.value = 'Saving changes...';
   const id = route.params.id;
 
   try {
@@ -1879,6 +1884,9 @@ if (!slug) {
   } catch {}
 }
 
+// Update loading message before redirect
+loadingMessage.value = 'Changes saved! Redirecting...';
+
 if (slug && process.client) {
   // full page navigation → guarantees header is fresh
   window.location.replace(`/${slug}`);
@@ -1887,10 +1895,10 @@ if (slug && process.client) {
 
 // final fallback
 if (process.client) window.location.reload();
+  // Loading stays true - page will navigate away
   } catch (err) {
     console.error("❌ submitForm error:", err);
     alert(err?.error?.message || "Update failed");
-  } finally {
     loading.value = false;
   }
 }

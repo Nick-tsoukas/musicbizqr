@@ -1524,3 +1524,167 @@ components/shareables/
   }
 }
 ```
+
+---
+
+## Stripe & Signup Integration
+
+### Overview
+
+MusicBizQR uses Stripe for subscription billing with a 30-day free trial. The integration spans both the Nuxt frontend and the Strapi backend.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         FRONTEND (Nuxt)                         │
+├─────────────────────────────────────────────────────────────────┤
+│  pages/signup.vue          → Email/password signup form         │
+│  pages/login.vue           → Login form                         │
+│  composables/useSignup.ts  → registerUser() helper              │
+│  composables/useFirebase.ts→ Google OAuth login                 │
+│  pages/account.vue         → Subscription status & billing      │
+│  pages/dashboard.vue       → Trial info display                 │
+│  components/PastDueBanner.vue → Past due payment warning        │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    NUXT SERVER (API Routes)                     │
+├─────────────────────────────────────────────────────────────────┤
+│  server/api/stripe/confirm-social.ts                            │
+│    → Handles Google/social signup                               │
+│    → Creates Strapi user + Stripe customer + trial              │
+│                                                                 │
+│  server/utils/stripe-trial.ts                                   │
+│    → createStripeCustomerAndTrial() utility                     │
+│    → Creates Stripe customer with metadata                      │
+│    → Creates subscription with 30-day trial                     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      STRAPI BACKEND                             │
+├─────────────────────────────────────────────────────────────────┤
+│  /api/stripe/register      → Email/password registration        │
+│  /api/stripe/billing       → Get billing info                   │
+│  /api/stripe/subscription-status → Get subscription status      │
+│  /api/stripe/create-billing-portal-session → Stripe portal      │
+│                                                                 │
+│  User fields:                                                   │
+│    - customerId (Stripe customer ID)                            │
+│    - subscriptionId (Stripe subscription ID)                    │
+│    - trialEndsAt (ISO date string)                              │
+│    - subscriptionStatus (trialing/active/past_due/etc)          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Signup Flows
+
+#### Email/Password Signup
+1. User fills form on `/signup`
+2. `useSignup().registerUser()` calls Strapi `/api/stripe/register`
+3. Strapi creates user + Stripe customer + 30-day trial subscription
+4. User is redirected to `/signupSuccess`
+
+#### Google OAuth Signup
+1. User clicks "Continue with Google" on `/signup` or `/login`
+2. `useFirebase().loginWithGoogle()` authenticates with Firebase
+3. Nuxt server `/api/stripe/confirm-social` is called
+4. Creates/finds Strapi user + creates Stripe customer + trial
+5. Returns JWT, user is redirected to `/dashboard`
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `composables/useSignup.ts` | `registerUser(name, email, password)` - calls Strapi registration |
+| `composables/useFirebase.ts` | `loginWithGoogle()` - Firebase + Strapi + Stripe flow |
+| `server/api/stripe/confirm-social.ts` | Social login handler - creates user + Stripe trial |
+| `server/utils/stripe-trial.ts` | `createStripeCustomerAndTrial()` - Stripe API calls |
+| `pages/signup.vue` | Signup form with loading state |
+| `pages/login.vue` | Login form with loading state |
+| `pages/account.vue` | Account settings + subscription status |
+| `components/PastDueBanner.vue` | Past due payment warning banner |
+
+### Environment Variables
+
+```bash
+# Stripe
+STRIPE_SECRET_KEY=sk_live_xxx          # Stripe secret key
+STRIPE_PUBLISHABLE_KEY=pk_live_xxx     # Stripe publishable key
+STRIPE_DEFAULT_PRICE_ID=price_xxx      # Default subscription price ID
+
+# Strapi
+STRAPI_URL=https://your-strapi.com     # Strapi backend URL
+```
+
+### Subscription States
+
+| Status | Description | UI Behavior |
+|--------|-------------|-------------|
+| `trialing` | 30-day free trial active | Shows days remaining |
+| `active` | Paid subscription active | Normal access |
+| `past_due` | Payment failed | Shows PastDueBanner, prompts payment |
+| `canceled` | Subscription canceled | Limited access |
+| `unpaid` | Multiple failed payments | Shows PastDueBanner |
+
+### Trial Flow
+
+1. **Day 0**: User signs up → 30-day trial starts
+2. **Days 1-29**: Full access, dashboard shows "X days left"
+3. **Day 30**: Trial ends, Stripe attempts first charge
+4. **If payment succeeds**: Status → `active`
+5. **If payment fails**: Status → `past_due`, PastDueBanner shown
+
+### Billing Portal
+
+Users can manage their subscription via Stripe's hosted billing portal:
+- Update payment method
+- View invoices
+- Cancel subscription
+
+Accessed via:
+- `/account` → "Manage Billing Info" button
+- `PastDueBanner` → "Pay Now" button
+
+Both call Strapi `/api/stripe/create-billing-portal-session` which returns a Stripe portal URL.
+
+### Stripe Customer Metadata
+
+When creating a Stripe customer, we store:
+```js
+{
+  email: user.email,
+  name: user.username,
+  metadata: {
+    appUserId: String(user.id)  // Strapi user ID for webhook lookups
+  }
+}
+```
+
+### Potential Improvements
+
+1. **Webhook Handler**: Add `/api/stripe/webhook` to handle Stripe events (payment succeeded, failed, subscription canceled)
+2. **Grace Period**: Allow brief grace period after trial ends before restricting access
+3. **Email Notifications**: Send trial ending reminders at 7 days, 3 days, 1 day
+4. **Proration**: Handle plan upgrades/downgrades with proration
+5. **Multiple Plans**: Support different pricing tiers
+
+### Debugging
+
+**Check subscription status:**
+```js
+// In browser console on dashboard
+const token = useStrapiToken().value
+const client = useStrapiClient()
+const status = await client('/stripe/subscription-status', {
+  headers: { Authorization: `Bearer ${token}` }
+})
+console.log(status)
+```
+
+**Stripe Dashboard:**
+- View customers: https://dashboard.stripe.com/customers
+- View subscriptions: https://dashboard.stripe.com/subscriptions
+- Test webhooks: https://dashboard.stripe.com/webhooks

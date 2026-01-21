@@ -1,10 +1,13 @@
 <template>
   <div class="min-h-screen bg-black pt-[var(--header-height)]">
     <!-- Loading Overlay -->
-    <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div class="flex flex-col items-center gap-4">
-        <div class="w-12 h-12 border-3 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-        <span class="text-white/70 text-sm">Creating your band...</span>
+    <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+      <div class="flex flex-col items-center gap-4 text-center px-6">
+        <div class="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+        <div>
+          <p class="text-white font-semibold text-lg">{{ loadingMessage }}</p>
+          <p class="text-white/50 text-sm mt-1">Please wait while we set everything up...</p>
+        </div>
       </div>
     </div>
 
@@ -733,6 +736,7 @@ const user = useStrapiUser();
 const token = useStrapiToken();
 
 const loading = ref(false);
+const loadingMessage = ref('Creating your band...');
 const isBandNameInLogo = ref(false);
 
 // Page style
@@ -937,6 +941,7 @@ onMounted(async () => {
 
 async function submitForm() {
   loading.value = true;
+  loadingMessage.value = 'Creating your band...';
   try {
     // Validate embed mode: require a real iframe
     if (singlesongType.value === "embed" && singlesongEmbedHtml.value.trim()) {
@@ -1032,13 +1037,14 @@ async function submitForm() {
     const json = await res.json();
     if (!res.ok) throw json;
 
-    // 4) Redirect
+    // 4) Redirect - keep loading true until navigation completes
+    loadingMessage.value = 'Band created! Redirecting...';
     const slug = json.data?.attributes?.slug;
     await router.push(slug ? { name: "slug", params: { slug } } : "/dashboard");
+    // Loading stays true - page will unmount on navigation
   } catch (err) {
     console.error("❌ createBand error:", err);
     alert(err?.error?.message || "Creation failed");
-  } finally {
     loading.value = false;
   }
 }
