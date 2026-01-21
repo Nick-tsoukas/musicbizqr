@@ -3,28 +3,7 @@ export default defineNuxtConfig({
 
 //  trigger redeploy
 
-  router: {
-    options: {
-      // @ts-ignore
-      scrollBehavior(to, from, savedPosition) {
-        // 1) use browser’s back/forward saved position
-        if (savedPosition) {
-          return savedPosition
-        }
-        // 2) if there’s a hash, scroll to that element
-        if (to.hash) {
-          return {
-            el: to.hash,
-            behavior: 'smooth',
-            // adjust this if your header height changes
-            top: 90
-          }
-        }
-        // 3) otherwise go to top
-        return { top: 0 }
-      }
-    }
-  },
+  // Router scroll behavior is configured in app/router.options.ts
 
   vite: {
     optimizeDeps: {
