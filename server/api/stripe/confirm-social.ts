@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
   // Step 3: Create Stripe customer and start trial
   const customer = await createStripeCustomerAndTrial(user)
 
-  // Step 4: Update Strapi user with customerId
+  // Step 4: Update Strapi user with Stripe data
   await $fetch(`${strapiUrl}/api/users/${user.id}`, {
     method: 'PUT',
     headers: {
@@ -74,6 +74,7 @@ export default defineEventHandler(async (event) => {
     body: {
       customerId: customer.id,
       subscriptionId: customer.subscriptionId,
+      subscriptionStatus: 'trialing',
       trialEndsAt: customer.trialEndsAt
     }
   })
