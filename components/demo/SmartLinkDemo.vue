@@ -26,8 +26,15 @@
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
           
-          <!-- MomentBadges -->
-          <div :class="[moduleClass(8), sectionMtClass, 'motion-reduce:transition-none motion-reduce:transform-none']" :style="moduleStyle(8)">
+          <!-- MomentBadges - positioned at top of hero with tight padding -->
+          <div 
+            :class="[
+              moduleClass(8), 
+              'absolute motion-reduce:transition-none motion-reduce:transform-none',
+              isPhone ? 'top-1.5 left-2 scale-[0.8] origin-top-left' : 'top-3 left-4 right-4'
+            ]" 
+            :style="moduleStyle(8)"
+          >
             <MomentBadges
               :is-on-tour="true"
               :has-new-release="true"
