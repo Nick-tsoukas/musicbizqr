@@ -98,6 +98,7 @@
           :fan-position="fanPositionText"
           :captions="momentCaptions"
           :moment-type="moment?.actionType || 'DEFAULT'"
+          :moment-id="moment?.id || null"
           @close="shareDrawerOpen = false"
           @shared="onMomentShared"
         />

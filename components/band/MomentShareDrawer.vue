@@ -267,6 +267,10 @@ const props = defineProps({
   momentType: {
     type: String,
     default: 'DEFAULT'
+  },
+  momentId: {
+    type: [Number, String],
+    default: null
   }
 })
 
@@ -329,6 +333,11 @@ watch(() => props.isOpen, async (isOpen) => {
 }, { immediate: true })
 
 function getShareUrl() {
+  // If we have a momentId, use the moment share URL for proper OG image
+  if (props.momentId) {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
+    return `${origin}/share/moment/${props.momentId}`
+  }
   return buildShareUrl({ bandSlug: props.bandSlug })
 }
 
@@ -519,7 +528,10 @@ async function handleInstagramKit() {
 
 async function handleFacebookShare() {
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
-  const fbShareUrl = `${origin}/share/band/${props.bandSlug}`
+  // Use moment share URL if available for proper OG image, otherwise fall back to band share
+  const fbShareUrl = props.momentId 
+    ? `${origin}/share/moment/${props.momentId}`
+    : `${origin}/share/band/${props.bandSlug}`
   openFacebookSharer(fbShareUrl)
   await copyToClipboard(currentCaption.value)
   showToast('Facebook opened + caption copied', 2500)
