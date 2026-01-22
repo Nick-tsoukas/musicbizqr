@@ -12,9 +12,9 @@
   <!-- Show full moment UI when moment exists -->
   <section
     v-if="moment"
-    class="mt-10 px-4 pb-10"
+    class="w-full px-6 mt-10 pb-10 md:max-w-[80vw] md:mx-auto"
   >
-    <div class="max-w-md mx-auto">
+    <div>
       <div class="text-center text-white/50 text-xs uppercase tracking-wider mb-3">
         Your Moment
       </div>

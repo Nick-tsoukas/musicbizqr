@@ -89,7 +89,7 @@
                 </button>
               </div>
 
-              <!-- Smart Link Style -->
+              <!-- Smart Link Style (COMMENTED OUT - defaulting to Classic)
               <div 
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
                 :class="pageStyle === 'smartlink' 
@@ -126,8 +126,9 @@
                   Preview
                 </button>
               </div>
+              -->
 
-              <!-- Compact Style -->
+              <!-- Compact Style (COMMENTED OUT - defaulting to Classic)
               <div 
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
                 :class="pageStyle === 'compact' 
@@ -161,8 +162,9 @@
                   Preview
                 </button>
               </div>
+              -->
 
-              <!-- Bold Style -->
+              <!-- Bold Style (COMMENTED OUT - defaulting to Classic)
               <div 
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all md:col-span-2"
                 :class="pageStyle === 'bold' 
@@ -199,6 +201,7 @@
                   Preview
                 </button>
               </div>
+              -->
 
             </div>
           </div>
