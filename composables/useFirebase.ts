@@ -4,10 +4,6 @@ export const useFirebase = () => {
   const provider = $firebase.provider
   const strapiAuth = useStrapiAuth()
   const router = useRouter()
-
-  const {
-    public: { strapiUrl }
-  } = useRuntimeConfig()
   
   async function loginWithGoogle() {
     try {
@@ -21,17 +17,6 @@ export const useFirebase = () => {
         return
       }
   
-      // OPTIONAL: check backend route with HEAD/GET to see if it exists
-      try {
-        const headResp = await $fetch.raw('/api/stripe/confirm-social', {
-          baseURL: strapiUrl,
-          method: 'GET' // harmless probe
-        })
-        console.log('[confirm-social] GET probe status:', headResp.status)
-      } catch (probeErr) {
-        console.warn('[confirm-social] probe failed:', probeErr)
-      }
-  
       // Get Firebase ID token (good practice for auth)
       const idToken = await user.getIdToken(true)
   
@@ -42,10 +27,10 @@ export const useFirebase = () => {
         provider: 'google'
       }
   
-      console.log('[confirm-social] POST →', strapiUrl, payload)
+      console.log('[confirm-social] POST →', payload)
   
+      // Call Nuxt server route (not Strapi) - handles Stripe customer + trial creation
       const res = await $fetch('/api/stripe/confirm-social', {
-        baseURL: strapiUrl,
         method: 'POST',
         body: payload,
         headers: {
