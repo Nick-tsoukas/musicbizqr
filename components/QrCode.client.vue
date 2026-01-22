@@ -222,11 +222,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="form-field">
                     <label class="form-label">Start Color</label>
-                    <ColorSwatchPicker v-model="gradientStartColor" />
+                    <div class="color-picker-wrapper">
+                      <input v-model="gradientStartColor" type="text" class="form-input pr-12" />
+                      <input v-model="gradientStartColor" type="color" class="color-picker-input" />
+                    </div>
                   </div>
                   <div class="form-field">
                     <label class="form-label">End Color</label>
-                    <ColorSwatchPicker v-model="gradientEndColor" />
+                    <div class="color-picker-wrapper">
+                      <input v-model="gradientEndColor" type="text" class="form-input pr-12" />
+                      <input v-model="gradientEndColor" type="color" class="color-picker-input" />
+                    </div>
                   </div>
                 </div>
               </div>

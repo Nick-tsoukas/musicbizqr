@@ -29,14 +29,14 @@
       <!-- 4) Full picker -->
       <Chrome
         :model-value="modelValue"
-        @update:model-value="select"
+        @update:model-value="onChromeUpdate"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineProps, defineEmits } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { Chrome } from '@ckpack/vue-color'
 
 const props = defineProps<{ modelValue: string }>()
@@ -55,9 +55,18 @@ const open = ref(false)
 const panelRef = ref<HTMLElement|null>(null)
 const buttonRef = ref<HTMLElement|null>(null)
 
-function select(color: string) {
-  emit('update:modelValue', color)
-  open.value = false
+function select(color: string | { hex?: string; hex8?: string }, closePanel = true) {
+  // Chrome picker returns an object with hex property, preset swatches return strings
+  const hexValue = typeof color === 'string' ? color : (color.hex || color.hex8 || '#000000')
+  emit('update:modelValue', hexValue)
+  if (closePanel) {
+    open.value = false
+  }
+}
+
+function onChromeUpdate(color: { hex?: string; hex8?: string }) {
+  // Don't close panel when using Chrome picker - let user continue adjusting
+  select(color, false)
 }
 
 function onClickOutside(event: MouseEvent) {
