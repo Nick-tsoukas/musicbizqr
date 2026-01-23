@@ -7,7 +7,7 @@
           v-if="band.bandImg?.url"
           :src="band.bandImg.url"
           :alt="`${band.name} image`"
-          class="absolute inset-0 w-full h-full object-cover"
+          class="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         
