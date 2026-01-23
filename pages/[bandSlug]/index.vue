@@ -364,14 +364,14 @@
       <!-- ============================================ -->
 
       <!-- V2: Show Day Header (only on SHOW_DAY mode) -->
-      <ShowDayHeader
-        v-if="shouldShowShowDayHeader && upcomingEvents.length > 0"
-        :event="upcomingEvents[0]"
-        :has-pay-entry="enabledPaymentButtons.length > 0"
-        class="mt-4"
-        @tickets="(e) => handleClick(band.data.id, 'tickets', e.ticketLink)"
-        @pay-entry="scrollToSupport"
-      />
+      <div v-if="shouldShowShowDayHeader && upcomingEvents.length > 0" class="w-full px-6 mt-4 md:max-w-[80vw] md:mx-auto">
+        <ShowDayHeader
+          :event="upcomingEvents[0]"
+          :has-pay-entry="enabledPaymentButtons.length > 0"
+          @tickets="(e) => handleClick(band.data.id, 'tickets', e.ticketLink)"
+          @pay-entry="scrollToSupport"
+        />
+      </div>
 
       <!-- NOW Banner -->
       <div v-if="showNowBanner && nowBannerContent" class="w-full px-6 mt-6 md:max-w-[80vw] md:mx-auto">

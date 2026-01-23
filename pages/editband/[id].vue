@@ -89,8 +89,9 @@
                 </button>
               </div>
 
-              <!-- Smart Link Style (COMMENTED OUT - defaulting to Classic)
+              <!-- Smart Link Style (only for allowed users) -->
               <div 
+                v-if="showAlternativeTemplates"
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
                 :class="pageStyle === 'smartlink' 
                   ? 'border-purple-500 bg-purple-500/10' 
@@ -126,10 +127,10 @@
                   Preview
                 </button>
               </div>
-              -->
 
-              <!-- Compact Style (COMMENTED OUT - defaulting to Classic)
+              <!-- Compact Style (only for allowed users) -->
               <div 
+                v-if="showAlternativeTemplates"
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
                 :class="pageStyle === 'compact' 
                   ? 'border-purple-500 bg-purple-500/10' 
@@ -162,10 +163,10 @@
                   Preview
                 </button>
               </div>
-              -->
 
-              <!-- Bold Style (COMMENTED OUT - defaulting to Classic)
+              <!-- Bold Style (only for allowed users) -->
               <div 
+                v-if="showAlternativeTemplates"
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all md:col-span-2"
                 :class="pageStyle === 'bold' 
                   ? 'border-purple-500 bg-purple-500/10' 
@@ -201,7 +202,6 @@
                   Preview
                 </button>
               </div>
-              -->
 
             </div>
           </div>
@@ -1093,6 +1093,13 @@ const pageStyle = ref('default'); // 'default' | 'compact' | 'bold'
 const buttonStyle = ref('classic'); // 'classic' | 'modern'
 const showStylePreview = ref(false);
 const previewingStyle = ref('default');
+
+// Feature flag: show alternative templates only for specific users
+const allowedTemplateEmails = ['test101@gmail.com', 'nick.tsoukas101@gmail.com'];
+const showAlternativeTemplates = computed(() => {
+  const email = user.value?.email?.toLowerCase();
+  return email && allowedTemplateEmails.includes(email);
+});
 
 function openStylePreview(style) {
   previewingStyle.value = style;

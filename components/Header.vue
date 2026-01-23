@@ -37,6 +37,17 @@
         <!-- Divider -->
         <div class="w-px h-5 bg-white/20 mx-2"></div>
 
+        <!-- Search button -->
+        <button
+          @click="openSearch"
+          class="nav-icon group"
+          title="Search Artists (⌘K)"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+
         <!-- Icon links -->
         <NuxtLink to="/saved" class="nav-icon" title="Saved">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,6 +111,16 @@
           class="mobile-nav-link"
           >Home</NuxtLink
         >
+        <!-- Mobile search button -->
+        <button
+          @click="openSearchMobile"
+          class="mobile-nav-link flex items-center gap-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Search Artists
+        </button>
         <NuxtLink to="/saved" @click="toggleMenu" class="mobile-nav-link">
           Saved
           <client-only>
@@ -164,11 +185,19 @@
         >
       </div>
     </nav>
+      <!-- Band Search Modal -->
+    <client-only>
+      <BandSearchModal
+        :is-open="isSearchOpen"
+        @close="isSearchOpen = false"
+        @select="onBandSelect"
+      />
+    </client-only>
   </header>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useStrapiUser, useStrapiAuth, useFetch, useRuntimeConfig } from '#imports'
 import { useRouter } from 'vue-router'
 import { useAsyncData } from '#app'
@@ -221,6 +250,38 @@ const logoutUserMobile = () => {
   toggleMenu()
   router.push('/')
 }
+
+// Search modal state
+const isSearchOpen = ref(false)
+
+function openSearch() {
+  isSearchOpen.value = true
+}
+
+function openSearchMobile() {
+  toggleMenu()
+  isSearchOpen.value = true
+}
+
+function onBandSelect(band) {
+  router.push(`/${band.slug}`)
+}
+
+// Keyboard shortcut: Cmd/Ctrl + K
+function handleGlobalKeydown(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault()
+    isSearchOpen.value = true
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleGlobalKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleGlobalKeydown)
+})
 </script>
 
 <style scoped>
