@@ -33,8 +33,8 @@ const siteUrl = 'https://musicbizqr.com'
 const ogImageUrl = computed(() => `${siteUrl}/api/og/band/${bandSlug.value}.png?v=${cacheVersion.value}`)
 const canonicalUrl = computed(() => `${siteUrl}/share/band/${bandSlug.value}`)
 
-// Set OG meta tags (SSR)
-useHead({
+// Set OG meta tags (SSR) - use functions for reactivity
+useHead(() => ({
   title: bandName.value,
   meta: [
     { name: 'description', content: bandDescription.value },
@@ -53,7 +53,7 @@ useHead({
   link: [
     { rel: 'canonical', href: canonicalUrl.value },
   ],
-})
+}))
 
 // Redirect humans to the actual band page (client-side only)
 onMounted(() => {

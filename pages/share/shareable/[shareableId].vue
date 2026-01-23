@@ -65,8 +65,8 @@ const canonicalUrl = computed(() => `${siteUrl}/share/shareable/${shareableId.va
 const shareTitle = computed(() => `${headline.value} - ${bandName.value}`)
 const shareDescription = computed(() => `${hero.value} • ${proof.value}`)
 
-// Set OG meta tags (SSR)
-useHead({
+// Set OG meta tags (SSR) - use functions for reactivity
+useHead(() => ({
   title: shareTitle.value,
   meta: [
     { name: 'description', content: shareDescription.value },
@@ -85,7 +85,7 @@ useHead({
   link: [
     { rel: 'canonical', href: canonicalUrl.value },
   ],
-})
+}))
 
 // Redirect humans to the band page (client-side only)
 onMounted(() => {
