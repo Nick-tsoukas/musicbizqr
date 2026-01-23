@@ -7,7 +7,8 @@
           v-if="band.bandImg?.url"
           :src="band.bandImg.url"
           :alt="`${band.name} image`"
-          class="absolute inset-0 w-full h-full object-cover object-top"
+          class="absolute inset-0 w-full h-full object-cover"
+          style="object-position: center 25%;"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         
@@ -98,14 +99,11 @@
         <div class="p-6 space-y-6">
           <!-- Featured Song - Card Style with inline audio player -->
           <section v-if="hasFeaturedSong">
-            <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Featured Song</h3>
+            <!-- Only show heading for direct audio files, not embeds -->
+            <h3 v-if="!isEmbedSong" class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Featured Song</h3>
             
-            <!-- Embedded player (Spotify, SoundCloud, etc.) -->
-            <div v-if="isEmbedSong && embedHtml" class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-              <div class="p-4 pb-2">
-                <div class="text-white font-semibold">{{ songTitle }}</div>
-                <div class="text-white/50 text-sm">{{ band.name }}</div>
-              </div>
+            <!-- Embedded player (Spotify, SoundCloud, etc.) - no extra heading/title -->
+            <div v-if="isEmbedSong && embedHtml" class="rounded-xl overflow-hidden">
               <div class="w-full" v-html="embedHtml" />
             </div>
             
