@@ -1067,10 +1067,6 @@
       />
     </client-only>
 
-    <!-- DEV-only indicator when Live Surface is enabled -->
-    <client-only>
-      <DevIndicator />
-    </client-only>
   </div>
 </template>
 
@@ -1103,7 +1099,6 @@ import SupportModule from "@/components/smartlink/SupportModule.vue";
 import MomentBadges from "@/components/smartlink/MomentBadges.vue";
 import ShowDayHeader from "@/components/smartlink/ShowDayHeader.vue";
 import MomentShareCard from "@/components/smartlink/MomentShareCard.vue";
-import DevIndicator from "@/components/smartlink/DevIndicator.vue";
 import { getDemoFlag } from '@/composables/useDemoFlags';
 
 import facebookIcon from "@/assets/facebookfree.png";
