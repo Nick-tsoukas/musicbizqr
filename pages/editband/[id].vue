@@ -89,9 +89,8 @@
                 </button>
               </div>
 
-              <!-- Cybered Style (only for allowed users) -->
-              <div 
-                v-if="showAlternativeTemplates"
+              <!-- Cybered Style -->
+              <div
                 class="relative p-4 rounded-xl border-2 cursor-pointer transition-all"
                 :class="pageStyle === 'smartlink' 
                   ? 'border-purple-500 bg-purple-500/10' 
@@ -1015,12 +1014,8 @@ const buttonStyle = ref('classic'); // 'classic' | 'modern'
 const showStylePreview = ref(false);
 const previewingStyle = ref('default');
 
-// Feature flag: show alternative templates only for specific users
-const allowedTemplateEmails = ['test101@gmail.com', 'nick.tsoukas101@gmail.com'];
-const showAlternativeTemplates = computed(() => {
-  const email = user.value?.email?.toLowerCase();
-  return email && allowedTemplateEmails.includes(email);
-});
+// Feature flag: show alternative templates for all users
+const showAlternativeTemplates = computed(() => true);
 
 function openStylePreview(style) {
   previewingStyle.value = style;
