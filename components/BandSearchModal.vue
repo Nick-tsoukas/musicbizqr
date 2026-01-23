@@ -4,7 +4,8 @@
     <Transition name="fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl"
+        class="fixed inset-0 bg-black/90 backdrop-blur-xl"
+        style="z-index: 999999998 !important;"
         @click="close"
       />
     </Transition>
@@ -13,34 +14,37 @@
     <Transition name="scale-fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-[201] flex flex-col items-center overflow-hidden"
+        class="fixed inset-0 flex flex-col items-center overflow-hidden"
+        style="z-index: 999999998 !important;"
         @click.self="close"
         @keydown.esc="close"
       >
-        <!-- Close button -->
+        <!-- Close button - more prominent -->
         <button
           @click="close"
-          class="absolute top-6 right-6 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-200 group border border-white/10 hover:border-white/20"
+          class="fixed top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200 border border-white/20 hover:border-white/40 shadow-lg"
+          style="z-index: 999999999 !important;"
+          aria-label="Close search"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         <!-- Keyboard hint -->
-        <div class="absolute top-6 left-6 hidden md:flex items-center gap-2 text-white/30 text-sm">
-          <kbd class="px-2 py-1 rounded bg-white/10 text-xs font-mono">ESC</kbd>
+        <div class="absolute top-4 left-4 hidden md:flex items-center gap-2 text-white/40 text-sm">
+          <kbd class="px-2 py-1 rounded bg-white/15 text-xs font-mono border border-white/10">ESC</kbd>
           <span>to close</span>
         </div>
 
         <!-- Search container -->
-        <div class="w-full max-w-3xl px-6 pt-20 md:pt-32">
+        <div class="w-full max-w-2xl px-4 pt-16 md:pt-24">
           <!-- Search header -->
-          <div class="text-center mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">
               Discover Artists
             </h2>
-            <p class="text-white/50">
+            <p class="text-white/50 text-sm">
               Find your next favorite band
             </p>
           </div>
@@ -92,7 +96,7 @@
         </div>
 
         <!-- Results area -->
-        <div class="flex-1 w-full max-w-3xl px-6 py-6 overflow-y-auto">
+        <div class="flex-1 w-full max-w-2xl px-4 py-4 overflow-y-auto">
           <!-- Empty state - initial -->
           <div v-if="!searchQuery" class="flex flex-col items-center justify-center py-16 text-center">
             <div class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-6">
