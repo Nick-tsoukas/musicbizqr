@@ -146,6 +146,74 @@
       </client-only>
     </div>
 
+    <!-- Cybered Style -->
+    <div
+      v-else-if="isCyberedStyle"
+      class="bg-black w-screen mx-auto pt-[var(--header-height)] fade-in"
+    >
+      <BandPageCybered
+        :band="band.data"
+        :upcoming-events="upcomingEvents"
+        :hidden-links="hiddenLinks"
+        :enabled-payment-buttons="enabledPaymentButtons"
+        :followable-platforms="followablePlatforms"
+        @play-song="onSongPlay"
+        @play-video="playVideo"
+        @link-click="(link) => handleClick(band.data.id, link.name, link.url)"
+        @view-event="(event) => router.push(`/${route.params.bandSlug}/event/${event.slug}`)"
+        @quick-tip="(amount) => handleQuickTip(amount)"
+        @follow="openFollowModal"
+        @save="onToggleSaveBand"
+        @share="shareDrawerOpen = true"
+      />
+      
+      <!-- Fan Moment Section for cybered -->
+      <client-only>
+        <FanMomentSection
+          v-if="band?.data?.id"
+          ref="fanMomentRef"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
+          :pulse-data="pulseData"
+        />
+      </client-only>
+
+      <footer class="h-40 flex justify-center items-center bg-black">
+        <img src="@/assets/musicbizlogo.png" alt="MusicBiz Logo" class="h-12" />
+      </footer>
+
+      <!-- Follow Band Modal -->
+      <client-only>
+        <FollowBandModal
+          :is-open="followModalOpen"
+          :band-name="band?.data?.name || ''"
+          :band-id="band?.data?.id"
+          :band-slug="currentBandSlug"
+          :platforms="followablePlatforms"
+          @close="followModalOpen = false"
+          @confirm="handleFollowConfirm"
+          @track="handleFollowTrack"
+        />
+      </client-only>
+
+      <!-- Share Drawer -->
+      <client-only>
+        <ShareDrawer
+          v-if="band?.data?.id"
+          :is-open="shareDrawerOpen"
+          :band-id="band.data.id"
+          :band-slug="currentBandSlug"
+          :band-name="band.data.name || 'This Artist'"
+          :band-image-url="band.data.bandImg?.url || null"
+          :is-band-name-in-logo="band.data.isBandNameInLogo || false"
+          @close="shareDrawerOpen = false"
+        />
+      </client-only>
+    </div>
+
     <!-- Bold Style -->
     <div
       v-else-if="isBoldStyle"
@@ -1084,6 +1152,7 @@ import ShareBandStrip from "@/components/ShareBandStrip.vue";
 import ShareDrawer from "@/components/band/ShareDrawer.vue";
 import BandPageCompact from "@/components/band/BandPageCompact.vue";
 import BandPageBold from "@/components/band/BandPageBold.vue";
+import BandPageCybered from "@/components/band/BandPageCybered.vue";
 import {
   normalizeLayoutConfig,
   isSectionEnabled,
@@ -1442,9 +1511,12 @@ const pageStyle = computed(() => {
 
 const isCompactStyle = computed(() => pageStyle.value === 'compact');
 const isBoldStyle = computed(() => pageStyle.value === 'bold');
+const isCyberedStyle = computed(() => pageStyle.value === 'smartlink');
 
 // Button style for streaming/social links: 'classic' (original) or 'modern' (updated)
+// Cybered (smartlink) style automatically uses modern buttons
 const buttonStyle = computed(() => {
+  if (isCyberedStyle.value) return 'modern';
   return band.value?.data?.buttonStyle || 'classic';
 });
 

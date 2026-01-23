@@ -29,8 +29,13 @@
 
           <!-- Preview Content -->
           <div class="overflow-y-auto max-h-[calc(90vh-80px)] p-4">
-            <!-- Default Style Preview -->
-            <div v-if="previewStyle === 'default'" class="band-preview-default">
+            <!-- Classic Style Preview (white borders, simple layout) -->
+            <div v-if="previewStyle === 'default'" class="band-preview-classic">
+              <BandPageStyleClassic />
+            </div>
+
+            <!-- Cybered Style Preview (modern cards, Live Surface features) -->
+            <div v-else-if="previewStyle === 'smartlink'" class="band-preview-cybered">
               <BandPageStyleDefault />
             </div>
 
@@ -52,6 +57,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import BandPageStyleClassic from './BandPageStyleClassic.vue'
 import BandPageStyleDefault from './BandPageStyleDefault.vue'
 import BandPageStyleCompact from './BandPageStyleCompact.vue'
 import BandPageStyleBold from './BandPageStyleBold.vue'
@@ -64,7 +70,7 @@ const props = defineProps({
   previewStyle: {
     type: String,
     default: 'default',
-    validator: (v) => ['default', 'compact', 'bold'].includes(v)
+    validator: (v) => ['default', 'smartlink', 'compact', 'bold'].includes(v)
   }
 })
 
@@ -72,8 +78,10 @@ const emit = defineEmits(['close'])
 
 const styleLabel = computed(() => {
   if (props.previewStyle === 'default') return 'Classic'
+  if (props.previewStyle === 'smartlink') return 'Cybered'
   if (props.previewStyle === 'compact') return 'Compact'
-  return 'Bold'
+  if (props.previewStyle === 'bold') return 'Bold'
+  return 'Preview'
 })
 
 function close() {
