@@ -427,15 +427,23 @@ const songUrl = computed(() => {
   return nestedUrl || directUrl || null
 })
 
-const hasStreamingLinks = computed(() => 
-  streamingPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
-)
-const hasSocialLinks = computed(() => 
-  socialPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
-)
-const hasEventHubLinks = computed(() => 
-  eventHubPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
-)
+const hasStreamingLinks = computed(() => {
+  const result = streamingPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
+  console.log('[DEBUG] hasStreamingLinks:', result, 'band keys:', Object.keys(props.band || {}))
+  console.log('[DEBUG] streaming check:', streamingPlatforms.map(p => ({ name: p.name, value: props.band[p.name] })))
+  return result
+})
+const hasSocialLinks = computed(() => {
+  const result = socialPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
+  console.log('[DEBUG] hasSocialLinks:', result)
+  console.log('[DEBUG] social check:', socialPlatforms.map(p => ({ name: p.name, value: props.band[p.name] })))
+  return result
+})
+const hasEventHubLinks = computed(() => {
+  const result = eventHubPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
+  console.log('[DEBUG] hasEventHubLinks:', result)
+  return result
+})
 
 // Live Feed Data
 const liveFeedItems = ref([])
