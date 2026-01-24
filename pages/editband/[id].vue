@@ -1531,6 +1531,8 @@ async function fetchBand() {
     });
 
     // Social & Streaming & Event Hubs
+    console.log('[DEBUG fetchBand] Full attrs:', attrs);
+    console.log('[DEBUG fetchBand] threads:', attrs.threads, 'discord:', attrs.discord, 'patreon:', attrs.patreon);
     Object.keys(social.value).forEach(
       (k) => (social.value[k] = attrs[k] || "")
     );
