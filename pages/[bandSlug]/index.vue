@@ -2336,10 +2336,19 @@ async function fetchBandData() {
     `${api}/api/bands/slug/${encodeURIComponent(s)}` +
     `?fields[0]=slug&fields[1]=name&fields[2]=isBandNameInLogo&fields[3]=bio&fields[4]=biotagline` +
     `&fields[5]=websitelink&fields[6]=websitelinktext` +
-    `&fields[7]=youtube&fields[8]=youtubeMusic&fields[9]=spotify&fields[10]=appleMusic` + // streaming
+    // streaming platforms
+    `&fields[7]=youtube&fields[8]=youtubeMusic&fields[9]=spotify&fields[10]=appleMusic` +
     `&fields[11]=reverbnation&fields[12]=soundcloud&fields[13]=bandcamp&fields[14]=twitch&fields[15]=deezer` +
-    `&fields[16]=facebook&fields[17]=instagram&fields[18]=twitter&fields[19]=tiktok` + // social
-    `&fields[20]=paymentsEnabled&fields[21]=stripeOnboardingComplete&fields[22]=paymentButtons&fields[23]=hiddenLinks&fields[24]=merchConcierge&fields[25]=pageStyle` +
+    `&fields[16]=amazonMusic&fields[17]=tidal&fields[18]=pandora&fields[19]=audiomack` +
+    `&fields[20]=mixcloud&fields[21]=beatport&fields[22]=napster&fields[23]=vimeo&fields[24]=kick` +
+    // social platforms
+    `&fields[25]=facebook&fields[26]=instagram&fields[27]=twitter&fields[28]=tiktok` +
+    `&fields[29]=threads&fields[30]=discord&fields[31]=telegram&fields[32]=reddit` +
+    `&fields[33]=pinterest&fields[34]=linkedin&fields[35]=whatsapp&fields[36]=snapchat&fields[37]=patreon` +
+    // event hubs
+    `&fields[38]=bandsintown&fields[39]=songkick` +
+    // other fields
+    `&fields[40]=paymentsEnabled&fields[41]=stripeOnboardingComplete&fields[42]=paymentButtons&fields[43]=hiddenLinks&fields[44]=merchConcierge&fields[45]=pageStyle` +
     `&populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
     `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +

@@ -1101,6 +1101,7 @@ const social = ref({
   linkedin: "",
   whatsapp: "",
   snapchat: "",
+  patreon: "",
 });
 
 // Streaming links

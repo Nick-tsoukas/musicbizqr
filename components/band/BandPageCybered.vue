@@ -496,6 +496,7 @@ const socialPlatforms = [
   { name: 'reddit', iconify: 'simple-icons:reddit', label: 'Reddit', color: '#FF4500' },
   { name: 'pinterest', iconify: 'simple-icons:pinterest', label: 'Pinterest', color: '#E60023' },
   { name: 'linkedin', iconify: 'simple-icons:linkedin', label: 'LinkedIn', color: '#0A66C2' },
+  { name: 'patreon', iconify: 'simple-icons:patreon', label: 'Patreon', color: '#FF424D' },
 ]
 
 const eventHubPlatforms = [

@@ -462,6 +462,7 @@ const socialPlatforms = [
   { name: 'twitter', label: 'X', icon: twitterIcon },
   { name: 'facebook', label: 'Facebook', icon: facebookIcon },
   { name: 'twitch', label: 'Twitch', icon: twitchIcon },
+  { name: 'patreon', label: 'Patreon', iconify: 'simple-icons:patreon', color: '#FF424D' },
 ]
 
 const isLinkHidden = (name) => props.hiddenLinks.includes(name)
