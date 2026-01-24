@@ -482,6 +482,36 @@
           </div>
         </section>
 
+        <!-- Event Hubs Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-orange-500 to-red-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Event Hubs</h2>
+              <p class="form-section-subtitle">Connect your concert discovery profiles</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-for="hub in Object.keys(eventHubs)" :key="hub" class="form-field">
+                <label :for="hub" class="form-label capitalize">{{ hub }}</label>
+                <input
+                  :id="hub"
+                  type="text"
+                  v-model="eventHubs[hub]"
+                  class="form-input"
+                  :placeholder="`https://${hub}.com/...`"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Website Link Section -->
         <section class="form-section">
           <div class="form-section-header">
@@ -722,24 +752,44 @@ function handleMemberImageUpload(e, idx) {
   members.value[idx].imageUrl = URL.createObjectURL(f);
 }
 
-// Social + Streaming
+// Social + Streaming + Event Hubs
 const social = ref({
   facebook: "",
   instagram: "",
-  twitch: "",
   twitter: "",
-  whatsapp: "",
   tiktok: "",
+  threads: "",
+  discord: "",
+  telegram: "",
+  reddit: "",
+  pinterest: "",
+  linkedin: "",
+  whatsapp: "",
   snapchat: "",
-  reverbnation: "",
 });
 const streaming = ref({
-  appleMusic: "",
-  spotify: "",
-  soundcloud: "",
   youtube: "",
-  deezer: "",
+  youtubeMusic: "",
+  spotify: "",
+  appleMusic: "",
+  amazonMusic: "",
+  tidal: "",
+  pandora: "",
+  soundcloud: "",
+  audiomack: "",
   bandcamp: "",
+  deezer: "",
+  mixcloud: "",
+  beatport: "",
+  napster: "",
+  twitch: "",
+  vimeo: "",
+  kick: "",
+  reverbnation: "",
+});
+const eventHubs = ref({
+  bandsintown: "",
+  songkick: "",
 });
 
 // Featured song/video
@@ -879,6 +929,14 @@ async function submitForm() {
       // streaming (normalized)
       ...Object.fromEntries(
         Object.entries(streaming.value).map(([key, val]) => [
+          key,
+          normalizeLink(val),
+        ])
+      ),
+
+      // event hubs (normalized)
+      ...Object.fromEntries(
+        Object.entries(eventHubs.value).map(([key, val]) => [
           key,
           normalizeLink(val),
         ])

@@ -15,6 +15,7 @@ export interface SectionConfig {
 export interface ButtonsConfig {
   streaming: string[];
   social: string[];
+  eventHubs: string[];
 }
 
 export interface LayoutConfig {
@@ -64,11 +65,21 @@ export const DEFAULT_STREAMING_ORDER = [
   'youtubeMusic',
   'spotify',
   'appleMusic',
-  'reverbnation',
   'soundcloud',
   'bandcamp',
-  'twitch',
   'deezer',
+  'twitch',
+  'reverbnation',
+  // New platforms
+  'amazonMusic',
+  'tidal',
+  'pandora',
+  'audiomack',
+  'mixcloud',
+  'beatport',
+  'napster',
+  'vimeo',
+  'kick',
 ] as const;
 
 /**
@@ -79,6 +90,21 @@ export const DEFAULT_SOCIAL_ORDER = [
   'instagram',
   'twitter',
   'tiktok',
+  // New platforms
+  'threads',
+  'discord',
+  'telegram',
+  'reddit',
+  'pinterest',
+  'linkedin',
+] as const;
+
+/**
+ * Default event hub platform order
+ */
+export const DEFAULT_EVENT_HUB_ORDER = [
+  'bandsintown',
+  'songkick',
 ] as const;
 
 /**
@@ -102,6 +128,7 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   buttons: {
     streaming: [...DEFAULT_STREAMING_ORDER],
     social: [...DEFAULT_SOCIAL_ORDER],
+    eventHubs: [...DEFAULT_EVENT_HUB_ORDER],
   },
 };
 
@@ -119,6 +146,11 @@ const VALID_STREAMING_IDS = new Set<string>(DEFAULT_STREAMING_ORDER);
  * Set of valid social platform IDs
  */
 const VALID_SOCIAL_IDS = new Set<string>(DEFAULT_SOCIAL_ORDER);
+
+/**
+ * Set of valid event hub platform IDs
+ */
+const VALID_EVENT_HUB_IDS = new Set<string>(DEFAULT_EVENT_HUB_ORDER);
 
 /**
  * Safely parse a layout config that might be malformed.
@@ -196,6 +228,7 @@ export function normalizeLayoutConfig(input: unknown): LayoutConfig {
   // Normalize buttons
   let streamingButtons: string[] = [];
   let socialButtons: string[] = [];
+  let eventHubButtons: string[] = [];
 
   if (parsed.buttons && typeof parsed.buttons === 'object') {
     // Streaming buttons
@@ -212,6 +245,14 @@ export function normalizeLayoutConfig(input: unknown): LayoutConfig {
         (id): id is string => typeof id === 'string' && VALID_SOCIAL_IDS.has(id)
       );
       socialButtons = uniqueArray(socialButtons);
+    }
+
+    // Event hub buttons
+    if (Array.isArray(parsed.buttons.eventHubs)) {
+      eventHubButtons = parsed.buttons.eventHubs.filter(
+        (id): id is string => typeof id === 'string' && VALID_EVENT_HUB_IDS.has(id)
+      );
+      eventHubButtons = uniqueArray(eventHubButtons);
     }
   }
 
@@ -239,12 +280,25 @@ export function normalizeLayoutConfig(input: unknown): LayoutConfig {
     }
   }
 
+  // If no valid event hub buttons, use defaults
+  if (eventHubButtons.length === 0) {
+    eventHubButtons = [...DEFAULT_EVENT_HUB_ORDER];
+  } else {
+    // Append any missing default event hub platforms at the end
+    for (const defaultId of DEFAULT_EVENT_HUB_ORDER) {
+      if (!eventHubButtons.includes(defaultId)) {
+        eventHubButtons.push(defaultId);
+      }
+    }
+  }
+
   return {
     version: typeof parsed.version === 'number' ? parsed.version : 1,
     sections,
     buttons: {
       streaming: streamingButtons,
       social: socialButtons,
+      eventHubs: eventHubButtons,
     },
   };
 }

@@ -37,15 +37,17 @@
         <!-- Divider -->
         <div class="w-px h-5 bg-white/20 mx-2"></div>
 
-        <!-- Search button -->
+        <!-- Search input field -->
         <button
           @click="openSearch"
-          class="nav-icon group"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-full border-2 border-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20 transition-all group"
           title="Search Artists (⌘K)"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
+          <span class="text-emerald-400/70 text-sm">Search bands...</span>
+          <kbd class="hidden lg:inline-flex px-1.5 py-0.5 rounded bg-white/10 text-[10px] text-white/50 font-mono">⌘K</kbd>
         </button>
 
         <!-- Icon links -->
@@ -68,6 +70,17 @@
           </svg>
         </button>
       </nav>
+
+      <!-- Mobile search button - always visible -->
+      <button
+        @click="openSearch"
+        class="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border-2 border-emerald-400 bg-emerald-400/10 mr-3"
+      >
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <span class="text-emerald-400/80 text-xs font-medium">Search</span>
+      </button>
 
       <button @click="toggleMenu" class="md:hidden focus:outline-none">
         <svg

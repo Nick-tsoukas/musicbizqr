@@ -580,6 +580,52 @@
           </div>
         </section>
 
+        <!-- Event Hubs Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-orange-500 to-red-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Event Hubs</h2>
+              <p class="form-section-subtitle">Connect your concert discovery profiles</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-for="hub in Object.keys(eventHubs)" :key="hub" class="form-field">
+                <div class="flex items-center justify-between mb-2">
+                  <label :for="hub" class="form-label capitalize mb-0">{{ hub }}</label>
+                  <label :for="`hide-${hub}`" class="flex items-center gap-2 cursor-pointer">
+                    <span class="text-white/50 text-xs">Hide</span>
+                    <div class="relative">
+                      <input
+                        type="checkbox"
+                        :id="`hide-${hub}`"
+                        :checked="isLinkHidden(hub)"
+                        @change="setLinkHidden(hub, $event.target.checked)"
+                        class="sr-only peer"
+                      />
+                      <div class="w-8 h-4 bg-white/20 rounded-full peer peer-checked:bg-purple-600 transition-colors"></div>
+                      <div class="absolute left-[2px] top-[2px] w-3 h-3 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                  </label>
+                </div>
+                <input
+                  :id="hub"
+                  type="text"
+                  v-model="eventHubs[hub]"
+                  class="form-input"
+                  :placeholder="`https://${hub}.com/...`"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Website Link Section -->
         <section class="form-section">
           <div class="form-section-header">
@@ -1045,22 +1091,44 @@ const members = ref([]);
 const social = ref({
   facebook: "",
   instagram: "",
-  twitch: "",
   twitter: "",
-  whatsapp: "",
   tiktok: "",
+  threads: "",
+  discord: "",
+  telegram: "",
+  reddit: "",
+  pinterest: "",
+  linkedin: "",
+  whatsapp: "",
   snapchat: "",
 });
 
 // Streaming links
 const streaming = ref({
-  appleMusic: "",
-  spotify: "",
-  soundcloud: "",
   youtube: "",
-  deezer: "",
+  youtubeMusic: "",
+  spotify: "",
+  appleMusic: "",
+  amazonMusic: "",
+  tidal: "",
+  pandora: "",
+  soundcloud: "",
+  audiomack: "",
   bandcamp: "",
+  deezer: "",
+  mixcloud: "",
+  beatport: "",
+  napster: "",
+  twitch: "",
+  vimeo: "",
+  kick: "",
   reverbnation: "",
+});
+
+// Event hub links
+const eventHubs = ref({
+  bandsintown: "",
+  songkick: "",
 });
 
 const hiddenLinks = ref([]);
@@ -1426,7 +1494,10 @@ async function fetchBand() {
     const j = await res.json();
     if (!j.data) throw new Error("No data");
 
-    const attrs = j.data.attributes;
+    // Support both Strapi response formats:
+    // - Core controller: { data: { id, attributes: {...} } }
+    // - Custom controller: { data: { id, name, ... } } (flat)
+    const attrs = j.data.attributes || j.data;
 
     stripeAccountId.value = attrs.stripeAccountId || null;
     stripeOnboardingComplete.value = attrs.stripeOnboardingComplete === true;
@@ -1441,24 +1512,32 @@ async function fetchBand() {
     pageStyle.value = attrs.pageStyle || "default";
     buttonStyle.value = attrs.buttonStyle || "classic";
 
-    // Existing image
-    const img = attrs.bandImg?.data;
+    // Existing image - handle both formats
+    const img = attrs.bandImg?.data || attrs.bandImg;
     bandImgId.value = img?.id || null;
-    bandImgUrl.value = img?.attributes?.url || "";
+    bandImgUrl.value = img?.attributes?.url || img?.url || "";
 
-    // Members
-    members.value = (attrs.members?.data || []).map((m) => ({
-      name: m.attributes.name,
-      instrument: m.attributes.instrument,
-      imageUrl: m.attributes.image?.data?.attributes?.url || null,
-    }));
+    // Members - handle both formats
+    const rawMembers = attrs.members?.data || attrs.members || [];
+    members.value = rawMembers.map((m) => {
+      const memberData = m.attributes || m;
+      const memberImg = memberData.image?.data || memberData.image;
+      return {
+        name: memberData.name,
+        instrument: memberData.instrument,
+        imageUrl: memberImg?.attributes?.url || memberImg?.url || null,
+      };
+    });
 
-    // Social & Streaming
+    // Social & Streaming & Event Hubs
     Object.keys(social.value).forEach(
       (k) => (social.value[k] = attrs[k] || "")
     );
     Object.keys(streaming.value).forEach(
       (k) => (streaming.value[k] = attrs[k] || "")
+    );
+    Object.keys(eventHubs.value).forEach(
+      (k) => (eventHubs.value[k] = attrs[k] || "")
     );
 
     hiddenLinks.value = normalizeHiddenLinks(attrs.hiddenLinks);
@@ -1467,7 +1546,7 @@ async function fetchBand() {
 
     normalizeMerchConcierge(attrs.merchConcierge);
 
-    // Singlesong component + existing file
+    // Singlesong component + existing file - handle both formats
     if (attrs.singlesong) {
       const ss = attrs.singlesong;
       singlesongTitle.value = ss.title || "";
@@ -1481,9 +1560,10 @@ async function fetchBand() {
       } else {
         singlesongType.value = "upload";
       }
-      singlesongFileId.value = ss.song?.data?.id || null;
+      const songFile = ss.song?.data || ss.song;
+      singlesongFileId.value = songFile?.id || null;
       // Store existing song filename for display
-      existingSongFilename.value = ss.song?.data?.attributes?.name || "";
+      existingSongFilename.value = songFile?.attributes?.name || songFile?.name || "";
     }
 
     // Singlevideo component
@@ -1655,7 +1735,7 @@ async function submitForm() {
           title: singlevideoTitle.value || "",
         };
 
-    // Normalize socials/streaming
+    // Normalize socials/streaming/eventHubs
     const normalizedSocial = Object.fromEntries(
       Object.entries(social.value).map(([key, val]) => [
         key,
@@ -1664,6 +1744,12 @@ async function submitForm() {
     );
     const normalizedStreaming = Object.fromEntries(
       Object.entries(streaming.value).map(([key, val]) => [
+        key,
+        normalizeLink(val),
+      ])
+    );
+    const normalizedEventHubs = Object.fromEntries(
+      Object.entries(eventHubs.value).map(([key, val]) => [
         key,
         normalizeLink(val),
       ])
@@ -1739,6 +1825,7 @@ async function submitForm() {
       })),
       ...normalizedSocial,
       ...normalizedStreaming,
+      ...normalizedEventHubs,
       singlesong: singlesongPayload,
       singlevideo: singlevideoPayload,
     };
@@ -1769,7 +1856,7 @@ if (!slug) {
       headers: { Authorization: `Bearer ${token.value}` },
     });
     const j = await r.json();
-    slug = j?.data?.attributes?.slug || null;
+    slug = j?.data?.attributes?.slug || j?.data?.slug || null;
   } catch {}
 }
 

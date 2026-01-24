@@ -604,10 +604,11 @@
                 "
                 :class="streamingButtonClasses"
               >
-                <img
-                  :src="platform.img"
-                  :class="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
+                <PlatformIcon
+                  :existing-icon="platform.img"
+                  :iconify="platform.iconify"
                   :alt="platform.label"
+                  :class-name="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
                 />
                 <span :class="buttonStyle === 'modern' ? 'text-white font-medium' : 'text-white font-semibold text-lg md:text-xl min-w-0 truncate'">{{ platform.label }}</span>
               </a>
@@ -633,10 +634,41 @@
                 "
                 :class="streamingButtonClasses"
               >
-                <img
-                  :src="platform.img"
-                  :class="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
+                <PlatformIcon
+                  :existing-icon="platform.img"
+                  :iconify="platform.iconify"
                   :alt="platform.label"
+                  :class-name="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
+                />
+                <span :class="buttonStyle === 'modern' ? 'text-white font-medium' : 'text-white font-semibold text-lg md:text-xl min-w-0 truncate'">{{ platform.label }}</span>
+              </a>
+            </template>
+          </div>
+        </section>
+
+        <!-- Event Hubs -->
+        <section v-if="hasEventHubLinks" class="mt-10">
+          <h3 v-if="buttonStyle === 'modern'" class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Event Hubs</h3>
+          <h2 v-else class="text-2xl md:text-3xl font-bold text-white mb-4">Event Hubs</h2>
+          <div :class="buttonStyle === 'modern' ? 'space-y-2' : ''">
+            <template v-for="platform in orderedEventHubPlatforms" :key="platform.name">
+              <a
+                v-if="band.data[platform.name] && !isLinkHidden(platform.name)"
+                :href="band.data[platform.name]"
+                @click.prevent="
+                  handleClick(
+                    band.data.id,
+                    platform.name,
+                    band.data[platform.name]
+                  )
+                "
+                :class="streamingButtonClasses"
+              >
+                <PlatformIcon
+                  :existing-icon="platform.img"
+                  :iconify="platform.iconify"
+                  :alt="platform.label"
+                  :class-name="buttonStyle === 'modern' ? 'w-6 h-6 shrink-0' : 'w-8 h-8 shrink-0'"
                 />
                 <span :class="buttonStyle === 'modern' ? 'text-white font-medium' : 'text-white font-semibold text-lg md:text-xl min-w-0 truncate'">{{ platform.label }}</span>
               </a>
@@ -1169,20 +1201,24 @@ import MomentBadges from "@/components/smartlink/MomentBadges.vue";
 import ShowDayHeader from "@/components/smartlink/ShowDayHeader.vue";
 import MomentShareCard from "@/components/smartlink/MomentShareCard.vue";
 import { getDemoFlag } from '@/composables/useDemoFlags';
+import PlatformIcon from "@/components/ui/PlatformIcon.vue";
 
-import facebookIcon from "@/assets/facebookfree.png";
-import instagramIcon from "@/assets/instagramfree.png";
-import twitchIcon from "@/assets/twitchfree.png";
+// Streaming icons (existing platforms only - new ones use iconify)
+import youtubeIcon from "@/assets/youtube-icon.svg";
+import youtubeMusicIcon from "@/assets/youtube-icon.svg";
+import spotifyIcon from "@/assets/spotify.svg";
 import appleMusicIcon from "@/assets/apple.svg";
 import soundcloudIcon from "@/assets/soundcloudlast.png";
-import deezerIcon from "@/assets/dezzer.svg";
-import youtubeIcon from "@/assets/youtube-icon.svg";
 import bandcampIcon from "@/assets/bandcamp.svg";
+import deezerIcon from "@/assets/dezzer.svg";
+import twitchIcon from "@/assets/twitchfree.png";
 import reverbnationIcon from "@/assets/reverbnation.png";
-import spotifyIcon from "@/assets/spotify.svg";
-import youtubeMusicIcon from "@/assets/youtube-icon.svg";
-import tiktokIcon from "@/assets/tiktok.png";
+
+// Social icons (existing platforms only - new ones use iconify)
+import facebookIcon from "@/assets/facebookfree.png";
+import instagramIcon from "@/assets/instagramfree.png";
 import twitterIcon from "@/assets/twitter.png";
+import tiktokIcon from "@/assets/tiktok.png";
 
 const hasTrackedEmbedClick = ref(false);
 const embedPlayerWrapperEl = ref(null);
@@ -2209,6 +2245,9 @@ const hasStreamingLinks = computed(() =>
 const hasSocialLinks = computed(() =>
   socialPlatforms.some((p) => !!band.value?.data?.[p.name] && !isLinkHidden(p.name))
 );
+const hasEventHubLinks = computed(() =>
+  eventHubPlatforms.some((p) => !!band.value?.data?.[p.name] && !isLinkHidden(p.name))
+);
 
 /* ---------- video ---------- */
 const singleVideoThumbnail = computed(() => {
@@ -2426,22 +2465,47 @@ const paginatedPastEvents = computed(() => {
 });
 
 const streamingPlatforms = [
+  // Existing platforms (keep img)
   { name: "youtube", img: youtubeIcon, label: "YouTube" },
   { name: "youtubeMusic", img: youtubeMusicIcon, label: "YouTube Music" },
   { name: "spotify", img: spotifyIcon, label: "Spotify" },
   { name: "appleMusic", img: appleMusicIcon, label: "Apple Music" },
-  { name: "reverbnation", img: reverbnationIcon, label: "Reverbnation" },
   { name: "soundcloud", img: soundcloudIcon, label: "SoundCloud" },
   { name: "bandcamp", img: bandcampIcon, label: "Bandcamp" },
-  { name: "twitch", img: twitchIcon, label: "Twitch" },
   { name: "deezer", img: deezerIcon, label: "Deezer" },
+  { name: "twitch", img: twitchIcon, label: "Twitch" },
+  { name: "reverbnation", img: reverbnationIcon, label: "Reverbnation" },
+  // New platforms (use iconify)
+  { name: "amazonMusic", iconify: "simple-icons:amazonmusic", label: "Amazon Music" },
+  { name: "tidal", iconify: "simple-icons:tidal", label: "TIDAL" },
+  { name: "pandora", iconify: "simple-icons:pandora", label: "Pandora" },
+  { name: "audiomack", iconify: "simple-icons:audiomack", label: "Audiomack" },
+  { name: "mixcloud", iconify: "simple-icons:mixcloud", label: "Mixcloud" },
+  { name: "beatport", iconify: "simple-icons:beatport", label: "Beatport" },
+  { name: "napster", iconify: "simple-icons:napster", label: "Napster" },
+  { name: "vimeo", iconify: "simple-icons:vimeo", label: "Vimeo" },
+  { name: "kick", iconify: "simple-icons:kick", label: "Kick" },
 ];
 
 const socialPlatforms = [
+  // Existing platforms (keep img)
   { name: "facebook", img: facebookIcon, label: "Facebook" },
   { name: "instagram", img: instagramIcon, label: "Instagram" },
   { name: "twitter", img: twitterIcon, label: "Twitter" },
-  { name: "tiktok", img: tiktokIcon, label: "Tiktok" },
+  { name: "tiktok", img: tiktokIcon, label: "TikTok" },
+  // New platforms (use iconify)
+  { name: "threads", iconify: "simple-icons:threads", label: "Threads" },
+  { name: "discord", iconify: "simple-icons:discord", label: "Discord" },
+  { name: "telegram", iconify: "simple-icons:telegram", label: "Telegram" },
+  { name: "reddit", iconify: "simple-icons:reddit", label: "Reddit" },
+  { name: "pinterest", iconify: "simple-icons:pinterest", label: "Pinterest" },
+  { name: "linkedin", iconify: "simple-icons:linkedin", label: "LinkedIn" },
+];
+
+const eventHubPlatforms = [
+  // New platforms (use iconify)
+  { name: "bandsintown", iconify: "simple-icons:bandsintown", label: "Bandsintown" },
+  { name: "songkick", iconify: "simple-icons:songkick", label: "Songkick" },
 ];
 
 const streamingPlatformsMap = Object.fromEntries(
@@ -2450,6 +2514,10 @@ const streamingPlatformsMap = Object.fromEntries(
 
 const socialPlatformsMap = Object.fromEntries(
   socialPlatforms.map((p) => [p.name, p])
+);
+
+const eventHubPlatformsMap = Object.fromEntries(
+  eventHubPlatforms.map((p) => [p.name, p])
 );
 
 const orderedStreamingPlatforms = computed(() => {
@@ -2463,6 +2531,13 @@ const orderedSocialPlatforms = computed(() => {
   const order = layoutConfig.value.buttons.social;
   return order
     .map((id) => socialPlatformsMap[id])
+    .filter(Boolean);
+});
+
+const orderedEventHubPlatforms = computed(() => {
+  const order = layoutConfig.value.buttons.eventHubs;
+  return order
+    .map((id) => eventHubPlatformsMap[id])
     .filter(Boolean);
 });
 

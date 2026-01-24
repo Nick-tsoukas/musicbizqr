@@ -224,7 +224,7 @@
                   @click.prevent="$emit('link-click', { name: platform.name, url: band[platform.name] })"
                   class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
                 >
-                  <img :src="platform.img" :alt="platform.label" class="w-6 h-6 shrink-0" />
+                  <PlatformIcon :existing-icon="platform.img" :iconify="platform.iconify" :color="platform.color" :alt="platform.label" class-name="w-6 h-6 shrink-0" />
                   <span class="text-white font-medium">{{ platform.label }}</span>
                 </a>
               </template>
@@ -242,7 +242,25 @@
                   @click.prevent="$emit('link-click', { name: platform.name, url: band[platform.name] })"
                   class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
                 >
-                  <img :src="platform.img" :alt="platform.label" class="w-6 h-6 shrink-0" />
+                  <PlatformIcon :existing-icon="platform.img" :iconify="platform.iconify" :color="platform.color" :alt="platform.label" class-name="w-6 h-6 shrink-0" />
+                  <span class="text-white font-medium">{{ platform.label }}</span>
+                </a>
+              </template>
+            </div>
+          </section>
+
+          <!-- Event Hubs - Modern Cards -->
+          <section v-if="hasEventHubLinks">
+            <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Event Hubs</h3>
+            <div class="space-y-2">
+              <template v-for="platform in eventHubPlatforms" :key="platform.name">
+                <a
+                  v-if="band[platform.name] && !isLinkHidden(platform.name)"
+                  :href="band[platform.name]"
+                  @click.prevent="$emit('link-click', { name: platform.name, url: band[platform.name] })"
+                  class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition"
+                >
+                  <PlatformIcon :existing-icon="platform.img" :iconify="platform.iconify" :color="platform.color" :alt="platform.label" class-name="w-6 h-6 shrink-0" />
                   <span class="text-white font-medium">{{ platform.label }}</span>
                 </a>
               </template>
@@ -323,6 +341,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { getDemoFlag } from '@/composables/useDemoFlags'
+import PlatformIcon from '@/components/ui/PlatformIcon.vue'
 
 // Live Surface Components
 import ShowDayHeader from '@/components/smartlink/ShowDayHeader.vue'
@@ -331,16 +350,18 @@ import ContinueChip from '@/components/smartlink/ContinueChip.vue'
 import LiveFeed from '@/components/smartlink/LiveFeed.vue'
 import SupportModule from '@/components/smartlink/SupportModule.vue'
 
-// Platform icons
-import spotifyIcon from '@/assets/spotify.svg'
-import appleMusicIcon from '@/assets/apple.svg'
+// Streaming icons (existing platforms only - new ones use iconify)
 import youtubeIcon from '@/assets/youtube-icon.svg'
 import youtubeMusicIcon from '@/assets/youtube-icon.svg'
+import spotifyIcon from '@/assets/spotify.svg'
+import appleMusicIcon from '@/assets/apple.svg'
 import soundcloudIcon from '@/assets/soundcloudlast.png'
 import bandcampIcon from '@/assets/bandcamp.svg'
 import deezerIcon from '@/assets/dezzer.svg'
 import twitchIcon from '@/assets/twitchfree.png'
 import reverbnationIcon from '@/assets/reverbnation.png'
+
+// Social icons (existing platforms only - new ones use iconify)
 import facebookIcon from '@/assets/facebookfree.png'
 import instagramIcon from '@/assets/instagramfree.png'
 import twitterIcon from '@/assets/twitter.png'
@@ -412,6 +433,9 @@ const hasStreamingLinks = computed(() =>
 const hasSocialLinks = computed(() => 
   socialPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
 )
+const hasEventHubLinks = computed(() => 
+  eventHubPlatforms.some(p => !!props.band[p.name] && !isLinkHidden(p.name))
+)
 
 // Live Feed Data
 const liveFeedItems = ref([])
@@ -437,22 +461,47 @@ const nowBannerContent = computed(() => ({
 
 // Platform definitions
 const streamingPlatforms = [
+  // Existing platforms (keep img)
   { name: 'youtube', img: youtubeIcon, label: 'YouTube' },
   { name: 'youtubeMusic', img: youtubeMusicIcon, label: 'YouTube Music' },
   { name: 'spotify', img: spotifyIcon, label: 'Spotify' },
   { name: 'appleMusic', img: appleMusicIcon, label: 'Apple Music' },
-  { name: 'reverbnation', img: reverbnationIcon, label: 'Reverbnation' },
   { name: 'soundcloud', img: soundcloudIcon, label: 'SoundCloud' },
   { name: 'bandcamp', img: bandcampIcon, label: 'Bandcamp' },
-  { name: 'twitch', img: twitchIcon, label: 'Twitch' },
   { name: 'deezer', img: deezerIcon, label: 'Deezer' },
+  { name: 'twitch', img: twitchIcon, label: 'Twitch' },
+  { name: 'reverbnation', img: reverbnationIcon, label: 'Reverbnation' },
+  // New platforms (use iconify with brand colors)
+  { name: 'amazonMusic', iconify: 'simple-icons:amazonmusic', label: 'Amazon Music', color: '#00A8E1' },
+  { name: 'tidal', iconify: 'simple-icons:tidal', label: 'TIDAL', color: '#00FFFF' },
+  { name: 'pandora', iconify: 'simple-icons:pandora', label: 'Pandora', color: '#3668FF' },
+  { name: 'audiomack', iconify: 'simple-icons:audiomack', label: 'Audiomack', color: '#FFA200' },
+  { name: 'mixcloud', iconify: 'simple-icons:mixcloud', label: 'Mixcloud', color: '#5000FF' },
+  { name: 'beatport', iconify: 'simple-icons:beatport', label: 'Beatport', color: '#94D500' },
+  { name: 'napster', iconify: 'simple-icons:napster', label: 'Napster', color: '#00A9E0' },
+  { name: 'vimeo', iconify: 'simple-icons:vimeo', label: 'Vimeo', color: '#1AB7EA' },
+  { name: 'kick', iconify: 'simple-icons:kick', label: 'Kick', color: '#53FC18' },
 ]
 
 const socialPlatforms = [
+  // Existing platforms (keep img)
   { name: 'facebook', img: facebookIcon, label: 'Facebook' },
   { name: 'instagram', img: instagramIcon, label: 'Instagram' },
   { name: 'twitter', img: twitterIcon, label: 'Twitter' },
   { name: 'tiktok', img: tiktokIcon, label: 'TikTok' },
+  // New platforms (use iconify with brand colors)
+  { name: 'threads', iconify: 'simple-icons:threads', label: 'Threads', color: '#FFFFFF' },
+  { name: 'discord', iconify: 'simple-icons:discord', label: 'Discord', color: '#5865F2' },
+  { name: 'telegram', iconify: 'simple-icons:telegram', label: 'Telegram', color: '#26A5E4' },
+  { name: 'reddit', iconify: 'simple-icons:reddit', label: 'Reddit', color: '#FF4500' },
+  { name: 'pinterest', iconify: 'simple-icons:pinterest', label: 'Pinterest', color: '#E60023' },
+  { name: 'linkedin', iconify: 'simple-icons:linkedin', label: 'LinkedIn', color: '#0A66C2' },
+]
+
+const eventHubPlatforms = [
+  // New platforms (use iconify with brand colors)
+  { name: 'bandsintown', iconify: 'simple-icons:bandsintown', label: 'Bandsintown', color: '#00CEC8' },
+  { name: 'songkick', iconify: 'simple-icons:songkick', label: 'Songkick', color: '#F80046' },
 ]
 
 // Methods
