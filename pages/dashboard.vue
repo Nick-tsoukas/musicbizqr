@@ -57,15 +57,6 @@
               ]"
             >
               {{ label }}
-
-function openShareDrawer(band) {
-  activeShareBand.value = band;
-  shareDrawerOpen.value = true;
-}
-
-function closeShareDrawer() {
-  shareDrawerOpen.value = false;
-}
             </button>
           </div>
         </div>
@@ -338,7 +329,7 @@ function closeShareDrawer() {
                 </button>
 
                 <button
-                  @click="copyToClipboard(`${config.public.baseUrl}/${band.slug}`)"
+                  @click="openShareDrawer(band)"
                   class="action-btn-labeled text-amber-400"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -565,6 +556,17 @@ function closeShareDrawer() {
         {{ toastMessage }}
       </div>
     </transition>
+
+    <ShareDrawer
+      v-if="activeShareBand"
+      :is-open="shareDrawerOpen"
+      :band-id="Number(activeShareBand.id)"
+      :band-slug="activeShareBand.slug"
+      :band-name="activeShareBand.name"
+      :band-image-url="activeShareBand.bandImg?.url || activeShareBand.imageUrl || null"
+      :is-band-name-in-logo="activeShareBand.isBandNameInLogo || false"
+      @close="closeShareDrawer"
+    />
   </div>
 </template>
 
@@ -676,6 +678,15 @@ const activeQrName = ref("qr-code");
 
 const shareDrawerOpen = ref(false);
 const activeShareBand = ref(null);
+
+function openShareDrawer(band) {
+  activeShareBand.value = band;
+  shareDrawerOpen.value = true;
+}
+
+function closeShareDrawer() {
+  shareDrawerOpen.value = false;
+}
 
 // Delete modal state
 const showDeleteModal = ref(false);
