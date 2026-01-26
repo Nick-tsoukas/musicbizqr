@@ -57,6 +57,15 @@
               ]"
             >
               {{ label }}
+
+function openShareDrawer(band) {
+  activeShareBand.value = band;
+  shareDrawerOpen.value = true;
+}
+
+function closeShareDrawer() {
+  shareDrawerOpen.value = false;
+}
             </button>
           </div>
         </div>
@@ -573,6 +582,7 @@ import { differenceInCalendarDays } from "date-fns";
 import { useRuntimeConfig } from "#imports";
 import ShareablesSection from '~/components/dashboard/ShareablesSection.vue';
 import DemoControlsCard from '~/components/dashboard/DemoControlsCard.vue';
+import ShareDrawer from '~/components/band/ShareDrawer.vue';
 
 // rebuild
 
@@ -663,6 +673,9 @@ let toastTimeout = null;
 const showDownload = ref(false);
 const activeQrOptions = ref(null);
 const activeQrName = ref("qr-code");
+
+const shareDrawerOpen = ref(false);
+const activeShareBand = ref(null);
 
 // Delete modal state
 const showDeleteModal = ref(false);
