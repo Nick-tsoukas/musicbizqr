@@ -341,40 +341,12 @@
         </div>
       </div>
 
-      <!-- Link Clicks: Top Platforms (from server rollups) -->
-      <div v-if="selectedTab === 'Link Clicks'" class="chart-card">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-white font-semibold">Top Platforms</h3>
-          <span class="text-white/50 text-xs">{{ totalClicksInRange }} in range</span>
-        </div>
-
-        <div v-if="topClickPlatforms.length" class="space-y-2">
-          <div
-            v-for="[name, count] in topClickPlatforms"
-            :key="name"
-            class="flex items-center gap-3"
-          >
-            <div class="w-28 truncate text-white/85 text-sm capitalize">{{ name }}</div>
-            <div class="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
-              <div
-                class="h-2 rounded-full bg-purple-400/80"
-                :style="{
-                  width:
-                    Math.min(
-                      100,
-                      Math.round(
-                        (count / (topClickPlatforms[0]?.[1] || 1)) * 100
-                      )
-                    ) + '%',
-                }"
-              />
-            </div>
-            <div class="w-10 text-right tabular-nums text-white/60 text-sm">{{ count }}</div>
-          </div>
-        </div>
-
-        <p v-else class="text-white/50 text-sm">No clicks in this range.</p>
-      </div>
+      <!-- Platform Clicks Card (always visible, elite design) -->
+      <AnalyticsPlatformClicksCard
+        :platform-data="topClickPlatforms"
+        :loading="isInitialLoading"
+        :range-label="museRangeLabel"
+      />
 
       <!-- USA Heat Map -->
       <UsHeatMapCard
