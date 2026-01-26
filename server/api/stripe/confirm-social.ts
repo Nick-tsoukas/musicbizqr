@@ -36,16 +36,47 @@ export default defineEventHandler(async (event) => {
   if (existingUsers.length > 0) {
     user = existingUsers[0]
 
-    // Log in existing user to get JWT
-    const loginRes = await $fetch<{ jwt: string }>(`${strapiUrl}/api/auth/local`, {
-      method: 'POST',
-      body: {
-        identifier: email,
-        password
+    // For existing users, try password login first (for Google-created accounts)
+    // If that fails, update their password to the Firebase-derived one and retry
+    try {
+      const loginRes = await $fetch<{ jwt: string }>(`${strapiUrl}/api/auth/local`, {
+        method: 'POST',
+        body: {
+          identifier: email,
+          password
+        }
+      })
+      jwt = loginRes.jwt
+    } catch (loginError: any) {
+      console.log('[confirm-social] Password login failed, updating password for Google auth')
+      
+      // Update user's password to Firebase-derived password using API token
+      const apiToken = config.strapiApiToken
+      if (!apiToken) {
+        throw new Error('Strapi API token not configured - cannot link Google account')
       }
-    })
 
-    jwt = loginRes.jwt
+      await $fetch(`${strapiUrl}/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${apiToken}`
+        },
+        body: {
+          password,
+          confirmed: true
+        }
+      })
+
+      // Now login should work
+      const loginRes = await $fetch<{ jwt: string }>(`${strapiUrl}/api/auth/local`, {
+        method: 'POST',
+        body: {
+          identifier: email,
+          password
+        }
+      })
+      jwt = loginRes.jwt
+    }
   } else {
     // Register new user
     const createRes = await $fetch<{ jwt: string; user: StrapiUser }>(`${strapiUrl}/api/auth/local/register`, {
