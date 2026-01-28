@@ -7,7 +7,16 @@ export const useFirebase = () => {
   
   async function loginWithGoogle() {
     try {
-      const { signInWithPopup } = await import('firebase/auth')
+      const { signInWithPopup, signOut } = await import('firebase/auth')
+      
+      // Sign out first to force account picker to show
+      await signOut(auth)
+      
+      // Force account selection every time
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      })
+      
       const result = await signInWithPopup(auth, provider)
       const user = result.user
       console.log('🟢 Firebase sign-in result:', result)
