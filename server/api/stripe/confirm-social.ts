@@ -38,7 +38,8 @@ export default defineEventHandler(async (event) => {
     throw new Error('Server configuration error - missing API token')
   }
   
-  const existingUsers = await $fetch<StrapiUser[]>(`${strapiUrl}/api/users?filters[email][$eq]=${email}`, {
+  // Use custom user-admin endpoint that works with API tokens
+  const existingUsers = await $fetch<StrapiUser[]>(`${strapiUrl}/api/user-admin/by-email/${encodeURIComponent(email)}`, {
     headers: {
       Authorization: `Bearer ${apiToken}`
     }
@@ -64,15 +65,16 @@ export default defineEventHandler(async (event) => {
     } catch (loginError: any) {
       console.log('[confirm-social] Password login failed, updating password for Google auth')
       
-      // Update user's password to Firebase-derived password using API token
-      await $fetch(`${strapiUrl}/api/users/${user.id}`, {
+      // Update user's password using custom user-admin endpoint (works with API tokens)
+      await $fetch(`${strapiUrl}/api/user-admin/${user.id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${apiToken}`
         },
         body: {
           password,
-          confirmed: true
+          confirmed: true,
+          provider: 'local'
         }
       })
 
@@ -107,11 +109,11 @@ export default defineEventHandler(async (event) => {
   // Step 3: Create Stripe customer and start trial
   const customer = await createStripeCustomerAndTrial(user)
 
-  // Step 4: Update Strapi user with Stripe data
-  await $fetch(`${strapiUrl}/api/users/${user.id}`, {
+  // Step 4: Update Strapi user with Stripe data using custom endpoint
+  await $fetch(`${strapiUrl}/api/user-admin/${user.id}`, {
     method: 'PUT',
     headers: {
-      Authorization: `Bearer ${jwt}`
+      Authorization: `Bearer ${apiToken}`
     },
     body: {
       customerId: customer.id,
