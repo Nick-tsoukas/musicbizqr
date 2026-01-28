@@ -12,23 +12,37 @@ type StrapiUser = {
 }
 
 export default defineEventHandler(async (event) => {
-  const { email, name, uid } = await readBody(event)
+  try {
+    const { email, name, uid } = await readBody(event)
 
-  if (!email || !name) {
-    return {
-      statusCode: 400,
-      body: { error: 'Missing email or name' }
+    if (!email || !name) {
+      return {
+        statusCode: 400,
+        body: { error: 'Missing email or name' }
+      }
     }
+
+    const config = useRuntimeConfig()
+    const strapiUrl = config.public.strapiUrl
+
+    // Use UID to generate a reproducible password
+    const password = uid + '_firebaseA1!'
+    
+    // Use email as username to avoid conflicts with display names containing spaces
+    const username = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '') + '_' + Date.now().toString(36)
+
+  // Step 1: Check if user already exists (requires API token for user lookup)
+  const apiToken = config.strapiApiToken
+  if (!apiToken) {
+    console.error('[confirm-social] STRAPI_API_TOKEN not configured')
+    throw new Error('Server configuration error - missing API token')
   }
-
-  const config = useRuntimeConfig()
-  const strapiUrl = config.public.strapiUrl
-
-  // Use UID to generate a reproducible password
-  const password = uid + '_firebaseA1!'
-
-  // Step 1: Check if user already exists
-  const existingUsers = await $fetch<StrapiUser[]>(`${strapiUrl}/api/users?filters[email][$eq]=${email}`)
+  
+  const existingUsers = await $fetch<StrapiUser[]>(`${strapiUrl}/api/users?filters[email][$eq]=${email}`, {
+    headers: {
+      Authorization: `Bearer ${apiToken}`
+    }
+  })
 
   let user: StrapiUser
   let jwt: string
@@ -51,11 +65,6 @@ export default defineEventHandler(async (event) => {
       console.log('[confirm-social] Password login failed, updating password for Google auth')
       
       // Update user's password to Firebase-derived password using API token
-      const apiToken = config.strapiApiToken
-      if (!apiToken) {
-        throw new Error('Strapi API token not configured - cannot link Google account')
-      }
-
       await $fetch(`${strapiUrl}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
@@ -79,15 +88,17 @@ export default defineEventHandler(async (event) => {
     }
   } else {
     // Register new user
+    console.log('[confirm-social] Registering new user:', { email, username })
     const createRes = await $fetch<{ jwt: string; user: StrapiUser }>(`${strapiUrl}/api/auth/local/register`, {
       method: 'POST',
       body: {
-        username: name,
+        username,
         email,
         password,
         confirmed: true
       }
     })
+    console.log('[confirm-social] User registered:', createRes.user?.id)
 
     user = createRes.user
     jwt = createRes.jwt
@@ -116,5 +127,10 @@ export default defineEventHandler(async (event) => {
       ...user,
       customerId: customer.id
     }
+  }
+  } catch (error: any) {
+    console.error('[confirm-social] Error:', error?.message || error)
+    console.error('[confirm-social] Stack:', error?.stack)
+    throw error
   }
 })
