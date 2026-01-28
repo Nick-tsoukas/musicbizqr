@@ -49,9 +49,15 @@ export const useFirebase = () => {
         console.error('Missing JWT in response', res)
         alert('Signup succeeded, but we couldn’t log you in. Please try again.')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Google login error:', err)
-      alert('Something went wrong during Google login')
+      console.error('Error message:', err?.message)
+      console.error('Error data:', err?.data)
+      console.error('Error status:', err?.status || err?.statusCode)
+      
+      // Show more specific error message
+      const errorMsg = err?.data?.message || err?.message || 'Unknown error'
+      alert(`Google login failed: ${errorMsg}`)
     }
   }
   
