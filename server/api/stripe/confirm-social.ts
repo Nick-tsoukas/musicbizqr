@@ -138,29 +138,42 @@ export default defineEventHandler(async (event) => {
       }
     }
   } else {
-    // Register new user
+    // Register new user using custom user-admin endpoint (bypasses email confirmation issues)
     console.log('[confirm-social] Registering new user:', { email, username })
     
-    let createRes: { jwt: string; user: StrapiUser }
+    let createRes: { data: StrapiUser }
     try {
-      createRes = await $fetch<{ jwt: string; user: StrapiUser }>(`${strapiUrl}/api/auth/local/register`, {
+      createRes = await $fetch<{ data: StrapiUser }>(`${strapiUrl}/api/user-admin/register`, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiToken}`
+        },
         body: {
           username,
           email,
           password,
-          confirmed: true
+          confirmed: true,
+          provider: 'local'
         }
       })
-      console.log('[confirm-social] User registered:', createRes.user?.id)
+      console.log('[confirm-social] User registered:', createRes.data?.id)
     } catch (registerError: any) {
       console.error('[confirm-social] Registration failed:', registerError?.message)
       console.error('[confirm-social] Registration error data:', registerError?.data)
       throw new Error(`Registration failed: ${registerError?.data?.error?.message || registerError?.message}`)
     }
 
-    user = createRes.user
-    jwt = createRes.jwt
+    user = createRes.data
+    
+    // Get JWT for the new user by logging in
+    const loginRes = await $fetch<{ jwt: string }>(`${strapiUrl}/api/auth/local`, {
+      method: 'POST',
+      body: {
+        identifier: email,
+        password
+      }
+    })
+    jwt = loginRes.jwt
 
     // Step 3: Create Stripe customer and start trial for NEW users only
     console.log('[confirm-social] Creating Stripe customer for new user')
