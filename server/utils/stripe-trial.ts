@@ -25,14 +25,23 @@ export async function createStripeCustomerAndTrial(user: MinimalUser) {
   const stripe = new Stripe(config.stripeSecretKey)
 
   try {
-    const customer = await stripe.customers.create({
-      email: user.email,
-      name: user.username,
-      metadata: {
-        appUserId: String(user.id)
-      }
-    })
-    console.log('[stripe-trial] Customer created:', customer.id)
+    // Check for existing Stripe customer by email (prevent duplicates)
+    const existingCustomers = await stripe.customers.list({ email: user.email, limit: 1 })
+    let customer
+    
+    if (existingCustomers.data.length > 0) {
+      customer = existingCustomers.data[0]
+      console.log('[stripe-trial] Found existing Stripe customer:', customer.id)
+    } else {
+      customer = await stripe.customers.create({
+        email: user.email,
+        name: user.username,
+        metadata: {
+          appUserId: String(user.id)
+        }
+      })
+      console.log('[stripe-trial] Customer created:', customer.id)
+    }
 
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
