@@ -218,14 +218,27 @@ Standard Strapi login via /api/auth/local
 ## Stripe Customer Management
 
 ### Deduplication Logic
-ALL signup flows now check for existing Stripe customers before creating:
+ALL signup flows now check for existing Stripe customers AND subscriptions before creating:
 
 ```javascript
+// Step 1: Check for existing customer
 const existingCustomers = await stripe.customers.list({ email, limit: 1 });
 if (existingCustomers.data.length > 0) {
   customer = existingCustomers.data[0];  // Use existing
+  
+  // Step 2: Check for existing active/trialing subscription
+  const existingSubs = await stripe.subscriptions.list({ customer: customer.id, status: 'all', limit: 1 });
+  if (existingSubs.data.length > 0 && 
+      (existingSubs.data[0].status === 'active' || existingSubs.data[0].status === 'trialing')) {
+    subscription = existingSubs.data[0];  // Use existing subscription
+  }
 } else {
   customer = await stripe.customers.create({ email, name });  // Create new
+}
+
+// Step 3: Only create subscription if none exists
+if (!subscription) {
+  subscription = await stripe.subscriptions.create({ ... });
 }
 ```
 
@@ -330,6 +343,10 @@ The `STRAPI_API_TOKEN` must be **identical** in both frontend and backend. The c
 ### Issue 4: Duplicate Stripe customers
 **Cause:** No deduplication check before creating customers
 **Solution:** Always call `stripe.customers.list({ email })` first
+
+### Issue 7: Duplicate Stripe subscriptions
+**Cause:** Even with customer deduplication, subscriptions were always created new
+**Solution:** Check `stripe.subscriptions.list({ customer })` for active/trialing subscription before creating
 
 ### Issue 5: User can't login after Google signup
 **Cause:** `provider` field was set to `'google'` but login requires `'local'`
