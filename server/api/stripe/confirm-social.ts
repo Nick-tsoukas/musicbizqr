@@ -29,8 +29,8 @@ export default defineEventHandler(async (event) => {
     // Use UID to generate a reproducible password
     const password = uid + '_firebaseA1!'
     
-    // Use email as username to avoid conflicts with display names containing spaces
-    const username = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '') + '_' + Date.now().toString(36)
+    // Use email as username (consistent with other signup flows)
+    const username = email
 
   // Step 1: Check if user already exists (requires API token for user lookup)
   const apiToken = config.strapiApiToken
