@@ -102,7 +102,7 @@
           </div>
 
           <!-- Action Buttons - Bottom -->
-          <div class="w-full max-w-sm space-y-3">
+          <div class="w-full max-w-sm space-y-3 pb-safe">
             <!-- Share Button -->
             <button
               @click="handleShare"
@@ -276,5 +276,9 @@ async function handleCopyLink() {
 .animate-float-delayed {
   animation: float 10s ease-in-out infinite;
   animation-delay: -3s;
+}
+
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
 </style>

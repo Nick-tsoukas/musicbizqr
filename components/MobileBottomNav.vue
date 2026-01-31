@@ -78,7 +78,7 @@ const { data: bandData } = await useAsyncData(
           'filters[users_permissions_user][id][$eq]': user.value.id,
           'fields[0]': 'slug',
           'fields[1]': 'name',
-          'populate[profileImage][fields][0]': 'url',
+          'populate[bandImg][fields][0]': 'url',
         },
       })
     : Promise.resolve(null),
@@ -94,10 +94,10 @@ const userBand = computed(() => {
   const item = list[0]
   const attrs = item.attributes || item
   const bandId = item.id
-  const profileImg = attrs.profileImage?.data?.attributes?.url || attrs.profileImage?.url
+  const bandImg = attrs.bandImg?.data?.attributes?.url || attrs.bandImg?.url
   let fullImageUrl = null
-  if (profileImg) {
-    fullImageUrl = profileImg.startsWith('http') ? profileImg : `${config.public.strapiUrl}${profileImg}`
+  if (bandImg) {
+    fullImageUrl = bandImg.startsWith('http') ? bandImg : `${config.public.strapiUrl}${bandImg}`
   }
   return {
     id: bandId,
