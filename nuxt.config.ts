@@ -47,7 +47,12 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-   
+      meta: [
+        { name: 'theme-color', content: '#FF00FF' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'MBQ' },
+      ],
       link: [
         {
           rel: 'stylesheet',
@@ -56,7 +61,9 @@ export default defineNuxtConfig({
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/icon?family=Material+Icons'
-        }
+        },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
       ],
     },
   },
@@ -74,8 +81,80 @@ export default defineNuxtConfig({
     "nuxt-particles",
     "@unlok-co/nuxt-stripe",
     '@nuxtjs/seo',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@vite-pwa/nuxt'
   ],
+
+  pwa: {
+    registerType: 'prompt',
+    manifest: false, // We use our own manifest.webmanifest
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff,woff2}'],
+      navigateFallback: '/offline',
+      navigateFallbackDenylist: [
+        /^\/api/,
+        /^\/account/,
+        /^\/dashboard/,
+        /^\/agency/,
+        /^\/internal/,
+        /^\/checkout/,
+      ],
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/musicbizqr\.com\/(?!api|account|dashboard|agency|internal|checkout).*/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'pages-cache',
+            networkTimeoutSeconds: 3,
+            expiration: {
+              maxEntries: 50,
+              maxAgeSeconds: 60 * 60 * 24, // 24 hours
+            },
+          },
+        },
+        {
+          urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'images-cache',
+            expiration: {
+              maxEntries: 100,
+              maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+            },
+          },
+        },
+        {
+          urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'fonts-cache',
+            expiration: {
+              maxEntries: 20,
+              maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+            },
+          },
+        },
+        {
+          urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts-cache',
+            expiration: {
+              maxEntries: 20,
+              maxAgeSeconds: 60 * 60 * 24 * 365,
+            },
+          },
+        },
+      ],
+    },
+    client: {
+      installPrompt: true,
+    },
+    devOptions: {
+      enabled: false,
+      type: 'module',
+    },
+  },
 
    image: {
     // Allow your S3 bucket host

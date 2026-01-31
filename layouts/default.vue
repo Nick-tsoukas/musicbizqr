@@ -5,6 +5,12 @@
     </Head>
     <Header />
     <slot />
+    
+    <!-- PWA Components -->
+    <ClientOnly>
+      <PwaUpdateToast />
+      <NetworkStatus />
+    </ClientOnly>
   </div>
 </template>
 
