@@ -50,7 +50,23 @@
     <!-- Performance Summary - Most important, at top -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-white text-lg font-semibold">Performance</h3>
+        <div class="flex items-center gap-3">
+          <h3 class="text-white text-lg font-semibold">Performance</h3>
+          <!-- Pulse Score Badge -->
+          <div 
+            v-if="pulseData?.pulseScore" 
+            class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+            :class="[
+              pulseData.pulseScore >= 70 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+              pulseData.pulseScore >= 40 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+              'bg-red-500/20 text-red-300 border border-red-500/30'
+            ]"
+            title="MBQ Pulse Score"
+          >
+            <span class="text-[10px]">⚡</span>
+            <span>{{ pulseData.pulseScore }}</span>
+          </div>
+        </div>
         <span class="text-gray-400 text-xs">{{ museRangeLabel }}</span>
       </div>
 
@@ -139,22 +155,7 @@
       class="mb-6"
     />
 
-    <!-- Pulse Moments Panel (Auto-generated shareable moments) -->
-    <PulseMomentsPanel
-      v-if="bandId"
-      :band-id="bandId"
-      :band-slug="bandSlug"
-      :band-name="bandName"
-      :band-image-url="bandImageUrl"
-      :is-band-name-in-logo="isBandNameInLogo"
-    />
-
-    <!-- MBQ Pulse Card -->
-    <MbqPulseCard
-      :pulse="pulseData"
-      :loading="pulseLoading"
-      :range-label="museRangeLabel"
-    />
+    <!-- Pulse Moments Panel & MBQ Pulse Card removed - consolidated into Performance header badge -->
 
     <!-- Insights (MUSE) - V2 Panel -->
     <InsightsPanel 
