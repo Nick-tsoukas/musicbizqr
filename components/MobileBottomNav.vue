@@ -95,11 +95,15 @@ const userBand = computed(() => {
   const attrs = item.attributes || item
   const bandId = item.id
   const profileImg = attrs.profileImage?.data?.attributes?.url || attrs.profileImage?.url
+  let fullImageUrl = null
+  if (profileImg) {
+    fullImageUrl = profileImg.startsWith('http') ? profileImg : `${config.public.strapiUrl}${profileImg}`
+  }
   return {
     id: bandId,
     slug: attrs.slug,
     name: attrs.name,
-    profileImage: profileImg ? `${config.public.strapiUrl}${profileImg}` : null,
+    profileImage: fullImageUrl,
   }
 })
 
