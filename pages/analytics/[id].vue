@@ -169,9 +169,8 @@
           </div>
         </div>
 
-        <!-- Top lists -->
+        <!-- Top lists (commented out - duplicates detailed sections below)
         <div class="grid sm:grid-cols-3 gap-3 text-gray-300 text-sm">
-          <!-- Top Cities -->
           <div>
             <p class="font-semibold text-white mb-1">Top Cities:</p>
             <p>
@@ -182,8 +181,6 @@
               }}
             </p>
           </div>
-
-          <!-- Top Sources -->
           <div>
             <p class="font-semibold text-white mb-1">Top Sources:</p>
             <p>
@@ -194,8 +191,6 @@
               }}
             </p>
           </div>
-
-          <!-- Top Platforms -->
           <div>
             <p class="font-semibold text-white mb-1">Top Platforms:</p>
             <p>
@@ -208,6 +203,7 @@
             </p>
           </div>
         </div>
+        -->
       </div>
     </div>
 

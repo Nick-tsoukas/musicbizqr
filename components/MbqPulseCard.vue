@@ -105,7 +105,7 @@
         </ul>
       </div>
 
-      <!-- Next Best Action -->
+      <!-- Next Best Action (commented out - redundant with InsightsPanel)
       <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-4">
         <p class="text-gray-400 text-xs mb-2 uppercase tracking-wide">Next Best Action</p>
         <p class="text-white font-medium text-sm mb-2">{{ pulse.nextBestAction?.title || 'Keep Building' }}</p>
@@ -120,7 +120,6 @@
             <span>{{ step }}</span>
           </li>
         </ul>
-        <!-- CTA Button -->
         <NuxtLink
           v-if="pulse.nextBestAction?.deepLink && pulse.nextBestAction?.cta"
           :to="pulse.nextBestAction.deepLink"
@@ -130,6 +129,7 @@
           <span class="text-purple-300">→</span>
         </NuxtLink>
       </div>
+      -->
     </div>
 
     <!-- Dev-only Debug Panel -->
