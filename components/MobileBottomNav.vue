@@ -7,6 +7,7 @@
     <div class="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent"></div>
     
     <div class="flex items-center justify-around px-2 py-2">
+      <!-- Nav Links -->
       <NuxtLink
         v-for="item in navItems"
         :key="item.path"
@@ -31,12 +32,34 @@
         <!-- Label -->
         <span class="nav-label">{{ item.label }}</span>
       </NuxtLink>
+
+      <!-- Share QR Button (Center, elevated) -->
+      <button
+        @click="showShareDrawer = true"
+        class="share-btn group"
+      >
+        <span class="share-btn-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          </svg>
+        </span>
+        <span class="nav-label text-white">Share</span>
+      </button>
     </div>
+
+    <!-- Share QR Drawer -->
+    <ShareQrDrawer
+      :is-open="showShareDrawer"
+      :band-name="userBand?.name || ''"
+      :band-slug="userBand?.slug || ''"
+      :profile-image="userBand?.profileImage || null"
+      @close="showShareDrawer = false"
+    />
   </nav>
 </template>
 
 <script setup>
-import { computed, h } from 'vue'
+import { ref, computed, h } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStrapiUser } from '#imports'
 import { useRuntimeConfig, useAsyncData } from '#app'
@@ -44,6 +67,8 @@ import { useRuntimeConfig, useAsyncData } from '#app'
 const route = useRoute()
 const user = useStrapiUser()
 const config = useRuntimeConfig()
+
+const showShareDrawer = ref(false)
 
 const { data: bandData } = await useAsyncData(
   'user-band-nav',
@@ -53,6 +78,7 @@ const { data: bandData } = await useAsyncData(
           'filters[users_permissions_user][id][$eq]': user.value.id,
           'fields[0]': 'slug',
           'fields[1]': 'name',
+          'populate[profileImage][fields][0]': 'url',
         },
       })
     : Promise.resolve(null),
@@ -66,9 +92,12 @@ const userBand = computed(() => {
   const list = bandData.value?.data || []
   if (!list.length) return null
   const item = list[0]
+  const attrs = item.attributes || item
+  const profileImg = attrs.profileImage?.data?.attributes?.url || attrs.profileImage?.url
   return {
-    slug: item.attributes?.slug ?? item.slug,
-    name: item.attributes?.name ?? item.name,
+    slug: attrs.slug,
+    name: attrs.name,
+    profileImage: profileImg ? `${config.public.strapiUrl}${profileImg}` : null,
   }
 })
 
@@ -138,5 +167,36 @@ function isActive(path) {
 
 .nav-label {
   @apply text-[10px] font-semibold tracking-wide uppercase;
+}
+
+.share-btn {
+  @apply flex flex-col items-center gap-1 -mt-6 relative;
+}
+
+.share-btn-inner {
+  @apply w-14 h-14 rounded-2xl flex items-center justify-center text-white transition-all duration-200;
+  background: linear-gradient(135deg, #FF00FF 0%, #9100FF 100%);
+  box-shadow: 0 4px 20px rgba(255, 0, 255, 0.4), 0 0 40px rgba(145, 0, 255, 0.2);
+}
+
+.share-btn:active .share-btn-inner {
+  transform: scale(0.95);
+}
+
+.share-btn-inner::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #FF00FF 0%, #9100FF 100%);
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(8px);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
 }
 </style>
