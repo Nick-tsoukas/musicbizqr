@@ -47,54 +47,7 @@
       </div>
     </div>
 
-    <!-- Pulse Moments Panel (Auto-generated shareable moments) -->
-    <PulseMomentsPanel
-      v-if="bandId"
-      :band-id="bandId"
-      :band-slug="bandSlug"
-      :band-name="bandName"
-      :band-image-url="bandImageUrl"
-      :is-band-name-in-logo="isBandNameInLogo"
-    />
-
-    <!-- MBQ Pulse Card -->
-    <MbqPulseCard
-      :pulse="pulseData"
-      :loading="pulseLoading"
-      :range-label="museRangeLabel"
-    />
-
-    <!-- Insights (MUSE) - V2 Panel -->
-    <InsightsPanel 
-      v-if="bandId"
-      :band-id="bandId"
-      class="mb-4"
-      @action="handleInsightAction"
-    />
-
-    <!-- Legacy Insights (fallback) -->
-    <div v-if="false" class="chart-card mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-white text-lg font-semibold">Insights (Muse)</h3>
-        <span class="text-gray-400 text-xs">
-          {{ humanDayLabel(museDisplayDate) }}
-        </span>
-      </div>
-
-      <div v-if="museLoading" class="text-gray-300 text-sm">Analyzing…</div>
-      <div v-else-if="museError" class="text-red-400 text-sm">
-        Couldn’t load insights.
-      </div>
-      <ul
-        v-else-if="insightBullets.length"
-        class="list-disc pl-5 text-gray-200 space-y-1"
-      >
-        <li v-for="(b, i) in insightBullets" :key="i">{{ b }}</li>
-      </ul>
-      <div v-else class="text-gray-400 text-sm">No insights yet.</div>
-    </div>
-
-    <!-- Performance Summary - Consolidated metrics -->
+    <!-- Performance Summary - Most important, at top -->
     <div class="chart-card mb-6">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-white text-lg font-semibold">Performance</h3>
@@ -178,6 +131,39 @@
       </div>
     </div>
 
+    <!-- Platform Clicks - Second most important -->
+    <AnalyticsPlatformClicksCard
+      :platform-data="topClickPlatforms"
+      :loading="isInitialLoading"
+      :range-label="museRangeLabel"
+      class="mb-6"
+    />
+
+    <!-- Pulse Moments Panel (Auto-generated shareable moments) -->
+    <PulseMomentsPanel
+      v-if="bandId"
+      :band-id="bandId"
+      :band-slug="bandSlug"
+      :band-name="bandName"
+      :band-image-url="bandImageUrl"
+      :is-band-name-in-logo="isBandNameInLogo"
+    />
+
+    <!-- MBQ Pulse Card -->
+    <MbqPulseCard
+      :pulse="pulseData"
+      :loading="pulseLoading"
+      :range-label="museRangeLabel"
+    />
+
+    <!-- Insights (MUSE) - V2 Panel -->
+    <InsightsPanel 
+      v-if="bandId"
+      :band-id="bandId"
+      class="mb-4"
+      @action="handleInsightAction"
+    />
+
     <!-- Tabs -->
     <div class="flex flex-wrap gap-2 mb-4">
       <button
@@ -256,14 +242,7 @@
         </div>
       </div>
 
-      <!-- Platform Clicks Card (always visible, elite design) -->
-      <AnalyticsPlatformClicksCard
-        :platform-data="topClickPlatforms"
-        :loading="isInitialLoading"
-        :range-label="museRangeLabel"
-      />
-
-      <!-- 💜 Follow Attempts (moved up - more meaningful) -->
+      <!-- 💜 Follow Attempts -->
       <div class="chart-card">
         <div class="flex items-center justify-between mb-4">
           <div>
