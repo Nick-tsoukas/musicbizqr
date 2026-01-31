@@ -15,7 +15,7 @@
 // GLOBAL MASTER SWITCH
 // ============================================
 // When false, page behaves EXACTLY as it does today (no layout shifts)
-export const SMARTLINK_LIVE_SURFACE_ENABLED = true;
+export const SMARTLINK_LIVE_SURFACE_ENABLED = false;
 
 // ============================================
 // V1 MODULE TOGGLES
@@ -23,39 +23,39 @@ export const SMARTLINK_LIVE_SURFACE_ENABLED = true;
 // Only active when SMARTLINK_LIVE_SURFACE_ENABLED is true
 
 // NOW Banner - shows contextual status (SHOW_TONIGHT, ON_TOUR, etc.)
-export const SMARTLINK_SHOW_NOW_BANNER = true;
+export const SMARTLINK_SHOW_NOW_BANNER = false;
 
 // Live Feed - micro-signals showing recent activity
-export const SMARTLINK_SHOW_LIVE_FEED = true;
+export const SMARTLINK_SHOW_LIVE_FEED = false;
 
 // Page Modes - state machine affecting CTA emphasis and section order
-export const SMARTLINK_SHOW_PAGE_MODES = true;
+export const SMARTLINK_SHOW_PAGE_MODES = false;
 
 // Continue Chip - "Continue on YouTube" for returning visitors
-export const SMARTLINK_SHOW_CONTINUE_CHIP = true;
+export const SMARTLINK_SHOW_CONTINUE_CHIP = false;
 
 // Fan Toasts - recognition toasts after key actions
-export const SMARTLINK_SHOW_FAN_TOASTS = true;
+export const SMARTLINK_SHOW_FAN_TOASTS = false;
 
 // Support Module Refactor - consolidated payment section
-export const SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR = true;
+export const SMARTLINK_SHOW_SUPPORT_MODULE_REFACTOR = false;
 
 // ============================================
 // DEMO DATA MODE
 // ============================================
 // When true AND real data is missing/low, shows realistic demo feed
 // Should be obvious in code but not visible to users
-export const DEMO_FEED_ENABLED = true;
+export const DEMO_FEED_ENABLED = false;
 
 // ============================================
 // V2 OPTIONAL FEATURES (future)
 // ============================================
-export const SMARTLINK_V2_ENABLED = true;  // Force V2 features on
+export const SMARTLINK_V2_ENABLED = false;  // V2 features disabled
 
 // V2 Module Toggles (only active when V2_ENABLED is true)
-export const SMARTLINK_SHOW_MOMENT_BADGES = true;
-export const SMARTLINK_SHOW_SHOW_DAY_HEADER = true;
-export const SMARTLINK_SHOW_MOMENT_SHARE_CARD = true;
+export const SMARTLINK_SHOW_MOMENT_BADGES = false;
+export const SMARTLINK_SHOW_SHOW_DAY_HEADER = false;
+export const SMARTLINK_SHOW_MOMENT_SHARE_CARD = false;
 
 // ============================================
 // HELPER FUNCTIONS

@@ -121,12 +121,33 @@ sitemap: {
     const res = await fetch(`${base}/api/seo-pages?pagination[pageSize]=1000`)
     const { data } = await res.json()
 
-    // ✅ Only include "good" categories (no uncategorized)
+    // Helper: normalize slug for SEO-safe URLs
+    const normalizeSlug = (str) => {
+      if (!str) return ''
+      return String(str)
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/[.,!?:;/"']+$/g, '')
+        .replace(/^-+|-+$/g, '')
+    }
+
+    // Helper: validate slug is valid (non-empty, not "null")
+    const isValidSlug = (str) => {
+      if (!str) return false
+      const normalized = normalizeSlug(str)
+      if (!normalized) return false
+      if (normalized === 'null' || normalized === 'undefined') return false
+      return true
+    }
+
+    // ✅ Only include "good" categories (no uncategorized, no null, normalized)
     const categories = Array.from(
       new Set(
         data
-          .map((page) => (page.attributes.category || '').trim())
-          .filter((cat) => cat && cat !== 'uncategorized')
+          .map((page) => normalizeSlug(page.attributes.category))
+          .filter((cat) => isValidSlug(cat) && cat !== 'uncategorized')
       )
     )
 
@@ -136,12 +157,14 @@ sitemap: {
       priority: 0.8
     }))
 
-    // ✅ Only include valid article URLs (must have category+slug)
+    // ✅ Only include valid article URLs (must have valid category+slug, normalized)
     const articleUrls = data
       .map((page) => {
-        const cat = (page.attributes.category || '').trim()
-        const slug = (page.attributes.slug || '').trim()
-        if (!cat || !slug) return null
+        const cat = normalizeSlug(page.attributes.category)
+        const slug = normalizeSlug(page.attributes.slug)
+        
+        // Skip invalid entries
+        if (!isValidSlug(cat) || !isValidSlug(slug)) return null
         if (cat === 'uncategorized') return null
 
         return {
@@ -156,7 +179,6 @@ sitemap: {
     return [
       { loc: '/', changefreq: 'daily', priority: 1.0 },
       { loc: '/article', changefreq: 'weekly', priority: 0.9 },
-      // optional but fine:
       { loc: '/contact', changefreq: 'monthly', priority: 0.4 },
       { loc: '/privacypolicy', changefreq: 'yearly', priority: 0.2 },
       { loc: '/termsofservice', changefreq: 'yearly', priority: 0.2 },
@@ -265,6 +287,27 @@ sitemap: {
   
       const seoApiUrl = `${process.env.STRAPI_URL}/api/seo-pages?populate=category&pagination[pageSize]=1000`
   
+      // Helper: normalize slug for SEO-safe URLs
+      const normalizeSlug = (str) => {
+        if (!str) return ''
+        return String(str)
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/[.,!?:;/"']+$/g, '')
+          .replace(/^-+|-+$/g, '')
+      }
+
+      // Helper: validate slug is valid (non-empty, not "null")
+      const isValidSlug = (str) => {
+        if (!str) return false
+        const normalized = normalizeSlug(str)
+        if (!normalized) return false
+        if (normalized === 'null' || normalized === 'undefined') return false
+        return true
+      }
+
       try {
         const res = await fetch(seoApiUrl)
         const json = await res.json()
@@ -273,10 +316,14 @@ sitemap: {
         let skipped = 0
   
         for (const page of json.data) {
-          const { category, slug } = page.attributes
+          const rawCategory = page.attributes.category
+          const rawSlug = page.attributes.slug
+          
+          const category = normalizeSlug(rawCategory)
+          const slug = normalizeSlug(rawSlug)
   
-          if (!category || !slug) {
-            console.warn(`⚠️ Skipping SEO page (missing category or slug): ID ${page.id}`)
+          if (!isValidSlug(category) || !isValidSlug(slug)) {
+            console.warn(`⚠️ Skipping SEO page (invalid category or slug): ID ${page.id}, category="${rawCategory}", slug="${rawSlug}"`)
             skipped++
             continue
           }
@@ -284,7 +331,7 @@ sitemap: {
           prerenderRoutes.push(`/article/${category}/${slug}`)
         }
 
-           prerenderRoutes.push('/article')
+        prerenderRoutes.push('/article')
   
         console.log(`✅ Pre-rendering ${prerenderRoutes.length} routes (${json.data.length - skipped} of ${json.data.length} articles)`)
   

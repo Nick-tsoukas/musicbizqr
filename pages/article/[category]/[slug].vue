@@ -10,6 +10,7 @@ import {
   watch,
 } from "#imports";
 import { marked } from "marked";
+import { normalizeSlug, buildArticleUrl } from "~/utils/seo";
 
 
 const nuxtApp = useNuxtApp()
@@ -53,8 +54,8 @@ function renderMarkdown(markdown) {
 
 // ---------------- Route / Config ----------------
 const route = useRoute();
-const category = route.params.category;
-const slug = route.params.slug;
+const category = normalizeSlug(route.params.category);
+const slug = normalizeSlug(route.params.slug);
 const config = useRuntimeConfig();
 
 function scrollToTopIfNeeded() {
@@ -101,7 +102,8 @@ if (error.value) {
 
 const page = seoPage.value?.data?.[0]?.attributes || {};
 
-const pageUrl = `https://musicbizqr.com/article/${category}/${slug}`;
+// Use buildArticleUrl for guaranteed canonical format (normalized, validated)
+const pageUrl = buildArticleUrl(category, slug) || `https://musicbizqr.com/article/${category}/${slug}`;
 const publishedDate = page.publishedAt || new Date().toISOString();
 const authorName = page.author?.name || "MusicBizQR";
 const keywordsArray = (page.keywords || "")

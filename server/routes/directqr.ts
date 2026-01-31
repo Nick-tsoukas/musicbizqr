@@ -28,9 +28,13 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1) try exact match on QR url
+    // Use deep populate to ensure band.slug is included
     const mainQuery = {
       'filters[url][$eq]': reqUrl.toString(),
-      populate: '*',
+      'populate[band][fields][0]': 'slug',
+      'populate[band][fields][1]': 'name',
+      'populate[event][fields][0]': 'slug',
+      'populate[q_image]': '*',
     } as const
 
     const searchUrl = `${strapiBase}/api/qrs`
@@ -45,7 +49,10 @@ export default defineEventHandler(async (event) => {
         method: 'GET',
         query: {
           'filters[options][data][$containsi]': looseId,
-          populate: '*',
+          'populate[band][fields][0]': 'slug',
+          'populate[band][fields][1]': 'name',
+          'populate[event][fields][0]': 'slug',
+          'populate[q_image]': '*',
         },
       })
       const fbRows = Array.isArray(fb?.data) ? fb.data : []
@@ -154,16 +161,46 @@ export default defineEventHandler(async (event) => {
     const { q_type, link, band, event: ev /* tours/albums removed per your note */ } = attrs
     let dest = `${reqUrl.protocol}//${reqUrl.host}`
 
+    // Debug logging for QR routing issues
+    console.log('[directqr] QR ID:', qrId, 'q_type:', q_type)
+    console.log('[directqr] band relation:', JSON.stringify(band))
+
     // → band profile
-    if (q_type === 'bandProfile' && band?.data) {
-      const slug = band.data.attributes?.slug
+    if (q_type === 'bandProfile') {
+      // Handle both Strapi v4 response formats:
+      // Format 1: band.data.attributes.slug (nested)
+      // Format 2: band.data.slug (flattened by custom controller)
+      // Format 3: band.slug (direct relation)
+      let slug: string | null = null
+      
+      if (band?.data?.attributes?.slug) {
+        slug = band.data.attributes.slug
+      } else if (band?.data?.slug) {
+        slug = band.data.slug
+      } else if (band?.slug) {
+        slug = band.slug
+      }
+      
+      console.log('[directqr] Resolved band slug:', slug)
+      
       if (slug) {
         dest = `${reqUrl.protocol}//${reqUrl.host}/${slug}`
+      } else {
+        console.warn('[directqr] WARNING: bandProfile QR has no valid band slug! QR ID:', qrId, 'Band data:', JSON.stringify(band))
       }
     }
     // → event
-    else if (q_type === 'events' && ev?.data) {
-      const slug = ev.data.attributes?.slug
+    else if (q_type === 'events') {
+      let slug: string | null = null
+      
+      if (ev?.data?.attributes?.slug) {
+        slug = ev.data.attributes.slug
+      } else if (ev?.data?.slug) {
+        slug = ev.data.slug
+      } else if (ev?.slug) {
+        slug = ev.slug
+      }
+      
       if (slug) {
         dest = `${reqUrl.protocol}//${reqUrl.host}/event/${slug}`
       }
@@ -173,6 +210,8 @@ export default defineEventHandler(async (event) => {
       dest = toAbsoluteHttps(link)
     }
     // else stays on site root
+    
+    console.log('[directqr] Final destination:', dest)
 
     // 7) preserve UTMs from the incoming request (reuse incoming from above)
     const out = new URL(dest)

@@ -1,10 +1,11 @@
 <script setup>
 import { useRoute, useAsyncData, useHead, useRuntimeConfig, computed } from '#imports'
+import { normalizeSlug, buildCategoryUrl, buildArticleUrl } from '~/utils/seo'
 
 const route = useRoute()
 const config = useRuntimeConfig()
 
-const category = String(route.params.category || '').trim()
+const category = normalizeSlug(route.params.category)
 const baseUrl = computed(() =>
   String(config.public.baseUrl || 'https://musicbizqr.com').replace(/\/$/, '')
 )
@@ -17,7 +18,8 @@ const displayTitle = computed(() =>
 
 
 
-const hubUrl = computed(() => `${baseUrl.value}/article/${category}`)
+// Use buildCategoryUrl for canonical URL (with fallback)
+const hubUrl = computed(() => buildCategoryUrl(category, baseUrl.value) || `${baseUrl.value}/article/${category}`)
 const articlesIndexUrl = computed(() => `${baseUrl.value}/article`)
 const homeUrl = computed(() => `${baseUrl.value}/`)
 
