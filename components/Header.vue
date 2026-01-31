@@ -115,7 +115,7 @@
         <div class="absolute top-20 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-20 left-0 w-48 h-48 bg-neon-purple/10 rounded-full blur-3xl pointer-events-none"></div>
         
-        <div class="relative flex flex-col px-6 py-8 space-y-2">
+        <div class="relative flex flex-col px-6 py-8 pb-24 space-y-2">
           <!-- Primary Navigation -->
           <div class="space-y-1">
             <NuxtLink
