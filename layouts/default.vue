@@ -1,7 +1,7 @@
 <template>
   <div class="bg-black">
     <Head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     </Head>
     <Header />
     <div class="pb-20 lg:pb-0">
