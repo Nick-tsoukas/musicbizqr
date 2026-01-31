@@ -64,9 +64,8 @@ export const useFirebase = () => {
       console.error('Error data:', err?.data)
       console.error('Error status:', err?.status || err?.statusCode)
       
-      // Show more specific error message
-      const errorMsg = err?.data?.message || err?.message || 'Unknown error'
-      alert(`Google login failed: ${errorMsg}`)
+      // Re-throw so calling code can handle loading state
+      throw err
     }
   }
   

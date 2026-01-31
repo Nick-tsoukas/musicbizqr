@@ -20,11 +20,15 @@ const config = useRuntimeConfig();
 const strapiBaseUrl = config.public.strapiUrl;
 
 const handleGoogleLogin = async () => {
+  loading.value = true;
+  errorMessage.value = "";
   try {
     await loginWithGoogle();
+    // Keep loading true - useFirebase will handle navigation to /dashboard
   } catch (err) {
     console.error("[Google Login Error]", err);
-    alert("Something went wrong signing in with Google");
+    errorMessage.value = "Something went wrong signing in with Google. Please try again.";
+    loading.value = false;
   }
 };
 
