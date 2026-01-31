@@ -4,7 +4,14 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     </Head>
     <Header />
-    <slot />
+    <div class="pb-20 lg:pb-0">
+      <slot />
+    </div>
+    
+    <!-- Mobile Bottom Nav for logged-in users -->
+    <ClientOnly>
+      <MobileBottomNav />
+    </ClientOnly>
     
     <!-- PWA Components -->
     <ClientOnly>
