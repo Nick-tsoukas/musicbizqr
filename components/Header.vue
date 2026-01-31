@@ -194,15 +194,6 @@
 
           <!-- Secondary Navigation -->
           <div class="space-y-1">
-            <NuxtLink to="/agency" @click="toggleMenu" class="mobile-nav-item">
-              <span class="mobile-nav-icon bg-neon-purple/20 text-neon-purple">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </span>
-              <span>Agency</span>
-            </NuxtLink>
-
             <NuxtLink to="/demo" @click="toggleMenu" class="mobile-nav-item">
               <span class="mobile-nav-icon">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
