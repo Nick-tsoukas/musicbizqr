@@ -94,167 +94,86 @@
       <div v-else class="text-gray-400 text-sm">No insights yet.</div>
     </div>
 
-    <!-- Muse Summary (derived from rollups) -->
+    <!-- Performance Summary - Consolidated metrics -->
     <div class="chart-card mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-white text-lg font-semibold">Muse Summary</h3>
-        <span class="text-gray-400 text-xs">Last {{ museRangeLabel }}</span>
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-white text-lg font-semibold">Performance</h3>
+        <span class="text-gray-400 text-xs">{{ museRangeLabel }}</span>
       </div>
 
       <div v-if="!liveMuseSummary" class="text-gray-400 text-sm">
-        No summary data yet.
+        No data yet.
       </div>
 
       <div v-else>
-        <!-- Metric grid -->
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
-          <!-- Page Views -->
-          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-            <p class="text-gray-400 text-xs">Page Views</p>
-            <p class="text-2xl font-semibold text-white">
-              {{ liveMuseSummary.pageViews ?? 0 }}
+        <!-- Primary metrics row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <!-- Page Views - Hero metric -->
+          <div class="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-400/20 rounded-xl p-4">
+            <p class="text-purple-300 text-xs font-medium uppercase tracking-wide">Views</p>
+            <p class="text-3xl font-bold text-white mt-1">
+              {{ (liveMuseSummary.pageViews ?? 0).toLocaleString() }}
             </p>
             <p
               :class="[
-                'text-xs font-medium',
+                'text-xs font-medium mt-1',
                 liveMuseSummary.growthPct > 0
                   ? 'text-emerald-400'
                   : liveMuseSummary.growthPct < 0
                     ? 'text-red-400'
-                    : 'text-gray-400',
+                    : 'text-gray-500',
               ]"
             >
-              {{ liveMuseSummary.growthPct > 0 ? '+' : '' }}{{ liveMuseSummary.growthPct ?? 0 }}% vs last day
+              {{ liveMuseSummary.growthPct > 0 ? '↑' : liveMuseSummary.growthPct < 0 ? '↓' : '' }} {{ Math.abs(liveMuseSummary.growthPct ?? 0) }}% vs prior
             </p>
           </div>
 
-          <!-- Link Clicks -->
-          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-            <p class="text-gray-400 text-xs">Link Clicks</p>
-            <p class="text-2xl font-semibold text-white">
-              {{ liveMuseSummary.linkClicks ?? 0 }}
-            </p>
-          </div>
-
-          <!-- Song Plays -->
-          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-            <p class="text-gray-400 text-xs">Song Plays</p>
-            <p class="text-2xl font-semibold text-white">
-              {{ liveMuseSummary.songPlays ?? 0 }}
-            </p>
-          </div>
-
-          <!-- Video Plays -->
-          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-            <p class="text-gray-400 text-xs">Video Plays</p>
-            <p class="text-2xl font-semibold text-white">
-              {{ liveMuseSummary.videoPlays ?? 0 }}
-            </p>
-          </div>
-
-          <!-- ✅ QR Scans -->
-          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-            <p class="text-gray-400 text-xs">QR Scans</p>
-            <p class="text-2xl font-semibold text-white">
-              {{ liveMuseSummary.qrScans ?? 0 }}
-            </p>
-          </div>
-
-          <!-- Engagement -->
-          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-            <p class="text-gray-400 text-xs">Engagement Rate</p>
-            <p class="text-2xl font-semibold text-white">
+          <!-- Engagement - Hero metric -->
+          <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-400/20 rounded-xl p-4">
+            <p class="text-emerald-300 text-xs font-medium uppercase tracking-wide">Engagement</p>
+            <p class="text-3xl font-bold text-white mt-1">
               {{ liveMuseSummary.engagementRate ?? 0 }}%
             </p>
+            <p class="text-xs text-gray-500 mt-1">Clicks + plays + scans</p>
           </div>
-        </div>
 
-        <!-- Top lists (commented out - duplicates detailed sections below)
-        <div class="grid sm:grid-cols-3 gap-3 text-gray-300 text-sm">
-          <div>
-            <p class="font-semibold text-white mb-1">Top Cities:</p>
-            <p>
-              {{
-                liveMuseSummary.topCities && liveMuseSummary.topCities.length
-                  ? liveMuseSummary.topCities.map((c) => c[0]).join(', ')
-                  : 'N/A'
-              }}
+          <!-- Top City -->
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-4">
+            <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">Top City</p>
+            <p class="text-xl font-semibold text-white mt-1 truncate">
+              {{ topCityKpi.city }}
             </p>
+            <p class="text-xs text-gray-500 mt-1">{{ topCityKpi.count.toLocaleString() }} visits</p>
           </div>
-          <div>
-            <p class="font-semibold text-white mb-1">Top Sources:</p>
-            <p>
-              {{
-                liveMuseSummary.topSources && liveMuseSummary.topSources.length
-                  ? liveMuseSummary.topSources.map((s) => s[0]).join(', ')
-                  : 'N/A'
-              }}
+
+          <!-- Top Platform -->
+          <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-4">
+            <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">Top Platform</p>
+            <p class="text-xl font-semibold text-white mt-1 truncate capitalize">
+              {{ topPlatformKpi.platform || '—' }}
             </p>
-          </div>
-          <div>
-            <p class="font-semibold text-white mb-1">Top Platforms:</p>
-            <p>
-              {{
-                liveMuseSummary.topPlatforms &&
-                liveMuseSummary.topPlatforms.length
-                  ? liveMuseSummary.topPlatforms.map((p) => p[0]).join(', ')
-                  : 'N/A'
-              }}
-            </p>
+            <p class="text-xs text-gray-500 mt-1">{{ topPlatformKpi.count.toLocaleString() }} clicks</p>
           </div>
         </div>
-        -->
-      </div>
-    </div>
 
-    <!-- Performance Overview (matches homepage demo KPI strip) -->
-    <div class="chart-card mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-white text-lg font-semibold">Performance Overview</h3>
-        <span class="text-gray-400 text-xs">{{ museRangeLabel }}</span>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-          <p class="text-gray-400 text-xs">Total</p>
-          <p class="text-2xl font-semibold text-white tabular-nums">
-            {{ kpiTotalValue.toLocaleString() }}
-          </p>
-          <p class="text-xs text-gray-400 mt-0.5">{{ kpiTotalLabel }}</p>
-        </div>
-
-        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-          <p class="text-gray-400 text-xs">Range</p>
-          <p class="text-2xl font-semibold text-white">{{ museRangeLabel }}</p>
-          <p class="text-xs text-gray-400 mt-0.5">Selected window</p>
-        </div>
-
-        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-          <p class="text-gray-400 text-xs">Top City</p>
-          <p class="text-white font-semibold truncate">
-            {{ topCityKpi.city }}
-          </p>
-          <p class="text-xs text-gray-400 mt-0.5 tabular-nums">
-            {{ topCityKpi.count.toLocaleString() }}
-          </p>
-        </div>
-
-        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-          <p class="text-gray-400 text-xs">Top Platform</p>
-          <p class="text-white font-semibold truncate">
-            {{ topPlatformKpi.platform }}
-          </p>
-          <p class="text-xs text-gray-400 mt-0.5 tabular-nums">
-            {{ topPlatformKpi.count.toLocaleString() }}
-          </p>
-        </div>
-
-        <div class="bg-gradient-to-b from-white/5 to-white/0 border border-white/10 rounded-xl p-3">
-          <p class="text-gray-400 text-xs">Engagement</p>
-          <p class="text-2xl font-semibold text-white tabular-nums">
-            {{ (liveMuseSummary?.engagementRate ?? 0).toLocaleString() }}%
-          </p>
-          <p class="text-xs text-gray-400 mt-0.5">Clicks + plays + scans</p>
+        <!-- Secondary metrics row -->
+        <div class="grid grid-cols-4 gap-2">
+          <div class="text-center p-3 rounded-lg bg-white/[0.02]">
+            <p class="text-xl font-semibold text-white">{{ (liveMuseSummary.linkClicks ?? 0).toLocaleString() }}</p>
+            <p class="text-xs text-gray-500">Clicks</p>
+          </div>
+          <div class="text-center p-3 rounded-lg bg-white/[0.02]">
+            <p class="text-xl font-semibold text-white">{{ (liveMuseSummary.qrScans ?? 0).toLocaleString() }}</p>
+            <p class="text-xs text-gray-500">QR Scans</p>
+          </div>
+          <div class="text-center p-3 rounded-lg bg-white/[0.02]">
+            <p class="text-xl font-semibold text-white">{{ (liveMuseSummary.songPlays ?? 0).toLocaleString() }}</p>
+            <p class="text-xs text-gray-500">Songs</p>
+          </div>
+          <div class="text-center p-3 rounded-lg bg-white/[0.02]">
+            <p class="text-xl font-semibold text-white">{{ (liveMuseSummary.videoPlays ?? 0).toLocaleString() }}</p>
+            <p class="text-xs text-gray-500">Videos</p>
+          </div>
         </div>
       </div>
     </div>
