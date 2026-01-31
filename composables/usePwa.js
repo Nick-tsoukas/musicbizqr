@@ -6,6 +6,8 @@ const isOnline = ref(true)
 const updateDismissed = ref(false)
 const installPromptEvent = ref(null)
 const canInstall = ref(false)
+const isDownloading = ref(false)
+const downloadComplete = ref(false)
 
 let registration = null
 
@@ -67,6 +69,9 @@ export function usePwa() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((reg) => {
         registration = reg
+        offlineReady.value = true
+        downloadComplete.value = true
+        isDownloading.value = false
         
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing
@@ -80,6 +85,24 @@ export function usePwa() {
             })
           }
         })
+      })
+      
+      // Track initial SW installation/caching
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg) {
+          const sw = reg.installing || reg.waiting || reg.active
+          if (sw && sw.state !== 'activated') {
+            isDownloading.value = true
+            sw.addEventListener('statechange', () => {
+              if (sw.state === 'activated') {
+                isDownloading.value = false
+                downloadComplete.value = true
+              }
+            })
+          } else if (sw && sw.state === 'activated') {
+            downloadComplete.value = true
+          }
+        }
       })
 
       // Listen for controller change to reload
@@ -106,6 +129,8 @@ export function usePwa() {
     isOnline,
     updateDismissed,
     canInstall,
+    isDownloading,
+    downloadComplete,
     updateServiceWorker,
     dismissUpdate,
     promptInstall,

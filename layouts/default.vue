@@ -16,6 +16,7 @@
     <!-- PWA Components -->
     <ClientOnly>
       <PwaUpdateToast />
+      <PwaDownloadIndicator />
       <NetworkStatus />
     </ClientOnly>
   </div>
