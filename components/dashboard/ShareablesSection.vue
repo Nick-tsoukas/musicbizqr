@@ -437,32 +437,119 @@ function loadMockData() {
 }
 
 /**
+ * Fetch pulse moments (real-time surges) from auto-active API
+ */
+async function fetchPulseMoments() {
+  const strapiUrl = config.public.strapiUrl
+  
+  try {
+    const response = await fetch(
+      `${strapiUrl}/api/fan-moments/auto-active?bandId=${props.bandId}`
+    )
+    const data = await response.json()
+    
+    if (data.ok && data.moment) {
+      // Convert moment to shareable card format
+      const moment = data.moment
+      return [{
+        id: `moment-${moment.id}`,
+        type: moment.momentType || 'PULSE_SURGE',
+        category: 'moments',
+        accent: moment.momentType === 'CITY_HEAT' ? 'blue' : 
+                moment.momentType === 'MOMENT_MATTERED' ? 'violet' : 'amber',
+        windowLabel: formatMomentExpiry(moment.expiresAt),
+        headline: moment.shareTitle || 'Fan energy is surging',
+        hero: moment.context?.velocity ? `${moment.context.velocity}x` : '🔥',
+        proof: moment.context?.cityName 
+          ? `${moment.context.cityName} is heating up`
+          : 'Real-time fan energy spike',
+        score: 95, // High priority for live moments
+        microCaption: buildMomentCaptions(moment, props.bandName),
+        isMoment: true,
+        momentData: moment,
+      }]
+    }
+    return []
+  } catch (err) {
+    console.error('[ShareablesSection] Failed to fetch pulse moments:', err)
+    return []
+  }
+}
+
+/**
+ * Format moment expiry for window label
+ */
+function formatMomentExpiry(expiresAt) {
+  if (!expiresAt) return '⚡ LIVE'
+  const expiry = new Date(expiresAt)
+  const now = new Date()
+  const diffMs = expiry - now
+  const diffMins = Math.floor(diffMs / (1000 * 60))
+  if (diffMins <= 0) return '⚡ LIVE'
+  if (diffMins < 60) return `⚡ ${diffMins}m left`
+  const diffHours = Math.floor(diffMins / 60)
+  return `⚡ ${diffHours}h left`
+}
+
+/**
+ * Build captions for pulse moment
+ */
+function buildMomentCaptions(moment, bandName) {
+  const cityName = moment.context?.cityName || ''
+  const velocity = moment.context?.velocity || ''
+  
+  return {
+    hype: cityName 
+      ? `${cityName} is going off right now 🔥 ${bandName} is heating up!`
+      : velocity 
+        ? `${velocity}x the normal energy 🔥 ${bandName} is surging!`
+        : `Something's happening with ${bandName} 🔥`,
+    grateful: cityName 
+      ? `${cityName}, we see you 🙏 Thank you for the love.`
+      : `Thank you for being part of this moment 🙏`,
+    tease: cityName 
+      ? `${cityName}… we might need to come see you 👀`
+      : `Something's building… stay close 👀`,
+  }
+}
+
+/**
  * Fetch live data from API
  */
 async function fetchLiveData() {
   const strapiUrl = config.public.strapiUrl
   
   try {
-    const response = await fetch(
-      `${strapiUrl}/api/pulse/shareables?bandId=${props.bandId}`
-    )
-    const data = await response.json()
+    // Fetch both shareables and pulse moments in parallel
+    const [shareablesRes, pulseMoments] = await Promise.all([
+      fetch(`${strapiUrl}/api/pulse/shareables?bandId=${props.bandId}`).then(r => r.json()),
+      fetchPulseMoments(),
+    ])
     
-    if (data.ok) {
-      cards.value = (data.cards || []).map(normalizeCard)
-      recommended.value = (data.recommended || []).map(normalizeCard)
-      generatedAt.value = data.generatedAt || new Date().toISOString()
-      
-      if (isDev) {
-        console.log('[ShareablesSection] Loaded live data:', {
-          cards: cards.value.length,
-          recommended: recommended.value.length,
-        })
-      }
-    } else {
-      console.warn('[ShareablesSection] API returned ok=false:', data)
-      cards.value = []
-      recommended.value = []
+    let allCards = []
+    
+    if (shareablesRes.ok) {
+      allCards = (shareablesRes.cards || []).map(normalizeCard)
+      recommended.value = (shareablesRes.recommended || []).map(normalizeCard)
+      generatedAt.value = shareablesRes.generatedAt || new Date().toISOString()
+    }
+    
+    // Merge pulse moments into cards (at the front for visibility)
+    if (pulseMoments.length > 0) {
+      const normalizedMoments = pulseMoments.map(normalizeCard)
+      allCards = [...normalizedMoments, ...allCards]
+      // Also add to recommended if there are live moments
+      recommended.value = [...normalizedMoments, ...recommended.value]
+    }
+    
+    cards.value = allCards
+    
+    if (isDev) {
+      console.log('[ShareablesSection] Loaded live data:', {
+        cards: cards.value.length,
+        moments: pulseMoments.length,
+        recommended: recommended.value.length,
+      })
     }
   } catch (err) {
     console.error('[ShareablesSection] Failed to fetch cards:', err)

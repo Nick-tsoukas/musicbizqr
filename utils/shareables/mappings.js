@@ -7,9 +7,10 @@
 
 /**
  * Card Types Enum
- * All 10 V1 shareable card types
+ * All V1 shareable card types + Pulse Moment types
  */
 export const CARD_TYPES = {
+  // Shareable card types
   CITY_CLAIM: 'CITY_CLAIM',
   MOMENTUM_SURGE: 'MOMENTUM_SURGE',
   AFTER_SHOW_ENERGY: 'AFTER_SHOW_ENERGY',
@@ -20,6 +21,10 @@ export const CARD_TYPES = {
   PLATFORM_PULL: 'PLATFORM_PULL',
   PEAK_HOUR: 'PEAK_HOUR',
   MILESTONE_DROP: 'MILESTONE_DROP',
+  // Pulse Moment types (real-time surges)
+  PULSE_SURGE: 'PULSE_SURGE',
+  CITY_HEAT: 'CITY_HEAT',
+  MOMENT_MATTERED: 'MOMENT_MATTERED',
 }
 
 /**
@@ -28,6 +33,7 @@ export const CARD_TYPES = {
  */
 export const TAB_DEFS = [
   { key: 'recommended', label: 'Recommended' },
+  { key: 'moments', label: '⚡ Moments' },
   { key: 'recaps', label: 'Recaps' },
   { key: 'spikes', label: 'Spikes' },
   { key: 'prompts', label: 'Prompts' },
@@ -49,6 +55,10 @@ export const TYPE_TO_TAB = {
   [CARD_TYPES.PLATFORM_PULL]: 'prompts',
   [CARD_TYPES.PEAK_HOUR]: 'spikes',
   [CARD_TYPES.MILESTONE_DROP]: 'prompts',
+  // Pulse Moment types → Moments tab
+  [CARD_TYPES.PULSE_SURGE]: 'moments',
+  [CARD_TYPES.CITY_HEAT]: 'moments',
+  [CARD_TYPES.MOMENT_MATTERED]: 'moments',
 }
 
 /**
@@ -66,6 +76,10 @@ export const TYPE_TO_ACCENT = {
   [CARD_TYPES.PLATFORM_PULL]: 'emerald',
   [CARD_TYPES.PEAK_HOUR]: 'amber',
   [CARD_TYPES.MILESTONE_DROP]: 'rose',
+  // Pulse Moment types
+  [CARD_TYPES.PULSE_SURGE]: 'amber',
+  [CARD_TYPES.CITY_HEAT]: 'blue',
+  [CARD_TYPES.MOMENT_MATTERED]: 'violet',
 }
 
 /**
@@ -204,7 +218,7 @@ export function filterCardsByTab(cards, tabKey) {
  * @returns {Object} Map of tabKey → count
  */
 export function getTabCounts(cards) {
-  const counts = { recommended: cards.length, recaps: 0, spikes: 0, prompts: 0 }
+  const counts = { recommended: cards.length, moments: 0, recaps: 0, spikes: 0, prompts: 0 }
   for (const card of cards) {
     const tab = getTabForType(card.type)
     if (counts[tab] !== undefined) {
