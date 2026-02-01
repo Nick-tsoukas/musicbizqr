@@ -87,12 +87,40 @@
                         {{ item.windowLabel }}
                       </span>
                     </div>
+                    
+                    <!-- Band Image - Always show -->
+                    <div class="flex justify-center mb-3">
+                      <div class="relative">
+                        <div 
+                          class="absolute inset-0 rounded-full blur-lg opacity-50"
+                          :style="{ backgroundColor: accentColor }"
+                        ></div>
+                        <div 
+                          v-if="previewBandImageUrl"
+                          class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-white/20"
+                        >
+                          <img 
+                            :src="previewBandImageUrl" 
+                            :alt="item.band?.name"
+                            class="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div 
+                          v-else
+                          class="relative w-14 h-14 rounded-full flex items-center justify-center border-2 border-white/20"
+                          :style="{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)` }"
+                        >
+                          <span class="text-white/70 text-base font-bold">{{ previewBandInitials }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <h4 class="text-white text-xs font-bold mb-2 line-clamp-2">{{ item.title }}</h4>
                     <div class="flex-1 flex items-center justify-center">
                       <span class="text-2xl font-black" :style="previewHeroStyle">{{ item.primaryStat }}</span>
                     </div>
                     <p class="text-white/60 text-[9px] uppercase tracking-wide mb-2">{{ item.secondaryStat }}</p>
-                    <p v-if="!item.band?.isBandNameInLogo" class="text-white text-xs font-semibold">{{ item.band?.name }}</p>
+                    <p v-if="!item.band?.isBandNameInLogo" class="text-white/80 text-[10px] font-medium">— {{ item.band?.name }} —</p>
                   </div>
                 </div>
               </div>
@@ -220,6 +248,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRuntimeConfig } from '#imports'
 import { useShareKit } from '~/composables/useShareKit'
 
 const props = defineProps({
@@ -274,6 +303,27 @@ const captionVariants = [
 const accentColor = computed(() => {
   const accent = props.item?.accent || 'violet'
   return ACCENT_COLORS?.[accent]?.primary || '#8B5CF6'
+})
+
+// Band image URL for preview - normalize relative URLs
+const previewBandImageUrl = computed(() => {
+  const url = props.item?.band?.imageUrl
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  // Prepend Strapi URL for relative paths
+  const strapiUrl = useRuntimeConfig().public?.strapiUrl || ''
+  return `${strapiUrl}${url}`
+})
+
+// Band initials for placeholder
+const previewBandInitials = computed(() => {
+  const name = props.item?.band?.name || ''
+  return name
+    .split(' ')
+    .map(w => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 })
 
 const previewGradientClass = computed(() => {

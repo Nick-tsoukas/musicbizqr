@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const bandName = band?.name || band?.attributes?.name || bandSlug
   const bandImageUrl = band?.bandImg?.url || band?.attributes?.bandImg?.data?.attributes?.url || null
 
-  // Generate SVG using Satori
+  // Generate SVG using Satori - matches share card style
   const svg = await satori(
     {
       type: 'div',
@@ -46,68 +46,96 @@ export default defineEventHandler(async (event) => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #1a0a2e 0%, #0f0f0f 50%, #0a1a1a 100%)',
+          background: '#0a0a0a',
           fontFamily: 'Inter',
+          position: 'relative',
         },
         children: [
-          // Decorative circle top right
+          // Subtle gradient overlay
           {
             type: 'div',
             props: {
               style: {
                 position: 'absolute',
-                top: '40px',
-                right: '80px',
-                width: '200px',
-                height: '200px',
-                borderRadius: '50%',
-                background: 'rgba(139, 92, 246, 0.2)',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'radial-gradient(ellipse at center, rgba(20, 30, 40, 0.5) 0%, transparent 70%)',
               },
             },
           },
-          // Decorative circle bottom left
-          {
-            type: 'div',
-            props: {
-              style: {
-                position: 'absolute',
-                bottom: '60px',
-                left: '100px',
-                width: '150px',
-                height: '150px',
-                borderRadius: '50%',
-                background: 'rgba(16, 185, 129, 0.15)',
-              },
-            },
-          },
-          // Band image (if available)
+          // Band image with glow effect
           bandImageUrl ? {
-            type: 'img',
+            type: 'div',
             props: {
-              src: bandImageUrl.startsWith('http') ? bandImageUrl : `${strapiUrl}${bandImageUrl}`,
               style: {
-                width: '180px',
-                height: '180px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '4px solid rgba(255, 255, 255, 0.2)',
-                marginBottom: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '40px',
+                position: 'relative',
               },
+              children: [
+                // Glow behind image
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      position: 'absolute',
+                      width: '220px',
+                      height: '220px',
+                      borderRadius: '50%',
+                      background: 'rgba(0, 200, 180, 0.15)',
+                      filter: 'blur(30px)',
+                    },
+                  },
+                },
+                {
+                  type: 'img',
+                  props: {
+                    src: bandImageUrl.startsWith('http') ? bandImageUrl : `${strapiUrl}${bandImageUrl}`,
+                    style: {
+                      width: '200px',
+                      height: '200px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid rgba(255, 255, 255, 0.15)',
+                    },
+                  },
+                },
+              ],
             },
           } : null,
-          // Band name
+          // "PUT SOMEONE ON" headline
           {
             type: 'div',
             props: {
               style: {
-                fontSize: '72px',
+                fontSize: '52px',
                 fontWeight: 700,
-                color: '#ffffff',
+                color: '#00c8b4',
                 textAlign: 'center',
-                maxWidth: '1000px',
-                lineHeight: 1.1,
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                marginBottom: '16px',
               },
-              children: bandName,
+              children: 'PUT SOMEONE ON',
+            },
+          },
+          // Band name with dashes
+          {
+            type: 'div',
+            props: {
+              style: {
+                fontSize: '28px',
+                fontWeight: 400,
+                color: 'rgba(255, 255, 255, 0.7)',
+                textAlign: 'center',
+                maxWidth: '900px',
+                marginBottom: '40px',
+              },
+              children: `— ${bandName} —`,
             },
           },
           // Tagline
@@ -115,9 +143,9 @@ export default defineEventHandler(async (event) => {
             type: 'div',
             props: {
               style: {
-                fontSize: '32px',
-                color: '#c4b5fd',
-                marginTop: '20px',
+                fontSize: '18px',
+                color: 'rgba(255, 255, 255, 0.4)',
+                letterSpacing: '2px',
               },
               children: 'Scan • Listen • Follow',
             },
@@ -129,11 +157,10 @@ export default defineEventHandler(async (event) => {
               style: {
                 position: 'absolute',
                 bottom: '30px',
-                right: '40px',
-                fontSize: '20px',
-                color: 'rgba(255, 255, 255, 0.4)',
+                fontSize: '16px',
+                color: 'rgba(255, 255, 255, 0.25)',
               },
-              children: 'MusicBizQR',
+              children: 'via MusicBizQR',
             },
           },
         ].filter(Boolean),

@@ -35,13 +35,44 @@
           </span>
         </div>
 
+        <!-- Band Image - Always show prominently -->
+        <div class="flex justify-center mb-3">
+          <div class="relative">
+            <!-- Glow behind image -->
+            <div 
+              class="absolute inset-0 rounded-full blur-xl opacity-40"
+              :style="{ backgroundColor: accentColor }"
+            ></div>
+            <!-- Image or placeholder -->
+            <div 
+              v-if="item.band?.imageUrl"
+              class="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/20"
+            >
+              <img 
+                :src="normalizedImageUrl" 
+                :alt="item.band?.name"
+                class="w-full h-full object-cover"
+                @error="handleImageError"
+              />
+            </div>
+            <!-- Placeholder with initials -->
+            <div 
+              v-else
+              class="relative w-16 h-16 rounded-full flex items-center justify-center border-2 border-white/20"
+              :style="placeholderStyle"
+            >
+              <span class="text-white/70 text-lg font-bold">{{ bandInitials }}</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Headline -->
-        <h4 class="text-white text-xs font-bold mb-2 line-clamp-2 leading-tight">
+        <h4 class="text-white text-xs font-bold mb-2 line-clamp-2 leading-tight text-center">
           {{ item.headline }}
         </h4>
 
         <!-- Hero stat -->
-        <div class="flex-1 flex items-center justify-center py-2">
+        <div class="flex-1 flex items-center justify-center py-1">
           <span 
             class="text-2xl font-black text-center"
             :style="heroStyle"
@@ -55,26 +86,18 @@
           {{ item.proof }}
         </p>
 
-        <!-- Micro caption -->
-        <p 
-          v-if="displayCaption"
-          class="text-white/65 text-[10px] italic text-center mb-2 line-clamp-2"
-        >
-          "{{ displayCaption }}"
-        </p>
-
         <!-- Band name (if not in logo) -->
         <p 
           v-if="!item.band?.isBandNameInLogo" 
-          class="text-white text-[11px] font-semibold text-center truncate"
+          class="text-white/80 text-[10px] font-medium text-center truncate mb-1"
         >
-          {{ item.band?.name }}
+          — {{ item.band?.name }} —
         </p>
 
         <!-- Share CTA -->
         <button
           @click.stop="$emit('share', item)"
-          class="mt-3 w-full py-2 px-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold hover:from-purple-500 hover:to-blue-500 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-purple-500/20"
+          class="mt-auto w-full py-2 px-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold hover:from-purple-500 hover:to-blue-500 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-purple-500/20"
         >
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -97,7 +120,8 @@
  * - QA-6: Unknown accent uses safe default (violet)
  */
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRuntimeConfig } from '#imports'
 import { ACCENT_COLORS, TYPE_TO_ACCENT, getAccentConfig } from '~/utils/shareables/mappings'
 
 const props = defineProps({
@@ -113,12 +137,46 @@ const props = defineProps({
 
 defineEmits(['click', 'share'])
 
+const config = useRuntimeConfig()
+const imageError = ref(false)
+
 // QA-6: Get accent color with safe fallback
 const accent = computed(() => {
   return getAccentConfig(props.item.accent, props.item.type)
 })
 
 const accentColor = computed(() => accent.value.primary)
+
+// Band image URL - normalize relative URLs
+const normalizedImageUrl = computed(() => {
+  const url = props.item.band?.imageUrl
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  // Prepend Strapi URL for relative paths
+  const strapiUrl = config.public?.strapiUrl || ''
+  return `${strapiUrl}${url}`
+})
+
+// Handle image load errors
+function handleImageError() {
+  imageError.value = true
+}
+
+// Placeholder style with accent gradient
+const placeholderStyle = computed(() => ({
+  background: `linear-gradient(135deg, ${accentColor.value}40, ${accentColor.value}20)`,
+}))
+
+// Band initials for placeholder
+const bandInitials = computed(() => {
+  const name = props.item.band?.name || ''
+  return name
+    .split(' ')
+    .map(w => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+})
 
 // Card size classes
 const cardSizeClass = computed(() => {
