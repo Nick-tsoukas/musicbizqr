@@ -27,38 +27,55 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // 1) Use the new lookup endpoint that bypasses entityService permission issues
-    const incoming = getQuery(event) as Record<string, string | string[]>
-    const looseId = (incoming.id as string) || ''
-    
-    const lookupUrl = `${strapiBase}/api/qrs/lookup`
-    const lookupRes: any = await $fetch(lookupUrl, {
-      method: 'GET',
-      query: {
-        url: reqUrl.toString(),
-        id: looseId,
-      },
-    }).catch(() => null)
-    
-    let row = lookupRes?.data ? { id: lookupRes.data.id, attributes: lookupRes.data } : null
-    
+    // 1) try exact match on QR url
+    // Use deep populate to ensure band.slug is included
+    const mainQuery = {
+      'filters[url][$eq]': reqUrl.toString(),
+      'populate[band][fields][0]': 'slug',
+      'populate[band][fields][1]': 'name',
+      'populate[event][fields][0]': 'slug',
+      'populate[q_image]': '*',
+    } as const
+
+    const searchUrl = `${strapiBase}/api/qrs`
+    const res: any = await $fetch(searchUrl, { method: 'GET', query: mainQuery })
+    let row = Array.isArray(res?.data) ? res.data[0] : null
+
+    // 1b) fallback: try match by "id" inside options.data
     if (!row) {
-      setResponseStatus(event, 404)
-      return 'QR not found'
+      const incoming = getQuery(event)
+      const looseId = (incoming.id as string) || ''
+      const fb: any = await $fetch(searchUrl, {
+        method: 'GET',
+        query: {
+          'filters[options][data][$containsi]': looseId,
+          'populate[band][fields][0]': 'slug',
+          'populate[band][fields][1]': 'name',
+          'populate[event][fields][0]': 'slug',
+          'populate[q_image]': '*',
+        },
+      })
+      const fbRows = Array.isArray(fb?.data) ? fb.data : []
+      if (!fbRows.length) {
+        setResponseStatus(event, 404)
+        return 'QR not found'
+      }
+      row = fbRows[0]
     }
 
     // 2) basic extract
     const qrId: number = row.id
     const attrs: any = row.attributes || {}
-    // The lookup endpoint returns band directly (not nested under .data)
-    const bandId: number | null = attrs.band?.id || null
+    const bandRel = attrs.band?.data
+    const bandId: number | null = bandRel ? bandRel.id : null
 
     // 3) create scan in Strapi with rich analytics data (non-blocking-ish)
     let createdScanId: number | null = null
-    // The lookup endpoint returns event directly (not nested under .data)
-    const eventId: number | null = attrs.event?.id || null
+    const eventRel = attrs.event?.data
+    const eventId: number | null = eventRel ? eventRel.id : null
     
-    // Extract UTM params from incoming request (reuse incoming from above)
+    // Extract UTM params from incoming request
+    const incoming = getQuery(event) as Record<string, string | string[]>
     const utmSource = typeof incoming.utm_source === 'string' ? incoming.utm_source : null
     const utmMedium = typeof incoming.utm_medium === 'string' ? incoming.utm_medium : null
     const utmCampaign = typeof incoming.utm_campaign === 'string' ? incoming.utm_campaign : null
@@ -141,31 +158,58 @@ export default defineEventHandler(async (event) => {
     }
 
     // 6) decide destination
-    const { q_type, link, band, event: ev } = attrs
+    const { q_type, link, band, event: ev /* tours/albums removed per your note */ } = attrs
     let dest = `${reqUrl.protocol}//${reqUrl.host}`
 
     // Debug logging for QR routing issues
     console.log('[directqr] QR ID:', qrId, 'q_type:', q_type)
     console.log('[directqr] band relation:', JSON.stringify(band))
 
-    // → band profile (lookup endpoint returns band directly with slug)
-    if (q_type === 'bandProfile' && band?.slug) {
-      dest = `${reqUrl.protocol}//${reqUrl.host}/${band.slug}`
-      console.log('[directqr] Resolved band slug:', band.slug)
+    // → band profile
+    if (q_type === 'bandProfile') {
+      // Handle both Strapi v4 response formats:
+      // Format 1: band.data.attributes.slug (nested)
+      // Format 2: band.data.slug (flattened by custom controller)
+      // Format 3: band.slug (direct relation)
+      let slug: string | null = null
+      
+      if (band?.data?.attributes?.slug) {
+        slug = band.data.attributes.slug
+      } else if (band?.data?.slug) {
+        slug = band.data.slug
+      } else if (band?.slug) {
+        slug = band.slug
+      }
+      
+      console.log('[directqr] Resolved band slug:', slug)
+      
+      if (slug) {
+        dest = `${reqUrl.protocol}//${reqUrl.host}/${slug}`
+      } else {
+        console.warn('[directqr] WARNING: bandProfile QR has no valid band slug! QR ID:', qrId, 'Band data:', JSON.stringify(band))
+      }
     }
-    // → event (lookup endpoint returns event directly with slug)
-    else if (q_type === 'events' && ev?.slug) {
-      dest = `${reqUrl.protocol}//${reqUrl.host}/event/${ev.slug}`
+    // → event
+    else if (q_type === 'events') {
+      let slug: string | null = null
+      
+      if (ev?.data?.attributes?.slug) {
+        slug = ev.data.attributes.slug
+      } else if (ev?.data?.slug) {
+        slug = ev.data.slug
+      } else if (ev?.slug) {
+        slug = ev.slug
+      }
+      
+      if (slug) {
+        dest = `${reqUrl.protocol}//${reqUrl.host}/event/${slug}`
+      }
     }
     // → external
     else if (q_type === 'externalURL' && link) {
       dest = toAbsoluteHttps(link)
     }
     // else stays on site root
-    
-    if (q_type === 'bandProfile' && !band?.slug) {
-      console.warn('[directqr] WARNING: bandProfile QR has no valid band slug! QR ID:', qrId, 'Band data:', JSON.stringify(band))
-    }
     
     console.log('[directqr] Final destination:', dest)
 
