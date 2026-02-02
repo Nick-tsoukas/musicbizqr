@@ -295,6 +295,11 @@ async function mountQr() {
   console.log('[DownloadQr] RAW candidateData:', candidateData)
   console.log('[DownloadQr] props.qrOptions:', JSON.stringify(props.qrOptions, null, 2))
   console.log('[DownloadQr] Has qrInstance:', !!props.qrInstance)
+  
+  // DEBUG: Check for invisible characters that might corrupt QR scanning
+  console.log('[DownloadQr] QR raw string:', JSON.stringify(candidateData))
+  console.log('[DownloadQr] First 20 char codes:', [...(candidateData || '').slice(0, 20)].map(c => c.charCodeAt(0)))
+  console.log('[DownloadQr] String length:', (candidateData || '').length)
 
   // CRITICAL: Validate the URL - must be a proper https:// URL with path
   const isValidUrl = (s) => /^https?:\/\/.+/.test(s || '')
