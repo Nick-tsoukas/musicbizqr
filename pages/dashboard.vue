@@ -796,13 +796,23 @@ function buildQrOptionsFromStrapi(raw) {
 
   const bg = saved.backgroundOptions?.color || a.backgroundColor || '#FFFFFF'
 
-  // CRITICAL: Ensure we always have a valid URL
-  if (!encoded || encoded === base) {
-    console.error('[QR Download] NO VALID URL FOUND! Building from node.id:', node?.id)
-    encoded = buildDirect(node?.id || 'unknown')
+  // CRITICAL: Ensure we always have a valid URL with directqr path
+  const hasDirectQr = /directqr\?id=/.test(encoded || '')
+  if (!encoded || encoded === base || !hasDirectQr) {
+    console.error('[QR Download] INVALID URL! Must contain directqr?id=. Got:', encoded)
+    // ALWAYS build a valid directqr URL as last resort
+    const fallbackId = a.slugId || node?.id || 'unknown'
+    encoded = buildDirect(fallbackId)
+    console.log('[QR Download] Built fallback URL:', encoded)
   }
   
   console.log('[QR Download] FINAL DATA TO ENCODE:', encoded)
+  
+  // FINAL VALIDATION - must be a valid directqr URL
+  if (!encoded.includes('directqr?id=')) {
+    console.error('[QR Download] CRITICAL: Still invalid after fallback! Using hardcoded fallback')
+    encoded = `https://musicbizqr.com/directqr?id=${node?.id || 'error'}`
+  }
 
   const opts = {
     data: encoded,
