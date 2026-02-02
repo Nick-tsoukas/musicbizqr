@@ -407,10 +407,15 @@ function normalizeCard(card) {
     },
     share: {
       shareUrl: getBandUrl(),
-      ogUrl: `${getBandUrl()}/share/band/${props.bandSlug}`,
+      ogUrl: getShareOgUrl(),
     },
     selectedCaptionStyle: 'hype',
   }
+}
+
+function getShareOgUrl() {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
+  return `${origin}/share/band/${props.bandSlug}`
 }
 
 // ============================================================
@@ -596,7 +601,7 @@ function openCustomize(card) {
     secondaryStat: card.proof,
     share: {
       shareUrl: card.share?.shareUrl || getBandUrl(),
-      ogUrl: card.share?.ogUrl || `${getBandUrl()}/share/band/${props.bandSlug}`,
+      ogUrl: card.share?.ogUrl || getShareOgUrl(),
       captions: card.microCaption,
       defaultCaptionStyle: card.selectedCaptionStyle || 'hype',
     },
