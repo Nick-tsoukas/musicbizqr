@@ -889,8 +889,8 @@
           </div>
         </section>
 
-        <!-- Merch Concierge Section -->
-        <section class="form-section">
+        <!-- Merch Concierge Section - DISABLED FOR TESTING
+        <section class="form-section-disabled">
           <div class="form-section-header">
             <div class="form-section-icon bg-gradient-to-br from-violet-500 to-purple-600">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1079,6 +1079,7 @@
             </div>
           </div>
         </section>
+        END Merch Concierge Section -->
 
         <!-- Submit Button -->
         <div class="pt-6 pb-10">
