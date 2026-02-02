@@ -1214,8 +1214,10 @@ useHead({
     },
     {
       property: "og:image",
-      content: "https://musicbizqr.com/musicbizlogo.png",
+      content: "https://musicbizqr.com/api/og/site.png",
     },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
     { property: "og:url", content: "https://musicbizqr.com" },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
@@ -1228,7 +1230,7 @@ useHead({
       content:
         "All-in-one music promo QR code tool for bands and musicians. Embed content and track engagement.",
     },
-    { name: "twitter:image", content: "https://musicbizqr.com/og-image.jpg" },
+    { name: "twitter:image", content: "https://musicbizqr.com/api/og/site.png" },
   ],
   link: [
     { rel: "canonical", href: "https://musicbizqr.com" },
