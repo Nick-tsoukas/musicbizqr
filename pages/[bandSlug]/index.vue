@@ -679,9 +679,13 @@
         <!-- Contact / Booking (Minimal) -->
         <section v-if="hasContactInfo" class="mt-16 pt-8 border-t border-white/10">
           <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/50">
-            <span v-if="band.data.recordLabel" class="flex items-center gap-1.5">
+            <a v-if="band.data.labelName && band.data.labelUrl" :href="band.data.labelUrl" target="_blank" rel="noopener" class="flex items-center gap-1.5 hover:text-white transition">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke-width="1.5"/></svg>
-              {{ band.data.recordLabel }}
+              {{ band.data.labelName }}
+            </a>
+            <span v-else-if="band.data.labelName" class="flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke-width="1.5"/></svg>
+              {{ band.data.labelName }}
             </span>
             <a v-if="band.data.bookingEmail" :href="`mailto:${band.data.bookingEmail}`" class="hover:text-white transition">
               Booking
@@ -2305,7 +2309,7 @@ const hasEventHubLinks = computed(() =>
 );
 const hasContactInfo = computed(() => {
   const d = band.value?.data;
-  return d?.bookingEmail || d?.managementEmail || d?.pressEmail || d?.bookingAgent || d?.recordLabel;
+  return d?.bookingEmail || d?.managementEmail || d?.pressEmail || d?.bookingAgent || d?.labelName;
 });
 
 /* ---------- video ---------- */

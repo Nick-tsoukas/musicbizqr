@@ -569,13 +569,23 @@
                 />
               </div>
               <div class="form-field">
-                <label for="recordLabel" class="form-label">Record Label</label>
+                <label for="labelName" class="form-label">Record Label Name</label>
                 <input
-                  id="recordLabel"
+                  id="labelName"
                   type="text"
-                  v-model="contacts.recordLabel"
+                  v-model="contacts.labelName"
                   class="form-input"
-                  placeholder="Label name"
+                  placeholder="e.g. Atlantic Records"
+                />
+              </div>
+              <div class="form-field">
+                <label for="labelUrl" class="form-label">Record Label Website</label>
+                <input
+                  id="labelUrl"
+                  type="url"
+                  v-model="contacts.labelUrl"
+                  class="form-input"
+                  placeholder="https://..."
                 />
               </div>
             </div>
@@ -870,7 +880,8 @@ const contacts = ref({
   managementEmail: "",
   pressEmail: "",
   bookingAgent: "",
-  recordLabel: "",
+  labelUrl: "",
+  labelName: "",
 });
 
 // Featured song/video
@@ -1028,7 +1039,8 @@ async function submitForm() {
       managementEmail: contacts.value.managementEmail?.trim() || "",
       pressEmail: contacts.value.pressEmail?.trim() || "",
       bookingAgent: contacts.value.bookingAgent?.trim() || "",
-      recordLabel: contacts.value.recordLabel?.trim() || "",
+      labelUrl: contacts.value.labelUrl?.trim() || "",
+      labelName: contacts.value.labelName?.trim() || "",
 
       // featured song — embedHtml OR upload
       singlesong: {
