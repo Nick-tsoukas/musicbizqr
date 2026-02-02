@@ -1,6 +1,6 @@
 <template>
   <div class="shareables-section">
-    <!-- Header -->
+    <!-- Headers -->
     <div class="flex items-start justify-between mb-4">
       <div>
         <h3 class="text-lg font-semibold text-white flex items-center gap-2">
