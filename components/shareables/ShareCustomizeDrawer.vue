@@ -425,14 +425,15 @@ function getOgUrl() {
     return props.item.share.ogUrl
   }
   // Build shareable share URL with OG image params for Facebook
+  // Note: field names vary - kind/type, title/headline, primaryStat/hero, secondaryStat/proof
   if (props.item?.id && props.item?.band?.id) {
     const params = new URLSearchParams({
       bandId: String(props.item.band.id),
       bandSlug: props.item.band.slug || '',
-      type: props.item.type || 'MILESTONE_DROP',
-      hero: encodeURIComponent(props.item.hero || ''),
-      headline: encodeURIComponent(props.item.headline || ''),
-      proof: encodeURIComponent(props.item.proof || ''),
+      type: props.item.kind || props.item.type || 'MILESTONE_DROP',
+      hero: encodeURIComponent(props.item.primaryStat || props.item.hero || ''),
+      headline: encodeURIComponent(props.item.title || props.item.headline || ''),
+      proof: encodeURIComponent(props.item.secondaryStat || props.item.proof || ''),
       accent: props.item.accent || 'violet',
     })
     return `https://musicbizqr.com/share/shareable/${props.item.id}?${params.toString()}`
