@@ -3,16 +3,16 @@
     <h1 class="text-white text-2xl font-bold mb-4">QR Test Page</h1>
     <p class="text-white/70 mb-8">Scan these QRs with your phone camera</p>
     
-    <!-- Test 1: QrcodeVue library -->
+    <!-- Test 1: QrcodeVue library (Canvas) -->
     <div class="mb-8">
-      <h2 class="text-white text-lg mb-2">Test 1: QrcodeVue (SVG)</h2>
+      <h2 class="text-white text-lg mb-2">Test 1: QrcodeVue (Canvas)</h2>
       <div class="bg-white p-6 rounded-2xl">
         <ClientOnly>
           <QrcodeVue 
             :value="testUrl"
             :size="200"
             level="M"
-            render-as="svg"
+            render-as="canvas"
           />
         </ClientOnly>
       </div>
@@ -32,14 +32,14 @@
 
     <!-- Test 3: Simple Google URL -->
     <div class="mb-8">
-      <h2 class="text-white text-lg mb-2">Test 3: Google URL</h2>
+      <h2 class="text-white text-lg mb-2">Test 3: Google URL (Canvas)</h2>
       <div class="bg-white p-6 rounded-2xl">
         <ClientOnly>
           <QrcodeVue 
             value="https://google.com"
             :size="200"
             level="M"
-            render-as="svg"
+            render-as="canvas"
           />
         </ClientOnly>
       </div>
