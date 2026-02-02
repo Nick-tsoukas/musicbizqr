@@ -1922,12 +1922,14 @@ function sanitizeEmbed(html) {
   return cleaned;
 }
 
-// Detect if embed is a playlist (needs more height)
-function isPlaylistEmbed(html) {
-  if (!html) return false;
-  return /spotify\.com\/embed\/playlist/i.test(html) || 
-         /spotify\.com\/embed\/album/i.test(html) ||
-         /soundcloud\.com.*playlists/i.test(html);
+// Detect Spotify embed type for smart height sizing
+function getSpotifyEmbedType(html) {
+  if (!html) return 'track';
+  if (/spotify\.com\/embed\/playlist/i.test(html)) return 'playlist';
+  if (/spotify\.com\/embed\/album/i.test(html)) return 'album';
+  if (/spotify\.com\/embed\/track/i.test(html)) return 'track';
+  if (/soundcloud\.com.*playlists/i.test(html)) return 'playlist';
+  return 'track'; // default
 }
 
 /* ---------- embed & featured song ---------- */
@@ -1935,9 +1937,19 @@ const rawEmbedHtml = computed(
   () => band.value?.data?.singlesong?.embedHtml || ""
 );
 const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
-const isPlaylist = computed(() => isPlaylistEmbed(rawEmbedHtml.value));
-// Dynamic height: playlists/albums need 380px, single tracks need 152px
-const embedHeightClass = computed(() => isPlaylist.value ? 'h-96' : 'h-40');
+const embedType = computed(() => getSpotifyEmbedType(rawEmbedHtml.value));
+
+// Smart height based on content type:
+// - track: compact (152px) - just the player
+// - album: medium (300px) - shows a few tracks  
+// - playlist: full (380px) - shows more tracks
+const embedHeightClass = computed(() => {
+  switch (embedType.value) {
+    case 'playlist': return 'h-[380px]';
+    case 'album': return 'h-[300px]';
+    default: return 'h-[152px]';
+  }
+});
 
 const hasFeaturedSong = computed(() => {
   const s = band.value?.data?.singlesong;
