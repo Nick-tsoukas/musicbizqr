@@ -1967,12 +1967,12 @@ const embedType = computed(() => getSpotifyEmbedType(rawEmbedHtml.value));
 
 // Smart height based on content type:
 // - track: compact (152px) - just the player
-// - album: medium (300px) - shows a few tracks  
-// - playlist: full (380px) - shows more tracks
+// - album: medium (352px) - shows several tracks  
+// - playlist: tall (500px) - shows many tracks for proper playlist experience
 const embedHeightClass = computed(() => {
   switch (embedType.value) {
-    case 'playlist': return 'h-[380px]';
-    case 'album': return 'h-[300px]';
+    case 'playlist': return 'h-[500px]';
+    case 'album': return 'h-[352px]';
     default: return 'h-[152px]';
   }
 });
