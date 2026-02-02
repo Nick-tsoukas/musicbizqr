@@ -111,10 +111,11 @@ export default defineNuxtConfig({
         /^\/agency/,
         /^\/internal/,
         /^\/checkout/,
+        /^\/directqr/,  // CRITICAL: Don't cache QR redirect route
       ],
       runtimeCaching: [
         {
-          urlPattern: /^https:\/\/musicbizqr\.com\/(?!api|account|dashboard|agency|internal|checkout).*/,
+          urlPattern: /^https:\/\/musicbizqr\.com\/(?!api|account|dashboard|agency|internal|checkout|directqr).*/,
           handler: 'NetworkFirst',
           options: {
             cacheName: 'pages-cache',
