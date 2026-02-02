@@ -105,6 +105,8 @@ export const DEFAULT_SOCIAL_ORDER = [
 export const DEFAULT_EVENT_HUB_ORDER = [
   'bandsintown',
   'songkick',
+  'jambase',
+  'relix',
 ] as const;
 
 /**
