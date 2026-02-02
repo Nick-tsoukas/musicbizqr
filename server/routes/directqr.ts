@@ -35,10 +35,7 @@ export default defineEventHandler(async (event) => {
     // Use deep populate to ensure band.slug is included
     const mainQuery = {
       'filters[url][$eq]': reqUrl.toString(),
-      'populate[band][fields][0]': 'slug',
-      'populate[band][fields][1]': 'name',
-      'populate[event][fields][0]': 'slug',
-      'populate[q_image]': '*',
+      'populate': 'band,event,q_image',
     } as const
 
     const searchUrl = `${strapiBase}/api/qrs`
@@ -60,10 +57,7 @@ export default defineEventHandler(async (event) => {
           const directRes: any = await $fetch(`${strapiBase}/api/qrs/${looseId}`, {
             method: 'GET',
             query: {
-              'populate[band][fields][0]': 'slug',
-              'populate[band][fields][1]': 'name',
-              'populate[event][fields][0]': 'slug',
-              'populate[q_image]': '*',
+              'populate': 'band,event,q_image',
             },
           })
           if (directRes?.data) {
@@ -81,10 +75,7 @@ export default defineEventHandler(async (event) => {
           method: 'GET',
           query: {
             'filters[slugId][$eq]': looseId,
-            'populate[band][fields][0]': 'slug',
-            'populate[band][fields][1]': 'name',
-            'populate[event][fields][0]': 'slug',
-            'populate[q_image]': '*',
+            'populate': 'band,event,q_image',
           },
         })
         const slugIdRows = Array.isArray(slugIdRes?.data) ? slugIdRes.data : []
@@ -100,10 +91,7 @@ export default defineEventHandler(async (event) => {
           method: 'GET',
           query: {
             'filters[options][data][$containsi]': looseId,
-            'populate[band][fields][0]': 'slug',
-            'populate[band][fields][1]': 'name',
-            'populate[event][fields][0]': 'slug',
-            'populate[q_image]': '*',
+            'populate': 'band,event,q_image',
           },
         })
         const fbRows = Array.isArray(fb?.data) ? fb.data : []
