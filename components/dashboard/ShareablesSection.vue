@@ -626,14 +626,31 @@ function openCustomize(card) {
   drawerOpen.value = true
 }
 
-async function handleQuickShare() {
-  const result = await webShare({
+function handleQuickShare() {
+  // Open drawer with generic band share (no specific card)
+  activeItem.value = {
+    id: null,
+    kind: 'BAND_SHARE',
+    source: 'manual',
+    accent: 'violet',
+    windowLabel: '',
     title: props.bandName,
-    url: getBandUrl(),
-  })
-  if (!result.ok) {
-    handleCopyLink()
+    primaryStat: '',
+    secondaryStat: '',
+    share: {
+      shareUrl: getBandUrl(),
+      ogUrl: getShareOgUrl(),
+      facebookUrl: `${typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'}/share/band/${props.bandSlug}`,
+      captions: {},
+      defaultCaptionStyle: 'hype',
+    },
+    band: {
+      id: props.bandId,
+      slug: props.bandSlug,
+      name: props.bandName,
+    },
   }
+  drawerOpen.value = true
 }
 
 async function handleCopyLink() {
