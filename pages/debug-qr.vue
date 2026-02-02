@@ -13,6 +13,14 @@
           placeholder="https://musicbizqr.com/directqr?id=79"
         />
         <p class="text-xs text-gray-500 mt-2">Current: {{ testUrl }}</p>
+        
+        <!-- Quick URL buttons -->
+        <div class="flex flex-wrap gap-2 mt-4">
+          <button @click="testUrl = 'https://google.com'" class="px-3 py-1 bg-green-600 rounded text-sm">Google (works)</button>
+          <button @click="testUrl = 'https://musicbizqr.com'" class="px-3 py-1 bg-blue-600 rounded text-sm">musicbizqr.com</button>
+          <button @click="testUrl = 'https://musicbizqr.com/directqr?id=79'" class="px-3 py-1 bg-purple-600 rounded text-sm">directqr?id=79</button>
+          <button @click="testUrl = 'https://musicbizqr.com/shannontehya'" class="px-3 py-1 bg-pink-600 rounded text-sm">/shannontehya</button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
