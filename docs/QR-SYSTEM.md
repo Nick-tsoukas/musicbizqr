@@ -463,6 +463,21 @@ const blob = await qr.getRawData("png")  // Get as blob
 | **#4** | `dashboard.vue` | Weak URL fallback | Now always builds from ID |
 | **#5** | `DownloadQr.client.vue` | `example.com` as fallback | Now uses `musicbizqr.com` |
 | **#6** | `dashboard.vue` | `a.link` in URL chain | Removed - it's destination, not directqr URL |
+| **#7** | `directqr.ts` | Used non-existent `/api/qrs/lookup` endpoint | Reverted to standard Strapi `/api/qrs` with filters |
+| **#8** | `QrCode.client.vue` | No URL validation | Added `ensureValidQrUrl()` function |
+| **#9** | `EditQrCode.client.vue` | No URL validation | Added `ensureValidQrUrl()` function |
+| **#10** | `dashboard.vue` | Direct image fetch had CORS issues | Reverted to modal-based download |
+
+---
+
+## Critical Validation Rules
+
+All QR-related code MUST follow these rules:
+
+1. **URL Format**: All QR data MUST be `https://musicbizqr.com/directqr?id={id}`
+2. **Validation**: URLs MUST start with `https://` and contain `directqr?id=`
+3. **Fallback**: If no valid URL, build from `slugId` → `node.id` → `'unknown'`
+4. **Never encode**: External URLs, empty strings, or non-URL data directly
 
 ---
 
