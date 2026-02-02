@@ -41,26 +41,71 @@ export default defineEventHandler(async (event) => {
     const res: any = await $fetch(searchUrl, { method: 'GET', query: mainQuery })
     let row = Array.isArray(res?.data) ? res.data[0] : null
 
-    // 1b) fallback: try match by "id" inside options.data
+    // 1b) fallback: try direct lookup by Strapi record ID
     if (!row) {
       const incoming = getQuery(event)
       const looseId = (incoming.id as string) || ''
-      const fb: any = await $fetch(searchUrl, {
-        method: 'GET',
-        query: {
-          'filters[options][data][$containsi]': looseId,
-          'populate[band][fields][0]': 'slug',
-          'populate[band][fields][1]': 'name',
-          'populate[event][fields][0]': 'slug',
-          'populate[q_image]': '*',
-        },
-      })
-      const fbRows = Array.isArray(fb?.data) ? fb.data : []
-      if (!fbRows.length) {
+      
+      // If id is numeric, try direct record lookup first
+      if (looseId && /^\d+$/.test(looseId)) {
+        try {
+          const directRes: any = await $fetch(`${strapiBase}/api/qrs/${looseId}`, {
+            method: 'GET',
+            query: {
+              'populate[band][fields][0]': 'slug',
+              'populate[band][fields][1]': 'name',
+              'populate[event][fields][0]': 'slug',
+              'populate[q_image]': '*',
+            },
+          })
+          if (directRes?.data) {
+            row = directRes.data
+          }
+        } catch (directErr) {
+          // Record not found by ID, continue to other fallbacks
+        }
+      }
+      
+      // 1c) fallback: try match by slugId field
+      if (!row && looseId) {
+        const slugIdRes: any = await $fetch(searchUrl, {
+          method: 'GET',
+          query: {
+            'filters[slugId][$eq]': looseId,
+            'populate[band][fields][0]': 'slug',
+            'populate[band][fields][1]': 'name',
+            'populate[event][fields][0]': 'slug',
+            'populate[q_image]': '*',
+          },
+        })
+        const slugIdRows = Array.isArray(slugIdRes?.data) ? slugIdRes.data : []
+        if (slugIdRows.length) {
+          row = slugIdRows[0]
+        }
+      }
+      
+      // 1d) fallback: try match by "id" inside options.data
+      if (!row && looseId) {
+        const fb: any = await $fetch(searchUrl, {
+          method: 'GET',
+          query: {
+            'filters[options][data][$containsi]': looseId,
+            'populate[band][fields][0]': 'slug',
+            'populate[band][fields][1]': 'name',
+            'populate[event][fields][0]': 'slug',
+            'populate[q_image]': '*',
+          },
+        })
+        const fbRows = Array.isArray(fb?.data) ? fb.data : []
+        if (fbRows.length) {
+          row = fbRows[0]
+        }
+      }
+      
+      if (!row) {
         setResponseStatus(event, 404)
         return 'QR not found'
       }
-      row = fbRows[0]
     }
 
     // 2) basic extract
