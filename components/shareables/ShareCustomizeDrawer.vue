@@ -420,23 +420,23 @@ function getShareUrl() {
 }
 
 function getOgUrl() {
-  // Prefer explicit ogUrl if provided (e.g., demo cards)
-  if (props.item?.share?.ogUrl) {
-    return props.item.share.ogUrl
-  }
-  // Build shareable share URL with OG image params for Facebook
-  // Note: field names vary - kind/type, title/headline, primaryStat/hero, secondaryStat/proof
+  // Always build shareable-specific URL for cards with band data
+  // This ensures the OG image includes card-specific hero/headline/proof
   if (props.item?.id && props.item?.band?.id) {
     const params = new URLSearchParams({
       bandId: String(props.item.band.id),
       bandSlug: props.item.band.slug || '',
       type: props.item.kind || props.item.type || 'MILESTONE_DROP',
-      hero: encodeURIComponent(props.item.primaryStat || props.item.hero || ''),
-      headline: encodeURIComponent(props.item.title || props.item.headline || ''),
-      proof: encodeURIComponent(props.item.secondaryStat || props.item.proof || ''),
+      hero: props.item.primaryStat || props.item.hero || '',
+      headline: props.item.title || props.item.headline || '',
+      proof: props.item.secondaryStat || props.item.proof || '',
       accent: props.item.accent || 'violet',
     })
     return `https://musicbizqr.com/share/shareable/${props.item.id}?${params.toString()}`
+  }
+  // Fallback to explicit ogUrl (e.g., demo cards without band data)
+  if (props.item?.share?.ogUrl) {
+    return props.item.share.ogUrl
   }
   return ''
 }
