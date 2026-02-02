@@ -1953,6 +1953,7 @@ function getSpotifyEmbedType(html) {
   if (!html) return 'track';
   if (/spotify\.com\/embed\/playlist/i.test(html)) return 'playlist';
   if (/spotify\.com\/embed\/album/i.test(html)) return 'album';
+  if (/spotify\.com\/embed\/artist/i.test(html)) return 'artist'; // Artist top tracks
   if (/spotify\.com\/embed\/track/i.test(html)) return 'track';
   if (/soundcloud\.com.*playlists/i.test(html)) return 'playlist';
   return 'track'; // default
@@ -1968,10 +1969,12 @@ const embedType = computed(() => getSpotifyEmbedType(rawEmbedHtml.value));
 // Smart height based on content type:
 // - track: compact (152px) - just the player
 // - album: medium (352px) - shows several tracks  
+// - artist: tall (400px) - shows top tracks
 // - playlist: tall (500px) - shows many tracks for proper playlist experience
 const embedHeightClass = computed(() => {
   switch (embedType.value) {
     case 'playlist': return 'h-[500px]';
+    case 'artist': return 'h-[400px]';
     case 'album': return 'h-[352px]';
     default: return 'h-[152px]';
   }
