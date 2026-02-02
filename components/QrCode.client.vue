@@ -397,10 +397,13 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { useAsyncData } from '#app'
+import { useAsyncData, useRuntimeConfig } from '#app'
 import { useRouter, useRoute, useStrapi, useStrapiUser, useStrapiClient } from '#imports'
 import { v4 as uuidv4 } from 'uuid'
 import { useDebounceFn, useThrottleFn } from '@vueuse/core'
+
+const config = useRuntimeConfig()
+const baseUrl = computed(() => (config.public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/, ''))
 
 /* ----------------------------- Utilities ----------------------------- */
 function normalizeLink(link) {
@@ -415,8 +418,7 @@ const qrcodeWrapper = ref(null)
 const qrCode = ref(null)
 
 const uuid = uuidv4()
-const qrValue = ref(`https://musicbizqr.com/directqr?id=${uuid}`)
-// const qrValue = ref(`http//localhost:3000/directqr?id=${uuid}`)
+const qrValue = ref(`${baseUrl.value}/directqr?id=${uuid}`)
 
 const qrSize = ref(300)
 
@@ -716,6 +718,7 @@ async function saveQrCode() {
       q_type: qType,
       link: normalizeLink(link.value),
       name: name.value,
+      slugId: uuid, // Save the UUID for consistent lookups
       options: getQRCodeOptions()
     }
 
@@ -738,10 +741,7 @@ async function saveQrCode() {
       body: formData
     })
     if (!created?.id) throw new Error('QR code was not saved (no ID returned).')
-  //  production 
-    const finalTracker = `https://musicbizqr.com/directqr?id=${created.id}`
-// local 
-// const finalTracker = `http://localhost:3000/directqr?id=${created.id}`
+    const finalTracker = `${baseUrl.value}/directqr?id=${created.id}`
 
     qrValue.value = finalTracker
     // Update QR with final tracker URL and wait for render
