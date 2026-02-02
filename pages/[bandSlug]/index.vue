@@ -2633,23 +2633,13 @@ function handleFollowConfirm(platformIds) {
     trackFollowRedirect(p.id, p.url);
   }
 
-  // Safe redirect behavior to avoid popup blockers:
-  // - Open first in current tab (always works)
-  // - Open rest in new tabs (user gesture allows this)
-  const [first, ...rest] = selectedPlatforms;
-
-  // Open additional tabs first (while we still have user gesture context)
-  for (const p of rest) {
+  // Open all selected platforms in new tabs (user stays on MBQ page)
+  for (const p of selectedPlatforms) {
     try {
       window.open(p.url, '_blank', 'noopener,noreferrer');
     } catch {
       // Popup blocked, fail gracefully
     }
-  }
-
-  // Navigate current tab to first platform
-  if (first?.url) {
-    window.location.href = first.url;
   }
 }
 
