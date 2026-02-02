@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const bandName = band?.name || band?.attributes?.name || bandSlug
   const bandImageUrl = band?.bandImg?.url || band?.attributes?.bandImg?.data?.attributes?.url || null
 
-  // Generate SVG using Satori - matches share card style
+  // Generate SVG using Satori - vibrant share card style
   const svg = await satori(
     {
       type: 'div',
@@ -46,26 +46,58 @@ export default defineEventHandler(async (event) => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#0a0a0a',
+          background: 'linear-gradient(135deg, #0f0a1a 0%, #1a0a2e 30%, #0a0a14 70%, #0a1a1a 100%)',
           fontFamily: 'Inter',
           position: 'relative',
+          overflow: 'hidden',
         },
         children: [
-          // Subtle gradient overlay
+          // Vibrant purple orb top-left
           {
             type: 'div',
             props: {
               style: {
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'radial-gradient(ellipse at center, rgba(20, 30, 40, 0.5) 0%, transparent 70%)',
+                top: '-80px',
+                left: '-60px',
+                width: '350px',
+                height: '350px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%)',
               },
             },
           },
-          // Band image with glow effect
+          // Blue orb bottom-right
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                bottom: '-100px',
+                right: '-80px',
+                width: '400px',
+                height: '400px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.1) 40%, transparent 70%)',
+              },
+            },
+          },
+          // Emerald accent orb
+          {
+            type: 'div',
+            props: {
+              style: {
+                position: 'absolute',
+                top: '50%',
+                right: '10%',
+                width: '200px',
+                height: '200px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 60%)',
+              },
+            },
+          },
+          // Band image with vibrant glow
           bandImageUrl ? {
             type: 'div',
             props: {
@@ -73,11 +105,25 @@ export default defineEventHandler(async (event) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '40px',
+                marginBottom: '32px',
                 position: 'relative',
               },
               children: [
-                // Glow behind image
+                // Multi-color glow behind image
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      position: 'absolute',
+                      width: '240px',
+                      height: '240px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.5) 0%, rgba(59, 130, 246, 0.4) 50%, rgba(16, 185, 129, 0.3) 100%)',
+                      filter: 'blur(40px)',
+                    },
+                  },
+                },
+                // Ring accent
                 {
                   type: 'div',
                   props: {
@@ -86,8 +132,7 @@ export default defineEventHandler(async (event) => {
                       width: '220px',
                       height: '220px',
                       borderRadius: '50%',
-                      background: 'rgba(0, 200, 180, 0.15)',
-                      filter: 'blur(30px)',
+                      border: '2px solid rgba(139, 92, 246, 0.3)',
                     },
                   },
                 },
@@ -96,71 +141,143 @@ export default defineEventHandler(async (event) => {
                   props: {
                     src: bandImageUrl.startsWith('http') ? bandImageUrl : `${strapiUrl}${bandImageUrl}`,
                     style: {
-                      width: '200px',
-                      height: '200px',
+                      width: '180px',
+                      height: '180px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      border: '3px solid rgba(255, 255, 255, 0.15)',
+                      border: '4px solid rgba(255, 255, 255, 0.2)',
                     },
                   },
                 },
               ],
             },
           } : null,
-          // "PUT SOMEONE ON" headline
+          // Band name - bold and prominent
           {
             type: 'div',
             props: {
               style: {
-                fontSize: '52px',
-                fontWeight: 700,
-                color: '#00c8b4',
+                fontSize: '56px',
+                fontWeight: 800,
+                color: '#ffffff',
                 textAlign: 'center',
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                marginBottom: '16px',
+                letterSpacing: '-1px',
+                marginBottom: '20px',
+                textShadow: '0 4px 30px rgba(139, 92, 246, 0.3)',
               },
-              children: 'PUT SOMEONE ON',
+              children: bandName,
             },
           },
-          // Band name with dashes
+          // Colorful tagline with gradient effect (simulated with colored words)
           {
             type: 'div',
             props: {
               style: {
-                fontSize: '28px',
-                fontWeight: 400,
-                color: 'rgba(255, 255, 255, 0.7)',
-                textAlign: 'center',
-                maxWidth: '900px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
                 marginBottom: '40px',
               },
-              children: `— ${bandName} —`,
+              children: [
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '28px',
+                      fontWeight: 700,
+                      color: '#8B5CF6',
+                      letterSpacing: '2px',
+                    },
+                    children: 'SCAN',
+                  },
+                },
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '28px',
+                      color: 'rgba(255, 255, 255, 0.4)',
+                    },
+                    children: '•',
+                  },
+                },
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '28px',
+                      fontWeight: 700,
+                      color: '#3B82F6',
+                      letterSpacing: '2px',
+                    },
+                    children: 'LISTEN',
+                  },
+                },
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '28px',
+                      color: 'rgba(255, 255, 255, 0.4)',
+                    },
+                    children: '•',
+                  },
+                },
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '28px',
+                      fontWeight: 700,
+                      color: '#10B981',
+                      letterSpacing: '2px',
+                    },
+                    children: 'FOLLOW',
+                  },
+                },
+              ],
             },
           },
-          // Tagline
-          {
-            type: 'div',
-            props: {
-              style: {
-                fontSize: '18px',
-                color: 'rgba(255, 255, 255, 0.4)',
-                letterSpacing: '2px',
-              },
-              children: 'Scan • Listen • Follow',
-            },
-          },
-          // Watermark
+          // MusicBizQR branding pill
           {
             type: 'div',
             props: {
               style: {
                 position: 'absolute',
                 bottom: '30px',
-                fontSize: '16px',
-                color: 'rgba(255, 255, 255, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: '100px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
               },
-              children: 'via MusicBizQR',
+              children: [
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)',
+                    },
+                  },
+                },
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      letterSpacing: '1px',
+                    },
+                    children: 'MusicBizQR',
+                  },
+                },
+              ],
             },
           },
         ].filter(Boolean),
