@@ -453,6 +453,19 @@ const blob = await qr.getRawData("png")  // Get as blob
 
 ---
 
+## Bugs Fixed (February 2026)
+
+| Bug | File | Issue | Fix |
+|-----|------|-------|-----|
+| **#1** | `QrCode.client.vue` | Hardcoded `https://musicbizqr.com` | Now uses `config.public.baseUrl` |
+| **#2** | `QrCode.client.vue` | Missing `slugId` on create | Now saves `slugId: uuid` |
+| **#3** | `EditQrCode.client.vue` | Missing `options.data` | Now saves `data: directUrl` |
+| **#4** | `dashboard.vue` | Weak URL fallback | Now always builds from ID |
+| **#5** | `DownloadQr.client.vue` | `example.com` as fallback | Now uses `musicbizqr.com` |
+| **#6** | `dashboard.vue` | `a.link` in URL chain | Removed - it's destination, not directqr URL |
+
+---
+
 ## Troubleshooting
 
 ### QR Won't Scan / "No App Found"
