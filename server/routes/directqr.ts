@@ -31,104 +31,52 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // 1) try exact match on QR url
-    // Use deep populate to ensure band.slug is included
-    const mainQuery = {
-      'filters[url][$eq]': reqUrl.toString(),
-      'populate': '*',
-    } as const
-
-    const searchUrl = `${strapiBase}/api/qrs`
-    console.log('[directqr] Looking up URL:', reqUrl.toString())
-    const res: any = await $fetch(searchUrl, { method: 'GET', query: mainQuery })
-    let row = Array.isArray(res?.data) ? res.data[0] : null
-    let foundBy = row ? 'url-exact-match' : null
-
-    // 1b) fallback: try direct lookup by Strapi record ID
+    // Use custom /api/qrs/lookup endpoint that properly populates band relation
+    const incoming = getQuery(event)
+    const looseId = (incoming.id as string) || ''
+    
+    console.log('[directqr] Looking up with custom endpoint, URL:', reqUrl.toString(), 'id:', looseId)
+    
+    // Use the custom lookup endpoint that bypasses Strapi permission sanitization
+    const lookupRes: any = await $fetch(`${strapiBase}/api/qrs/lookup`, {
+      method: 'GET',
+      query: {
+        url: reqUrl.toString(),
+        id: looseId,
+      },
+    }).catch(() => null)
+    
+    let row = lookupRes?.data || null
+    let foundBy = row ? 'custom-lookup' : null
+    
     if (!row) {
-      const incoming = getQuery(event)
-      const looseId = (incoming.id as string) || ''
-      
-      console.log('[directqr] URL match failed, trying fallbacks with id:', looseId)
-      
-      // If id is numeric, try direct record lookup first
-      if (looseId && /^\d+$/.test(looseId)) {
-        try {
-          const directRes: any = await $fetch(`${strapiBase}/api/qrs/${looseId}`, {
-            method: 'GET',
-            query: {
-              'populate': '*',
-            },
-          })
-          if (directRes?.data) {
-            row = directRes.data
-            foundBy = 'direct-strapi-id'
-          }
-        } catch (directErr) {
-          // Record not found by ID, continue to other fallbacks
-        }
-      }
-      
-      // 1c) fallback: try match by slugId field
-      if (!row && looseId) {
-        const slugIdRes: any = await $fetch(searchUrl, {
-          method: 'GET',
-          query: {
-            'filters[slugId][$eq]': looseId,
-            'populate': '*',
-          },
-        })
-        const slugIdRows = Array.isArray(slugIdRes?.data) ? slugIdRes.data : []
-        if (slugIdRows.length) {
-          row = slugIdRows[0]
-          foundBy = 'slugId-field'
-        }
-      }
-      
-      // 1d) fallback: try match by "id" inside options.data
-      if (!row && looseId) {
-        const fb: any = await $fetch(searchUrl, {
-          method: 'GET',
-          query: {
-            'filters[options][data][$containsi]': looseId,
-            'populate': '*',
-          },
-        })
-        const fbRows = Array.isArray(fb?.data) ? fb.data : []
-        if (fbRows.length) {
-          row = fbRows[0]
-          foundBy = 'options-data-containsi'
-        }
-      }
-      
-      if (!row) {
-        setResponseStatus(event, 404)
-        return 'QR not found'
-      }
+      setResponseStatus(event, 404)
+      return 'QR not found'
     }
 
-    // 2) basic extract
+    // 2) basic extract - custom lookup returns flat structure (no attributes wrapper)
     const qrId: number = row.id
-    const attrs: any = row.attributes || {}
+    const q_type = row.q_type
+    const link = row.link
+    const band = row.band  // Already populated by custom endpoint
+    const ev = row.event
+    const arEnabled = row.arEnabled
+    const template = row.template
     
-    // DEBUG: Log the full row structure to understand what we're getting
+    // DEBUG: Log the full row structure
     console.log('[directqr] Found by:', foundBy)
     console.log('[directqr] Found row ID:', qrId)
     console.log('[directqr] Row structure:', JSON.stringify(row, null, 2))
-    console.log('[directqr] Attrs keys:', Object.keys(attrs))
-    console.log('[directqr] q_type:', attrs.q_type)
-    console.log('[directqr] band attr:', JSON.stringify(attrs.band))
+    console.log('[directqr] q_type:', q_type)
+    console.log('[directqr] band:', JSON.stringify(band))
     
-    const bandRel = attrs.band?.data
-    const bandId: number | null = bandRel ? bandRel.id : null
+    const bandId: number | null = band?.id || null
 
     // 3) create scan in Strapi with rich analytics data (non-blocking-ish)
     let createdScanId: number | null = null
-    const eventRel = attrs.event?.data
-    const eventId: number | null = eventRel ? eventRel.id : null
+    const eventId: number | null = ev?.id || null
     
     // Extract UTM params from incoming request
-    const incoming = getQuery(event) as Record<string, string | string[]>
     const utmSource = typeof incoming.utm_source === 'string' ? incoming.utm_source : null
     const utmMedium = typeof incoming.utm_medium === 'string' ? incoming.utm_medium : null
     const utmCampaign = typeof incoming.utm_campaign === 'string' ? incoming.utm_campaign : null
@@ -203,15 +151,14 @@ export default defineEventHandler(async (event) => {
     })
 
     // 5) AR redirect (your existing behavior)
-    if (attrs.arEnabled) {
-      const tmpl = attrs.template || 'test'
+    if (arEnabled) {
+      const tmpl = template || 'test'
       const arUrl = new URL(`/ar/${qrId}`, reqUrl.origin)
       arUrl.searchParams.set('template', tmpl)
       return sendRedirect(event, arUrl.toString(), 302)
     }
 
     // 6) decide destination
-    const { q_type, link, band, event: ev /* tours/albums removed per your note */ } = attrs
     let dest = `${reqUrl.protocol}//${reqUrl.host}`
 
     // Debug logging for QR routing issues
@@ -279,13 +226,12 @@ export default defineEventHandler(async (event) => {
       return {
         foundBy,
         qrId,
-        q_type: attrs.q_type,
-        band: attrs.band,
-        link: attrs.link,
-        resolvedSlug: attrs.band?.data?.attributes?.slug || attrs.band?.data?.slug || attrs.band?.slug || null,
+        q_type,
+        band,
+        link,
+        resolvedSlug: band?.slug || null,
         destination: out.toString(),
         rowKeys: Object.keys(row),
-        attrsKeys: Object.keys(attrs),
       }
     }
 
