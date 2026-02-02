@@ -418,7 +418,17 @@ const qrcodeWrapper = ref(null)
 const qrCode = ref(null)
 
 const uuid = uuidv4()
-const qrValue = ref(`${baseUrl.value}/directqr?id=${uuid}`)
+
+// CRITICAL: Validate URL is scannable before using
+function ensureValidQrUrl(url) {
+  if (!url || !url.startsWith('https://')) {
+    console.error('[QR] INVALID URL detected:', url)
+    return `https://musicbizqr.com/directqr?id=${uuid}`
+  }
+  return url
+}
+
+const qrValue = ref(ensureValidQrUrl(`${baseUrl.value}/directqr?id=${uuid}`))
 
 const qrSize = ref(300)
 

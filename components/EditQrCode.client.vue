@@ -414,9 +414,20 @@ const qrData = ref(null)
 
 // Stable redirect id and URL (ALWAYS used in the QR)
 const slugId = ref("") // persisted on the QR record
+
+// CRITICAL: Ensure URL is always valid for phone scanning
+function ensureValidQrUrl(url) {
+  if (!url || !url.startsWith('https://') || !url.includes('directqr?id=')) {
+    console.error('[EditQR] INVALID URL detected:', url)
+    return `https://musicbizqr.com/directqr?id=${slugId.value || 'unknown'}`
+  }
+  return url
+}
+
 const directUrl = computed(() => {
   const base = (config.public.baseUrl || "https://musicbizqr.com").replace(/\/+$/, "")
-  return `${base}/directqr?id=${slugId.value}`
+  const url = `${base}/directqr?id=${slugId.value}`
+  return ensureValidQrUrl(url)
 })
 
 function extractIdFromUrl(u) {
