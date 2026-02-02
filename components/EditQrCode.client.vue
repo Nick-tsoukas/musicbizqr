@@ -329,7 +329,7 @@
                   <select v-model="cornersSquareType" class="form-input">
                     <option value="square">Square</option>
                     <option value="dot">Dot</option>
-                    <option value="extra-rounded">Extra Rounded</option>
+                    <option value="extraRounded">Extra Rounded</option>
                   </select>
                 </div>
               </div>
@@ -556,7 +556,7 @@ async function initializeVariables() {
   gradient.value = !!data.options?.dotsOptions?.gradient
   gradientType.value = data.options?.dotsOptions?.gradient?.type || "linear"
   gradientRotation.value = data.options?.dotsOptions?.gradient?.rotation
-    ? (data.options.dotsOptions.gradient.rotation * Math.PI) / Math.PI / 2 // keep original degrees if provided in rad
+    ? (data.options.dotsOptions.gradient.rotation * 180) / Math.PI
     : 0
   gradientStartColor.value =
     data.options?.dotsOptions?.gradient?.colorStops?.[0]?.color || "#e6289d"
