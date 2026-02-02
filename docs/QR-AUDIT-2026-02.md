@@ -281,6 +281,61 @@ gradientRotation.value = data.options?.dotsOptions?.gradient?.rotation
 
 ---
 
+## Critical Fix: Band Relation Not Populating (February 2, 2026)
+
+### Problem
+QR codes were redirecting to the home page instead of the artist page, even though the band relation was properly set in Strapi admin.
+
+**Symptoms:**
+- `?debug=1` showed `band: null` and `resolvedSlug: null`
+- `attrsKeys` did not include `band`
+- `q_type` was correctly `bandProfile`
+
+### Root Cause
+1. **Strapi API permission sanitization** was stripping the band relation from responses
+2. Standard `populate=*` and `populate=band` syntax didn't work
+3. The custom `/api/qrs/lookup` endpoint existed but was **missing direct `slugId` field lookup**
+
+### Solution
+
+**Strapi (`qrdb/src/api/qr/controllers/qr.js`):**
+Added proper lookup chain to the custom endpoint:
+```javascript
+// 1. Try exact URL match
+// 2. Try direct slugId field match (NEW - most reliable)
+// 3. Try numeric Strapi ID match (NEW)
+// 4. Last resort: search options.data
+```
+
+**Nuxt (`qr/server/routes/directqr.ts`):**
+Switched from standard Strapi API to custom `/api/qrs/lookup` endpoint that:
+- Uses `strapi.db.query` directly (bypasses permission sanitization)
+- Returns flat structure with band data included
+- Properly populates band with `{ id, slug, name }`
+
+### Verification
+Test URL: `https://musicbizqr.com/directqr?id={slugId}&debug=1`
+
+Expected response:
+```json
+{
+  "foundBy": "custom-lookup",
+  "qrId": 84,
+  "q_type": "bandProfile",
+  "band": { "id": 32, "slug": "escaper", "name": "Escaper" },
+  "resolvedSlug": "escaper",
+  "destination": "https://musicbizqr.com/escaper"
+}
+```
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `qrdb/src/api/qr/controllers/qr.js` | Added slugId and numeric ID lookups |
+| `qr/server/routes/directqr.ts` | Use custom lookup endpoint |
+
+---
+
 ## Conclusion
 
 The QR system is **stable and production-ready**. The previous PWA caching issue has been properly fixed. The codebase has good error handling, validation, and fallback mechanisms.
@@ -290,3 +345,4 @@ The identified issues are minor and don't affect core functionality. The gradien
 ---
 
 *Audit completed: February 2, 2026*
+*Updated: February 2, 2026 - Band relation fix*
