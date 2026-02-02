@@ -418,6 +418,21 @@ function getShareOgUrl() {
   return `${origin}/share/band/${props.bandSlug}`
 }
 
+// Build Facebook share URL for a shareable card with all params for OG image
+function buildShareableFacebookUrl(card) {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://musicbizqr.com'
+  const params = new URLSearchParams({
+    bandId: String(props.bandId),
+    bandSlug: props.bandSlug,
+    type: card.type || 'MILESTONE_DROP',
+    hero: encodeURIComponent(card.hero || ''),
+    headline: encodeURIComponent(card.headline || ''),
+    proof: encodeURIComponent(card.proof || ''),
+    accent: card.accent || 'violet',
+  })
+  return `${origin}/share/shareable/${card.id}?${params.toString()}`
+}
+
 // ============================================================
 // DATA FETCHING
 // ============================================================
@@ -602,6 +617,7 @@ function openCustomize(card) {
     share: {
       shareUrl: card.share?.shareUrl || getBandUrl(),
       ogUrl: card.share?.ogUrl || getShareOgUrl(),
+      facebookUrl: buildShareableFacebookUrl(card),
       captions: card.microCaption,
       defaultCaptionStyle: card.selectedCaptionStyle || 'hype',
     },
