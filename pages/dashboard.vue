@@ -710,28 +710,16 @@ async function openDownloadForQr(rawOrId) {
   try {
     const id = typeof rawOrId === 'object' ? rawOrId.id : rawOrId
 
-    // Fetch detailed row with options (cached)
-    const full = await fetchQrOptionsById(id)
-    const row = full?.data || rawOrId
-
-    // PRIORITY: Try to download existing q_image directly (safest - already has correct data)
-    const qImage = row?.attributes?.q_image?.data?.attributes?.url || 
-                   row?.attributes?.q_image?.url ||
-                   row?.q_image?.data?.attributes?.url ||
-                   row?.q_image?.url
-    
-    if (qImage) {
-      console.log('[Download] Using existing q_image:', qImage)
-      await downloadExistingImage(qImage, row?.attributes?.name || `qr-${id}`)
-      return
-    }
-
-    // Fallback: Show modal and regenerate (for QRs without saved image)
-    console.warn('[Download] No q_image found, falling back to regeneration')
+    // Show the modal immediately with a lightweight "loading" state
     activeQrOptions.value = null
     activeQrName.value = 'Loading…'
     showDownload.value = true
 
+    // Fetch detailed row with options (cached)
+    const full = await fetchQrOptionsById(id)
+    const row = full?.data || rawOrId
+
+    // Build the QR options for the component
     const built = buildQrOptionsFromStrapi(row)
     activeQrOptions.value = built
     activeQrName.value = row?.attributes?.name || `qr-${id}`
@@ -739,26 +727,6 @@ async function openDownloadForQr(rawOrId) {
     console.error('[Download] failed to load options', e)
     showDownload.value = false
     alert('Could not load QR options. Please try again.')
-  }
-}
-
-// Download the existing q_image directly (safest method - uses pre-generated image)
-async function downloadExistingImage(imageUrl, name) {
-  try {
-    const response = await fetch(imageUrl)
-    const blob = await response.blob()
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${name.replace(/\s+/g, '-').toLowerCase()}.png`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-    console.log('[Download] Successfully downloaded existing q_image')
-  } catch (e) {
-    console.error('[Download] Failed to download existing image:', e)
-    alert('Could not download QR image. Please try again.')
   }
 }
 
