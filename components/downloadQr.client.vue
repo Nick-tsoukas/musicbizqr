@@ -284,11 +284,24 @@ async function mountQr() {
   }
 
   // Capture and lock the encoded string we want to use everywhere
-  currentData.value =
+  let candidateData =
     (props.qrOptions && props.qrOptions.data) ||
     (props.qrInstance && props.qrInstance?._options?.data) ||
     rawOpts.data ||
-    FALLBACK_DATA
+    ''
+
+  // CRITICAL: Validate the URL - must be a proper https:// URL
+  const isValidUrl = (s) => /^https?:\/\/.+/.test(s || '')
+  
+  if (!isValidUrl(candidateData)) {
+    console.error('[DownloadQr] INVALID DATA - not a URL:', candidateData)
+    console.error('[DownloadQr] props.qrOptions:', JSON.stringify(props.qrOptions, null, 2))
+    // Last resort: use fallback
+    candidateData = FALLBACK_DATA
+  }
+  
+  currentData.value = candidateData
+  console.log('[DownloadQr] currentData set to:', currentData.value)
 
   // Ensure data + preview dimensions are present
   const baseOpts = {
@@ -363,12 +376,15 @@ async function mountQr() {
 
   isLoading.value = false
 }
-console.log('[DownloadQr] PROPS:', {
-  modelValue: props.modelValue,
-  qrInstance: props.qrInstance,
-  qrOptions: props.qrOptions,
-  defaultName: props.defaultName
-})
+// Debug logging on mount
+if (typeof window !== 'undefined') {
+  console.log('[DownloadQr] Component loaded with props:', {
+    modelValue: props.modelValue,
+    hasQrInstance: !!props.qrInstance,
+    qrOptionsData: props.qrOptions?.data,
+    defaultName: props.defaultName
+  })
+}
 
 watch(
   () => props.qrOptions,

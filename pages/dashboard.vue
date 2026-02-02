@@ -796,8 +796,16 @@ function buildQrOptionsFromStrapi(raw) {
 
   const bg = saved.backgroundOptions?.color || a.backgroundColor || '#FFFFFF'
 
+  // CRITICAL: Ensure we always have a valid URL
+  if (!encoded || encoded === base) {
+    console.error('[QR Download] NO VALID URL FOUND! Building from node.id:', node?.id)
+    encoded = buildDirect(node?.id || 'unknown')
+  }
+  
+  console.log('[QR Download] FINAL DATA TO ENCODE:', encoded)
+
   const opts = {
-    data: encoded || base,
+    data: encoded,
     width: Number(saved.size || saved.width || 300),
     height: Number(saved.size || saved.height || 300),
     backgroundOptions: { color: bg },
