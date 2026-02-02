@@ -602,6 +602,9 @@ async function rebuildQr() {
 }
 
 function getQRCodeOptions() {
+  // DEBUG: Log exactly what URL is being encoded in the QR
+  console.log('[EditQR] getQRCodeOptions called with data:', directUrl.value)
+  
   const baseDots = { type: dotsType.value }
 
   const opts = {
@@ -749,6 +752,9 @@ const updateQrCodeSubmit = async () => {
 
     // ✅ QR always encodes the redirect URL
     qrValue.value = directUrl.value
+    
+    console.log('[EditQR SAVE] ✅ Saving QR with URL:', directUrl.value)
+    console.log('[EditQR SAVE] ✅ slugId:', slugId.value)
 
     const form = {
       url: directUrl.value,   // what the QR encodes

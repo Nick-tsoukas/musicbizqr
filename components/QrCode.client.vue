@@ -494,6 +494,9 @@ const lastColorOptions = reactive({
 
 /* ---------------------------- QR Options ---------------------------- */
 function getQRCodeOptions() {
+  // DEBUG: Log exactly what URL is being encoded in the QR
+  console.log('[QrCode CREATE] getQRCodeOptions called with data:', qrValue.value)
+  
   const options = {
     margin: 16,
     width: qrSize.value,
@@ -752,6 +755,9 @@ async function saveQrCode() {
     })
     if (!created?.id) throw new Error('QR code was not saved (no ID returned).')
     const finalTracker = `${baseUrl.value}/directqr?id=${created.id}`
+    
+    console.log('[QrCode CREATE] ✅ QR saved with ID:', created.id)
+    console.log('[QrCode CREATE] ✅ Final tracker URL:', finalTracker)
 
     qrValue.value = finalTracker
     // Update QR with final tracker URL and wait for render

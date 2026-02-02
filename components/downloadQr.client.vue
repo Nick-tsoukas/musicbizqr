@@ -291,8 +291,10 @@ async function mountQr() {
     rawOpts.data ||
     ''
 
+  console.log('[DownloadQr] ========== QR DOWNLOAD DEBUG ==========')
   console.log('[DownloadQr] RAW candidateData:', candidateData)
-  console.log('[DownloadQr] props.qrOptions:', props.qrOptions)
+  console.log('[DownloadQr] props.qrOptions:', JSON.stringify(props.qrOptions, null, 2))
+  console.log('[DownloadQr] Has qrInstance:', !!props.qrInstance)
 
   // CRITICAL: Validate the URL - must be a proper https:// URL with path
   const isValidUrl = (s) => /^https?:\/\/.+/.test(s || '')
