@@ -205,6 +205,12 @@
             <p v-if="errorMsg" class="text-sm text-red-400 pt-1">
               {{ errorMsg }}
             </p>
+            
+            <!-- DEBUG: Show what URL is encoded -->
+            <div class="mt-4 p-3 bg-gray-800 rounded text-xs">
+              <p class="text-gray-400 mb-1">QR encodes this URL:</p>
+              <p class="text-green-400 break-all font-mono">{{ currentData }}</p>
+            </div>
           </div>
         </div>
       </div>
