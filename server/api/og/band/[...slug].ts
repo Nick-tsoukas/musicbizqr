@@ -6,11 +6,15 @@ const WIDTH = 1200
 const HEIGHT = 630
 
 export default defineEventHandler(async (event) => {
+  console.log('[og/band] Request received')
+  
   // Get the slug from the catch-all param (returns array) and remove .png extension
   const slugParam = getRouterParam(event, 'slug')
   // Handle both array (catch-all) and string formats
   const rawSlug = Array.isArray(slugParam) ? slugParam.join('/') : (slugParam || '')
   const bandSlug = rawSlug.replace(/\.png$/, '')
+  
+  console.log('[og/band] Processing slug:', bandSlug)
   
   if (!bandSlug) {
     throw createError({ statusCode: 400, message: 'Missing bandSlug' })
@@ -22,17 +26,20 @@ export default defineEventHandler(async (event) => {
   // Fetch band data from Strapi
   let band: any = null
   try {
+    console.log('[og/band] Fetching band from Strapi:', bandSlug)
     const res = await fetch(
       `${strapiUrl}/api/bands?filters[slug][$eq]=${bandSlug}&populate=bandImg`
     )
     const json = await res.json()
     band = json.data?.[0]
+    console.log('[og/band] Band found:', band ? 'yes' : 'no')
   } catch (err) {
     console.error('[og/band] Failed to fetch band:', err)
   }
 
   const bandName = band?.name || band?.attributes?.name || bandSlug
   const bandImageUrl = band?.bandImg?.url || band?.attributes?.bandImg?.data?.attributes?.url || null
+  console.log('[og/band] Band name:', bandName, 'Image URL:', bandImageUrl ? 'present' : 'none')
 
   // Generate SVG using Satori - vibrant share card style
   const svg = await satori(
@@ -317,15 +324,40 @@ export default defineEventHandler(async (event) => {
   return pngBuffer
 })
 
+// Font cache to avoid repeated fetches
+let fontCache: ArrayBuffer | null = null
+
 // Load a default font for Satori
 async function loadDefaultFont(): Promise<ArrayBuffer> {
-  const fontUrl = 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff'
-  
-  try {
-    const res = await fetch(fontUrl)
-    return await res.arrayBuffer()
-  } catch (err) {
-    console.error('[og/band] Failed to load font:', err)
-    return new ArrayBuffer(0)
+  // Return cached font if available
+  if (fontCache && fontCache.byteLength > 0) {
+    return fontCache
   }
+  
+  // Try multiple font sources for reliability
+  const fontUrls = [
+    'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff',
+    'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.woff',
+  ]
+  
+  for (const fontUrl of fontUrls) {
+    try {
+      const res = await fetch(fontUrl, { 
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; OGImageBot/1.0)' }
+      })
+      if (res.ok) {
+        const buffer = await res.arrayBuffer()
+        if (buffer.byteLength > 0) {
+          fontCache = buffer
+          console.log('[og/band] Font loaded successfully from:', fontUrl)
+          return buffer
+        }
+      }
+    } catch (err) {
+      console.error('[og/band] Failed to load font from:', fontUrl, err)
+    }
+  }
+  
+  console.error('[og/band] All font sources failed!')
+  return new ArrayBuffer(0)
 }
