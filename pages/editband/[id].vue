@@ -626,6 +626,66 @@
           </div>
         </section>
 
+        <!-- Contact / Booking Section -->
+        <section class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon bg-gradient-to-br from-amber-500 to-yellow-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="form-section-title">Contact / Booking</h2>
+              <p class="form-section-subtitle">How industry & fans can reach you</p>
+            </div>
+          </div>
+
+          <div class="form-section-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-field">
+                <label for="bookingEmail" class="form-label">Booking Email</label>
+                <input
+                  id="bookingEmail"
+                  type="email"
+                  v-model="contacts.bookingEmail"
+                  class="form-input"
+                  placeholder="booking@yourband.com"
+                />
+              </div>
+              <div class="form-field">
+                <label for="managementEmail" class="form-label">Management Email</label>
+                <input
+                  id="managementEmail"
+                  type="email"
+                  v-model="contacts.managementEmail"
+                  class="form-input"
+                  placeholder="management@yourband.com"
+                />
+              </div>
+              <div class="form-field">
+                <label for="pressEmail" class="form-label">Press / Media Email</label>
+                <input
+                  id="pressEmail"
+                  type="email"
+                  v-model="contacts.pressEmail"
+                  class="form-input"
+                  placeholder="press@yourband.com"
+                />
+              </div>
+              <div class="form-field">
+                <label for="bookingAgent" class="form-label">Booking Agent / Agency</label>
+                <input
+                  id="bookingAgent"
+                  type="text"
+                  v-model="contacts.bookingAgent"
+                  class="form-input"
+                  placeholder="Agent name or agency"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Website Link Section -->
         <section class="form-section">
           <div class="form-section-header">
@@ -1134,6 +1194,14 @@ const eventHubs = ref({
   relix: "",
 });
 
+// Contact / Booking
+const contacts = ref({
+  bookingEmail: "",
+  managementEmail: "",
+  pressEmail: "",
+  bookingAgent: "",
+});
+
 const hiddenLinks = ref([]);
 
 // Merch Concierge config
@@ -1545,6 +1613,12 @@ async function fetchBand() {
       (k) => (eventHubs.value[k] = attrs[k] || "")
     );
 
+    // Load contact/booking fields
+    contacts.value.bookingEmail = attrs.bookingEmail || "";
+    contacts.value.managementEmail = attrs.managementEmail || "";
+    contacts.value.pressEmail = attrs.pressEmail || "";
+    contacts.value.bookingAgent = attrs.bookingAgent || "";
+
     hiddenLinks.value = normalizeHiddenLinks(attrs.hiddenLinks);
 
     paymentButtons.value = mergePaymentButtons(attrs.paymentButtons);
@@ -1831,6 +1905,11 @@ async function submitForm() {
       ...normalizedSocial,
       ...normalizedStreaming,
       ...normalizedEventHubs,
+      // contact / booking
+      bookingEmail: contacts.value.bookingEmail?.trim() || "",
+      managementEmail: contacts.value.managementEmail?.trim() || "",
+      pressEmail: contacts.value.pressEmail?.trim() || "",
+      bookingAgent: contacts.value.bookingAgent?.trim() || "",
       singlesong: singlesongPayload,
       singlevideo: singlevideoPayload,
     };
