@@ -648,6 +648,8 @@ function handleQuickShare() {
       id: props.bandId,
       slug: props.bandSlug,
       name: props.bandName,
+      imageUrl: props.bandImageUrl,
+      isBandNameInLogo: props.isBandNameInLogo,
     },
   }
   drawerOpen.value = true

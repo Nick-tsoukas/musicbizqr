@@ -586,10 +586,14 @@ export function useShareKit() {
 
       ctx.textAlign = 'center'
 
+      // Check if this is a simple band share (no card content)
+      const isBandShareOnly = !card.headline && !card.hero
+
       // === ARTIST PHOTO ===
       const hasImage = !!bandImageUrl
-      const imageSize = 280
-      const imageY = 160
+      // Larger image for band-only shares
+      const imageSize = isBandShareOnly ? 360 : 280
+      const imageY = isBandShareOnly ? 200 : 160
 
       if (bandImageUrl) {
         try {
@@ -657,96 +661,135 @@ export function useShareKit() {
         ctx.fillText(initials, width / 2, imageY + imageSize / 2 + 28)
       }
 
-      // === HEADLINE ===
-      const headlineY = hasImage ? imageY + imageSize + 60 : 280
-      const headlineText = stripLeadingEmoji(card.headline) || card.headline
-      const { lines: headlineLines, fontSize: headlineFontSize } = wrapText(
-        ctx, headlineText, width - 120, 2, 42, 30
-      )
-      
-      ctx.font = `bold ${headlineFontSize}px system-ui, -apple-system, sans-serif`
-      ctx.fillStyle = '#ffffff'
-      headlineLines.forEach((line, i) => {
-        ctx.fillText(line, width / 2, headlineY + i * (headlineFontSize + 8))
-      })
-
-      // === HERO STAT ===
-      const heroY = headlineY + headlineLines.length * (headlineFontSize + 8) + 80
-      const { text: heroText, fontSize: heroFontSize } = fitHeroText(
-        ctx, card.hero, width - 100, 120, 72
-      )
-
-      // Hero glow effect
-      ctx.save()
-      ctx.shadowColor = accent.glow
-      ctx.shadowBlur = 40
-      ctx.font = `900 ${heroFontSize}px system-ui, -apple-system, sans-serif`
-      
-      // MBQ gradient fill for hero
-      const heroGradient = ctx.createLinearGradient(
-        width / 2 - 200, heroY,
-        width / 2 + 200, heroY
-      )
-      heroGradient.addColorStop(0, '#F472B6')    // Pink
-      heroGradient.addColorStop(0.3, accent.primary)  // Accent color
-      heroGradient.addColorStop(0.6, '#60A5FA')  // Blue
-      heroGradient.addColorStop(1, '#34D399')    // Green
-      ctx.fillStyle = heroGradient
-      ctx.fillText(heroText, width / 2, heroY)
-      ctx.restore()
-
-      // Thin accent underline
-      ctx.beginPath()
-      ctx.moveTo(width / 2 - 80, heroY + 20)
-      ctx.lineTo(width / 2 + 80, heroY + 20)
-      ctx.strokeStyle = accent.primary + '60'
-      ctx.lineWidth = 2
-      ctx.stroke()
-
-      // === PROOF LINE ===
-      const proofY = heroY + 60
-      ctx.font = '600 28px system-ui, -apple-system, sans-serif'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
-      ctx.fillText(card.proof || '', width / 2, proofY)
-
-      // === CAPTION (optional) ===
-      const caption = card.microCaption?.[captionStyle] || card.microCaption?.hype
-      if (caption) {
-        const captionY = proofY + 55
-        ctx.font = 'italic 30px system-ui, -apple-system, sans-serif'
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+      // === BAND SHARE ONLY LAYOUT ===
+      if (isBandShareOnly) {
+        // Clean band-focused layout - no stats, just band presentation
         
-        // Wrap caption to 2 lines max
-        const { lines: captionLines } = wrapText(ctx, `"${caption}"`, width - 140, 2, 30, 24)
-        ctx.font = `italic 28px system-ui, -apple-system, sans-serif`
-        captionLines.forEach((line, i) => {
-          ctx.fillText(line, width / 2, captionY + i * 36)
-        })
-      }
-
-      // === BAND NAME ===
-      if (!isBandNameInLogo) {
-        const bandNameY = height - 160
-        ctx.font = 'bold 40px system-ui, -apple-system, sans-serif'
-        ctx.fillStyle = '#ffffff'
-        
-        // Truncate if too long
-        let displayName = bandName
-        while (ctx.measureText(displayName).width > width - 100 && displayName.length > 10) {
-          displayName = displayName.slice(0, -4) + '...'
+        // Band name prominently below image
+        if (!isBandNameInLogo) {
+          const bandNameY = imageY + imageSize + 80
+          ctx.font = 'bold 56px system-ui, -apple-system, sans-serif'
+          ctx.fillStyle = '#ffffff'
+          
+          let displayName = bandName
+          while (ctx.measureText(displayName).width > width - 100 && displayName.length > 10) {
+            displayName = displayName.slice(0, -4) + '...'
+          }
+          ctx.fillText(displayName, width / 2, bandNameY)
+          
+          // Accent underline below band name
+          const underlineWidth = Math.min(ctx.measureText(displayName).width * 0.6, 200)
+          ctx.beginPath()
+          ctx.moveTo(width / 2 - underlineWidth / 2, bandNameY + 20)
+          ctx.lineTo(width / 2 + underlineWidth / 2, bandNameY + 20)
+          ctx.strokeStyle = accent.primary
+          ctx.lineWidth = 3
+          ctx.stroke()
         }
-        ctx.fillText(displayName, width / 2, bandNameY)
+        
+        // Tagline
+        ctx.font = '32px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+        ctx.fillText('Scan • Listen • Follow', width / 2, height - 120)
+
+        // Branding
+        ctx.font = '24px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
+        ctx.fillText('via MusicBizQR', width / 2, height - 70)
+      } else {
+        // === FULL CARD LAYOUT (with headline/hero/proof) ===
+        
+        // === HEADLINE ===
+        const headlineY = hasImage ? imageY + imageSize + 60 : 280
+        const headlineText = stripLeadingEmoji(card.headline) || card.headline
+        const { lines: headlineLines, fontSize: headlineFontSize } = wrapText(
+          ctx, headlineText, width - 120, 2, 42, 30
+        )
+        
+        ctx.font = `bold ${headlineFontSize}px system-ui, -apple-system, sans-serif`
+        ctx.fillStyle = '#ffffff'
+        headlineLines.forEach((line, i) => {
+          ctx.fillText(line, width / 2, headlineY + i * (headlineFontSize + 8))
+        })
+
+        // === HERO STAT ===
+        const heroY = headlineY + headlineLines.length * (headlineFontSize + 8) + 80
+        const { text: heroText, fontSize: heroFontSize } = fitHeroText(
+          ctx, card.hero, width - 100, 120, 72
+        )
+
+        // Hero glow effect
+        ctx.save()
+        ctx.shadowColor = accent.glow
+        ctx.shadowBlur = 40
+        ctx.font = `900 ${heroFontSize}px system-ui, -apple-system, sans-serif`
+        
+        // MBQ gradient fill for hero
+        const heroGradient = ctx.createLinearGradient(
+          width / 2 - 200, heroY,
+          width / 2 + 200, heroY
+        )
+        heroGradient.addColorStop(0, '#F472B6')    // Pink
+        heroGradient.addColorStop(0.3, accent.primary)  // Accent color
+        heroGradient.addColorStop(0.6, '#60A5FA')  // Blue
+        heroGradient.addColorStop(1, '#34D399')    // Green
+        ctx.fillStyle = heroGradient
+        ctx.fillText(heroText, width / 2, heroY)
+        ctx.restore()
+
+        // Thin accent underline
+        ctx.beginPath()
+        ctx.moveTo(width / 2 - 80, heroY + 20)
+        ctx.lineTo(width / 2 + 80, heroY + 20)
+        ctx.strokeStyle = accent.primary + '60'
+        ctx.lineWidth = 2
+        ctx.stroke()
+
+        // === PROOF LINE ===
+        const proofY = heroY + 60
+        ctx.font = '600 28px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
+        ctx.fillText(card.proof || '', width / 2, proofY)
+
+        // === CAPTION (optional) ===
+        const caption = card.microCaption?.[captionStyle] || card.microCaption?.hype
+        if (caption) {
+          const captionY = proofY + 55
+          ctx.font = 'italic 30px system-ui, -apple-system, sans-serif'
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+          
+          // Wrap caption to 2 lines max
+          const { lines: captionLines } = wrapText(ctx, `"${caption}"`, width - 140, 2, 30, 24)
+          ctx.font = `italic 28px system-ui, -apple-system, sans-serif`
+          captionLines.forEach((line, i) => {
+            ctx.fillText(line, width / 2, captionY + i * 36)
+          })
+        }
+
+        // === BAND NAME ===
+        if (!isBandNameInLogo) {
+          const bandNameY = height - 160
+          ctx.font = 'bold 40px system-ui, -apple-system, sans-serif'
+          ctx.fillStyle = '#ffffff'
+          
+          // Truncate if too long
+          let displayName = bandName
+          while (ctx.measureText(displayName).width > width - 100 && displayName.length > 10) {
+            displayName = displayName.slice(0, -4) + '...'
+          }
+          ctx.fillText(displayName, width / 2, bandNameY)
+        }
+
+        // === TAGLINE ===
+        ctx.font = '28px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+        ctx.fillText('Scan • Listen • Follow', width / 2, height - 100)
+
+        // === BRANDING ===
+        ctx.font = '22px system-ui, -apple-system, sans-serif'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'
+        ctx.fillText('via MusicBizQR', width / 2, height - 55)
       }
-
-      // === TAGLINE ===
-      ctx.font = '28px system-ui, -apple-system, sans-serif'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-      ctx.fillText('Scan • Listen • Follow', width / 2, height - 100)
-
-      // === BRANDING ===
-      ctx.font = '22px system-ui, -apple-system, sans-serif'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'
-      ctx.fillText('via MusicBizQR', width / 2, height - 55)
 
       // Convert to blob
       return new Promise((resolve) => {
