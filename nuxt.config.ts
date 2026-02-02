@@ -101,8 +101,6 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'prompt',
     manifest: false, // We use our own manifest.webmanifest
-    // TEMPORARILY disable service worker to test if PWA is breaking QR scanning
-    selfDestroying: true,
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico,woff,woff2}'],
       navigateFallback: '/offline',
