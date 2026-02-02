@@ -682,6 +682,16 @@
                   placeholder="Agent name or agency"
                 />
               </div>
+              <div class="form-field">
+                <label for="recordLabel" class="form-label">Record Label</label>
+                <input
+                  id="recordLabel"
+                  type="text"
+                  v-model="contacts.recordLabel"
+                  class="form-input"
+                  placeholder="Label name"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -1200,6 +1210,7 @@ const contacts = ref({
   managementEmail: "",
   pressEmail: "",
   bookingAgent: "",
+  recordLabel: "",
 });
 
 const hiddenLinks = ref([]);
@@ -1618,6 +1629,7 @@ async function fetchBand() {
     contacts.value.managementEmail = attrs.managementEmail || "";
     contacts.value.pressEmail = attrs.pressEmail || "";
     contacts.value.bookingAgent = attrs.bookingAgent || "";
+    contacts.value.recordLabel = attrs.recordLabel || "";
 
     hiddenLinks.value = normalizeHiddenLinks(attrs.hiddenLinks);
 
@@ -1910,6 +1922,7 @@ async function submitForm() {
       managementEmail: contacts.value.managementEmail?.trim() || "",
       pressEmail: contacts.value.pressEmail?.trim() || "",
       bookingAgent: contacts.value.bookingAgent?.trim() || "",
+      recordLabel: contacts.value.recordLabel?.trim() || "",
       singlesong: singlesongPayload,
       singlevideo: singlevideoPayload,
     };

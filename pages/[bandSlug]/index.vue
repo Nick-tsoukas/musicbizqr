@@ -676,74 +676,25 @@
           </div>
         </section>
 
-        <!-- Contact / Booking -->
-        <section v-if="hasContactInfo" class="mt-10">
-          <h3 v-if="buttonStyle === 'modern'" class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Contact / Booking</h3>
-          <h2 v-else class="text-2xl md:text-3xl font-bold text-white mb-4">Contact / Booking</h2>
-          <div class="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4">
-            <!-- Booking Email -->
-            <a
-              v-if="band.data.bookingEmail"
-              :href="`mailto:${band.data.bookingEmail}`"
-              class="flex items-center gap-3 text-white/80 hover:text-white transition group"
-            >
-              <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition">
-                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <div class="text-xs text-white/50 uppercase tracking-wider">Booking</div>
-                <div class="font-medium">{{ band.data.bookingEmail }}</div>
-              </div>
+        <!-- Contact / Booking (Minimal) -->
+        <section v-if="hasContactInfo" class="mt-16 pt-8 border-t border-white/10">
+          <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/50">
+            <span v-if="band.data.recordLabel" class="flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke-width="1.5"/></svg>
+              {{ band.data.recordLabel }}
+            </span>
+            <a v-if="band.data.bookingEmail" :href="`mailto:${band.data.bookingEmail}`" class="hover:text-white transition">
+              Booking
             </a>
-            <!-- Management Email -->
-            <a
-              v-if="band.data.managementEmail"
-              :href="`mailto:${band.data.managementEmail}`"
-              class="flex items-center gap-3 text-white/80 hover:text-white transition group"
-            >
-              <div class="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center group-hover:bg-violet-500/30 transition">
-                <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <div>
-                <div class="text-xs text-white/50 uppercase tracking-wider">Management</div>
-                <div class="font-medium">{{ band.data.managementEmail }}</div>
-              </div>
+            <a v-if="band.data.managementEmail" :href="`mailto:${band.data.managementEmail}`" class="hover:text-white transition">
+              Management
             </a>
-            <!-- Press Email -->
-            <a
-              v-if="band.data.pressEmail"
-              :href="`mailto:${band.data.pressEmail}`"
-              class="flex items-center gap-3 text-white/80 hover:text-white transition group"
-            >
-              <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition">
-                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                </svg>
-              </div>
-              <div>
-                <div class="text-xs text-white/50 uppercase tracking-wider">Press / Media</div>
-                <div class="font-medium">{{ band.data.pressEmail }}</div>
-              </div>
+            <a v-if="band.data.pressEmail" :href="`mailto:${band.data.pressEmail}`" class="hover:text-white transition">
+              Press
             </a>
-            <!-- Booking Agent -->
-            <div
-              v-if="band.data.bookingAgent"
-              class="flex items-center gap-3 text-white/80"
-            >
-              <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <div class="text-xs text-white/50 uppercase tracking-wider">Booking Agent</div>
-                <div class="font-medium">{{ band.data.bookingAgent }}</div>
-              </div>
-            </div>
+            <span v-if="band.data.bookingAgent" class="text-white/40">
+              {{ band.data.bookingAgent }}
+            </span>
           </div>
         </section>
 
@@ -2354,7 +2305,7 @@ const hasEventHubLinks = computed(() =>
 );
 const hasContactInfo = computed(() => {
   const d = band.value?.data;
-  return d?.bookingEmail || d?.managementEmail || d?.pressEmail || d?.bookingAgent;
+  return d?.bookingEmail || d?.managementEmail || d?.pressEmail || d?.bookingAgent || d?.recordLabel;
 });
 
 /* ---------- video ---------- */

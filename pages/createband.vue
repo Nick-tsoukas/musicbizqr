@@ -568,6 +568,16 @@
                   placeholder="Agent name or agency"
                 />
               </div>
+              <div class="form-field">
+                <label for="recordLabel" class="form-label">Record Label</label>
+                <input
+                  id="recordLabel"
+                  type="text"
+                  v-model="contacts.recordLabel"
+                  class="form-input"
+                  placeholder="Label name"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -860,6 +870,7 @@ const contacts = ref({
   managementEmail: "",
   pressEmail: "",
   bookingAgent: "",
+  recordLabel: "",
 });
 
 // Featured song/video
@@ -1017,6 +1028,7 @@ async function submitForm() {
       managementEmail: contacts.value.managementEmail?.trim() || "",
       pressEmail: contacts.value.pressEmail?.trim() || "",
       bookingAgent: contacts.value.bookingAgent?.trim() || "",
+      recordLabel: contacts.value.recordLabel?.trim() || "",
 
       // featured song — embedHtml OR upload
       singlesong: {
