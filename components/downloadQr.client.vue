@@ -155,8 +155,21 @@
               </p>
             </div>
 
+            <!-- SAFE MODE toggle -->
+            <div class="p-3 rounded-lg border-2" :class="safeMode ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 bg-white/5'">
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" v-model="safeMode" class="w-4 h-4" />
+                <span class="text-sm font-semibold" :class="safeMode ? 'text-emerald-400' : 'text-white/70'">
+                  Safe QR Mode (recommended)
+                </span>
+              </label>
+              <p class="text-xs text-white/50 mt-1">
+                Uses square dots, solid background, and high contrast for maximum scan reliability.
+              </p>
+            </div>
+
             <!-- Background options (for PNG/JPEG) -->
-            <div v-if="format !== 'svg'">
+            <div v-if="format !== 'svg' && !safeMode">
               <label class="inline-flex items-center gap-2">
                 <input type="checkbox" v-model="transparentBg" />
                 <span class="text-sm">Transparent background</span>
@@ -201,6 +214,7 @@
 
 <script setup>
 import { ref, watch, onMounted, computed, nextTick } from 'vue'
+import { sanitizeQrValue, SAFE_QR_CONFIG, getQrDebugInfo } from '~/utils/qr'
 
 // Props from parent
 const props = defineProps({
@@ -222,11 +236,13 @@ const styleOpts = ref(null)
 
 const fileName = ref(props.defaultName)
 const previewZoom = ref(100)     // % (CSS scale only)
-const exportSize = ref(1024)     // pixels for the actual file
+const exportSize = ref(512)      // SAFE: Use 512 for reliable scanning
 const customSize = ref(null)
 const format = ref('png')        // 'png' | 'jpeg' | 'svg'
-const transparentBg = ref(false) // default unchecked
+const transparentBg = ref(false) // default unchecked - SAFE: solid background
 const bgColor = ref('#FFFFFF')
+const safeMode = ref(true)       // SAFE MODE: Use proven-scannable QR config
+const showDebug = ref(false)     // Debug panel toggle
 const downloading = ref(false)
 const errorMsg = ref('')
 const isLoading = ref(false)
@@ -293,43 +309,50 @@ async function mountQr() {
 
   console.log('[DownloadQr] ========== QR DOWNLOAD DEBUG ==========')
   console.log('[DownloadQr] RAW candidateData:', candidateData)
-  console.log('[DownloadQr] props.qrOptions:', JSON.stringify(props.qrOptions, null, 2))
-  console.log('[DownloadQr] Has qrInstance:', !!props.qrInstance)
   
-  // DEBUG: Check for invisible characters that might corrupt QR scanning
-  console.log('[DownloadQr] QR raw string:', JSON.stringify(candidateData))
-  console.log('[DownloadQr] First 20 char codes:', [...(candidateData || '').slice(0, 20)].map(c => c.charCodeAt(0)))
-  console.log('[DownloadQr] String length:', (candidateData || '').length)
+  // CRITICAL: Sanitize the data to remove invisible characters (BOM, zero-width, etc.)
+  candidateData = sanitizeQrValue(candidateData)
+  
+  console.log('[DownloadQr] SANITIZED candidateData:', candidateData)
+  console.log('[DownloadQr] Safe Mode:', safeMode.value)
 
-  // CRITICAL: Validate the URL - must be a proper https:// URL with path
+  // Validate the URL
   const isValidUrl = (s) => /^https?:\/\/.+/.test(s || '')
-  const hasDirectQr = (s) => /directqr/.test(s || '')
   
   if (!isValidUrl(candidateData)) {
     console.error('[DownloadQr] INVALID DATA - not a URL:', candidateData)
-    // Last resort: use fallback with warning
     candidateData = FALLBACK_DATA
     console.warn('[DownloadQr] Using fallback URL:', candidateData)
-  } else if (!hasDirectQr(candidateData)) {
-    console.warn('[DownloadQr] WARNING: URL does not contain directqr:', candidateData)
   }
   
   currentData.value = candidateData
   console.log('[DownloadQr] FINAL currentData:', currentData.value)
 
   // Ensure data + preview dimensions are present
-  const baseOpts = {
+  let baseOpts = {
     ...rawOpts,
     data: currentData.value,
     width: PREVIEW_SIZE,
     height: PREVIEW_SIZE,
   }
 
+  // SAFE MODE: Apply proven-scannable config
+  if (safeMode.value) {
+    console.log('[DownloadQr] Applying SAFE MODE config')
+    baseOpts = {
+      ...baseOpts,
+      ...SAFE_QR_CONFIG,
+      data: currentData.value, // Keep the sanitized data
+      width: PREVIEW_SIZE,
+      height: PREVIEW_SIZE,
+    }
+  }
+
   // Save style bits so preview/export re-use the exact look
   styleOpts.value = {
-    margin: baseOpts?.margin ?? 16,
-    backgroundOptions: baseOpts?.backgroundOptions,
-    dotsOptions: baseOpts?.dotsOptions,
+    margin: baseOpts?.margin ?? 20, // SAFE: Ensure quiet zone
+    backgroundOptions: baseOpts?.backgroundOptions || { color: '#FFFFFF' },
+    dotsOptions: baseOpts?.dotsOptions || { type: 'square', color: '#000000' },
     cornersSquareOptions: baseOpts?.cornersSquareOptions,
     cornersDotOptions: baseOpts?.cornersDotOptions,
     image: baseOpts?.image,
