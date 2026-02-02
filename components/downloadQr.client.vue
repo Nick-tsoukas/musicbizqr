@@ -210,6 +210,17 @@
             <div class="mt-4 p-3 bg-gray-800 rounded text-xs">
               <p class="text-gray-400 mb-1">QR encodes this URL:</p>
               <p class="text-green-400 break-all font-mono">{{ currentData }}</p>
+              
+              <!-- BACKUP QR using different library -->
+              <p class="text-gray-400 mt-3 mb-1">Backup QR (scan this one):</p>
+              <div class="bg-white p-2 inline-block rounded">
+                <img 
+                  v-if="currentData" 
+                  :src="`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentData)}`"
+                  alt="Backup QR"
+                  class="w-[150px] h-[150px]"
+                />
+              </div>
             </div>
           </div>
         </div>
