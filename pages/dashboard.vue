@@ -710,16 +710,28 @@ async function openDownloadForQr(rawOrId) {
   try {
     const id = typeof rawOrId === 'object' ? rawOrId.id : rawOrId
 
-    // Show the modal immediately with a lightweight "loading" state
+    // Fetch detailed row with options (cached)
+    const full = await fetchQrOptionsById(id)
+    const row = full?.data || rawOrId
+
+    // PRIORITY: Try to download existing q_image directly (safest - already has correct data)
+    const qImage = row?.attributes?.q_image?.data?.attributes?.url || 
+                   row?.attributes?.q_image?.url ||
+                   row?.q_image?.data?.attributes?.url ||
+                   row?.q_image?.url
+    
+    if (qImage) {
+      console.log('[Download] Using existing q_image:', qImage)
+      await downloadExistingImage(qImage, row?.attributes?.name || `qr-${id}`)
+      return
+    }
+
+    // Fallback: Show modal and regenerate (for QRs without saved image)
+    console.warn('[Download] No q_image found, falling back to regeneration')
     activeQrOptions.value = null
     activeQrName.value = 'Loading…'
     showDownload.value = true
 
-    // Fetch detailed row with options (cached)
-    const full = await fetchQrOptionsById(id)
-    const row = full?.data || rawOrId // fallback to existing if something odd
-
-    // Build the QR options for the component
     const built = buildQrOptionsFromStrapi(row)
     activeQrOptions.value = built
     activeQrName.value = row?.attributes?.name || `qr-${id}`
@@ -727,6 +739,26 @@ async function openDownloadForQr(rawOrId) {
     console.error('[Download] failed to load options', e)
     showDownload.value = false
     alert('Could not load QR options. Please try again.')
+  }
+}
+
+// Download the existing q_image directly (safest method - uses pre-generated image)
+async function downloadExistingImage(imageUrl, name) {
+  try {
+    const response = await fetch(imageUrl)
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${name.replace(/\s+/g, '-').toLowerCase()}.png`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    console.log('[Download] Successfully downloaded existing q_image')
+  } catch (e) {
+    console.error('[Download] Failed to download existing image:', e)
+    alert('Could not download QR image. Please try again.')
   }
 }
 
@@ -1013,10 +1045,8 @@ async function fetchQrOptionsById(id) {
   const row = await findOne('qrs', id, {
     fields: ['name','url','link','template','arEnabled','options','slugId'],
     populate: {
-      // only if you really store a media relation named "logo"
       logo: { fields: ['url'] },
-      // if your preview image is called q_image and you want it too:
-      // q_image: { fields: ['url'] }
+      q_image: { fields: ['url'] }, // Include the pre-generated QR image
     },
     // publicationState: 'live', // add if you use draft/publish
   })

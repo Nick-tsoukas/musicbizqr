@@ -291,18 +291,24 @@ async function mountQr() {
     rawOpts.data ||
     ''
 
-  // CRITICAL: Validate the URL - must be a proper https:// URL
+  console.log('[DownloadQr] RAW candidateData:', candidateData)
+  console.log('[DownloadQr] props.qrOptions:', props.qrOptions)
+
+  // CRITICAL: Validate the URL - must be a proper https:// URL with path
   const isValidUrl = (s) => /^https?:\/\/.+/.test(s || '')
+  const hasDirectQr = (s) => /directqr/.test(s || '')
   
   if (!isValidUrl(candidateData)) {
     console.error('[DownloadQr] INVALID DATA - not a URL:', candidateData)
-    console.error('[DownloadQr] props.qrOptions:', JSON.stringify(props.qrOptions, null, 2))
-    // Last resort: use fallback
+    // Last resort: use fallback with warning
     candidateData = FALLBACK_DATA
+    console.warn('[DownloadQr] Using fallback URL:', candidateData)
+  } else if (!hasDirectQr(candidateData)) {
+    console.warn('[DownloadQr] WARNING: URL does not contain directqr:', candidateData)
   }
   
   currentData.value = candidateData
-  console.log('[DownloadQr] currentData set to:', currentData.value)
+  console.log('[DownloadQr] FINAL currentData:', currentData.value)
 
   // Ensure data + preview dimensions are present
   const baseOpts = {
@@ -435,6 +441,18 @@ async function download() {
     .replace(/\s+/g, '-')
     .toLowerCase()
   const quality = 1
+
+  // CRITICAL DEBUG: Log exactly what we're encoding
+  console.log('[DownloadQr] DOWNLOADING WITH DATA:', currentData.value)
+  console.log('[DownloadQr] styleOpts:', JSON.stringify(styleOpts.value))
+  
+  // Validate data one more time before download
+  if (!currentData.value || !currentData.value.startsWith('http')) {
+    console.error('[DownloadQr] CRITICAL: Invalid data at download time:', currentData.value)
+    errorMsg.value = 'Invalid QR data. Please try again.'
+    downloading.value = false
+    return
+  }
 
   try {
     // Update to export size + style for the actual file
