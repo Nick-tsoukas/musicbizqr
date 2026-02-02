@@ -205,23 +205,6 @@
             <p v-if="errorMsg" class="text-sm text-red-400 pt-1">
               {{ errorMsg }}
             </p>
-            
-            <!-- DEBUG: Show what URL is encoded -->
-            <div class="mt-4 p-3 bg-gray-800 rounded text-xs">
-              <p class="text-gray-400 mb-1">QR encodes this URL:</p>
-              <p class="text-green-400 break-all font-mono">{{ currentData }}</p>
-              
-              <!-- BACKUP QR using different library -->
-              <p class="text-gray-400 mt-3 mb-1">Backup QR (scan this one):</p>
-              <div class="bg-white p-2 inline-block rounded">
-                <img 
-                  v-if="currentData" 
-                  :src="`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentData)}`"
-                  alt="Backup QR"
-                  class="w-[150px] h-[150px]"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -273,7 +256,7 @@ const customSize = ref(null)
 const format = ref('png')        // 'png' | 'jpeg' | 'svg'
 const transparentBg = ref(false) // default unchecked - SAFE: solid background
 const bgColor = ref('#FFFFFF')
-const safeMode = ref(true)       // SAFE MODE: Use proven-scannable QR config
+const safeMode = ref(false)      // PWA was the issue, not styling - show real QR
 const showDebug = ref(false)     // Debug panel toggle
 const downloading = ref(false)
 const errorMsg = ref('')
@@ -339,14 +322,8 @@ async function mountQr() {
     rawOpts.data ||
     ''
 
-  console.log('[DownloadQr] ========== QR DOWNLOAD DEBUG ==========')
-  console.log('[DownloadQr] RAW candidateData:', candidateData)
-  
-  // CRITICAL: Sanitize the data to remove invisible characters (BOM, zero-width, etc.)
+  // Sanitize the data to remove invisible characters (BOM, zero-width, etc.)
   candidateData = sanitizeQrValue(candidateData)
-  
-  console.log('[DownloadQr] SANITIZED candidateData:', candidateData)
-  console.log('[DownloadQr] Safe Mode:', safeMode.value)
 
   // Validate the URL
   const isValidUrl = (s) => /^https?:\/\/.+/.test(s || '')
@@ -358,7 +335,6 @@ async function mountQr() {
   }
   
   currentData.value = candidateData
-  console.log('[DownloadQr] FINAL currentData:', currentData.value)
 
   // Ensure data + preview dimensions are present
   let baseOpts = {
@@ -368,9 +344,8 @@ async function mountQr() {
     height: PREVIEW_SIZE,
   }
 
-  // SAFE MODE: Apply proven-scannable config
+  // SAFE MODE: Apply proven-scannable config (optional fallback)
   if (safeMode.value) {
-    console.log('[DownloadQr] Applying SAFE MODE config')
     baseOpts = {
       ...baseOpts,
       ...SAFE_QR_CONFIG,
