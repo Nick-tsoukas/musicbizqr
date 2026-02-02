@@ -20,6 +20,10 @@ export default defineEventHandler(async (event) => {
   const reqUrl = getRequestURL(event)
   const cfg = useRuntimeConfig()
   const strapiBase = cfg.public?.strapiUrl
+  
+  // Debug mode: add ?debug=1 to see JSON response instead of redirect
+  const queryParams = getQuery(event)
+  const debugMode = queryParams.debug === '1'
 
   // hard fail → send to app
   if (!strapiBase) {
@@ -279,6 +283,21 @@ export default defineEventHandler(async (event) => {
     for (const [k, v] of Object.entries(incoming)) {
       if (k.startsWith('utm_') && typeof v === 'string' && !out.searchParams.has(k)) {
         out.searchParams.set(k, v)
+      }
+    }
+
+    // Debug mode: return JSON instead of redirect
+    if (debugMode) {
+      return {
+        foundBy,
+        qrId,
+        q_type: attrs.q_type,
+        band: attrs.band,
+        link: attrs.link,
+        resolvedSlug: attrs.band?.data?.attributes?.slug || attrs.band?.data?.slug || attrs.band?.slug || null,
+        destination: out.toString(),
+        rowKeys: Object.keys(row),
+        attrsKeys: Object.keys(attrs),
       }
     }
 
