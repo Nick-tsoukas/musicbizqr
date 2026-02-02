@@ -41,8 +41,8 @@
             class="w-full"
           >
             <div
-              class="relative w-full h-64 rounded-xl overflow-hidden"
-              :class="{ 'embed-shake': embedShake }"
+              class="relative w-full rounded-xl overflow-hidden"
+              :class="[embedHeightClass, { 'embed-shake': embedShake }]"
             >
               <div
                 ref="embedPlayerWrapperEl"
@@ -240,8 +240,8 @@
             class="w-full"
           >
             <div
-              class="relative w-full h-64 rounded-xl overflow-hidden"
-              :class="{ 'embed-shake': embedShake }"
+              class="relative w-full rounded-xl overflow-hidden"
+              :class="[embedHeightClass, { 'embed-shake': embedShake }]"
             >
               <div
                 ref="embedPlayerWrapperEl"
@@ -494,8 +494,8 @@
             class="w-full"
           >
             <div
-              class="relative w-full h-64 rounded-lg overflow-hidden"
-              :class="{ 'embed-shake': embedShake }"
+              class="relative w-full rounded-lg overflow-hidden"
+              :class="[embedHeightClass, { 'embed-shake': embedShake }]"
             >
               <div
                 id="embedPlayerWrapper"
@@ -1909,7 +1909,25 @@ function sanitizeEmbed(html) {
   if (!html) return "";
   // must contain an iframe; strip scripts
   if (!/<iframe[\s\S]*<\/iframe>/i.test(html)) return "";
-  return html.replace(/<script[\s\S]*?<\/script>/gi, "");
+  let cleaned = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+  
+  // Improve Spotify embeds - ensure proper sizing
+  if (cleaned.includes('open.spotify.com/embed')) {
+    // Force iframe to fill container
+    cleaned = cleaned.replace(/<iframe/i, '<iframe style="width:100%;height:100%;border:none;border-radius:12px;"');
+    // Remove any fixed width/height attributes that conflict
+    cleaned = cleaned.replace(/\s(width|height)=["'][^"']*["']/gi, '');
+  }
+  
+  return cleaned;
+}
+
+// Detect if embed is a playlist (needs more height)
+function isPlaylistEmbed(html) {
+  if (!html) return false;
+  return /spotify\.com\/embed\/playlist/i.test(html) || 
+         /spotify\.com\/embed\/album/i.test(html) ||
+         /soundcloud\.com.*playlists/i.test(html);
 }
 
 /* ---------- embed & featured song ---------- */
@@ -1917,6 +1935,9 @@ const rawEmbedHtml = computed(
   () => band.value?.data?.singlesong?.embedHtml || ""
 );
 const safeEmbedHtml = computed(() => sanitizeEmbed(rawEmbedHtml.value));
+const isPlaylist = computed(() => isPlaylistEmbed(rawEmbedHtml.value));
+// Dynamic height: playlists/albums need 380px, single tracks need 152px
+const embedHeightClass = computed(() => isPlaylist.value ? 'h-96' : 'h-40');
 
 const hasFeaturedSong = computed(() => {
   const s = band.value?.data?.singlesong;

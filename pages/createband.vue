@@ -295,8 +295,8 @@
               </button>
             </div>
 
-            <!-- Song Title -->
-            <div class="form-field">
+            <!-- Song Title (only for upload mode - embeds have title built in) -->
+            <div v-if="singlesongType === 'upload'" class="form-field">
               <label for="singlesong-title" class="form-label">Song Title</label>
               <input
                 type="text"
