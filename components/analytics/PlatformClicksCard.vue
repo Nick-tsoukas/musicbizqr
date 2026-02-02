@@ -204,6 +204,8 @@ const PLATFORM_CONFIG: Record<string, { color: string; bgClass: string; icon: st
   napster: { color: '#000000', bgClass: 'bg-white/10 border-white/20', icon: 'napster' },
   bandsintown: { color: '#00CEC8', bgClass: 'bg-[#00CEC8]/10 border-[#00CEC8]/20', icon: 'bandsintown' },
   songkick: { color: '#F80046', bgClass: 'bg-[#F80046]/10 border-[#F80046]/20', icon: 'songkick' },
+  jambase: { color: '#FF6B00', bgClass: 'bg-[#FF6B00]/10 border-[#FF6B00]/20', icon: 'jambase' },
+  relix: { color: '#E31837', bgClass: 'bg-[#E31837]/10 border-[#E31837]/20', icon: 'relix' },
   website: { color: '#8B5CF6', bgClass: 'bg-violet-500/10 border-violet-500/20', icon: 'globe' },
   merch: { color: '#10B981', bgClass: 'bg-emerald-500/10 border-emerald-500/20', icon: 'shopping' },
   tickets: { color: '#F59E0B', bgClass: 'bg-amber-500/10 border-amber-500/20', icon: 'ticket' },
@@ -240,6 +242,8 @@ function formatPlatformName(platform: string): string {
     audiomack: 'Audiomack',
     mixcloud: 'Mixcloud',
     beatport: 'Beatport',
+    jambase: 'JamBase',
+    relix: 'Relix',
   }
   const key = platform.toLowerCase().replace(/[\s_-]/g, '')
   return nameMap[key] || platform.charAt(0).toUpperCase() + platform.slice(1)

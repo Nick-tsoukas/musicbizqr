@@ -2534,6 +2534,8 @@ const eventHubPlatforms = [
   // New platforms (use iconify)
   { name: "bandsintown", iconify: "simple-icons:bandsintown", label: "Bandsintown" },
   { name: "songkick", iconify: "simple-icons:songkick", label: "Songkick" },
+  { name: "jambase", iconify: "mdi:music-note", label: "JamBase" },
+  { name: "relix", iconify: "mdi:microphone-variant", label: "Relix" },
 ];
 
 const streamingPlatformsMap = Object.fromEntries(

@@ -790,6 +790,8 @@ const streaming = ref({
 const eventHubs = ref({
   bandsintown: "",
   songkick: "",
+  jambase: "",
+  relix: "",
 });
 
 // Featured song/video

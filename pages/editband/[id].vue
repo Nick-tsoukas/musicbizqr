@@ -1130,6 +1130,8 @@ const streaming = ref({
 const eventHubs = ref({
   bandsintown: "",
   songkick: "",
+  jambase: "",
+  relix: "",
 });
 
 const hiddenLinks = ref([]);

@@ -511,6 +511,8 @@ const eventHubPlatforms = [
   // New platforms (use iconify with brand colors)
   { name: 'bandsintown', iconify: 'simple-icons:bandsintown', label: 'Bandsintown', color: '#00CEC8' },
   { name: 'songkick', iconify: 'simple-icons:songkick', label: 'Songkick', color: '#F80046' },
+  { name: 'jambase', iconify: 'mdi:music-note', label: 'JamBase', color: '#FF6B00' },
+  { name: 'relix', iconify: 'mdi:microphone-variant', label: 'Relix', color: '#E31837' },
 ]
 
 // Methods
