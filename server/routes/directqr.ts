@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     // Use deep populate to ensure band.slug is included
     const mainQuery = {
       'filters[url][$eq]': reqUrl.toString(),
-      'populate': 'band,event,q_image',
+      'populate': '*',
     } as const
 
     const searchUrl = `${strapiBase}/api/qrs`
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
           const directRes: any = await $fetch(`${strapiBase}/api/qrs/${looseId}`, {
             method: 'GET',
             query: {
-              'populate': 'band,event,q_image',
+              'populate': '*',
             },
           })
           if (directRes?.data) {
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
           method: 'GET',
           query: {
             'filters[slugId][$eq]': looseId,
-            'populate': 'band,event,q_image',
+            'populate': '*',
           },
         })
         const slugIdRows = Array.isArray(slugIdRes?.data) ? slugIdRes.data : []
@@ -91,7 +91,7 @@ export default defineEventHandler(async (event) => {
           method: 'GET',
           query: {
             'filters[options][data][$containsi]': looseId,
-            'populate': 'band,event,q_image',
+            'populate': '*',
           },
         })
         const fbRows = Array.isArray(fb?.data) ? fb.data : []
