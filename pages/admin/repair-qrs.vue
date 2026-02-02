@@ -6,11 +6,7 @@
         This tool will regenerate all your QR images to ensure they encode valid scannable URLs.
       </p>
 
-      <div v-if="!user" class="bg-red-900/50 p-4 rounded-lg">
-        Please log in to use this tool.
-      </div>
-
-      <div v-else>
+      <div>
         <div class="bg-gray-800 p-6 rounded-lg mb-6">
           <h2 class="text-xl font-semibold mb-4">Your QRs</h2>
           <p class="text-gray-400 mb-4">Found {{ qrs.length }} QR codes</p>
@@ -54,13 +50,11 @@ const repairProgress = ref(0)
 const repairLog = ref([])
 
 onMounted(async () => {
-  if (!user.value) return
-  
   try {
+    // Fetch all QRs (admin repair - no user filter)
     const res = await client('/qrs', {
       method: 'GET',
       params: {
-        'filters[users_permissions_user][id][$eq]': user.value.id,
         'populate': '*',
         'pagination[pageSize]': 100
       }
