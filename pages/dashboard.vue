@@ -736,6 +736,15 @@ function buildQrOptionsFromStrapi(raw) {
   const a = node?.attributes || {}
   const saved = a.options || {}               // ✅ you were missing this
 
+  // DEBUG: Log what we're working with
+  console.log('[QR Download Debug]', {
+    nodeId: node?.id,
+    savedData: saved.data,
+    attrUrl: a.url,
+    attrLink: a.link,
+    attrSlugId: a.slugId,
+  })
+
   // prefer the exact string you saved in options.data
   let encoded =
     (saved.data && String(saved.data).trim()) ||
@@ -750,15 +759,21 @@ function buildQrOptionsFromStrapi(raw) {
   const base = (useRuntimeConfig().public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/, '')
   const buildDirect = (id) => `${base}/directqr?id=${id}`
 
-  if (isOriginOnly(encoded)) {
-    if (a.url && /\bid=/.test(a.url)) {
+  // If no valid URL found, or only origin without path, build from slugId or node.id
+  if (!encoded || isOriginOnly(encoded)) {
+    // First try slugId (preferred)
+    if (a.slugId) {
+      encoded = buildDirect(a.slugId)
+    } else if (a.url && /\bid=/.test(a.url)) {
       encoded = toAbsHttps(a.url.trim())
-    } else if (node?.id) {                   // ✅ use node.id (not raw.id)
+    } else if (node?.id) {
       encoded = buildDirect(node.id)
     }
   }
 
   encoded = toAbsHttps(encoded)
+  
+  console.log('[QR Download Debug] Final encoded URL:', encoded)
 
   const logo =
     saved.image ||
@@ -988,7 +1003,7 @@ async function fetchQrOptionsById(id) {
 
   // ask ONLY for fields your builder reads, and that exist in your CT
   const row = await findOne('qrs', id, {
-    fields: ['name','url','link','template','arEnabled','options'],
+    fields: ['name','url','link','template','arEnabled','options','slugId'],
     populate: {
       // only if you really store a media relation named "logo"
       logo: { fields: ['url'] },

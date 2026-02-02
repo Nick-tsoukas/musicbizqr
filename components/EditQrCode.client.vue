@@ -746,6 +746,7 @@ const updateQrCodeSubmit = async () => {
       link: q_type.value === "externalURL" ? normalizeLink(link.value) : (link.value || null), // destination
       name: name.value,
       options: {
+        data: directUrl.value, // ✅ CRITICAL: Store the URL in options for download
         size: qrSize.value,
         backgroundOptions: { color: bgColor.value },
         image: imageSettings.src,
