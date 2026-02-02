@@ -267,7 +267,8 @@ async function mountQr() {
   isLoading.value = true
   errorMsg.value = ''
 
-  const FALLBACK_DATA = 'https://example.com'
+  // CRITICAL: Use real domain as fallback, not example.com which phones won't recognize
+  const FALLBACK_DATA = 'https://musicbizqr.com'
 
   // Do we have usable options?
   const hasOpts = !!(props.qrInstance || (props.qrOptions && props.qrOptions.data))

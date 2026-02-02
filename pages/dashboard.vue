@@ -746,11 +746,11 @@ function buildQrOptionsFromStrapi(raw) {
   })
 
   // prefer the exact string you saved in options.data
+  // NOTE: a.link is the DESTINATION (e.g. spotify.com), NOT the directqr URL - don't use it here!
   let encoded =
     (saved.data && String(saved.data).trim()) ||
     (a.url && String(a.url).trim()) ||
     (a.qrValue && String(a.qrValue).trim()) ||
-    (a.link && String(a.link).trim()) ||
     (a.data && String(a.data).trim()) ||
     ''
 
