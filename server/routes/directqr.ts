@@ -38,13 +38,17 @@ export default defineEventHandler(async (event) => {
     } as const
 
     const searchUrl = `${strapiBase}/api/qrs`
+    console.log('[directqr] Looking up URL:', reqUrl.toString())
     const res: any = await $fetch(searchUrl, { method: 'GET', query: mainQuery })
     let row = Array.isArray(res?.data) ? res.data[0] : null
+    let foundBy = row ? 'url-exact-match' : null
 
     // 1b) fallback: try direct lookup by Strapi record ID
     if (!row) {
       const incoming = getQuery(event)
       const looseId = (incoming.id as string) || ''
+      
+      console.log('[directqr] URL match failed, trying fallbacks with id:', looseId)
       
       // If id is numeric, try direct record lookup first
       if (looseId && /^\d+$/.test(looseId)) {
@@ -60,6 +64,7 @@ export default defineEventHandler(async (event) => {
           })
           if (directRes?.data) {
             row = directRes.data
+            foundBy = 'direct-strapi-id'
           }
         } catch (directErr) {
           // Record not found by ID, continue to other fallbacks
@@ -81,6 +86,7 @@ export default defineEventHandler(async (event) => {
         const slugIdRows = Array.isArray(slugIdRes?.data) ? slugIdRes.data : []
         if (slugIdRows.length) {
           row = slugIdRows[0]
+          foundBy = 'slugId-field'
         }
       }
       
@@ -99,6 +105,7 @@ export default defineEventHandler(async (event) => {
         const fbRows = Array.isArray(fb?.data) ? fb.data : []
         if (fbRows.length) {
           row = fbRows[0]
+          foundBy = 'options-data-containsi'
         }
       }
       
@@ -111,6 +118,15 @@ export default defineEventHandler(async (event) => {
     // 2) basic extract
     const qrId: number = row.id
     const attrs: any = row.attributes || {}
+    
+    // DEBUG: Log the full row structure to understand what we're getting
+    console.log('[directqr] Found by:', foundBy)
+    console.log('[directqr] Found row ID:', qrId)
+    console.log('[directqr] Row structure:', JSON.stringify(row, null, 2))
+    console.log('[directqr] Attrs keys:', Object.keys(attrs))
+    console.log('[directqr] q_type:', attrs.q_type)
+    console.log('[directqr] band attr:', JSON.stringify(attrs.band))
+    
     const bandRel = attrs.band?.data
     const bandId: number | null = bandRel ? bandRel.id : null
 
