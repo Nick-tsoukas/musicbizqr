@@ -604,8 +604,10 @@ async function handleInstagramKit() {
 }
 
 async function handleFacebookShare() {
+  const ogUrl = getOgUrl()
+  console.log('[ShareDrawer] Facebook share URL:', ogUrl)
   const trackingPayload = getTrackingPayload()
-  openFacebookSharerWithTracking(getOgUrl(), trackingPayload)
+  openFacebookSharerWithTracking(ogUrl, trackingPayload)
   await copyToClipboard(selectedCaption.value)
   showToast('Facebook opened + caption copied', 2500)
 }
