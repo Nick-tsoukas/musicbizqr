@@ -214,7 +214,22 @@
 
 <script setup>
 import { ref, watch, onMounted, computed, nextTick } from 'vue'
-import { sanitizeQrValue, SAFE_QR_CONFIG, getQrDebugInfo } from '~/utils/qr'
+
+// Inline sanitization to avoid import issues
+function sanitizeQrValue(value) {
+  let str = String(value ?? '')
+  str = str.replace(/[\u200B-\u200D\uFEFF\u00A0\u2060\u180E]/g, '')
+  return str.trim()
+}
+
+const SAFE_QR_CONFIG = {
+  margin: 20,
+  qrOptions: { errorCorrectionLevel: 'M' },
+  dotsOptions: { type: 'square', color: '#000000' },
+  cornersSquareOptions: { type: 'square', color: '#000000' },
+  cornersDotOptions: { type: 'square', color: '#000000' },
+  backgroundOptions: { color: '#FFFFFF' },
+}
 
 // Props from parent
 const props = defineProps({
