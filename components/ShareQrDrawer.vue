@@ -16,25 +16,14 @@
         </div>
 
         <!-- Content Container - clicks on background close modal -->
-        <div class="relative h-full flex flex-col items-center justify-between px-6 py-8 safe-area-all" @click="$emit('close')">
+        <div class="relative h-full flex flex-col items-center justify-between px-6 py-8 safe-area-all" @click="closeModal">
           <!-- Header -->
           <div class="w-full flex items-center justify-center pt-4" @click.stop>
             <p class="text-white/60 text-sm font-medium tracking-[0.2em] uppercase">Scan to Connect</p>
           </div>
 
           <!-- Main Content - Centered -->
-          <div class="flex-1 flex flex-col items-center justify-center -mt-8" @click.stop>
-            <!-- Close Button - RIGHT NEXT TO PROFILE IMAGE -->
-            <button 
-              @click="$emit('close')"
-              class="mb-4 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center gap-2 text-white font-medium active:scale-95 active:bg-white/30"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Close
-            </button>
-
+          <div class="flex-1 flex flex-col items-center justify-center" @click.stop>
             <!-- Artist Profile Image - Large -->
             <div class="relative mb-6">
               <!-- Glow ring -->
@@ -106,6 +95,17 @@
 
           <!-- Action Buttons - Bottom -->
           <div class="w-full max-w-sm space-y-3 pb-safe" @click.stop>
+            <!-- CLOSE BUTTON - AT THE BOTTOM WHERE IT CAN'T BE BLOCKED -->
+            <button 
+              @click="closeModal"
+              @touchend.prevent="closeModal"
+              class="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white/20 border-2 border-white/40 text-white font-bold text-lg"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Close
+            </button>
             <!-- Share Button -->
             <button
               @click="handleShare"
@@ -160,7 +160,13 @@ const props = defineProps({
   }
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close'])
+
+// Explicit close function - more reliable than inline $emit
+function closeModal() {
+  console.log('[ShareQrDrawer] closeModal called')
+  emit('close')
+}
 
 const copied = ref(false)
 const imageError = ref(false)
