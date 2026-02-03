@@ -4,7 +4,8 @@
     <Transition name="fade">
       <div 
         v-if="isOpen" 
-        class="fixed inset-0 z-[100] overflow-hidden"
+        class="fixed inset-0 overflow-hidden"
+        style="z-index: 99999 !important;"
       >
         <!-- Animated Background -->
         <div class="absolute inset-0 bg-black">
@@ -19,14 +20,14 @@
 
         <!-- Content Container -->
         <div class="relative h-full flex flex-col items-center justify-between px-6 py-8 safe-area-all" @click.stop>
-          <!-- Header -->
-          <div class="w-full flex items-center justify-between">
+          <!-- Header - pushed down with extra padding for PWA -->
+          <div class="w-full flex items-center justify-between pt-4" style="position: relative; z-index: 99999;">
             <div class="w-10"></div>
             <p class="text-white/60 text-sm font-medium tracking-[0.2em] uppercase">Scan to Connect</p>
             <button 
               @click="$emit('close')"
-              class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition"
-              style="position: relative; z-index: 9999 !important;"
+              class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition active:scale-95"
+              style="position: relative; z-index: 99999 !important; -webkit-tap-highlight-color: transparent;"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
