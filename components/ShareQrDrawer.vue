@@ -5,7 +5,7 @@
       <div 
         v-if="isOpen" 
         class="fixed inset-0 overflow-hidden"
-        style="z-index: 99999 !important;"
+        style="z-index: 999999999 !important;"
       >
         <!-- Animated Background -->
         <div class="absolute inset-0 bg-black">

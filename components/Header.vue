@@ -275,8 +275,8 @@
             </button>
           </div>
 
-          <!-- App badge -->
-          <div class="pt-6">
+          <!-- App badge - only show if NOT already in PWA -->
+          <div v-if="!isPwa" class="pt-6">
             <NuxtLink 
               to="/install" 
               @click="toggleMenu"
@@ -347,6 +347,7 @@ const userSlug = computed(() => {
 
 // Menu state & actions
 const isMenuOpen = ref(false)
+const isPwa = ref(false)
 const toggleMenu = () => {
   document.body.style.overflow = isMenuOpen.value ? '' : 'hidden'
   isMenuOpen.value = !isMenuOpen.value
@@ -387,6 +388,9 @@ function handleGlobalKeydown(e) {
 
 onMounted(() => {
   document.addEventListener('keydown', handleGlobalKeydown)
+  // Check if running as installed PWA (standalone mode)
+  isPwa.value = window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true
 })
 
 onUnmounted(() => {
