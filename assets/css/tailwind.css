@@ -10,6 +10,12 @@
 :root {
   --header-height: 70px;
 }
+
+/* Hide header when share modal is open */
+body.share-modal-open header {
+  display: none !important;
+}
+
 html {
   background: black;
   margin: 0;

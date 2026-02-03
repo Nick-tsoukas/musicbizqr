@@ -17,9 +17,18 @@
 
         <!-- Content Container - clicks on background close modal -->
         <div class="relative h-full flex flex-col items-center justify-between px-6 py-8 safe-area-all" @click="closeModal">
-          <!-- Header -->
-          <div class="w-full flex items-center justify-center pt-4" @click.stop>
+          <!-- Header with Close Button -->
+          <div class="w-full flex items-center justify-between pt-4" @click.stop>
+            <div class="w-10"></div>
             <p class="text-white/60 text-sm font-medium tracking-[0.2em] uppercase">Scan to Connect</p>
+            <button 
+              @click="closeModal"
+              class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
           <!-- Main Content - Centered -->
@@ -95,17 +104,6 @@
 
           <!-- Action Buttons - Bottom -->
           <div class="w-full max-w-sm space-y-3 pb-safe" @click.stop>
-            <!-- CLOSE BUTTON - AT THE BOTTOM WHERE IT CAN'T BE BLOCKED -->
-            <button 
-              @click="closeModal"
-              @touchend.prevent="closeModal"
-              class="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white/20 border-2 border-white/40 text-white font-bold text-lg"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Close
-            </button>
             <!-- Share Button -->
             <button
               @click="handleShare"
@@ -138,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 
 const props = defineProps({
@@ -162,9 +160,26 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
-// Explicit close function - more reliable than inline $emit
+// Hide header when modal is open
+watch(() => props.isOpen, (isOpen) => {
+  if (typeof document !== 'undefined') {
+    if (isOpen) {
+      document.body.classList.add('share-modal-open')
+    } else {
+      document.body.classList.remove('share-modal-open')
+    }
+  }
+}, { immediate: true })
+
+// Cleanup on unmount
+onUnmounted(() => {
+  if (typeof document !== 'undefined') {
+    document.body.classList.remove('share-modal-open')
+  }
+})
+
+// Explicit close function
 function closeModal() {
-  console.log('[ShareQrDrawer] closeModal called')
   emit('close')
 }
 
