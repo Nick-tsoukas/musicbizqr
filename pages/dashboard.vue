@@ -1517,36 +1517,82 @@ async function goToBillingPortal() {
 /* Item Actions */
 .item-actions {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 @media (min-width: 640px) {
   .item-actions {
-    flex-wrap: nowrap;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: auto;
+    margin-top: 0;
   }
 }
 
 .action-btn-labeled {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
   white-space: nowrap;
+  width: 100%;
+}
+
+.action-btn-labeled span {
+  flex: 1;
+  text-align: left;
+  margin-left: 0.75rem;
+}
+
+.action-btn-labeled::after {
+  content: '›';
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 0.5rem;
+}
+
+.action-btn-labeled.text-red-400::after {
+  content: '';
+}
+
+@media (min-width: 640px) {
+  .action-btn-labeled {
+    display: inline-flex;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    width: auto;
+  }
+  
+  .action-btn-labeled span {
+    margin-left: 0.375rem;
+    text-align: center;
+  }
+  
+  .action-btn-labeled::after {
+    content: '';
+    display: none;
+  }
 }
 
 .action-btn-labeled:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: white;
-  transform: translateY(-1px);
+}
+
+.action-btn-labeled:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .action-btn-labeled:disabled {
