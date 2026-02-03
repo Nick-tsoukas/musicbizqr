@@ -15,28 +15,26 @@
           <div class="absolute top-1/2 left-0 w-64 h-64 bg-accent/10 rounded-full blur-[80px] animate-float"></div>
         </div>
 
-        <!-- Click outside to close -->
-        <div class="absolute inset-0" @click="$emit('close')"></div>
-
-        <!-- Content Container -->
-        <div class="relative h-full flex flex-col items-center justify-between px-6 py-8 safe-area-all" @click.stop>
-          <!-- Header - pushed down with extra padding for PWA -->
-          <div class="w-full flex items-center justify-between pt-4" style="position: relative; z-index: 99999;">
-            <div class="w-10"></div>
+        <!-- Content Container - clicks on background close modal -->
+        <div class="relative h-full flex flex-col items-center justify-between px-6 py-8 safe-area-all" @click="$emit('close')">
+          <!-- Header -->
+          <div class="w-full flex items-center justify-center pt-4" @click.stop>
             <p class="text-white/60 text-sm font-medium tracking-[0.2em] uppercase">Scan to Connect</p>
+          </div>
+
+          <!-- Main Content - Centered -->
+          <div class="flex-1 flex flex-col items-center justify-center -mt-8" @click.stop>
+            <!-- Close Button - RIGHT NEXT TO PROFILE IMAGE -->
             <button 
               @click="$emit('close')"
-              class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition active:scale-95"
-              style="position: relative; z-index: 99999 !important; -webkit-tap-highlight-color: transparent;"
+              class="mb-4 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center gap-2 text-white font-medium active:scale-95 active:bg-white/30"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
+              Close
             </button>
-          </div>
 
-          <!-- Main Content - Centered -->
-          <div class="flex-1 flex flex-col items-center justify-center -mt-8">
             <!-- Artist Profile Image - Large -->
             <div class="relative mb-6">
               <!-- Glow ring -->
@@ -107,7 +105,7 @@
           </div>
 
           <!-- Action Buttons - Bottom -->
-          <div class="w-full max-w-sm space-y-3 pb-safe">
+          <div class="w-full max-w-sm space-y-3 pb-safe" @click.stop>
             <!-- Share Button -->
             <button
               @click="handleShare"
