@@ -298,7 +298,7 @@
 
               <div class="item-actions">
                 <button
-                  @click="router.push(`/${band.slug}`)"
+                  @click="openExternal(`${config.public.baseUrl}/${band.slug}`)"
                   class="action-btn-labeled"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -439,7 +439,7 @@
 
               <div class="item-actions">
                 <button
-                  @click="router.push(`/${ev.bandSlug}/event/${ev.slug}`)"
+                  @click="openExternal(`${config.public.baseUrl}/${ev.bandSlug}/event/${ev.slug}`)"
                   class="action-btn-labeled"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -585,6 +585,8 @@ import { useRuntimeConfig } from "#imports";
 import ShareablesSection from '~/components/dashboard/ShareablesSection.vue';
 import DemoControlsCard from '~/components/dashboard/DemoControlsCard.vue';
 import ShareDrawer from '~/components/band/ShareDrawer.vue';
+
+const { openExternal } = useOpenExternal();
 
 // rebuild
 
