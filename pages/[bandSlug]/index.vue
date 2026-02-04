@@ -1,10 +1,5 @@
 <template>
   <div>
-    <!-- Back to App button for logged-in users -->
-    <ClientOnly>
-      <BackToAppButton />
-    </ClientOnly>
-
     <div v-if="loadingData" class="loading-container">
       <div class="spinner"></div>
     </div>
