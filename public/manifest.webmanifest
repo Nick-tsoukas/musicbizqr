@@ -2,7 +2,7 @@
   "name": "MusicBizQR",
   "short_name": "MBQ",
   "description": "Smart links, analytics, and live momentum for artists.",
-  "start_url": "/dashboard",
+  "start_url": "/",
   "scope": "/dashboard",
   "display": "standalone",
   "theme_color": "#FF00FF",

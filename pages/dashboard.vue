@@ -571,6 +571,10 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'auth'
+})
+
 import { useNuxtApp } from "#app";
 import {
   ref,

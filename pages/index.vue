@@ -920,7 +920,10 @@ import {
   onMounted,
   onUnmounted,
   useRuntimeConfig,
+  navigateTo,
 } from "#imports";
+
+const user = useStrapiUser()
 
 import SmartLinkDemoPhone from "@/components/demo/SmartLinkDemoPhone.vue";
 import SmartLinkDemoInline from "@/components/demo/SmartLinkDemoInline.vue";
@@ -940,6 +943,12 @@ const index = ref(0);
 let timer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
+  // Redirect logged-in users to dashboard
+  if (user.value) {
+    navigateTo('/dashboard')
+    return
+  }
+  
   timer = setInterval(() => {
     index.value = (index.value + 1) % insights.length;
   }, 5000);

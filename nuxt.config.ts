@@ -329,7 +329,12 @@ sitemap: {
     prefix: '/api',
     admin: '/admin',
     version: 'v4',
-    cookie: {},
+    cookie: {
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60,  // 30 days (matches Strapi JWT default)
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    },
     cookieName: 'strapi_jwt'
   },
 
