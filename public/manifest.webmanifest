@@ -3,7 +3,7 @@
   "short_name": "MBQ",
   "description": "Smart links, analytics, and live momentum for artists.",
   "start_url": "/",
-  "scope": "/dashboard",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#FF00FF",
   "background_color": "#000000",
