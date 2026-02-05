@@ -148,31 +148,6 @@
             </div>
           </div>
 
-          <!-- Caption Style Toggle -->
-          <div>
-            <div class="text-white/40 text-xs uppercase tracking-wider mb-3">Caption Style</div>
-            <div class="flex gap-2 flex-wrap">
-              <button
-                v-for="variant in captionVariants"
-                :key="variant.key"
-                @click="captionStyle = variant.key"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-all',
-                  captionStyle === variant.key
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                ]"
-              >
-                {{ variant.label }}
-              </button>
-            </div>
-          </div>
-
-          <!-- Caption Preview -->
-          <div class="p-4 bg-black/40 rounded-xl border border-white/5">
-            <p class="text-white/80 text-sm leading-relaxed">"{{ selectedCaption }}"</p>
-          </div>
-
           <!-- Primary Share Button -->
           <button
             @click="handleShare"
@@ -196,16 +171,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
               Copy Link
-            </button>
-
-            <button
-              @click="handleCopyCaption"
-              class="py-3 px-4 rounded-xl border border-white/15 text-white/70 text-sm font-medium hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              Copy Caption
             </button>
 
             <button
