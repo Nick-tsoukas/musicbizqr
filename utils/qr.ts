@@ -4,6 +4,37 @@
  */
 
 /**
+ * QR Gateway Configuration
+ * All new QR codes should encode URLs pointing to the gateway subdomain.
+ * This allows the PWA to have full scope while QR scans go through the gateway.
+ */
+const QR_GATEWAY_ORIGIN = 'https://qr.musicbizqr.com'
+const LEGACY_ORIGIN = 'https://musicbizqr.com'
+
+/**
+ * Get the encoded QR URL for a given QR ID.
+ * This URL is what gets embedded into the QR code image.
+ * Uses the gateway subdomain (qr.musicbizqr.com) for new QR codes.
+ * 
+ * @param qrId - The QR record ID or slug ID
+ * @returns The full URL to encode in the QR image
+ */
+export function getEncodedQrUrl(qrId: string | number): string {
+  return `${QR_GATEWAY_ORIGIN}/directqr?id=${qrId}`
+}
+
+/**
+ * Get the legacy encoded QR URL (main domain).
+ * Only use this for backwards compatibility if explicitly needed.
+ * 
+ * @param qrId - The QR record ID or slug ID
+ * @returns The legacy URL (musicbizqr.com)
+ */
+export function getLegacyEncodedQrUrl(qrId: string | number): string {
+  return `${LEGACY_ORIGIN}/directqr?id=${qrId}`
+}
+
+/**
  * Remove invisible characters that can corrupt QR scanning
  * - BOM (Byte Order Mark)
  * - Zero-width characters

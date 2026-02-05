@@ -401,9 +401,9 @@ import { useAsyncData, useRuntimeConfig } from '#app'
 import { useRouter, useRoute, useStrapi, useStrapiUser, useStrapiClient } from '#imports'
 import { v4 as uuidv4 } from 'uuid'
 import { useDebounceFn, useThrottleFn } from '@vueuse/core'
+import { getEncodedQrUrl } from '~/utils/qr'
 
 const config = useRuntimeConfig()
-const baseUrl = computed(() => (config.public?.baseUrl || 'https://musicbizqr.com').replace(/\/+$/, ''))
 
 /* ----------------------------- Utilities ----------------------------- */
 function normalizeLink(link) {
@@ -419,16 +419,8 @@ const qrCode = ref(null)
 
 const uuid = uuidv4()
 
-// CRITICAL: Validate URL is scannable before using
-function ensureValidQrUrl(url) {
-  if (!url || !url.startsWith('https://')) {
-    console.error('[QR] INVALID URL detected:', url)
-    return `https://musicbizqr.com/directqr?id=${uuid}`
-  }
-  return url
-}
-
-const qrValue = ref(ensureValidQrUrl(`${baseUrl.value}/directqr?id=${uuid}`))
+// Use the gateway URL helper for all new QR codes
+const qrValue = ref(getEncodedQrUrl(uuid))
 
 const qrSize = ref(300)
 
@@ -754,7 +746,8 @@ async function saveQrCode() {
       body: formData
     })
     if (!created?.id) throw new Error('QR code was not saved (no ID returned).')
-    const finalTracker = `${baseUrl.value}/directqr?id=${created.id}`
+    // Use gateway URL for the final QR image
+    const finalTracker = getEncodedQrUrl(created.id)
     
     console.log('[QrCode CREATE] ✅ QR saved with ID:', created.id)
     console.log('[QrCode CREATE] ✅ Final tracker URL:', finalTracker)

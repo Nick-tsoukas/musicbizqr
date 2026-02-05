@@ -399,6 +399,7 @@ import { ref, reactive, watch, onMounted, computed } from "vue"
 import { useDebounceFn } from "@vueuse/core"
 import { useRuntimeConfig } from "#app"
 import { v4 as uuidv4 } from "uuid"
+import { getEncodedQrUrl } from '~/utils/qr'
 
 const config = useRuntimeConfig()
 const { findOne, find } = useStrapi()
@@ -415,19 +416,10 @@ const qrData = ref(null)
 // Stable redirect id and URL (ALWAYS used in the QR)
 const slugId = ref("") // persisted on the QR record
 
-// CRITICAL: Ensure URL is always valid for phone scanning
-function ensureValidQrUrl(url) {
-  if (!url || !url.startsWith('https://') || !url.includes('directqr?id=')) {
-    console.error('[EditQR] INVALID URL detected:', url)
-    return `https://musicbizqr.com/directqr?id=${slugId.value || 'unknown'}`
-  }
-  return url
-}
-
+// Use gateway URL helper for all QR codes (new and regenerated)
 const directUrl = computed(() => {
-  const base = (config.public.baseUrl || "https://musicbizqr.com").replace(/\/+$/, "")
-  const url = `${base}/directqr?id=${slugId.value}`
-  return ensureValidQrUrl(url)
+  if (!slugId.value) return ''
+  return getEncodedQrUrl(slugId.value)
 })
 
 function extractIdFromUrl(u) {
