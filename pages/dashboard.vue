@@ -29,7 +29,8 @@
         @add-payment="goToBillingPortal"
       />
 
-      <!-- MBQ Pulse Section -->
+      <!-- MBQ Pulse Section (commented out - not ready yet) -->
+      <!--
       <section v-if="hasBand && !loading" class="dashboard-section mb-8">
         <div class="section-header bg-gradient-to-r from-violet-600 to-purple-600">
           <div class="flex items-center gap-3">
@@ -43,7 +44,6 @@
               <p class="text-white/70 text-sm">Your fan momentum at a glance</p>
             </div>
           </div>
-          <!-- Range Selector -->
           <div class="flex flex-wrap gap-2">
             <button
               v-for="(label, days) in pulseRangeOptions"
@@ -68,8 +68,26 @@
             :show-opt-in="true"
             :band-id="bandItems[0]?.id"
           />
-          
-          <!-- Shareables Section (unified 10 card types) -->
+        </div>
+      </section>
+      -->
+
+      <!-- Shareables Section -->
+      <section v-if="hasBand && !loading && bandItems[0]?.id" class="dashboard-section mb-8">
+        <div class="section-header bg-gradient-to-r from-violet-600 to-purple-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Shareables</h2>
+              <p class="text-white/70 text-sm">Share your music with fans</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-content">
           <ShareablesSection
             v-if="bandItems[0]?.id"
             :band-id="bandItems[0].id"
@@ -79,14 +97,6 @@
             :is-band-name-in-logo="bandItems[0].isBandNameInLogo || false"
             class="mt-4"
           />
-          
-          <!-- System Status Card (commented out - not needed for now)
-          <SystemStatusCard
-            v-if="bandItems[0]?.id"
-            :band-id="bandItems[0].id"
-            @refresh="refreshPanels"
-          />
-          -->
         </div>
       </section>
 
