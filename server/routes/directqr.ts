@@ -21,6 +21,13 @@ export default defineEventHandler(async (event) => {
   const cfg = useRuntimeConfig()
   const strapiBase = cfg.public?.strapiUrl
   
+  // Determine if request is from qr.musicbizqr.com subdomain
+  const host = event.node.req.headers.host || reqUrl.host
+  const isQrGateway = host.startsWith('qr.musicbizqr.com')
+  
+  // Always use main domain for redirects when on qr subdomain
+  const targetOrigin = isQrGateway ? 'https://musicbizqr.com' : `${reqUrl.protocol}//${reqUrl.host}`
+  
   // Debug mode: add ?debug=1 to see JSON response instead of redirect
   const queryParams = getQuery(event)
   const debugMode = queryParams.debug === '1'
@@ -153,13 +160,13 @@ export default defineEventHandler(async (event) => {
     // 5) AR redirect (your existing behavior)
     if (arEnabled) {
       const tmpl = template || 'test'
-      const arUrl = new URL(`/ar/${qrId}`, reqUrl.origin)
+      const arUrl = new URL(`/ar/${qrId}`, targetOrigin)
       arUrl.searchParams.set('template', tmpl)
       return sendRedirect(event, arUrl.toString(), 302)
     }
 
     // 6) decide destination
-    let dest = `${reqUrl.protocol}//${reqUrl.host}`
+    let dest = targetOrigin
 
     // Debug logging for QR routing issues
     console.log('[directqr] QR ID:', qrId, 'q_type:', q_type)
@@ -184,7 +191,7 @@ export default defineEventHandler(async (event) => {
       console.log('[directqr] Resolved band slug:', slug)
       
       if (slug) {
-        dest = `${reqUrl.protocol}//${reqUrl.host}/${slug}`
+        dest = `${targetOrigin}/${slug}`
       } else {
         console.warn('[directqr] WARNING: bandProfile QR has no valid band slug! QR ID:', qrId, 'Band data:', JSON.stringify(band))
       }
@@ -202,7 +209,7 @@ export default defineEventHandler(async (event) => {
       }
       
       if (slug) {
-        dest = `${reqUrl.protocol}//${reqUrl.host}/event/${slug}`
+        dest = `${targetOrigin}/event/${slug}`
       }
     }
     // → external
