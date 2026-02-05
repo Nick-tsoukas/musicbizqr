@@ -91,7 +91,7 @@
       </section>
 
       <!-- Demo Controls (only for whitelisted users) -->
-      <DemoControlsCard />
+      <!-- <DemoControlsCard /> -->
 
       <!-- QR Codes Section -->
       <div v-if="loading" class="mb-8">
