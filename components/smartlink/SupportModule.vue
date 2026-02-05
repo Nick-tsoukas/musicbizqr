@@ -91,12 +91,32 @@
                       v-for="amt in (btn.presetAmounts || [])"
                       :key="amt"
                       type="button"
-                      @click="paymentAmounts[btn.key] = Number(amt)"
+                      @click="selectPresetAmount(btn.key, Number(amt))"
                       class="px-3 py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 transition"
-                      :class="{ 'bg-purple-600/40 border-purple-400/50': Number(paymentAmounts[btn.key]) === Number(amt) }"
+                      :class="{ 'bg-purple-600/40 border-purple-400/50': !customAmountActive[btn.key] && Number(paymentAmounts[btn.key]) === Number(amt) }"
                     >
                       ${{ amt }}
                     </button>
+                    <button
+                      type="button"
+                      @click="toggleCustomAmount(btn.key)"
+                      class="px-3 py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 transition"
+                      :class="{ 'bg-purple-600/40 border-purple-400/50': customAmountActive[btn.key] }"
+                    >
+                      + Custom
+                    </button>
+                  </div>
+                  <!-- Custom amount input -->
+                  <div v-if="customAmountActive[btn.key]" class="mt-3 flex items-center gap-2">
+                    <span class="text-white/60">$</span>
+                    <input
+                      v-model.number="paymentAmounts[btn.key]"
+                      type="number"
+                      step="1"
+                      min="1"
+                      placeholder="Enter amount"
+                      class="w-28 px-3 py-2 rounded-lg bg-black/50 border border-white/20 text-white text-sm"
+                    />
                   </div>
                 </div>
 
@@ -157,6 +177,7 @@ const isExpanded = ref(false)
 const isProcessing = ref(false)
 const processingKey = ref(null)
 const paymentAmounts = reactive({})
+const customAmountActive = reactive({})
 
 // Expand by default on SHOW_DAY mode
 const expandByDefault = computed(() => {
@@ -187,6 +208,19 @@ function handleQuickTip(amount) {
 function handleCheckout(btn) {
   const amount = paymentAmounts[btn.key]
   emit('checkout', { button: btn, amount })
+}
+
+function selectPresetAmount(key, amount) {
+  customAmountActive[key] = false
+  paymentAmounts[key] = amount
+}
+
+function toggleCustomAmount(key) {
+  customAmountActive[key] = !customAmountActive[key]
+  if (customAmountActive[key]) {
+    // Clear the amount so user can enter fresh
+    paymentAmounts[key] = null
+  }
 }
 </script>
 

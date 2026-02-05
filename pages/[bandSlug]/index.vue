@@ -1040,12 +1040,31 @@
                       type="button"
                       class="px-3 py-2 rounded-md border border-white/20 text-white hover:bg-purple-900/40"
                       :class="{
-                        'bg-purple-900/60': Number(paymentAmountByKey[btn.key]) === Number(amt),
+                        'bg-purple-900/60': !customAmountActiveByKey[btn.key] && Number(paymentAmountByKey[btn.key]) === Number(amt),
                       }"
-                      @click="paymentAmountByKey[btn.key] = Number(amt)"
+                      @click="selectPresetAmount(btn.key, Number(amt))"
                     >
                       ${{ amt }}
                     </button>
+                    <button
+                      type="button"
+                      class="px-3 py-2 rounded-md border border-white/20 text-white hover:bg-purple-900/40"
+                      :class="{ 'bg-purple-900/60': customAmountActiveByKey[btn.key] }"
+                      @click="toggleCustomAmount(btn.key)"
+                    >
+                      + Custom
+                    </button>
+                  </div>
+                  <div v-if="customAmountActiveByKey[btn.key]" class="mt-3 flex items-center gap-2">
+                    <span class="text-white/80">$</span>
+                    <input
+                      v-model.number="paymentAmountByKey[btn.key]"
+                      type="number"
+                      step="1"
+                      min="1"
+                      placeholder="Enter amount"
+                      class="w-32 px-3 py-2 rounded-md bg-black border border-white/20 text-white"
+                    />
                   </div>
                 </div>
 
@@ -1286,6 +1305,7 @@ const paymentBannerDetail = ref("");
 const paymentError = ref("");
 const paymentLoadingKey = ref(null);
 const paymentAmountByKey = ref({});
+const customAmountActiveByKey = ref({});
 
 const merchError = ref("");
 const merchCheckoutLoadingIndex = ref(null);
@@ -1387,6 +1407,18 @@ function initPaymentDefaults() {
 function formatUsd(cents) {
   const n = Number(cents || 0);
   return `$${(n / 100).toFixed(2)}`;
+}
+
+function selectPresetAmount(key, amount) {
+  customAmountActiveByKey.value[key] = false;
+  paymentAmountByKey.value[key] = amount;
+}
+
+function toggleCustomAmount(key) {
+  customAmountActiveByKey.value[key] = !customAmountActiveByKey.value[key];
+  if (customAmountActiveByKey.value[key]) {
+    paymentAmountByKey.value[key] = null;
+  }
 }
 
 function isMerchSoldOut(index) {
