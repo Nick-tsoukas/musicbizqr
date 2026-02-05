@@ -78,8 +78,13 @@
                     class="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl opacity-40"
                     :style="{ backgroundColor: accentColor }"
                   ></div>
+                  <div 
+                    class="absolute -bottom-6 -left-6 w-16 h-16 rounded-full blur-2xl opacity-20"
+                    style="background-color: #10B981;"
+                  ></div>
                   <div class="relative z-10 h-full flex flex-col p-4 text-center">
-                    <div class="mb-2">
+                    <!-- Window label badge (only if has card data) -->
+                    <div v-if="item.windowLabel" class="mb-2">
                       <span 
                         class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
                         :style="previewBadgeStyle"
@@ -88,8 +93,8 @@
                       </span>
                     </div>
                     
-                    <!-- Band Image - Always show -->
-                    <div class="flex justify-center mb-3">
+                    <!-- Band Image - Always show (larger for band-only share) -->
+                    <div class="flex justify-center" :class="isBandShareOnly ? 'mb-4 mt-4' : 'mb-3'">
                       <div class="relative">
                         <div 
                           class="absolute inset-0 rounded-full blur-lg opacity-50"
@@ -97,7 +102,8 @@
                         ></div>
                         <div 
                           v-if="previewBandImageUrl"
-                          class="relative w-14 h-14 rounded-full overflow-hidden border-2 border-white/20"
+                          class="relative rounded-full overflow-hidden border-2 border-white/20"
+                          :class="isBandShareOnly ? 'w-20 h-20' : 'w-14 h-14'"
                         >
                           <img 
                             :src="previewBandImageUrl" 
@@ -107,20 +113,32 @@
                         </div>
                         <div 
                           v-else
-                          class="relative w-14 h-14 rounded-full flex items-center justify-center border-2 border-white/20"
+                          class="relative rounded-full flex items-center justify-center border-2 border-white/20"
+                          :class="isBandShareOnly ? 'w-20 h-20' : 'w-14 h-14'"
                           :style="{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)` }"
                         >
-                          <span class="text-white/70 text-base font-bold">{{ previewBandInitials }}</span>
+                          <span class="text-white/70 font-bold" :class="isBandShareOnly ? 'text-xl' : 'text-base'">{{ previewBandInitials }}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <h4 class="text-white text-xs font-bold mb-2 line-clamp-2">{{ item.title }}</h4>
-                    <div class="flex-1 flex items-center justify-center">
-                      <span class="text-2xl font-black" :style="previewHeroStyle">{{ item.primaryStat }}</span>
-                    </div>
-                    <p class="text-white/60 text-[9px] uppercase tracking-wide mb-2">{{ item.secondaryStat }}</p>
-                    <p v-if="!item.band?.isBandNameInLogo" class="text-white/80 text-[10px] font-medium">— {{ item.band?.name }} —</p>
+                    <!-- Band Share Only Layout -->
+                    <template v-if="isBandShareOnly">
+                      <h4 v-if="!item.band?.isBandNameInLogo" class="text-white text-sm font-bold mb-2">{{ item.band?.name }}</h4>
+                      <div class="flex-1"></div>
+                      <p class="text-white/60 text-[9px] uppercase tracking-wide mb-1">Scan • Listen • Follow</p>
+                      <p class="text-white/40 text-[8px]">via MusicBizQR</p>
+                    </template>
+                    
+                    <!-- Full Card Layout -->
+                    <template v-else>
+                      <h4 class="text-white text-xs font-bold mb-2 line-clamp-2">{{ item.title }}</h4>
+                      <div class="flex-1 flex items-center justify-center">
+                        <span class="text-2xl font-black" :style="previewHeroStyle">{{ item.primaryStat }}</span>
+                      </div>
+                      <p class="text-white/60 text-[9px] uppercase tracking-wide mb-2">{{ item.secondaryStat }}</p>
+                      <p v-if="!item.band?.isBandNameInLogo" class="text-white/80 text-[10px] font-medium">— {{ item.band?.name }} —</p>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -303,6 +321,11 @@ const captionVariants = [
 const accentColor = computed(() => {
   const accent = props.item?.accent || 'violet'
   return ACCENT_COLORS?.[accent]?.primary || '#8B5CF6'
+})
+
+// Check if this is a band-share-only (no card data like hero/proof stats)
+const isBandShareOnly = computed(() => {
+  return !props.item?.primaryStat && !props.item?.secondaryStat
 })
 
 // Band image URL for preview - normalize relative URLs
