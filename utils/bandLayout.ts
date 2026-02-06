@@ -97,6 +97,9 @@ export const DEFAULT_SOCIAL_ORDER = [
   'reddit',
   'pinterest',
   'linkedin',
+  'whatsapp',
+  'snapchat',
+  'patreon',
 ] as const;
 
 /**
