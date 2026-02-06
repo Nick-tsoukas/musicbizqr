@@ -2642,6 +2642,9 @@ const socialPlatforms = [
   { name: "reddit", iconify: "simple-icons:reddit", label: "Reddit" },
   { name: "pinterest", iconify: "simple-icons:pinterest", label: "Pinterest" },
   { name: "linkedin", iconify: "simple-icons:linkedin", label: "LinkedIn" },
+  { name: "whatsapp", iconify: "simple-icons:whatsapp", label: "WhatsApp" },
+  { name: "snapchat", iconify: "simple-icons:snapchat", label: "Snapchat" },
+  { name: "patreon", iconify: "simple-icons:patreon", label: "Patreon" },
 ];
 
 const eventHubPlatforms = [

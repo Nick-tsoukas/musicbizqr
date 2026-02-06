@@ -524,6 +524,8 @@ const socialPlatforms = [
   { name: 'reddit', iconify: 'simple-icons:reddit', label: 'Reddit', color: '#FF4500' },
   { name: 'pinterest', iconify: 'simple-icons:pinterest', label: 'Pinterest', color: '#E60023' },
   { name: 'linkedin', iconify: 'simple-icons:linkedin', label: 'LinkedIn', color: '#0A66C2' },
+  { name: 'whatsapp', iconify: 'simple-icons:whatsapp', label: 'WhatsApp', color: '#25D366' },
+  { name: 'snapchat', iconify: 'simple-icons:snapchat', label: 'Snapchat', color: '#FFFC00' },
   { name: 'patreon', iconify: 'simple-icons:patreon', label: 'Patreon', color: '#FF424D' },
 ]
 

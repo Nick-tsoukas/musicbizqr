@@ -941,6 +941,7 @@ const social = ref({
   linkedin: "",
   whatsapp: "",
   snapchat: "",
+  patreon: "",
 });
 const streaming = ref({
   youtube: "",

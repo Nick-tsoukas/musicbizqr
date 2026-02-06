@@ -366,7 +366,15 @@ const socialPlatforms = [
   { name: 'twitter', label: 'X', icon: twitterIcon },
   { name: 'facebook', label: 'Facebook', icon: facebookIcon },
   { name: 'twitch', label: 'Twitch', icon: twitchIcon },
-  { name: 'patreon', label: 'Patreon', iconify: 'simple-icons:patreon', color: '#FF424D' },
+  { name: 'threads', iconify: 'simple-icons:threads', label: 'Threads', color: '#FFFFFF' },
+  { name: 'discord', iconify: 'simple-icons:discord', label: 'Discord', color: '#5865F2' },
+  { name: 'telegram', iconify: 'simple-icons:telegram', label: 'Telegram', color: '#26A5E4' },
+  { name: 'reddit', iconify: 'simple-icons:reddit', label: 'Reddit', color: '#FF4500' },
+  { name: 'pinterest', iconify: 'simple-icons:pinterest', label: 'Pinterest', color: '#E60023' },
+  { name: 'linkedin', iconify: 'simple-icons:linkedin', label: 'LinkedIn', color: '#0A66C2' },
+  { name: 'whatsapp', iconify: 'simple-icons:whatsapp', label: 'WhatsApp', color: '#25D366' },
+  { name: 'snapchat', iconify: 'simple-icons:snapchat', label: 'Snapchat', color: '#FFFC00' },
+  { name: 'patreon', iconify: 'simple-icons:patreon', label: 'Patreon', color: '#FF424D' },
 ]
 
 const isLinkHidden = (name) => props.hiddenLinks.includes(name)
