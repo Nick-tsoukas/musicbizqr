@@ -35,9 +35,21 @@
         @share="openShareModal"
       >
         <template #audio-player>
-          <!-- Embedded Track -->
+          <!-- Elite Spotify Widget (new oEmbed flow) -->
+          <div v-if="isEliteSpotifyEmbed" class="w-full">
+            <EliteSpotifyEmbedWidget
+              :spotify-url="band.data.singlesong.spotifyUrl"
+              :title="band.data.singlesong.spotifyOembedTitle || band.data.singlesong.title"
+              :thumbnail-url="band.data.singlesong.spotifyOembedThumbnailUrl"
+              :type="band.data.singlesong.spotifyOembedType || 'track'"
+              :iframe-html="band.data.singlesong.spotifyOembedHtml"
+              :artist-name="band.data.name"
+            />
+          </div>
+
+          <!-- Legacy Embedded Track (iframe paste) -->
           <div
-            v-if="band.data.singlesong?.isEmbed && safeEmbedHtml"
+            v-else-if="band.data.singlesong?.isEmbed && safeEmbedHtml"
             class="w-full"
           >
             <div
@@ -234,9 +246,21 @@
         @share="shareDrawerOpen = true"
       >
         <template #audio-player>
-          <!-- Embedded Track -->
+          <!-- Elite Spotify Widget (new oEmbed flow) -->
+          <div v-if="isEliteSpotifyEmbed" class="w-full">
+            <EliteSpotifyEmbedWidget
+              :spotify-url="band.data.singlesong.spotifyUrl"
+              :title="band.data.singlesong.spotifyOembedTitle || band.data.singlesong.title"
+              :thumbnail-url="band.data.singlesong.spotifyOembedThumbnailUrl"
+              :type="band.data.singlesong.spotifyOembedType || 'track'"
+              :iframe-html="band.data.singlesong.spotifyOembedHtml"
+              :artist-name="band.data.name"
+            />
+          </div>
+
+          <!-- Legacy Embedded Track (iframe paste) -->
           <div
-            v-if="band.data.singlesong?.isEmbed && safeEmbedHtml"
+            v-else-if="band.data.singlesong?.isEmbed && safeEmbedHtml"
             class="w-full"
           >
             <div
@@ -488,9 +512,21 @@
             Featured Song
           </h2>
 
-          <!-- Embedded Track -->
+          <!-- Elite Spotify Widget (new oEmbed flow) -->
+          <div v-if="isEliteSpotifyEmbed" class="w-full">
+            <EliteSpotifyEmbedWidget
+              :spotify-url="band.data.singlesong.spotifyUrl"
+              :title="band.data.singlesong.spotifyOembedTitle || band.data.singlesong.title"
+              :thumbnail-url="band.data.singlesong.spotifyOembedThumbnailUrl"
+              :type="band.data.singlesong.spotifyOembedType || 'track'"
+              :iframe-html="band.data.singlesong.spotifyOembedHtml"
+              :artist-name="band.data.name"
+            />
+          </div>
+
+          <!-- Legacy Embedded Track (iframe paste) -->
           <div
-            v-if="band.data.singlesong.isEmbed && safeEmbedHtml"
+            v-else-if="band.data.singlesong.isEmbed && safeEmbedHtml"
             class="w-full"
           >
             <div
@@ -1241,6 +1277,7 @@ import LiveFeed from "@/components/smartlink/LiveFeed.vue";
 import ContinueChip from "@/components/smartlink/ContinueChip.vue";
 import FanToast from "@/components/smartlink/FanToast.vue";
 import SupportModule from "@/components/smartlink/SupportModule.vue";
+import EliteSpotifyEmbedWidget from "@/components/smartlink/EliteSpotifyEmbedWidget.vue";
 // V2 Components
 import MomentBadges from "@/components/smartlink/MomentBadges.vue";
 import ShowDayHeader from "@/components/smartlink/ShowDayHeader.vue";
@@ -2016,6 +2053,11 @@ const hasFeaturedSong = computed(() => {
   const s = band.value?.data?.singlesong;
   if (!s) return false;
 
+  // Elite Spotify embed (new oEmbed flow)
+  if (s.isEmbed && s.platform === 'spotify' && s.spotifyUrl && s.spotifyOembedHtml) {
+    return true;
+  }
+
   if (s.isEmbed) {
     // Only render if we truly have a valid iframe after sanitization
     return !!safeEmbedHtml.value;
@@ -2025,6 +2067,13 @@ const hasFeaturedSong = computed(() => {
   const nestedUrl = s?.song?.data?.attributes?.url;
   const directUrl = s?.song?.url;
   return !!(nestedUrl || directUrl);
+});
+
+// Check if this is an Elite Spotify embed (new oEmbed flow with metadata)
+const isEliteSpotifyEmbed = computed(() => {
+  const s = band.value?.data?.singlesong;
+  if (!s) return false;
+  return s.isEmbed && s.platform === 'spotify' && s.spotifyUrl && s.spotifyOembedHtml;
 });
 
 function handleFirstClick() {
@@ -2435,7 +2484,7 @@ async function fetchBandData() {
     `${api}/api/bands/slug/${encodeURIComponent(s)}` +
     `?populate[bandImg][fields][0]=url` +
     `&populate[singlevideo][fields][0]=youtubeid&populate[singlevideo][fields][1]=title` +
-    `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml` +
+    `&populate[singlesong][fields][0]=title&populate[singlesong][fields][1]=isEmbed&populate[singlesong][fields][2]=embedHtml&populate[singlesong][fields][3]=platform&populate[singlesong][fields][4]=spotifyUrl&populate[singlesong][fields][5]=spotifyOembedTitle&populate[singlesong][fields][6]=spotifyOembedThumbnailUrl&populate[singlesong][fields][7]=spotifyOembedType&populate[singlesong][fields][8]=spotifyOembedHtml` +
     `&populate[singlesong][populate][song][fields][0]=url&populate[singlesong][populate][cover][fields][0]=url` +
     `&populate[events][fields][0]=date&populate[events][fields][1]=slug&populate[events][fields][2]=city&populate[events][fields][3]=state&populate[events][fields][4]=venue`;
 

@@ -90,8 +90,19 @@
       <section v-if="hasFeaturedSong" class="space-y-2">
         <h3 class="text-white/50 text-xs font-semibold uppercase tracking-wider">Featured Song</h3>
         <slot name="audio-player">
+          <!-- Elite Spotify Widget (new oEmbed flow) -->
+          <div v-if="isEliteSpotifyEmbed">
+            <EliteSpotifyEmbedWidget
+              :spotify-url="band.singlesong.spotifyUrl"
+              :title="band.singlesong.spotifyOembedTitle || band.singlesong.title"
+              :thumbnail-url="band.singlesong.spotifyOembedThumbnailUrl"
+              :type="band.singlesong.spotifyOembedType || 'track'"
+              :iframe-html="band.singlesong.spotifyOembedHtml"
+              :artist-name="band.name"
+            />
+          </div>
           <!-- Default: Simple audio player if no slot content provided -->
-          <div v-if="!isEmbedSong && band.singlesong?.song?.url" class="bg-white/5 border border-white/10 rounded-xl p-4">
+          <div v-else-if="!isEmbedSong && band.singlesong?.song?.url" class="bg-white/5 border border-white/10 rounded-xl p-4">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
                 <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
@@ -109,7 +120,7 @@
               </button>
             </div>
           </div>
-          <!-- Embed song -->
+          <!-- Legacy Embed song -->
           <div v-else-if="isEmbedSong && safeEmbedHtml" class="rounded-xl overflow-hidden" v-html="safeEmbedHtml"></div>
         </slot>
       </section>
@@ -258,6 +269,7 @@ import ShowDayHeader from '~/components/smartlink/ShowDayHeader.vue'
 import NowBanner from '~/components/smartlink/NowBanner.vue'
 import ContinueChip from '~/components/smartlink/ContinueChip.vue'
 import LiveFeed from '~/components/smartlink/LiveFeed.vue'
+import EliteSpotifyEmbedWidget from '@/components/smartlink/EliteSpotifyEmbedWidget.vue'
 
 import facebookIcon from "@/assets/facebookfree.png"
 import instagramIcon from "@/assets/instagramfree.png"
@@ -379,6 +391,13 @@ const hasFeaturedSong = computed(() => {
 
 const isEmbedSong = computed(() => {
   return props.band.singlesong?.isEmbed === true
+})
+
+// Check if this is an Elite Spotify embed (new oEmbed flow with metadata)
+const isEliteSpotifyEmbed = computed(() => {
+  const s = props.band.singlesong
+  if (!s) return false
+  return s.isEmbed && s.platform === 'spotify' && s.spotifyUrl && s.spotifyOembedHtml
 })
 
 const safeEmbedHtml = computed(() => {

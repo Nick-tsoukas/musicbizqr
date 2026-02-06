@@ -418,24 +418,119 @@
 
             <!-- Embed Mode -->
             <div v-if="singlesongType === 'embed'" class="space-y-4">
+              <!-- Platform Selector -->
               <div class="form-field">
-                <label for="singlesong-embedhtml" class="form-label">Embed Code</label>
-                <textarea
-                  id="singlesong-embedhtml"
-                  v-model="singlesongEmbedHtml"
-                  class="form-input form-textarea font-mono text-sm"
-                  rows="5"
-                  placeholder="Paste your iframe embed code here..."
-                ></textarea>
+                <label for="singlesong-platform" class="form-label">Platform</label>
+                <div class="relative">
+                  <select
+                    id="singlesong-platform"
+                    v-model="singlesongPlatform"
+                    class="w-full px-4 py-3 pr-10 rounded-xl bg-[#1a1a2e] border border-white/10 text-white appearance-none cursor-pointer focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition duration-200"
+                  >
+                    <option value="" class="bg-[#1a1a2e] text-white/50">Select platform...</option>
+                    <option value="spotify" class="bg-[#1a1a2e] text-white">🎵 Spotify</option>
+                    <option value="appleMusic" class="bg-[#1a1a2e] text-white">🍎 Apple Music</option>
+                    <option value="youtube" class="bg-[#1a1a2e] text-white">▶️ YouTube</option>
+                    <option value="soundcloud" class="bg-[#1a1a2e] text-white">☁️ SoundCloud</option>
+                    <option value="bandcamp" class="bg-[#1a1a2e] text-white">🎸 Bandcamp</option>
+                    <option value="deezer" class="bg-[#1a1a2e] text-white">🎧 Deezer</option>
+                    <option value="mixcloud" class="bg-[#1a1a2e] text-white">🎚️ Mixcloud</option>
+                    <option value="audiomack" class="bg-[#1a1a2e] text-white">🔊 Audiomack</option>
+                  </select>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
-              <button
-                v-if="singlesongEmbedHtml"
-                type="button"
-                @click="deleteSong"
-                class="text-red-400 hover:text-red-300 text-sm transition"
-              >
-                Clear embed code
-              </button>
+
+              <!-- Spotify Elite Flow -->
+              <div v-if="singlesongPlatform === 'spotify'" class="space-y-4">
+                <div class="form-field">
+                  <label for="spotify-url" class="form-label">Spotify Link</label>
+                  <p class="text-white/50 text-xs mb-2">Paste a track, album, playlist, or artist URL</p>
+                  <div class="relative">
+                    <input
+                      id="spotify-url"
+                      type="text"
+                      v-model="spotifyUrlInput"
+                      class="form-input w-full pr-10"
+                      placeholder="https://open.spotify.com/track/..."
+                    />
+                    <div v-if="spotifyOembedLoading" class="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div class="w-5 h-5 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Spotify oEmbed Error -->
+                <div v-if="spotifyOembedError" class="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                  {{ spotifyOembedError }}
+                </div>
+
+                <!-- Spotify Preview -->
+                <div v-if="spotifyOembedData" class="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+                  <div class="p-4 border-b border-white/10">
+                    <div class="flex items-center gap-2 text-green-400 text-xs font-medium mb-2">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                      </svg>
+                      <span class="uppercase tracking-wider">{{ spotifyOembedData.type }}</span>
+                    </div>
+                    <h4 class="text-white font-semibold">{{ spotifyOembedData.title }}</h4>
+                  </div>
+                  <div class="flex">
+                    <img
+                      v-if="spotifyOembedData.thumbnailUrl"
+                      :src="spotifyOembedData.thumbnailUrl"
+                      :alt="spotifyOembedData.title"
+                      class="w-24 h-24 object-cover"
+                    />
+                    <div class="flex-1 p-4 flex items-center">
+                      <span class="text-green-400 text-sm">✓ Ready to save</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Clear Spotify -->
+                <button
+                  v-if="spotifyOembedData || spotifyUrlInput"
+                  type="button"
+                  @click="clearSpotifyEmbed"
+                  class="text-red-400 hover:text-red-300 text-sm transition"
+                >
+                  Clear Spotify embed
+                </button>
+              </div>
+
+              <!-- Non-Spotify: Legacy iframe paste -->
+              <div v-else-if="singlesongPlatform && singlesongPlatform !== 'spotify'" class="space-y-4">
+                <div class="form-field">
+                  <label for="singlesong-embedhtml" class="form-label">Embed Code</label>
+                  <p class="text-white/50 text-xs mb-2">Paste the iframe embed code from {{ singlesongPlatform }}</p>
+                  <textarea
+                    id="singlesong-embedhtml"
+                    v-model="singlesongEmbedHtml"
+                    class="form-input form-textarea font-mono text-sm"
+                    rows="5"
+                    placeholder="Paste your iframe embed code here..."
+                  ></textarea>
+                </div>
+                <button
+                  v-if="singlesongEmbedHtml"
+                  type="button"
+                  @click="deleteSong"
+                  class="text-red-400 hover:text-red-300 text-sm transition"
+                >
+                  Clear embed code
+                </button>
+              </div>
+
+              <!-- No platform selected hint -->
+              <div v-else class="p-4 rounded-xl border border-white/10 bg-white/5 text-white/50 text-sm text-center">
+                Select a platform above to add an embedded player
+              </div>
             </div>
           </div>
         </section>
@@ -1538,6 +1633,79 @@ const singlesongFileId = ref(null); // preserve existing file relation
 const existingSongFilename = ref(""); // store the existing song filename
 const songInputKey = ref(0); // key to reset file input
 
+// Spotify oEmbed state
+const spotifyUrlInput = ref("");
+const spotifyOembedLoading = ref(false);
+const spotifyOembedError = ref("");
+const spotifyOembedData = ref(null); // { spotifyUrl, type, title, thumbnailUrl, html }
+
+// Auto-fetch debounce timer
+let spotifyFetchTimeout = null;
+
+// Check if URL looks like a valid Spotify URL
+function isValidSpotifyUrl(url) {
+  if (!url) return false;
+  return url.startsWith('https://open.spotify.com/') && 
+    (url.includes('/track/') || url.includes('/album/') || url.includes('/playlist/') || url.includes('/artist/'));
+}
+
+// Watch for Spotify URL changes and auto-fetch
+watch(spotifyUrlInput, (newUrl) => {
+  // Clear any pending fetch
+  if (spotifyFetchTimeout) {
+    clearTimeout(spotifyFetchTimeout);
+    spotifyFetchTimeout = null;
+  }
+  
+  // Clear previous data/error when URL changes
+  spotifyOembedError.value = "";
+  
+  // If URL is valid, auto-fetch after a short delay
+  if (isValidSpotifyUrl(newUrl)) {
+    spotifyFetchTimeout = setTimeout(() => {
+      fetchSpotifyOembed();
+    }, 500); // 500ms debounce
+  }
+});
+
+async function fetchSpotifyOembed() {
+  if (!spotifyUrlInput.value) return;
+  if (!isValidSpotifyUrl(spotifyUrlInput.value)) {
+    spotifyOembedError.value = "Please enter a valid Spotify URL";
+    return;
+  }
+  
+  spotifyOembedLoading.value = true;
+  spotifyOembedError.value = "";
+  spotifyOembedData.value = null;
+  
+  try {
+    const res = await $fetch(`/api/spotify/oembed`, {
+      query: { url: spotifyUrlInput.value }
+    });
+    
+    if (res.ok) {
+      spotifyOembedData.value = res;
+      // Auto-fill title if empty
+      if (!singlesongTitle.value && res.title) {
+        singlesongTitle.value = res.title;
+      }
+    } else {
+      spotifyOembedError.value = "Failed to fetch Spotify data";
+    }
+  } catch (err) {
+    spotifyOembedError.value = err.data?.message || err.message || "Failed to fetch Spotify data";
+  } finally {
+    spotifyOembedLoading.value = false;
+  }
+}
+
+function clearSpotifyEmbed() {
+  spotifyUrlInput.value = "";
+  spotifyOembedData.value = null;
+  spotifyOembedError.value = "";
+}
+
 const singlevideoYoutubeUrl = ref("");
 
 // Clear the song fields and mark for removal on Save
@@ -1547,11 +1715,15 @@ function deleteSong() {
   singlesongTitle.value = "";
   singlesongPlatform.value = "";
   singlesongTrackId.value = "";
-  singlesongEmbedHtml.value = ""; // NEW
+  singlesongEmbedHtml.value = "";
   singlesongFile.value = null;
   singlesongFileId.value = null;
   existingSongFilename.value = "";
-  songInputKey.value++; // reset file input
+  songInputKey.value++;
+  // Clear Spotify oEmbed state
+  spotifyUrlInput.value = "";
+  spotifyOembedData.value = null;
+  spotifyOembedError.value = "";
 }
 
 // Clear the video field and mark for removal on Save
@@ -1656,17 +1828,29 @@ async function fetchBand() {
       singlesongTitle.value = ss.title || "";
       if (ss.isEmbed) {
         singlesongType.value = "embed";
-        // legacy (keep reading in case old data exists)
         singlesongPlatform.value = ss.platform || "";
         singlesongTrackId.value = ss.trackId || "";
-        // NEW: load raw embed code if present
         singlesongEmbedHtml.value = ss.embedHtml || "";
+        
+        // Load Spotify oEmbed data if present
+        if (ss.platform === "spotify" && ss.spotifyUrl) {
+          spotifyUrlInput.value = ss.spotifyUrl || "";
+          spotifyOembedData.value = {
+            spotifyUrl: ss.spotifyUrl,
+            type: ss.spotifyOembedType || "track",
+            title: ss.spotifyOembedTitle || "",
+            thumbnailUrl: ss.spotifyOembedThumbnailUrl || "",
+            html: ss.spotifyOembedHtml || ""
+          };
+        } else if (!ss.platform && ss.embedHtml && ss.embedHtml.includes("open.spotify.com")) {
+          // Legacy Spotify embed - detect and set platform
+          singlesongPlatform.value = "spotify";
+        }
       } else {
         singlesongType.value = "upload";
       }
       const songFile = ss.song?.data || ss.song;
       singlesongFileId.value = songFile?.id || null;
-      // Store existing song filename for display
       existingSongFilename.value = songFile?.attributes?.name || songFile?.name || "";
     }
 
@@ -1816,17 +2000,24 @@ async function submitForm() {
     let singlesongPayload = null;
     if (!removeSong.value) {
       const isEmbed = singlesongType.value === "embed";
-      const embedHtml = isEmbed ? (singlesongEmbedHtml.value || "").trim() : "";
+      const isSpotify = isEmbed && singlesongPlatform.value === "spotify";
+      const embedHtml = isEmbed && !isSpotify ? (singlesongEmbedHtml.value || "").trim() : "";
 
       singlesongPayload = {
         title: singlesongTitle.value || "",
         isEmbed,
-        // Prefer raw embed HTML. If present, we ignore platform/trackId.
-        embedHtml: isEmbed ? embedHtml || null : null,
-        platform:
-          isEmbed && !embedHtml ? singlesongPlatform.value || null : null, // legacy fallback
-        trackId: isEmbed && !embedHtml ? singlesongTrackId.value || null : null, // legacy fallback
-        embedUrl: null, // no builder anymore
+        platform: isEmbed ? singlesongPlatform.value || null : null,
+        // For non-Spotify embeds, use embedHtml
+        embedHtml: isEmbed && !isSpotify ? embedHtml || null : null,
+        // For Spotify, use oEmbed data
+        spotifyUrl: isSpotify && spotifyOembedData.value ? spotifyOembedData.value.spotifyUrl : null,
+        spotifyOembedTitle: isSpotify && spotifyOembedData.value ? spotifyOembedData.value.title : null,
+        spotifyOembedThumbnailUrl: isSpotify && spotifyOembedData.value ? spotifyOembedData.value.thumbnailUrl : null,
+        spotifyOembedType: isSpotify && spotifyOembedData.value ? spotifyOembedData.value.type : null,
+        spotifyOembedHtml: isSpotify && spotifyOembedData.value ? spotifyOembedData.value.html : null,
+        // Legacy fields
+        trackId: null,
+        embedUrl: null,
         song: !isEmbed ? newSongId || singlesongFileId.value || null : null,
       };
     }

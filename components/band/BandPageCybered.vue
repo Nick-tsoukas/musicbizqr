@@ -102,8 +102,20 @@
             <!-- Only show heading for direct audio files, not embeds -->
             <h3 v-if="!isEmbedSong" class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Featured Song</h3>
             
-            <!-- Embedded player (Spotify, SoundCloud, etc.) - no extra heading/title -->
-            <div v-if="isEmbedSong && embedHtml" class="rounded-xl overflow-hidden">
+            <!-- Elite Spotify Widget (new oEmbed flow) -->
+            <div v-if="isEliteSpotifyEmbed">
+              <EliteSpotifyEmbedWidget
+                :spotify-url="band.singlesong.spotifyUrl"
+                :title="band.singlesong.spotifyOembedTitle || band.singlesong.title"
+                :thumbnail-url="band.singlesong.spotifyOembedThumbnailUrl"
+                :type="band.singlesong.spotifyOembedType || 'track'"
+                :iframe-html="band.singlesong.spotifyOembedHtml"
+                :artist-name="band.name"
+              />
+            </div>
+
+            <!-- Legacy Embedded player (Spotify, SoundCloud, etc.) - no extra heading/title -->
+            <div v-else-if="isEmbedSong && embedHtml" class="rounded-xl overflow-hidden">
               <div class="w-full" v-html="embedHtml" />
             </div>
             
@@ -349,6 +361,7 @@ import NowBanner from '@/components/smartlink/NowBanner.vue'
 import ContinueChip from '@/components/smartlink/ContinueChip.vue'
 import LiveFeed from '@/components/smartlink/LiveFeed.vue'
 import SupportModule from '@/components/smartlink/SupportModule.vue'
+import EliteSpotifyEmbedWidget from '@/components/smartlink/EliteSpotifyEmbedWidget.vue'
 
 // Streaming icons (existing platforms only - new ones use iconify)
 import youtubeIcon from '@/assets/youtube-icon.svg'
@@ -418,6 +431,13 @@ const songTitle = computed(() => props.band.singlesong?.title || 'Featured Track
 const songCoverUrl = computed(() => props.band.singlesong?.cover?.url || props.band.bandImg?.url || null)
 const isEmbedSong = computed(() => !!props.band.singlesong?.isEmbed)
 const embedHtml = computed(() => props.band.singlesong?.embedHtml || null)
+
+// Check if this is an Elite Spotify embed (new oEmbed flow with metadata)
+const isEliteSpotifyEmbed = computed(() => {
+  const s = props.band.singlesong
+  if (!s) return false
+  return s.isEmbed && s.platform === 'spotify' && s.spotifyUrl && s.spotifyOembedHtml
+})
 const songUrl = computed(() => {
   // Get the song file URL for playback (matches formatSingleSong logic)
   const song = props.band.singlesong
