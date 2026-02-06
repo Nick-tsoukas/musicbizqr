@@ -112,7 +112,7 @@
                 :iframe-html="band.singlesong.spotifyOembedHtml"
                 :artist-name="band.name"
                 @spotify-click="(e) => $emit('link-click', { name: 'spotify_embed_click', url: e.url })"
-                @spotify-play="(e) => $emit('link-click', { name: 'spotify_embed_play', url: e.url })"
+                @spotify-play="$emit('media-play', { type: 'song', title: 'Spotify Embed Play' })"
               />
             </div>
 
@@ -394,6 +394,7 @@ const emit = defineEmits([
   'play-song',
   'play-video',
   'link-click',
+  'media-play',
   'view-event',
   'quick-tip',
   'follow',

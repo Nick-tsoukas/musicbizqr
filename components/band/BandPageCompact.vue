@@ -100,7 +100,7 @@
               :iframe-html="band.singlesong.spotifyOembedHtml"
               :artist-name="band.name"
               @spotify-click="(e) => $emit('link-click', { name: 'spotify_embed_click', url: e.url })"
-              @spotify-play="(e) => $emit('link-click', { name: 'spotify_embed_play', url: e.url })"
+              @spotify-play="$emit('media-play', { type: 'song', title: 'Spotify Embed Play' })"
             />
           </div>
           <!-- Default: Simple audio player if no slot content provided -->
@@ -351,7 +351,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['play-song', 'link-click', 'view-event', 'quick-tip', 'follow', 'share'])
+defineEmits(['play-song', 'link-click', 'media-play', 'view-event', 'quick-tip', 'follow', 'share'])
 
 const streamingPlatforms = [
   { name: 'spotify', label: 'Spotify', icon: spotifyIcon, colorClass: 'bg-[#1DB954]/10 border-[#1DB954]/30 hover:bg-[#1DB954]/20' },

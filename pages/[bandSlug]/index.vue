@@ -45,7 +45,7 @@
               :iframe-html="band.data.singlesong.spotifyOembedHtml"
               :artist-name="band.data.name"
               @spotify-click="(e) => handleClick(band.data.id, 'spotify_embed_click', e.url)"
-              @spotify-play="(e) => handleClick(band.data.id, 'spotify_embed_play', e.url)"
+              @spotify-play="() => trackMediaPlay(band.data.id, 'song', 'Spotify Embed Play')"
             />
           </div>
 
@@ -258,7 +258,7 @@
               :iframe-html="band.data.singlesong.spotifyOembedHtml"
               :artist-name="band.data.name"
               @spotify-click="(e) => handleClick(band.data.id, 'spotify_embed_click', e.url)"
-              @spotify-play="(e) => handleClick(band.data.id, 'spotify_embed_play', e.url)"
+              @spotify-play="() => trackMediaPlay(band.data.id, 'song', 'Spotify Embed Play')"
             />
           </div>
 
@@ -526,7 +526,7 @@
               :iframe-html="band.data.singlesong.spotifyOembedHtml"
               :artist-name="band.data.name"
               @spotify-click="(e) => handleClick(band.data.id, 'spotify_embed_click', e.url)"
-              @spotify-play="(e) => handleClick(band.data.id, 'spotify_embed_play', e.url)"
+              @spotify-play="() => trackMediaPlay(band.data.id, 'song', 'Spotify Embed Play')"
             />
           </div>
 
