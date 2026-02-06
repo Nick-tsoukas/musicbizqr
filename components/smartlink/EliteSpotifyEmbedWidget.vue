@@ -69,7 +69,7 @@
     <div v-else class="rounded-xl overflow-hidden border border-green-500/30">
       <!-- Iframe container -->
       <div class="w-full" :style="{ height: iframeHeight }">
-        <div v-html="iframeHtml" class="w-full h-full" />
+        <div v-html="sanitizedIframeHtml" class="w-full h-full" />
       </div>
     </div>
   </div>
@@ -158,6 +158,16 @@ const iframeHeight = computed(() => {
     default:
       return '152px'
   }
+})
+
+// Sanitize iframe HTML to prevent Spotify from opening external links
+const sanitizedIframeHtml = computed(() => {
+  if (!props.iframeHtml) return ''
+  // Add sandbox attribute to prevent navigation while allowing scripts for playback
+  return props.iframeHtml.replace(
+    /<iframe/gi,
+    '<iframe sandbox="allow-scripts allow-same-origin"'
+  )
 })
 </script>
 

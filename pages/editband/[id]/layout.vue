@@ -159,6 +159,37 @@
         </div>
       </div>
 
+      <!-- Event Hubs Order -->
+      <div class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Event Hubs Order</h2>
+        <p class="text-white/50 text-sm mb-4">
+          Drag to reorder how event hub platforms appear on your page.
+        </p>
+
+        <div class="space-y-2">
+          <div
+            v-for="(platformId, index) in localEventHubOrder"
+            :key="platformId"
+            class="flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/5"
+            draggable="true"
+            @dragstart="onDragStart($event, index, 'eventHubs')"
+            @dragover.prevent="onDragOver($event, index, 'eventHubs')"
+            @drop="onDrop($event, index, 'eventHubs')"
+            @dragend="onDragEnd"
+          >
+            <div class="cursor-grab text-white/40 hover:text-white/70 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+              </svg>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="text-white font-medium capitalize">{{ getEventHubLabel(platformId) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Preview Link -->
       <div class="border-t border-white/10 pt-6">
         <NuxtLink
@@ -209,6 +240,7 @@ const bandName = ref('');
 const localSections = ref([]);
 const localStreamingOrder = ref([]);
 const localSocialOrder = ref([]);
+const localEventHubOrder = ref([]);
 
 const dragState = ref({
   type: null,
@@ -252,6 +284,13 @@ const socialLabels = {
   patreon: 'Patreon',
 };
 
+const eventHubLabels = {
+  bandsintown: 'Bandsintown',
+  songkick: 'Songkick',
+  jambase: 'JamBase',
+  relix: 'Relix',
+};
+
 const isDefault = computed(() => {
   const currentConfig = {
     version: 1,
@@ -259,6 +298,7 @@ const isDefault = computed(() => {
     buttons: {
       streaming: [...localStreamingOrder.value],
       social: [...localSocialOrder.value],
+      eventHubs: [...localEventHubOrder.value],
     },
   };
   return isDefaultConfig(currentConfig);
@@ -274,6 +314,10 @@ function getStreamingLabel(id) {
 
 function getSocialLabel(id) {
   return socialLabels[id] || id;
+}
+
+function getEventHubLabel(id) {
+  return eventHubLabels[id] || id;
 }
 
 function onDragStart(event, index, type) {
@@ -299,6 +343,8 @@ function onDrop(event, toIndex, type) {
     arr = localStreamingOrder.value;
   } else if (type === 'social') {
     arr = localSocialOrder.value;
+  } else if (type === 'eventHubs') {
+    arr = localEventHubOrder.value;
   }
 
   const item = arr.splice(fromIndex, 1)[0];
@@ -327,6 +373,7 @@ async function fetchBand() {
     localSections.value = normalized.sections.map((s) => ({ ...s }));
     localStreamingOrder.value = [...normalized.buttons.streaming];
     localSocialOrder.value = [...normalized.buttons.social];
+    localEventHubOrder.value = [...normalized.buttons.eventHubs];
   } catch (err) {
     console.error('[layout] fetch error', err);
     error.value = 'Failed to load band data. Please try again.';
@@ -347,6 +394,7 @@ async function saveLayout() {
       buttons: {
         streaming: localStreamingOrder.value,
         social: localSocialOrder.value,
+        eventHubs: localEventHubOrder.value,
       },
     });
 
@@ -400,6 +448,7 @@ async function resetToDefault() {
     localSections.value = normalized.sections.map((s) => ({ ...s }));
     localStreamingOrder.value = [...normalized.buttons.streaming];
     localSocialOrder.value = [...normalized.buttons.social];
+    localEventHubOrder.value = [...normalized.buttons.eventHubs];
 
     saveSuccess.value = true;
     setTimeout(() => {

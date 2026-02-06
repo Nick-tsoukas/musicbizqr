@@ -334,6 +334,7 @@ export function createSaveableConfig(config: LayoutConfig): LayoutConfig {
     buttons: {
       streaming: [...config.buttons.streaming],
       social: [...config.buttons.social],
+      eventHubs: [...config.buttons.eventHubs],
     },
   };
 }
@@ -372,6 +373,16 @@ export function isDefaultConfig(config: LayoutConfig): boolean {
   }
   for (let i = 0; i < config.buttons.social.length; i++) {
     if (config.buttons.social[i] !== DEFAULT_LAYOUT.buttons.social[i]) {
+      return false;
+    }
+  }
+
+  // Check event hub buttons order
+  if (config.buttons.eventHubs.length !== DEFAULT_LAYOUT.buttons.eventHubs.length) {
+    return false;
+  }
+  for (let i = 0; i < config.buttons.eventHubs.length; i++) {
+    if (config.buttons.eventHubs[i] !== DEFAULT_LAYOUT.buttons.eventHubs[i]) {
       return false;
     }
   }
