@@ -220,11 +220,20 @@ const streamingLabels = {
   youtubeMusic: 'YouTube Music',
   spotify: 'Spotify',
   appleMusic: 'Apple Music',
-  reverbnation: 'Reverbnation',
+  amazonMusic: 'Amazon Music',
+  tidal: 'TIDAL',
+  pandora: 'Pandora',
   soundcloud: 'SoundCloud',
+  audiomack: 'Audiomack',
   bandcamp: 'Bandcamp',
-  twitch: 'Twitch',
   deezer: 'Deezer',
+  mixcloud: 'Mixcloud',
+  beatport: 'Beatport',
+  napster: 'Napster',
+  twitch: 'Twitch',
+  vimeo: 'Vimeo',
+  kick: 'Kick',
+  reverbnation: 'Reverbnation',
 };
 
 const socialLabels = {
@@ -232,6 +241,15 @@ const socialLabels = {
   instagram: 'Instagram',
   twitter: 'Twitter / X',
   tiktok: 'TikTok',
+  threads: 'Threads',
+  discord: 'Discord',
+  telegram: 'Telegram',
+  reddit: 'Reddit',
+  pinterest: 'Pinterest',
+  linkedin: 'LinkedIn',
+  whatsapp: 'WhatsApp',
+  snapchat: 'Snapchat',
+  patreon: 'Patreon',
 };
 
 const isDefault = computed(() => {
