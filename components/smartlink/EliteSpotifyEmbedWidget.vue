@@ -46,6 +46,7 @@
           rel="noopener noreferrer"
           class="w-9 h-9 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-400 hover:scale-105 text-black transition-all"
           title="Open in Spotify"
+          @click="handleSpotifyClick"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -53,7 +54,7 @@
         </a>
         <button
           type="button"
-          @click="showPlayer = true"
+          @click="handlePlayClick"
           class="h-9 px-4 flex items-center justify-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-all border border-white/10 hover:border-green-500/30"
         >
           <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -105,7 +106,18 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['spotify-click', 'spotify-play'])
+
 const showPlayer = ref(false)
+
+function handleSpotifyClick() {
+  emit('spotify-click', { url: props.spotifyUrl, type: props.type })
+}
+
+function handlePlayClick() {
+  showPlayer.value = true
+  emit('spotify-play', { url: props.spotifyUrl, type: props.type })
+}
 
 const typeLabel = computed(() => {
   switch (props.type) {
